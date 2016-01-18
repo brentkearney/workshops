@@ -1,0 +1,9 @@
+# Rename to config.yml and customize
+default:
+  legacy_person: 'https://www.example.com/db/?section=Updates&sub=person&id='
+  events: 'http://www.example.com/events'
+  title: 'Workshop Manager'
+  logo_file: 'logo.png'
+
+development:
+  title: 'Workshops Development Mode'

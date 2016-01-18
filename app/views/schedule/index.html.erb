@@ -1,0 +1,84 @@
+<article>
+  <% if @event.nil? %>
+      <div class="row event-not-found">
+        <div class="col-lg-6">
+          <div class="panel panel-default">
+            <div class="panel-heading table-heading">
+              Event not found.
+            </div>
+            <div class="panel-body">
+              <p>Sorry, there is no record of that event here. Maybe you will find it on the website:</p>
+              <p><%= link_to Global.config.events %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+  <% else %>
+    <% @event.days.each do |day| %>
+      <div class="row day-table<%= ' first-day' if day == @event.days.first %>">
+        <div class="col-lg-12">
+          <div class="panel panel-default">
+            <div class="panel-heading table-heading">
+              <%= fa_icon 'calendar-times-o' %> <%= day.strftime("%A, %b %e") %>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body panel-schedule">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover members-list">
+                  <tbody>
+                  <%= render partial: 'schedule_index_items', locals: { day: day } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+              <% if policy(@schedule_policy).create? %>
+                  <div class="add-item-buttons">
+                  <%= link_to "Add an item on " + day.strftime("%A"), event_schedule_day_path(@event, day.strftime("%Y-%m-%d")), class: 'btn btn-sm btn-default add-item' %>
+                  </div>
+              <% end %>
+            </div>
+            <!-- /.panel-body -->
+          </div>
+          <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-12 -->
+      </div>
+      <!-- /.row -->
+    <% end %>
+  <% end %>
+
+  <% if policy(Schedule.new(event: @event)).publish_schedule? %>
+  <div class="row bottom-buttons">
+    <div class="col-md-6">
+      <div class="well publish_schedule_controls">
+        <div id="event-code"><%= @event.code %></div>
+        <span class="publish_schedule_text">
+          Publish This Schedule:
+          <%= check_box_tag(:publish_schedule, @event.publish_schedule, @event.publish_schedule) %>
+        </span>
+      </div>
+      <!-- /.well -->
+    </div>
+    <!-- /.col-md-6 -->
+    <div class="col-md-6">
+      <div class="well publish_schedule_controls">
+        <span class="print_schedule">
+          <%= link_to '<i class="fa fa-print fa-fw"></i> Print this Schedule'.html_safe, '#print', id: 'print-button', class: 'btn btn-default' %>
+        </span>
+      </div>
+      <!-- /.well -->
+    </div>
+    <!-- /.col-md-6 -->
+  </div>
+  <!-- /.row -->
+  <% end %>
+
+  <% if user_signed_in? && @event.location == 'CMO' %>
+  <div class="row" id="send_video_button">
+    <div class="col-md-3 col-md-offset-9">
+    <%= link_to "Send Video Filenames to #{@event.location}", event_schedule_send_videos_path(@event), class: 'btn btn-sm btn-default add-item' %>
+    </div>
+  </div>
+  <!-- /.row -->
+  <% end %>
+</article>

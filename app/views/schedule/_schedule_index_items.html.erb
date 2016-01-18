@@ -1,0 +1,17 @@
+<% @schedules.select {|s| s.start_time.strftime("%Y%m%d") == day.strftime("%Y%m%d") }.sort_by(&:start_time).each do |item| %>
+    <tr>
+      <td width="30"><%= item[:start_time].strftime("%H:%M") %></td>
+      <td width="30"><%= item[:end_time].strftime("%H:%M") %></td>
+      <td>
+        <%= schedule_link(item) %>
+        <span class="location">(<%= item[:location] %>)</span>
+      </td>
+      <% if policy(item).destroy? %>
+      <td width="5">
+        <div class="delete-item-buttons">
+        <%= link_to '<span class="glyphicon glyphicon-remove"></span>'.html_safe, event_schedule_path(@event, item), title: "Delete this item", method: :delete, data: { confirm: "Are you sure you want to delete \"#{item.name}\"?" } %>
+        </div>
+      </td>
+      <% end %>
+    </tr>
+<% end %>

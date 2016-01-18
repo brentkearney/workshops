@@ -1,0 +1,44 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Event:</strong>
+  <%= @schedule.event %>
+</p>
+
+<p>
+  <strong>Lecture:</strong>
+  <%= @schedule.lecture_id %>
+</p>
+
+<p>
+  <strong>Start time:</strong>
+  <%= @schedule.start_time %>
+</p>
+
+<p>
+  <strong>End time:</strong>
+  <%= @schedule.end_time %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @schedule.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @schedule.description %>
+</p>
+
+<p>
+  <strong>Location:</strong>
+  <%= @schedule.location %>
+</p>
+
+<p>
+  <strong>Updated by:</strong>
+  <%= @schedule.updated_by %>
+</p>
+
+<%= link_to 'Edit', edit_schedule_path(@event, @schedule) %> |
+<%= link_to 'Back', schedules_path %>

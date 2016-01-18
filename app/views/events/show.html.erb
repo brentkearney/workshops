@@ -1,0 +1,121 @@
+<article>
+  <% if @event.nil? %>
+      <div class="row event-not-found">
+        <div class="col-lg-6">
+          <div class="panel panel-default">
+            <div class="panel-heading table-heading">
+              Event not found.
+            </div>
+            <div class="panel-body">
+              <p>Sorry, there is no record of that event here. You might find it on the website:</p>
+              <p><%= link_to Global.config.events %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.row -->
+  <% else %>
+    <div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading table-heading">
+        <%= @event.code %> Event Details
+      </div>
+      <!-- /.panel-heading -->
+      <div class="panel-body">
+        <div class="table-responsive">
+          <table class="table">
+            <tbody>
+            <tr>
+              <td align="right" width="140">Event Code:</td>
+              <td><%= @event.code %></td>
+            </tr>
+            <tr>
+              <td align="right">Event Name:</td>
+              <td><%= @event.name %></td>
+            </tr>
+            <% if policy(@event).view_details? %>
+              <% unless @event.short_name.blank? %>
+                <tr>
+                  <td align="right">Short name:</td>
+                  <td><%= @event.short_name %></td>
+                </tr>
+              <% end %>
+              <% unless @event.door_code.blank? %>
+                <tr>
+                  <td align="right">Door Access Code:</td>
+                  <td><%= @event.door_code %></td>
+                </tr>
+              <% end %>
+              <% if policy(@event).event_staff? %>
+                <tr>
+                  <td align="right">Booking Code:</td>
+                  <td><%= @event.booking_code %></td>
+                </tr>
+              <% end %>
+                <tr>
+                  <td align="right">Max participants:</td>
+                  <td><%= @event.max_participants %></td>
+                </tr>
+            <% end %>
+            <tr>
+              <td align="right">Location / TZ:</td>
+              <td><%= @event.location %> / <%= @event.time_zone %></td>
+            </tr>
+            <tr>
+              <td align="right">Start Date:</td>
+              <td><%= @event.arrival_date %></td>
+            </tr>
+            <tr>
+              <td align="right">End Date:</td>
+              <td><%= @event.departure_date %></td>
+            </tr>
+            <tr>
+              <td align="right">Event type:</td>
+              <td><%= @event.event_type %></td>
+            </tr>
+            <tr>
+              <td align="right">Description:</td><br />
+              <td><%= simple_format(get_description) %></td>
+            </tr>
+            <% if policy(@event).view_details? %>
+              <tr>
+                <td align="right">Last updated:</td><br />
+                <td>
+                  <% if @event.updated_by.blank? %>
+                      <em>Unknown</em>
+                  <% else %>
+                      by <%= @event.updated_by %> on <%= @event.updated_at %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+        <!-- /.table-responsive -->
+      </div>
+      <!-- /.panel-body -->
+    </div>
+    <!-- /.panel -->
+
+    <% if user_signed_in? && policy(@event).edit? %>
+    <div class="row buttons">
+      <div class="form-group">
+      <%= link_to 'Edit Event', edit_event_path(@event), class: 'btn btn-sm btn-default' %>
+      </div>
+    </div>
+    <% else %>
+        <div class="row buttons">
+          <div class="form-group">
+            <%= link_to 'Event Schedule', event_schedule_index_path(@event), class: 'btn btn-sm btn-default' %>
+          </div>
+        </div>
+    <% end %>
+  </div>
+  <!-- /.col-lg-12 -->
+  </div>
+    <!-- /.row -->
+  <% end %>
+
+</article>

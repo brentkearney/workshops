@@ -1,0 +1,17 @@
+Dear <%= @resource.person.dear_name %>,
+
+You are invited to use "Workshops", online software for managing your workshop
+schedule and viewing your workshop participants. Please set a password at:
+
+<%= accept_invitation_url(@resource, :invitation_token => @token) %>
+
+If you have any questions, please feel free to ask. Have a great workshop!
+
+Brent Kearney
+
+--
+BIRS Technology Manager
+Banff International Research Station
+for Mathematical Innovation and Discovery
+http://www.birs.ca
+help@birs.ca

@@ -1,0 +1,91 @@
+# Copyright (c) 2016 Brent Kearney. This file is part of Workshops.
+# Workshops is licensed under the GNU Affero General Public License
+# as published by the Free Software Foundation, version 3 of the License.
+# See the COPYRIGHT file for details and exceptions.
+
+require 'rails_helper'
+
+RSpec.describe Lecture, type: :model do
+  before :each do
+    @event = FactoryGirl.build(:event)
+    @lecture = FactoryGirl.create(:lecture, event: @event,
+                                    start_time: (@event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
+                                    end_time: (@event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
+  end
+
+  it 'has valid factory' do
+    expect(@lecture).to be_valid
+  end
+
+  it 'is invalid without an event' do
+    @lecture.event = nil
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:event)
+  end
+
+  it 'is invalid without a person' do
+    @lecture.person = nil
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:person)
+  end
+
+  it 'is invalid without a title' do
+    @lecture.title = nil
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:title)
+  end
+
+  it 'is invalid without a start time' do
+    @lecture.start_time = nil
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:start_time)
+  end
+
+  it 'is invalid without an end time' do
+    @lecture.end_time = nil
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:end_time)
+  end
+
+  it 'is invalid without a room' do
+    @lecture.room = nil
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:room)
+  end
+
+  it 'is invalid without updated_by' do
+    @lecture.updated_by = nil
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:updated_by)
+  end
+
+  it 'is invalid if the start time is outside of the event\'s dates' do
+    expect(@lecture).to be_valid
+    @lecture.start_time = (@event.start_date - 2.days).to_time
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:start_time)
+
+    @lecture.start_time = (@event.start_date + 1.days).to_time
+    expect(@lecture).to be_valid
+
+    @lecture.start_time = (@event.end_date + 1.days).to_time
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:start_time)
+  end
+
+  it 'is invalid if the end time is outside of the event\'s dates' do
+    expect(@lecture).to be_valid
+    @lecture.end_time = (@event.end_date + 1.days + 11.hours).to_s(:db)
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:end_time)
+  end
+
+  it 'is invalid if the end time is before the start time' do
+    expect(@lecture).to be_valid
+    @lecture.start_time = (@event.start_date + 2.days).to_time
+    @lecture.end_time = (@event.start_date + 1.days).to_time
+    expect(@lecture).not_to be_valid
+    expect(@lecture.errors).to include(:end_time)
+  end
+
+end

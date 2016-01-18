@@ -1,0 +1,29 @@
+Workshops is Copyright (c) 2016 Brent Kearney, and files herein are
+licensed under the Affero General Public License version 3, the text of
+which can be found in the GNU-AGPL-3.0 file, or at:
+https://opensource.org/licenses/AGPL-3.0.
+
+Some components of Workshops, including Ruby on Rails, JQuery, Twitter
+Bootstrap, and Devise are licensed under the MIT License. All unmodified
+files from these and other sources retain their original copyright and
+license notices: see the relevant individual files for their respective
+licenses.  Attribution information for Workshops is contained in the
+AUTHORS file.
+
+In addition, as a special exception, the copyright holder gives
+permission to modify and keep private portions of this program that
+facilitate integration with an organization's technical environment. For
+this reason, the program files that facilitate connectivity to external
+services are licensed under the MIT License, as noted in the relevant
+individual files.
+
+You must obey the GNU Affero General Public License V3 or later in all
+respects for all of the code used other than the portions mentioned in
+<<<<<<< HEAD
+the exception above.
+=======
+the exception above.  If you modify file(s) with this exception, you may
+extend this exception to your version of the file(s), but you are not
+obligated to do so.  If you do not wish to do so, delete this exception
+statement from your version.
+>>>>>>> 4f692500f454fa442ca195381168c68f515c3dfc

@@ -1,0 +1,8 @@
+<% unless @memberships.nil? || @membership.nil? %>
+<h4><%= @membership.person.firstname %>'s Event Memberships</h4>
+<ol id="memberships">
+	<% @memberships.each do |m| %>
+	<li><%= link_to "#{m.event.code}: #{m.event.name}", event_path(m.event.code) %></li>
+	<% end %>
+</ol>
+<% end %>

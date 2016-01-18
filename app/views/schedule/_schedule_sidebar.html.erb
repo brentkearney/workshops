@@ -1,0 +1,27 @@
+<% Time.use_zone(@event.time_zone) do %>
+    <div class="list-group" id="schedule-sidebar">
+      <a href="#" class="list-group-item active">
+        <h4 class="list-group-item-heading"><%= @day.strftime("%A, %b %e") %></h4>
+      </a>
+      <% @event.schedule_on(@day).each do |item| %>
+          <div class="list-group-item">
+            <span class="schedule-times"><%= item[:start_time].strftime("%H:%M") %> - <%= item[:end_time].strftime("%H:%M") %></span>
+            <span class="schedule-titles"><%= link_to item[:name], event_schedule_edit_path(@event, item) %></span>
+          </div>
+      <% end %>
+      <% if @event.schedule_on(@day).empty? %>
+          <div class="list-group-item">Nothing yet scheduled on this day.</div>
+      <% end %>
+    </div>
+<% end %>
+
+<div class="list-group">
+  <a href="#" class="list-group-item active">
+    <h4 class="list-group-item-heading">Switch To Another Day</h4>
+  </a>
+  <% @event.days.each do |day| %>
+    <% unless day.to_date == @day.to_date %>
+      <%= link_to "Add an item on " + day.strftime("%A"), event_schedule_day_path(@event, day.strftime("%Y-%m-%d")), class: 'btn btn-sm btn-default list-group-item' %>
+    <% end %>
+  <% end %>
+</div>

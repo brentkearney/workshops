@@ -1,0 +1,45 @@
+// Place all the styles related to the Memberships controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+/* Membership#show */
+#profile-pic {
+  margin: 8px 0;
+}
+.profile {
+  font-size: 1.2em;
+
+  .row {
+    margin: 10px 0;
+  }
+
+  .profile-name {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin-bottom: 0.3em;
+  }
+  .profile-affil {
+
+  }
+}
+
+#member-buttons {
+  margin-top: 25px;
+}
+
+#gender-select {
+  width: 50px;
+}
+
+.invites {
+  font-weight: bold;
+  text-align: center;
+}
+
+td.invite {
+  vertical-align: middle;
+}
+
+td.invite a.invite-btn a:visited {
+  color: #fff;
+}

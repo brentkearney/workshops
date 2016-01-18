@@ -1,0 +1,42 @@
+<h2>Password Change</h2>
+<%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :method => :put, :role => 'form'}) do |f| %>
+<%= devise_error_messages! %>
+
+<div class="row">
+  <div class="well col-md-12 horizontal-authform">
+    <div class="col-md-6">
+      <div class="well well-sm">
+        <fieldset>
+          <h3>Current Password</h3>
+          <p>To change your password, you must enter your current password:</p>
+          <div class="form-group">
+            <%= f.label :current_password %>
+            <%= f.password_field :current_password, class: 'form-control' %>
+          </div>
+        </fieldset>
+       </div>
+      <%= f.submit 'Update Password', :class => 'button right btn btn-primary' %> |
+      <%= link_to "Cancel", root_path, class: 'button right btn btn-primary' %>
+
+    </div>
+    <div class="col-md-6">
+      <div class="well well-sm">
+        <fieldset>
+          <h3>New Password</h3>
+          <p>Enter your new password, twice:</p>
+          <div class="form-group">
+            <%= f.label :password %>
+            <%= f.password_field :password, :autocomplete => 'off', class: 'form-control' %>
+            <p>(12 character minimum)</p>
+          </div>
+          <div class="form-group">
+            <%= f.label :password_confirmation %>
+            <%= f.password_field :password_confirmation, class: 'form-control' %>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+  <% end %>
+</div>
+

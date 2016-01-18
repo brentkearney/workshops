@@ -1,0 +1,43 @@
+#welcome-message {
+  font-size: 1.3em;
+  margin: 2em 1em;
+}
+
+#more-welcome-info {
+  border-top: 2px dashed lightgrey;
+  margin-top: 100px;
+}
+
+.your-workshops-heading {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.event-date {
+  font-size: 0.7em;
+  color: #333333;
+  font-style: italic;
+}
+
+.panel-primary .event-date {
+  color: #fff;
+}
+.panel-heading {
+  a:hover {
+    background-color: transparent;
+    text-decoration: none;
+    color: inherit;
+  }
+}
+.workshop-links {
+  padding: 2em;
+}
+
+p {
+  font-size: 1.2em;
+  line-height: 1.6em;
+  margin-bottom: 2em;
+  a {
+    text-decoration: underline;
+  }
+}

@@ -1,0 +1,28 @@
+// Place all the styles related to the Events controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+@import "_colours";
+
+td#confirmed-column {
+  text-align: center;
+  padding-right: 1.8em;
+}
+
+.table tbody tr.heading > th {
+  background-color: $subdued-color !important;
+  font-size: 1.3em;
+}
+table#workshop-details {
+  margin-top: -18px; /* hack to fix mystery spacing */
+  margin-bottom: 10px;
+}
+
+#edit-button {
+  margin-bottom: 40px;
+}
+
+.schedule-button {
+  margin-top: 20px;
+  padding-right: 5px;
+  vertical-align: bottom;
+}

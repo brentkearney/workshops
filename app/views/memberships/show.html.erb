@@ -1,0 +1,51 @@
+<article>
+<h4><strong>Event Member:</strong></h4>
+
+<div id="profile-pic" class="col-md-3"><%= profile_pic(@membership.person) %></div>
+
+<div class="col-md-9 profile">
+	<div class="row profile-name"><%= @membership.person.name %></div>
+	<div class="row profile-affil"><%= @membership.person.affil_with_title %></div>
+	<% if policy(@membership).use_email_address? %>
+	<div class="row profile-email"><%= mail_to @membership.person.email %></div>
+	<% end %>
+	<% unless @membership.person.url.blank? %>
+	<div class="row profile-url"><%= link_to @membership.person.url, @membership.person.url %></div>
+	<% end %>
+
+  <div class="row profile-attendance">
+    <strong>Attendance:</strong>
+    <%= @membership.attendance %>
+  </div>
+
+  <div class="row profile-role">
+    <strong>Role:</strong>
+    <%= @membership.role %>
+  </div>
+
+  <% if policy(@membership).view_details? %>
+  <div class="row pofile-arrival">
+	 <strong>Arriving on:</strong>
+	 <%= @membership.arrival_date %>
+	</div>
+
+	<div class="row profile-departure">
+	 <strong>Departing on:</strong>
+	 <%= @membership.departure_date %>
+	</div>
+
+	<div class="row profile-replied-at">
+	 <strong>Replied at:</strong>
+	 <%= @membership.replied_at %>
+	</div>
+  <% end %>
+
+	<div class="row" id="member-buttons">
+	<%= link_to "Back to #{@event.code}", event_memberships_path(@event), class: 'btn btn-sm btn-default' %>
+	</div><!-- member-buttons -->
+	
+	</div><!-- nested row -->
+
+</div><!-- right-side column -->
+</article>
+

@@ -1,0 +1,10 @@
+/* Width of Sidebar */
+@media(min-width:768px) {
+  #page-wrapper {
+    margin: 0 0 0 175px;
+  }
+  .sidebar {
+    width: 175px;
+    margin-top: 15px;
+  }
+}

@@ -1,0 +1,52 @@
+<div id="profile-pic" class="col-md-3"><%= profile_pic(@membership.person) %></div>
+<div class="col-md-9 profile">
+	<div class="row profile-name"><%= @membership.person.name %> (<%= @membership.person.gender %>)</div>
+	<div class="row profile-affil"><%= @membership.person.affil_with_title %></div>
+	<div class="row profile-email"><%= mail_to @membership.person.email %></div>
+	<% unless @membership.person.url.blank? %>
+	<div class="row profile-title"><%= link_to @membership.person.url, @membership.person.url %></div>
+	<% end %>
+	
+	<div class="form-group">
+		<div class="col-md-1 control-label">
+			<%= f.label :role, "Role: " %>
+		</div>
+		<div class="col-md-4">
+			<%= show_roles(f) %>
+		</div>
+		
+	</div>
+	
+	<!-- person data begin -->
+	<% if @membership.person_id.blank? %>
+		<%= f.fields_for @membership.person do |person| %>
+			<%= person.hidden_field :salutation %>
+			<%= person.hidden_field :firstname %>
+			<%= person.hidden_field :lastname %>
+			<%= person.hidden_field :affiliation %>
+			<%= person.hidden_field :email %>
+			<%= person.hidden_field :url %>
+			<%= person.hidden_field :gender %>
+			<%= person.hidden_field :department %>
+			<%= person.hidden_field :title %>
+			<%= person.hidden_field :academic_status %>
+			<%= person.hidden_field :url %>
+			<%= person.hidden_field :legacy_id %>
+		<% end %>
+	<% else %>
+		<%= f.hidden_field :person_id %>
+	<% end %>
+		<%= f.hidden_field :event_id %>
+	<!-- person data end -->
+
+	<div class="row" id="member-buttons">
+		<%= f.submit "Add & Edit", :name => "edit_button", class: 'btn btn-sm btn-default' %> 
+		| <%= f.submit "Add This Person", :name => "confirm_button", class: 'btn btn-sm btn-default' %>
+		| <%= link_to "Start Over", new_event_membership_path(@event), class: 'btn btn-sm btn-default' %>
+	</div><!-- member-buttons -->
+	
+	</div><!-- nested row -->
+
+</div><!-- right-side column -->
+
+</div>

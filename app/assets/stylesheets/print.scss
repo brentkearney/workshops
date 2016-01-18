@@ -1,0 +1,45 @@
+body {
+  background: white;
+  font-size: 12pt;
+  -webkit-print-color-adjust: exact;
+}
+
+@page {
+  size: 8.5in 11in;
+  margin: 2cm;
+}
+
+nav, .footer, .add-item-buttons, .delete-item-buttons,
+.first-day, .bottom-buttons, .fa-toggle-down {
+  display: none;
+}
+
+.day-table {
+  page-break-inside: avoid;
+}
+
+#page-wrapper {
+  width: auto; margin: 0 5%;
+  padding: 0;
+  border: 0;
+  float: none !important;
+  color: black;
+  background: transparent;
+}
+
+.table-heading {
+  background-color: #BBBBBB !important;
+}
+
+/* Unsuccessful attempt to get striped table rows working */
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #f9f9f9;
+  -webkit-print-color-adjust: exact;
+}
+
+/* Remove printing of URLs */
+@media print {
+  a[href]:after {
+    content: none !important;
+  }
+}

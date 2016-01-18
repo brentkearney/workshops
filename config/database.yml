@@ -1,0 +1,22 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  min_messages: WARNING
+  pool: 5
+  username: postgres
+  host: db
+  port: 5432
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASS'] %>
+
+production: 
+  <<: *default 
+  database: workshops_production
+  
+development: 
+  <<: *default 
+  database: workshops_development
+    
+test:
+  <<: *default
+  database: workshops_test
