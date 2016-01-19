@@ -42,7 +42,7 @@ module ScheduleHelpers
   end
 
   def ends_after_begins
-    if end_time < start_time
+    if end_time <= start_time
       errors.add(:end_time, "- must be greater than start time")
     end
   end
