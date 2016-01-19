@@ -62,7 +62,7 @@ class DefaultSchedule
 
   def schedule_with_lectures
     if @event
-      @schedules = @event.schedules.order(:start_time)
+      @schedules = @event.schedules.order(:start_time).includes(:lecture)
     else
       @schedules = Array.new
     end
