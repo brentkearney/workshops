@@ -23,7 +23,7 @@ class LegacyConnector
   require 'rest_client'
     
   def initialize
-    @rest_url = Rails.application.secrets.legacy_api
+    @rest_url = Global.config.legacy_api
   end
   
   # get a list of events within a given date range

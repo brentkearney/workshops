@@ -4,6 +4,7 @@ default:
   events: 'http://www.example.com/events'
   title: 'Workshop Manager'
   logo_file: 'logo.png'
+  legacy_api: 'https://database.example.com/api/your_api_key'
 
 development:
   title: 'Workshops Development Mode'
