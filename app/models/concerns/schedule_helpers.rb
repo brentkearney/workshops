@@ -47,6 +47,32 @@ module ScheduleHelpers
     end
   end
 
+  # Schedule items can overlap, but not Lectures
+  def errors_or_warnings(field, other)
+    if self.is_a?(Schedule)
+      add_warning(field, other)
+    else
+      add_error(field, other)
+    end
+  end
+
+  def times_overlap
+    self.class.where("to_char(start_time, 'YYYY-MM-DD') = ? AND event_id = ? AND id != ?",
+                     self.start_time.strftime('%Y-%m-%d'),
+                     self.event_id,
+                     self.id.nil? ? 0 : self.id
+    ).each do |other|
+
+      if start_time < other.start_time && end_time > other.start_time
+        errors_or_warnings(:end_time, other)
+      end
+
+      if start_time >= other.start_time && start_time < other.end_time
+        errors_or_warnings(:start_time, other)
+      end
+    end
+  end
+
   def clean_data
     # remove leading & trailing whitespace
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }

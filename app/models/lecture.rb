@@ -16,11 +16,20 @@ class Lecture < ActiveRecord::Base
   validate :ends_after_begins, unless: :missing_data
   validate :times_use_event_timezone, unless: :missing_data
   validate :times_within_event, unless: :missing_data
+  validate :times_overlap, unless: :missing_data
 
   # app/models/concerns/schedule_helpers.rb
   include ScheduleHelpers
 
   private
+
+  def add_error(field, other)
+    if room == other.room
+      msg = '<strong>cannot overlap with another lecture in the same room:</strong> '
+      msg << "#{other.person.name} in #{other.room} at #{other.start_time.strftime('%H:%M')} - #{other.end_time.strftime('%H:%M')}"
+      errors.add(field, msg)
+    end
+  end
 
   def update_legacy_db
     if Rails.env.production?
