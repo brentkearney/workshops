@@ -88,4 +88,55 @@ RSpec.describe Lecture, type: :model do
     expect(@lecture.errors).to include(:end_time)
   end
 
+  it 'is invalid if the end time is equal to the start time (causes infinite loop!)' do
+    lecture = FactoryGirl.build(:lecture)
+    lecture2 = Lecture.new(lecture.attributes.merge(start_time: lecture.end_time + 60.minutes, end_time: lecture.end_time + 60.minutes))
+    expect(lecture2).not_to be_valid
+  end
+
+  context 'if times overlap with another scheduled lecture' do
+    before do
+      @lecture1 = @lecture
+      expect(@lecture1).to be_valid
+    end
+
+    it 'is invalid if the start time is >= other start time and < other end time' do
+      lecture2 = Lecture.new(@lecture1.attributes.
+          merge(id: 666, start_time: @lecture1.start_time + 5.minutes, end_time: @lecture1.end_time - 5.minutes))
+      expect(lecture2).not_to be_valid
+    end
+
+    it 'is valid if the start time is == other end time' do
+      lecture2 = Lecture.new(@lecture1.attributes.
+          merge(id: 666, start_time: @lecture1.end_time, end_time: @lecture1.end_time + 5.minutes))
+      expect(lecture2).to be_valid
+    end
+
+    it 'is invalid if the end time is > other start_time and < other end_time' do
+      lecture2 = Lecture.new(@lecture1.attributes.
+          merge(id: 666, end_time: @lecture1.start_time + 5.minutes))
+      expect(lecture2).not_to be_valid
+    end
+
+    it 'is valid if the end time is == other start time' do
+      lecture2 = Lecture.new(@lecture1.attributes.
+          merge(id: 666, start_time: @lecture1.start_time - 25.minutes, end_time: @lecture1.start_time))
+      expect(lecture2).to be_valid
+    end
+
+    it 'is invalid if the start time is < other start time and the end time is > other start time' do
+      lecture2 = Lecture.new(@lecture1.attributes.
+          merge(id: 666, start_time: @lecture1.start_time - 5.minutes, end_time: @lecture1.start_time + 5.minutes))
+      expect(lecture2).to be_valid
+      expect(lecture2.flash_notice).not_to be_empty
+      expect(lecture2.flash_notice[:warning]).to have_text('overlaps with')
+    end
+
+    it 'does not invalidate because it overlaps with itself' do
+      expect(@lecture1).to be_valid
+      @lecture1.start_time = @lecture1.start_time + 5.minutes
+      expect(@lecture1).to be_valid
+    end
+  
+  end
 end

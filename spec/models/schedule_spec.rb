@@ -56,10 +56,12 @@ RSpec.describe 'Model validations: Schedule', type: :model do
       expect(@schedule1).to be_valid
     end
 
-    it 'is invalid if the start time is >= other start time and < other end time' do
+    it 'if the start time is >= other start time and < other end time, it produces a warning' do
       schedule2 = Schedule.new(@schedule1.attributes.
           merge(id: 666, start_time: @schedule1.start_time + 5.minutes, end_time: @schedule1.end_time - 5.minutes))
-      expect(schedule2).not_to be_valid
+      expect(schedule2).to be_valid
+      expect(schedule2.flash_notice).not_to be_empty
+      expect(schedule2.flash_notice[:warning]).to have_text('overlaps with')
     end
 
     it 'is valid if the start time is == other end time' do
@@ -69,10 +71,12 @@ RSpec.describe 'Model validations: Schedule', type: :model do
       expect(schedule2).to be_valid
     end
 
-    it 'is invalid if the end time is > other start_time and < other end_time' do
+    it 'if the end time is > other start_time and < other end_time, it produces a warning' do
       schedule2 = Schedule.new(@schedule1.attributes.
                      merge(id: 666, end_time: @schedule1.start_time + 5.minutes))
-      expect(schedule2).not_to be_valid
+      expect(schedule2).to be_valid
+      expect(schedule2.flash_notice).not_to be_empty
+      expect(schedule2.flash_notice[:warning]).to have_text('overlaps with')
     end
 
     it 'is valid if the end time is == other start time' do
@@ -81,10 +85,12 @@ RSpec.describe 'Model validations: Schedule', type: :model do
       expect(schedule2).to be_valid
     end
 
-    it 'is invalid if the start time is < other start time and the end time is > other start time' do
+    it 'if the start time is < other start time and the end time is > other start time, it produces a warning' do
       schedule2 = Schedule.new(@schedule1.attributes.
                      merge(id: 666, start_time: @schedule1.start_time - 5.minutes, end_time: @schedule1.start_time + 5.minutes))
-      expect(schedule2).not_to be_valid
+      expect(schedule2).to be_valid
+      expect(schedule2.flash_notice).not_to be_empty
+      expect(schedule2.flash_notice[:warning]).to have_text('overlaps with')
     end
 
     it 'does not invalidate because it overlaps with itself' do
@@ -114,6 +120,12 @@ RSpec.describe 'Model validations: Schedule', type: :model do
   it 'is invalid if the end time is before the start time' do
     schedule = FactoryGirl.build(:schedule)
     schedule2 = Schedule.new(schedule.attributes.merge(start_time: schedule.end_time + 60.minutes, end_time: schedule.end_time + 30.minutes))
+    expect(schedule2).not_to be_valid
+  end
+
+  it 'is invalid if the end time is equal to the start time (causes infinite loop!)' do
+    schedule = FactoryGirl.build(:schedule)
+    schedule2 = Schedule.new(schedule.attributes.merge(start_time: schedule.end_time + 60.minutes, end_time: schedule.end_time + 60.minutes))
     expect(schedule2).not_to be_valid
   end
 
