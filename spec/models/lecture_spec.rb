@@ -127,9 +127,7 @@ RSpec.describe Lecture, type: :model do
     it 'is invalid if the start time is < other start time and the end time is > other start time' do
       lecture2 = Lecture.new(@lecture1.attributes.
           merge(id: 666, start_time: @lecture1.start_time - 5.minutes, end_time: @lecture1.start_time + 5.minutes))
-      expect(lecture2).to be_valid
-      expect(lecture2.flash_notice).not_to be_empty
-      expect(lecture2.flash_notice[:warning]).to have_text('overlaps with')
+      expect(lecture2).not_to be_valid
     end
 
     it 'does not invalidate because it overlaps with itself' do

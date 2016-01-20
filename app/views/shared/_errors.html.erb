@@ -6,12 +6,14 @@
       The <%= object.class.name.humanize.downcase %> could not be saved. 
     </h3>
     <h4>
-      Please correct the following <%= pluralize(object.errors.count, "error") %>:
+      Please correct the following:
     </h4>
   </header>
   <ul>
     <% object.errors.full_messages.each do |message| %>
+      <% unless message =~ /is invalid/ %>
       <li><%= message.html_safe %></li>
+      <% end %>
     <% end %>
   </ul>
 </div>

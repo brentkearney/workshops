@@ -61,7 +61,7 @@ RSpec.describe 'Model validations: Schedule', type: :model do
           merge(id: 666, start_time: @schedule1.start_time + 5.minutes, end_time: @schedule1.end_time - 5.minutes))
       expect(schedule2).to be_valid
       expect(schedule2.flash_notice).not_to be_empty
-      expect(schedule2.flash_notice[:warning]).to have_text('overlaps with')
+      expect(schedule2.flash_notice[:warning]).to include('overlaps with')
     end
 
     it 'is valid if the start time is == other end time' do
@@ -76,7 +76,7 @@ RSpec.describe 'Model validations: Schedule', type: :model do
                      merge(id: 666, end_time: @schedule1.start_time + 5.minutes))
       expect(schedule2).to be_valid
       expect(schedule2.flash_notice).not_to be_empty
-      expect(schedule2.flash_notice[:warning]).to have_text('overlaps with')
+      expect(schedule2.flash_notice[:warning]).to include('overlaps with')
     end
 
     it 'is valid if the end time is == other start time' do
@@ -90,7 +90,7 @@ RSpec.describe 'Model validations: Schedule', type: :model do
                      merge(id: 666, start_time: @schedule1.start_time - 5.minutes, end_time: @schedule1.start_time + 5.minutes))
       expect(schedule2).to be_valid
       expect(schedule2.flash_notice).not_to be_empty
-      expect(schedule2.flash_notice[:warning]).to have_text('overlaps with')
+      expect(schedule2.flash_notice[:warning]).to include('overlaps with')
     end
 
     it 'does not invalidate because it overlaps with itself' do

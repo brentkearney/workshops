@@ -40,6 +40,16 @@
   margin-right: 2em;
 }
 
+.flash-messages .warning-header {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.flash-messages p {
+  font-size: 1em;
+  margin-top: 1.5em;
+}
+
 .flash {
   @extend .alert;
   text-align: center;
