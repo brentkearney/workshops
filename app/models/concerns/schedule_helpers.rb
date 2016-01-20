@@ -57,20 +57,12 @@ module ScheduleHelpers
   end
 
   def times_overlap
-    self.class.where("to_char(start_time, 'YYYY-MM-DD') = ? AND event_id = ? AND id != ?",
-                     self.start_time.strftime('%Y-%m-%d'),
-                     self.event_id,
-                     self.id.nil? ? 0 : self.id
-    ).each do |other|
-
-      if start_time < other.start_time && end_time > other.start_time
-        errors_or_warnings(:end_time, other)
-      end
-
-      if start_time >= other.start_time && start_time < other.end_time
-        errors_or_warnings(:start_time, other)
-      end
-    end
+    self.class.where("((start_time, end_time) OVERLAPS (timestamp :start, timestamp :end))
+                      AND event_id = :this_event AND id != :myself",
+                      :start => self.start_time, :end => self.end_time,
+                      :this_event => self.event_id,
+                      :myself => self.id.nil? ? 0 : self.id
+    ).order(:start_time).each { |other| errors_or_warnings(:start_time, other) }
   end
 
   def clean_data

@@ -37,13 +37,13 @@ class Schedule < ActiveRecord::Base
 
   def add_warning(field, other)
     if self.flash_notice.blank? || self.flash_notice[:warning].blank?
-      self.flash_notice = {:warning => "<span class=\"warning-header\">\"#{self.name} (#{self.location})\" " +
+      self.flash_notice = {:warning => "<span class=\"warning-header\">\"#{self.name} (#{self.location}) @ #{self.start_time.strftime('%H:%M')} - #{self.end_time.strftime('%H:%M')}\" " +
           "overlaps with these items: </span>\n<p>" +
           "#{overlaps_message(other)}" +
           "</p>\n" }
     else
       unless self.flash_notice[:warning].include? overlaps_message(other)
-        self.flash_notice[:warning] = "#{self.flash_notice[:warning]}"[0...-5]
+        self.flash_notice[:warning] = "#{self.flash_notice[:warning]}" #[0...-5]
         self.flash_notice[:warning] <<  "<p>#{overlaps_message(other)}</p>\n"
       end
     end
