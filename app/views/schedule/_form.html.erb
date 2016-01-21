@@ -5,8 +5,8 @@
 <input id="day" name="day" type="hidden" value="<%= @day.strftime("%Y-%m-%d") %>" />
 <fieldset>
   <div class="row">
-    <div class="col-lg-1"></div>
-    <div class="form-group col-lg-9">
+    <div class="col-sm-1"></div>
+    <div class="form-group col-sm-7">
       <table id="select-times">
         <tr>
           <td class="form-group">
@@ -34,10 +34,13 @@
         </tr>
       </table>
     </div>
+    <!-- /.form-group .col-sm-7 -->
   </div>
+  <!-- /.row -->
   <div class="row">
   <%= render 'update_all' %>
   </div>
+  <!-- /.row -->
 
   <div class="form-group">
       <%= f.label "Title" %>:
@@ -73,7 +76,7 @@
   </div>
 
   <div class="row buttons">
-    <div class="col-lg-4">
+    <div class="col-xs-7">
       <div class="form-group">
           <%= link_to "Back to Schedule", event_schedule_index_path(@event), class: 'btn btn-sm btn-default' %> | <%= f.submit (f.object.new_record? ? "Add New Schedule Item" : "Update Schedule"), class: 'btn btn-sm btn-default' %>
       </div>
@@ -84,12 +87,14 @@
       </div>
       <% end %>
     </div>
-    <!-- /.col-lg-4 -->
-    <div class="col-lg-4"></div>
-    <div class="col-lg-4">
+    <!-- /.col-xs-6 -->
+
+    <div class="col-xs-5">
+      <% unless @schedule.updated_at.blank? %>
       <p id="updated_by">Last updated by <%= @schedule.updated_by %> at: <br /> <%= @schedule.updated_at %></p>
+      <% end %>
     </div>
-    <!-- /.col-lg-4 -->
+    <!-- /.col-xs-6 -->
   </div>
   <!-- /.row .buttons -->
 </fieldset>

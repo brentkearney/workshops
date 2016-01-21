@@ -37,3 +37,4 @@ public/assets/
 passenger.*
 config/settings/*.yml
 app/assets/images/*_logo.png
+public/icons/*
