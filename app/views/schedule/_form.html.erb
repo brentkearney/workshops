@@ -6,33 +6,34 @@
 <fieldset>
   <div class="row">
     <div class="col-lg-1"></div>
-    <td class="form-group col-lg-9">
-    <table id="select-times">
-      <tr>
-        <td class="form-group">
-          <%= f.label "Scheduling Item on" %>:
-        </td>
-        <td class="form-group select-day">
-          <%= f.select :day, @event.days.map {|day| [ day.strftime("%A, %B %e"), day.to_date ]}, {}, { :class => 'form-control days' } %>
-        </td>
-      </tr>
-      <tr>
-        <td class="form-group">
-          <%= f.label :start_time %>:
-        </td>
-        <td class="form-group select-times">
-          <%= f.time_select :start_time, {}, { :class => 'form-control' } %>
-        </td>
-      </tr>
-      <tr>
-        <td class="form-group">
-          <%= f.label :end_time %>:
-        </td>
-        <td class="form-group select-times">
-          <%= f.time_select :end_time, {}, { :class => 'form-control' } %>
-        </td>
-      </tr>
-    </table>
+    <div class="form-group col-lg-9">
+      <table id="select-times">
+        <tr>
+          <td class="form-group">
+            <%= f.label "Scheduling Item on" %>:
+          </td>
+          <td class="form-group select-day">
+            <%= f.select :day, @event.days.map {|day| [ day.strftime("%A, %B %e"), day.to_date ]}, {}, { :class => 'form-control days' } %>
+          </td>
+        </tr>
+        <tr>
+          <td class="form-group">
+            <%= f.label :start_time %>:
+          </td>
+          <td class="form-group select-times">
+            <%= f.time_select :start_time, {}, { :class => 'form-control' } %>
+          </td>
+        </tr>
+        <tr>
+          <td class="form-group">
+            <%= f.label :end_time %>:
+          </td>
+          <td class="form-group select-times">
+            <%= f.time_select :end_time, {}, { :class => 'form-control' } %>
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
   <div class="row">
   <%= render 'update_all' %>
@@ -72,15 +73,24 @@
   </div>
 
   <div class="row buttons">
-    <div class="form-group">
-        <%= link_to "Back to Schedule", event_schedule_index_path(@event), class: 'btn btn-sm btn-default' %> | <%= f.submit (f.object.new_record? ? "Add New Schedule Item" : "Update Schedule"), class: 'btn btn-sm btn-default' %>
-    </div>
+    <div class="col-lg-4">
+      <div class="form-group">
+          <%= link_to "Back to Schedule", event_schedule_index_path(@event), class: 'btn btn-sm btn-default' %> | <%= f.submit (f.object.new_record? ? "Add New Schedule Item" : "Update Schedule"), class: 'btn btn-sm btn-default' %>
+      </div>
 
-    <% unless f.object.new_record? %>
-    <div class="form-group">
-        <%= link_to 'Delete Schedule Item', event_schedule_path(@event, @schedule), method: :delete, class: 'btn btn-sm btn-default', data: { confirm: "Are you sure you want to remove #{@schedule.name}?" } %>
+      <% unless f.object.new_record? %>
+      <div class="form-group">
+          <%= link_to 'Delete Schedule Item', event_schedule_path(@event, @schedule), method: :delete, class: 'btn btn-sm btn-default', data: { confirm: "Are you sure you want to remove #{@schedule.name}?" } %>
+      </div>
+      <% end %>
     </div>
-    <% end %>
+    <!-- /.col-lg-4 -->
+    <div class="col-lg-4"></div>
+    <div class="col-lg-4">
+      <p id="updated_by">Last updated by <%= @schedule.updated_by %> at: <br /> <%= @schedule.updated_at %></p>
+    </div>
+    <!-- /.col-lg-4 -->
   </div>
+  <!-- /.row .buttons -->
 </fieldset>
 <% end %>
