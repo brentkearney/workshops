@@ -10,24 +10,31 @@ class EventsController < ApplicationController
   # GET /events
   # GET /events.json
   def index
-    if params[:kind]
-      @heading = event_kind.pluralize
-      @events = Event.kind(event_kind)
-    elsif params[:scope]
-      @heading = event_scope.capitalize + " Events" 
-      @events = Event.send(event_scope)
-    else
-      @events = current_user.person.events.where("role LIKE '%Organizer%' OR (attendance != 'Not Yet Invited' AND attendance != 'Declined')").order(:start_date)
-      @heading = 'Your Events'
-    end
+    @heading = 'Your Events'
+    @events = current_user.person.events
   end
-  
+
+  # GET /events/all
   def all
     @events = policy_scope(Event)
     @heading = 'All Events'
     render :index
   end
-  
+
+  # GET /events/scope/future
+  def scope
+    @heading = event_scope.capitalize + " Events"
+    @events = Event.send(event_scope)
+    render :index
+  end
+
+  # GET /events/kind/foo
+  def kind
+    @heading = event_kind.pluralize
+    @events = Event.kind(event_kind)
+    render :index
+  end
+
   def event_scope
     if params[:scope].in? %w(past future mypast myfuture)
       params[:scope]

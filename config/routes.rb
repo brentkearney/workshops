@@ -22,8 +22,8 @@ Rails.application.routes.draw do
   get 'participants' => 'welcome#participants', as: :welcome_member
 
   # Events, schedules, memberships
-  get 'events/kind/:kind' => 'events#index', as: :event_kind
-  get 'events/scope/:scope' => 'events#index', as: :event_scope
+  get 'events/kind/:kind' => 'events#kind', as: :event_kind
+  get 'events/scope/:scope' => 'events#scope', as: :event_scope
   get 'events/all' => 'events#all', as: :events_all
   resources :events do
     get 'schedule/new/:day' => 'schedule#new', as: :schedule_day

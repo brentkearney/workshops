@@ -9,7 +9,7 @@ FactoryGirl.define do
     f.password password
     f.password_confirmation password
     f.confirmed_at Time.now
-    f.location 'BIRS'
+    f.location Global.location.first
 
     trait :staff do
       role 'staff'

@@ -5,7 +5,7 @@
 
 class Person < ActiveRecord::Base
   has_many :memberships, :dependent => :destroy
-  has_many :events, through: :memberships, source: :event
+  has_many :events, -> { where ("attendance != 'Not Yet Invited' AND attendance != 'Declined'") }, through: :memberships, source: :event
   has_one :user, :dependent => :destroy
 
   before_validation :downcase_email
