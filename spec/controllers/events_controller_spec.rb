@@ -6,49 +6,115 @@
 require 'rails_helper'
 
 RSpec.describe EventsController, type: :controller do
-  describe "#index" do
-    context 'without authentication' do
-      it 'redirects to sign_in path' do
+  describe '#index' do
+    it 'responds with success code' do
+      get :index
+
+      expect(response).to be_success
+    end
+
+    it 'assigns @heading to "All Events"' do
+      get :index
+
+      expect(assigns(:heading)).to eq('All Events')
+    end
+
+    it 'assigns @events to all events' do
+      event = create(:event)
+
+      get :index
+
+      expect(assigns(:events)).to match_array(event)
+    end
+
+    context 'as an unauthenticated user' do
+      it '@events excludes template events' do
+        event1 = create(:event, template: false)
+        event2 = create(:event, template: true)
+
         get :index
 
-        expect(response).to redirect_to(new_user_session_path)
+        expect(assigns(:events)).to match_array(event1)
       end
     end
 
-    context 'with authentication' do
-      let(:person) { FactoryGirl.build(:person) }
-      let(:user) { FactoryGirl.build(:user, person: person) }
+    context 'as an authenticated user' do
+      let(:person) { build(:person) }
+      let(:user) { build(:user, person: person, role: 'member') }
 
       before do
         allow(request.env['warden']).to receive(:authenticate!).and_return(user)
         allow(controller).to receive(:current_user).and_return(user)
       end
 
-      it 'responds with success code' do
-        get :index
+      context 'member' do
+        before do
+          user.member!
+        end
 
-        expect(response).to be_success
+        it '@events excludes template events' do
+          event1 = create(:event, template: false)
+          event2 = create(:event, template: true)
+
+          get :index
+
+          expect(assigns(:events)).to match_array(event1)
+        end
       end
 
-      it 'assigns @heading to "Your Events"' do
-        get :index
+      context 'staff' do
+        before do
+          user.staff!
+        end
 
-        expect(assigns(:heading)).to eq('Your Events')
+        it "@events includes only events at the user's location" do
+          event1 = create(:event, location: user.location)
+          event2 = create(:event, location: 'elsewhere')
+
+          get :index
+
+          expect(assigns(:events)).to match_array(event1)
+        end
+
+        it "@events includes template events" do
+          event1 = create(:event, template: false, location: user.location)
+          event2 = create(:event, template: true, location: user.location)
+
+          get :index
+
+          expect(assigns(:events)).to match_array([event1, event2])
+        end
+
+        it "@events excludes template events that are not at user's location" do
+          event1 = create(:event, template: false, location: user.location)
+          event2 = create(:event, template: true, location: user.location)
+          event3 = create(:event, template: true, location: 'elsewhere')
+
+          get :index
+
+          expect(assigns(:events)).to match_array([event1, event2])
+        end
       end
 
-      it "assigns the authenticated user's events to @events" do
-        event = FactoryGirl.build(:event)
-        # person defined above, associated to authenticated user
-        membership = FactoryGirl.build(:membership, person: person, event: event)
+      context 'admin user' do
+        before do
+          user.admin!
+        end
 
-        get :index
+        it '@events includes all events including templates' do
+          event1 = create(:event, template: false, location: user.location)
+          event2 = create(:event, template: true, location: user.location)
+          event3 = create(:event, template: true, location: 'elsewhere')
+          event4 = create(:event, template: false, location: 'elsewhere')
 
-        expect(assigns(:events)).to eq(person.events)
+          get :index
+
+          expect(assigns(:events)).to match_array([event1, event2, event3, event4])
+        end
       end
+
     end
+
   end
 
-  describe '#all' do
-    
-  end
 end

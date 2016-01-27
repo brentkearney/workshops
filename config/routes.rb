@@ -24,7 +24,7 @@ Rails.application.routes.draw do
   # Events, schedules, memberships
   get 'events/kind/:kind' => 'events#kind', as: :event_kind
   get 'events/scope/:scope' => 'events#scope', as: :event_scope
-  get 'events/all' => 'events#all', as: :events_all
+  get 'events/mine' => 'events#mine', as: :my_events
   resources :events do
     get 'schedule/new/:day' => 'schedule#new', as: :schedule_day
     get 'schedule/new/:day/item' => 'schedule#new_item', as: :schedule_item

@@ -21,13 +21,15 @@ class EventPolicy
     end
   end
 
-  # Include template events for staff in #all view
+  # Only staff can see template events, at their location
   class Scope < Struct.new(:current_user, :model)
     def resolve
-      if current_user.is_admin? || current_user.staff?
+      if current_user && current_user.is_admin?
         model.all.order(:start_date)
+      elsif current_user && current_user.staff?
+        model.where(location: current_user.location).order(:start_date)
       else
-        model.where(:template => false).order(:start_date)
+        model.where(template: false).order(:start_date)
       end
     end
   end
@@ -54,7 +56,7 @@ class EventPolicy
     end
   end
 
-  # To allow the use of emails when they are not shared by the member
+  # Allow the use of emails when they are not shared by the member
   def use_email_addresses?
     allow_orgs_and_admins
   end

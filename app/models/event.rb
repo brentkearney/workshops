@@ -40,6 +40,7 @@ class Event < ActiveRecord::Base
   
   scope :kind, ->(kind) { 
     if kind == 'Research in Teams'
+      # this kind stays plural
       where("event_type = ?", 'Research in Teams')
     else
       where("event_type = ?", kind.titleize.singularize)

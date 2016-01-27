@@ -89,8 +89,9 @@ module EventDecorators
   end
 
   def country
-    Global.location.country.
-        send self.location
+    if Global.location.country.key?(self.location)
+      Global.location.country.send(self.location)
+    end
   end
 
   def schedule_on(day)

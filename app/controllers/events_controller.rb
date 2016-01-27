@@ -5,30 +5,29 @@
 
 class EventsController < ApplicationController
   before_action :set_event, :set_attendance
-  before_filter :authenticate_user!, :except => [:show]
+  before_filter :authenticate_user!, :only => [:new, :edit, :create, :update, :destroy]
 
   # GET /events
   # GET /events.json
   def index
+    @events = policy_scope(Event)
+    @heading = 'All Events'
+  end
+
+  # Get /events/mine
+  def mine
     @heading = 'Your Events'
     @events = current_user.person.events
   end
 
-  # GET /events/all
-  def all
-    @events = policy_scope(Event)
-    @heading = 'All Events'
-    render :index
-  end
-
-  # GET /events/scope/future
+  # GET /events/scope/future || past || year || location
   def scope
     @heading = event_scope.capitalize + " Events"
     @events = Event.send(event_scope)
     render :index
   end
 
-  # GET /events/kind/foo
+  # GET /events/kind/
   def kind
     @heading = event_kind.pluralize
     @events = Event.kind(event_kind)
@@ -119,7 +118,6 @@ class EventsController < ApplicationController
 
   private
 
-    # Never trust parameters from the scary internet, only allow the white list through.
     def event_params
       params.require(:event).permit(:code, :name, :short_name, :start_date, :end_date, :time_zone, :event_type, :location, :description, :press_release, :max_participants, :door_code, :booking_code, :updated_by)
     end

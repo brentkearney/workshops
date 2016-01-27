@@ -5,7 +5,7 @@
         <a href="/" id="home"><i class="fa fa-dashboard fa-fw"></i> Home</a>
       </li>
       <li>
-        <%= link_to '<i class="fa fa-university fa-fw"></i> All Events'.html_safe, events_all_path, :id => 'all-events' %>
+        <%= link_to '<i class="fa fa-university fa-fw"></i> All Events'.html_safe, events_path, :id => 'all-events' %>
       </li>
       <li>
         <%= link_to '<i class="fa fa-forward fa-fw"></i> Future Events'.html_safe, event_scope_path(:future), :id => 'future-events' %>
@@ -14,7 +14,7 @@
         <%= link_to '<i class="fa fa-backward fa-fw"></i> Past Events'.html_safe, event_scope_path(:past), :id => 'past-events' %>
       </li>
       <li>
-        <%= link_to '<i class="fa fa-suitcase fa-fw"></i> Your Events'.html_safe, events_path, :id => 'your-events' %>
+        <%= link_to '<i class="fa fa-suitcase fa-fw"></i> Your Events'.html_safe, my_events_path, :id => 'your-events' %>
       </li>
 
       <% if @event && @event.id %>
