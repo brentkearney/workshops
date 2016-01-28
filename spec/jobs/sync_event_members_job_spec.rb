@@ -5,17 +5,14 @@
 
 require 'rails_helper'
 
-# Thanks Chuck! https://medium.com/@chuckjhardy/testing-rails-activejob-with-rspec-5c3de1a64b66
 RSpec.describe SyncEventMembersJob, type: :job do
   include ActiveJob::TestHelper
 
-  before do
-    @event = FactoryGirl.create(:event, code: '16w5666')
-    @person = FactoryGirl.create(:person)
-    @membership = FactoryGirl.create(:membership, person: @person, event: @event)
-  end
+  let(:event) { create(:event, code: '12w5999') }
+  let(:person) { create(:person) }
+  let(:membership) { create(:membership, person: person, event: event) }
 
-  subject(:job) { described_class.perform_later(@event) }
+  subject(:job) { SyncEventMembersJob.perform_later(event) }
 
   it 'queues the job' do
     expect { job }
@@ -28,9 +25,9 @@ RSpec.describe SyncEventMembersJob, type: :job do
 
   it 'executes perform' do
     expect {
-      expect(SyncMembers.new(@event)).to receive(:run)
+      expect(SyncMembers.new(event)).to receive(:run)
       perform_enqueued_jobs { job }
-    }.to raise_error(RuntimeError) # Error because 16w5666 has no members
+    }.to raise_error(RuntimeError) # Error because 12w5999 has no (remote) members
   end
 
   it 'handles no results error' do

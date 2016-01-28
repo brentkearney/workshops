@@ -6,6 +6,12 @@
 require 'rails_helper'
 
 RSpec.describe EventsController, type: :controller do
+  before do
+    Schedule.delete_all
+    Membership.delete_all
+    Event.delete_all
+  end
+
   describe '#index' do
     it 'responds with success code' do
       get :index

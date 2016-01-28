@@ -12,11 +12,15 @@ class WelcomeController < ApplicationController
     welcome_page = 'welcome_' + current_user.role + '_path'
     welcome_page.slice!('super_')
 
-    current_user.person.events.each do |event|
+    current_user.person.memberships.each do |membership|
+      if membership.role =~ /Organizer/ && current_user.member?
+        welcome_page = 'welcome_organizers_path'
+      end
+
+      # Update user's events with data from remote database
+      event = membership.event
       if !event.template
-        # Update local event with data from remote database, in the background
         SyncEventMembersJob.perform_later(event) if policy(event).sync?
-        welcome_page = 'welcome_organizers_path' if current_user.is_organizer?(event)
       end
     end
 

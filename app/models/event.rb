@@ -4,9 +4,9 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Event < ActiveRecord::Base
-  has_many :memberships, :dependent => :destroy
+  has_many :memberships, dependent: :destroy
   has_many :members, through: :memberships, source: :person
-  has_many :schedules, :dependent => :destroy
+  has_many :schedules, dependent: :destroy
   has_many :lectures
 
   before_save :clean_data
