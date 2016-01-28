@@ -22,6 +22,7 @@ class EventsController < ApplicationController
   end
 
   # GET /events/past
+  # GET /events/past.json
   def past
     @heading = 'Past Events'
     @events = Event.past
@@ -29,6 +30,7 @@ class EventsController < ApplicationController
   end
 
   # GET /events/future
+  # GET /events/future.json
   def future
     @heading = 'Future Events'
     @events = Event.future
