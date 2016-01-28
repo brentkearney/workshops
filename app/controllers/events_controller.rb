@@ -17,7 +17,7 @@ class EventsController < ApplicationController
   # Get /events/mine
   def my_events
     @heading = 'My Events'
-    @events = current_user.person.events
+    @events = current_user.person.events.order(:start_date)
     render :index
   end
 
