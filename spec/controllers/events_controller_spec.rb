@@ -185,92 +185,117 @@ RSpec.describe EventsController, type: :controller do
 
   end
 
-  describe '#scope' do
-    context ':past' do
-      it 'responds with success code' do
-        get :scope, { scope: :past }
+  describe '#past' do
+    it 'responds with success code' do
+      get :past
 
-        expect(response).to be_success
-      end
-
-      it 'renders :index' do
-        get :scope, { scope: :past }
-
-        expect(response).to render_template(:index)
-      end
-
-      it 'assigns @heading to "Past Events"' do
-        get :scope, { scope: :past }
-
-        expect(assigns(:heading)).to eq('Past Events')
-      end
-
-      it 'assigns @events only with events from the past' do
-        past_event = create(:event, start_date: Date.today.prev_month.prev_week(:sunday),
-                                end_date: Date.today.prev_month.prev_week(:sunday) + 5.days)
-        current_event = create(:event, start_date: Date.today.prev_week(:sunday),
-                        end_date: Date.today.prev_week(:sunday) + 5.days)
-        future_event = create(:event, start_date: Date.today.next_week(:sunday),
-                                end_date: Date.today.next_week(:sunday) + 5.days)
-        get :scope, { scope: :past }
-
-        expect(assigns(:events)).to match_array(past_event)
-      end
+      expect(response).to be_success
     end
 
-    context ':future' do
-      it 'responds with success code' do
-        get :scope, { scope: :future }
+    it 'renders :index' do
+      get :past
 
-        expect(response).to be_success
-      end
+      expect(response).to render_template(:index)
+    end
 
-      it 'renders :index' do
-        get :scope, { scope: :future }
+    it 'assigns @heading to "Past Events"' do
+      get :past
 
-        expect(response).to render_template(:index)
-      end
+      expect(assigns(:heading)).to eq('Past Events')
+    end
 
-      it 'assigns @heading to "Future Events"' do
-        get :scope, { scope: :future }
-
-        expect(assigns(:heading)).to eq('Future Events')
-      end
-
-      it 'assigns @events only with the current event and future events' do
-        past_event = create(:event, start_date: Date.today.prev_month.prev_week(:sunday),
-                            end_date: Date.today.prev_month.prev_week(:sunday) + 5.days)
-        current_event = create(:event, start_date: Date.today.prev_week(:sunday),
-                               end_date: Date.today.prev_week(:sunday) + 5.days)
-        future_event = create(:event, start_date: Date.today.next_week(:sunday),
+    it 'assigns @events only with events from the past' do
+      past_event = create(:event, start_date: Date.today.prev_month.prev_week(:sunday),
+                              end_date: Date.today.prev_month.prev_week(:sunday) + 5.days)
+      current_event = create(:event, start_date: Date.today.prev_week(:sunday),
+                      end_date: Date.today.prev_week(:sunday) + 5.days)
+      future_event = create(:event, start_date: Date.today.next_week(:sunday),
                               end_date: Date.today.next_week(:sunday) + 5.days)
+      get :past
 
-        get :scope, { scope: :future }
+      expect(assigns(:events)).to match_array(past_event)
+    end
+  end
 
-        expect(assigns(:events)).to match_array([current_event, future_event])
-      end
+  describe '#future' do
+    it 'responds with success code' do
+      get :future
+
+      expect(response).to be_success
     end
 
-    context ':year' do
-      let(:year) { Date.today.strftime("%Y") }
+    it 'renders :index' do
+      get :future
 
-      it 'responds with success code' do
-        get :scope, { scope: :year, format: year }
+      expect(response).to render_template(:index)
+    end
 
-        expect(response).to be_success
-      end
+    it 'assigns @heading to "Future Events"' do
+      get :future
 
-      it 'renders :index' do
-        get :scope, { scope: :year, format: year }
+      expect(assigns(:heading)).to eq('Future Events')
+    end
 
-        expect(response).to render_template(:index)
-      end
+    it 'assigns @events only with the current event and future events' do
+      past_event = create(:event, start_date: Date.today.prev_month.prev_week(:sunday),
+                          end_date: Date.today.prev_month.prev_week(:sunday) + 5.days)
+      current_event = create(:event, start_date: Date.today.prev_week(:sunday),
+                             end_date: Date.today.prev_week(:sunday) + 5.days)
+      future_event = create(:event, start_date: Date.today.next_week(:sunday),
+                            end_date: Date.today.next_week(:sunday) + 5.days)
 
-      it '(assigns @heading to "[Year] Events"' do
-        get :scope, { scope: :year, format: year }
+      get :future
 
-        expect(assigns(:heading)).to eq("#{year} Events")
+      expect(assigns(:events)).to match_array([current_event, future_event])
+    end
+  end
+
+  describe '#year' do
+    let(:year) { Date.today.strftime("%Y") }
+
+    it 'responds with success code' do
+      get :year, { year: year }
+
+      expect(response).to be_success
+    end
+
+    it 'renders :index' do
+      get :year, { year: year }
+
+      expect(response).to render_template(:index)
+    end
+
+    it '(assigns @heading to "[Year] Events"' do
+      get :year, { year: year }
+
+      expect(assigns(:heading)).to eq("#{year} Events")
+    end
+  end
+
+  describe '#location' do
+    Global.location.all.each do |loc|
+      context ":#{loc}" do
+        let(:location) { loc }
+
+        it 'responds with success code' do
+          get :location, { location: location }
+
+          expect(response).to be_success
+        end
+
+        it 'renders :index' do
+          get :location, { location: location }
+
+          expect(response).to render_template(:index)
+        end
+
+        it %Q(assigns @heading to "Events at #{loc}") do
+          get :location, { location: location }
+
+          expect(assigns(:heading)).to eq("Events at #{loc}")
+        end
       end
     end
   end
+
 end

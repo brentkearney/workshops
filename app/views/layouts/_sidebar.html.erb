@@ -11,10 +11,10 @@
       <%= link_to '<i class="fa fa-suitcase fa-fw"></i> My Events'.html_safe, my_events_path, :id => 'my-events' %>
       </li>
       <li>
-        <%= link_to '<i class="fa fa-forward fa-fw"></i> Future Events'.html_safe, event_scope_path(:future), :id => 'future-events' %>
+        <%= link_to '<i class="fa fa-forward fa-fw"></i> Future Events'.html_safe, events_future_path, :id => 'future-events' %>
       </li>
       <li>
-        <%= link_to '<i class="fa fa-backward fa-fw"></i> Past Events'.html_safe, event_scope_path(:past), :id => 'past-events' %>
+        <%= link_to '<i class="fa fa-backward fa-fw"></i> Past Events'.html_safe, events_past_path, :id => 'past-events' %>
       </li>
 
       <% if @event && @event.id %>

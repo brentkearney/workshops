@@ -18,24 +18,54 @@ class EventsController < ApplicationController
   def my_events
     @heading = 'My Events'
     @events = current_user.person.events
-
     render :index
   end
 
-  # GET /events/scope/future || past || year || location
-  def scope
-    scope = event_scope
-    @heading = scope[:title]
-    @events = Event.send(scope[:method], scope[:args])
-
+  # GET /events/past
+  def past
+    @heading = 'Past Events'
+    @events = Event.past
     render :index
   end
 
-  # GET /events/kind/
+  # GET /events/future
+  def future
+    @heading = 'Future Events'
+    @events = Event.future
+    render :index
+  end
+
+  # GET /events/year/:year
+  # GET /events/year/:year.json
+  def year
+    year = params[:year]
+    redirect_to events_path unless year =~ /\d{4}/
+    
+    @heading = "#{year} Events"
+    @events = Event.year(year)
+    render :index
+  end
+
+  # GET /events/location/:location
+  # GET /events/location/:location.json
+  def location
+    location = params[:location]
+    location = Global.location.first unless Global.location.all.include?(location)
+
+    @heading = "Events at #{location}"
+    @events = Event.location(location)
+    render :index
+  end
+
+  # GET /events/kind/:kind
   def kind
-    @heading = event_kind.pluralize
-    @events = Event.kind(event_kind)
+    kind = params[:kind]
+    unless kind == 'research-in-teams' || Global.event.types.key?(kind.singularize)
+      kind = Global.event.types.first
+    end
 
+    @heading = kind.pluralize
+    @events = Event.kind(kind)
     render :index
   end
 
@@ -106,53 +136,5 @@ class EventsController < ApplicationController
 
     def event_params
       params.require(:event).permit(:code, :name, :short_name, :start_date, :end_date, :time_zone, :event_type, :location, :description, :press_release, :max_participants, :door_code, :booking_code, :updated_by)
-    end
-
-    def event_scope
-      data = {title: '', method: '', args: ''}
-
-      case params[:scope]
-        when 'year'
-          year = params[:format]
-
-          if year =~ /\d{4}/
-            data[:title] = year
-            data[:method] = 'year'
-            data[:args] = year
-          else
-            redirect_to events_path
-          end
-
-        when 'location'
-          location = params[:format]
-          location = Global.location.first unless Global.location.key?(location)
-          
-          data[:title] = location
-          data[:method] = 'location'
-          data[:args] = location
-
-        when 'past', 'future'
-          data[:title] = params[:scope]
-          data[:method] = params[:scope]
-
-        else
-          redirect_to events_path
-        end
-
-      data[:title] = data[:title].capitalize + ' Events'
-      data
-    end
-
-    def event_kind
-      if params[:kind] == 'research-in-teams'
-        return 'Research in Teams'
-      else
-        kind = params[:kind].titleize
-        if kind.singularize.in? Global.event.types
-          kind
-        else
-          '5 Day Workshops'
-        end
-      end
     end
 end
