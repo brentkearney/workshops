@@ -41,11 +41,13 @@ class EventsController < ApplicationController
   # GET /events/year/:year.json
   def year
     year = params[:year]
-    redirect_to events_path unless year =~ /\d{4}/
-    
-    @heading = "#{year} Events"
-    @events = Event.year(year)
-    render :index
+    if year =~ /^\d{4}$/
+      @heading = "#{year} Events"
+      @events = Event.year(year)
+      render :index
+    else
+      redirect_to events_path
+    end
   end
 
   # GET /events/location/:location
