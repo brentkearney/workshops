@@ -8,9 +8,9 @@ $(document).ready ->
 
   switch window.location.pathname
     when '/events' then $('a#all-events').addClass('active')
-    when '/events/scope/future' then $('a#future-events').addClass('active')
-    when '/events/scope/past' then $('a#past-events').addClass('active')
-    when '/events' then $('a#my-events').addClass('active')
+    when '/events/my_events' then $('a#my-events').addClass('active')
+    when '/events/past' then $('a#past-events').addClass('active')
+    when '/events/future' then $('a#future-events').addClass('active')
     else
       if $('body').is('.welcome')
         $('a#home').addClass('active')
