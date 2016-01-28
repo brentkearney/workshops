@@ -7,10 +7,10 @@ $(document).ready ->
   $('div.sidebar').find('*').removeClass('active')
 
   switch window.location.pathname
-    when '/events/all' then $('a#all-events').addClass('active')
+    when '/events' then $('a#all-events').addClass('active')
     when '/events/scope/future' then $('a#future-events').addClass('active')
     when '/events/scope/past' then $('a#past-events').addClass('active')
-    when '/events' then $('a#your-events').addClass('active')
+    when '/events' then $('a#my-events').addClass('active')
     else
       if $('body').is('.welcome')
         $('a#home').addClass('active')
