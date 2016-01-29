@@ -15,7 +15,13 @@ class StaffMailer < ApplicationMailer
     @error_messages = ''
 
     sync_errors['People'].each do |person|
-      person_name = person[:lastname] + ', ' +  person[:firstname]
+
+      Rails.logger.debug("\n\n********************************************\n\n")
+      Rails.logger.debug("person object is a: #{person.class}\n\n")
+      Rails.logger.debug("person contains:\n#{person.inspect}")
+      Rails.logger.debug("\n\n********************************************\n\n")
+      
+      person_name = "#{person[:lastname]}, #{person[:firstname]}"
       legacy_id = person.legacy_id.to_s
       legacy_url = Global.config.legacy_person
       if legacy_id.nil?
@@ -34,6 +40,12 @@ class StaffMailer < ApplicationMailer
     end
 
     sync_errors['Memberships'].each do |membership|
+
+      Rails.logger.debug("\n\n********************************************\n\n")
+      Rails.logger.debug("membership object is a: #{membership.class}\n\n")
+      Rails.logger.debug("membership contains:\n#{membership.inspect}")
+      Rails.logger.debug("\n\n********************************************\n\n")
+
       person_name = membership.person.name
       legacy_id = membership.person.legacy_id.to_s
       legacy_url = Global.config.legacy_person
