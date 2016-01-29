@@ -212,14 +212,61 @@ RSpec.describe EventsController, type: :controller do
 
     it 'assigns @events only with events from the past' do
       past_event = create(:event, start_date: Date.today.prev_month.prev_week(:sunday),
-                              end_date: Date.today.prev_month.prev_week(:sunday) + 5.days)
+                          end_date: Date.today.prev_month.prev_week(:sunday) + 5.days)
       current_event = create(:event, start_date: Date.today.prev_week(:sunday),
-                      end_date: Date.today.prev_week(:sunday) + 5.days)
+                             end_date: Date.today.prev_week(:sunday) + 5.days)
       future_event = create(:event, start_date: Date.today.next_week(:sunday),
-                              end_date: Date.today.next_week(:sunday) + 5.days)
+                            end_date: Date.today.next_week(:sunday) + 5.days)
       get :past
 
       expect(assigns(:events)).to match_array(past_event)
+    end
+
+    context 'with user roles' do
+      let(:person) { build(:person) }
+      let(:user) { build(:user, person: person) }
+
+      before do
+        allow(request.env['warden']).to receive(:authenticate!).and_return(user)
+        allow(controller).to receive(:current_user).and_return(user)
+
+        @event1 = create(:event, location: user.location, start_date: Date.today.prev_month.prev_week(:sunday),
+                         end_date: Date.today.prev_month.prev_week(:sunday) + 5.days)
+        @event2 = create(:event, location: 'elsewhere', start_date: @event1.start_date - 1.week,
+                         end_date: @event1.end_date - 1.week)
+      end
+
+      it "members: @events includes all past events" do
+        user.member!
+
+        get :past
+
+        expect(assigns(:events)).to match_array([@event1, @event2])
+      end
+
+      it "staff: @events includes only events at the user's location" do
+        user.staff!
+
+        get :past
+
+        expect(assigns(:events)).to match_array([@event1])
+      end
+
+      it "admin: @events includes all past events" do
+        user.admin!
+
+        get :past
+
+        expect(assigns(:events)).to match_array([@event1, @event2])
+      end
+
+      it "super_admin: @events includes all past events" do
+        user.super_admin!
+
+        get :past
+
+        expect(assigns(:events)).to match_array([@event1, @event2])
+      end
     end
   end
 
@@ -253,6 +300,53 @@ RSpec.describe EventsController, type: :controller do
       get :future
 
       expect(assigns(:events)).to match_array([current_event, future_event])
+    end
+
+    context 'with user roles' do
+      let(:person) { build(:person) }
+      let(:user) { build(:user, person: person) }
+
+      before do
+        allow(request.env['warden']).to receive(:authenticate!).and_return(user)
+        allow(controller).to receive(:current_user).and_return(user)
+
+        @event1 = create(:event, location: user.location, start_date: Date.today.next_week(:sunday),
+                         end_date: Date.today.next_week(:sunday) + 5.days)
+        @event2 = create(:event, location: 'elsewhere', start_date: @event1.start_date - 1.week,
+                         end_date: @event1.end_date - 1.week)
+      end
+
+      it "members: @events includes all future events" do
+        user.member!
+
+        get :future
+
+        expect(assigns(:events)).to match_array([@event1, @event2])
+      end
+
+      it "staff: @events includes only events at the user's location" do
+        user.staff!
+
+        get :future
+
+        expect(assigns(:events)).to match_array([@event1])
+      end
+
+      it "admin: @events includes all future events" do
+        user.admin!
+
+        get :future
+
+        expect(assigns(:events)).to match_array([@event1, @event2])
+      end
+
+      it "super_admin: @events includes all future events" do
+        user.super_admin!
+
+        get :future
+
+        expect(assigns(:events)).to match_array([@event1, @event2])
+      end
     end
   end
 

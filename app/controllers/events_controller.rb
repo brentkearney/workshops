@@ -25,7 +25,7 @@ class EventsController < ApplicationController
   # GET /events/past.json
   def past
     @heading = 'Past Events'
-    @events = Event.past
+    @events = policy_scope(Event).past
     render :index
   end
 
@@ -33,7 +33,7 @@ class EventsController < ApplicationController
   # GET /events/future.json
   def future
     @heading = 'Future Events'
-    @events = Event.future
+    @events = policy_scope(Event).future
     render :index
   end
 
@@ -43,7 +43,7 @@ class EventsController < ApplicationController
     year = params[:year]
     if year =~ /^\d{4}$/
       @heading = "#{year} Events"
-      @events = Event.year(year)
+      @events = policy_scope(Event).year(year)
       render :index
     else
       redirect_to events_path
@@ -72,7 +72,7 @@ class EventsController < ApplicationController
     end
 
     @heading = kind.pluralize
-    @events = Event.kind(kind)
+    @events = policy_scope(Event).kind(kind)
     render :index
   end
 

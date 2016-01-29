@@ -19,7 +19,7 @@ FactoryGirl.define do
     f.event_type Global.event.types.first
     f.max_participants 42
     f.location Global.location.first
-    f.time_zone 'Eastern Time (US & Canada)'
+    f.time_zone Global.location.timezone.send(Global.location.first)
     f.description { Faker::Lorem.sentence(6) }
     f.updated_by 'FactoryGirl'
     f.template false
