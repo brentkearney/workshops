@@ -33,7 +33,7 @@ class Event < ActiveRecord::Base
     param =~ /\D/ ? find_by_code(param) : super
   end
   
-  scope :past, -> { where("end_date <= ? AND template = ?", Time.now, false).order('start_date DESC') }
+  scope :past, -> { where("end_date < ? AND template = ?", Time.now, false).order('start_date DESC') }
   scope :future, -> { where("end_date >= ? AND template = ?", Time.now, false).order(:start_date) }
   scope :year, ->(year) { where("start_date >= '?-01-01' AND end_date <= '?-12-31' AND template = ?", year.to_i, year.to_i, false) }
   scope :location, ->(location) { where("location = ? AND template = ?", location, false) }
@@ -41,9 +41,9 @@ class Event < ActiveRecord::Base
   scope :kind, ->(kind) { 
     if kind == 'Research in Teams'
       # this kind stays plural
-      where("event_type = ?", 'Research in Teams')
+      where("event_type = ?", 'Research in Teams').order(:start_date)
     else
-      where("event_type = ?", kind.titleize.singularize)
+      where("event_type = ?", kind.titleize.singularize).order(:start_date)
     end
   }
 

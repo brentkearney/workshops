@@ -271,10 +271,30 @@ RSpec.describe EventsController, type: :controller do
       expect(response).to render_template(:index)
     end
 
-    it '(assigns @heading to "[Year] Events"' do
+    it %Q(assigns @heading to [year] Events") do
       get :year, { year: year }
 
       expect(assigns(:heading)).to eq("#{year} Events")
+    end
+
+    it "assigns @events to events of [year]" do
+      this_year = Date.parse("#{year}-09-01").next_week(:sunday)
+      event1 = create(:event, start_date: this_year, end_date: this_year + 5.days)
+      last_year = Date.parse("#{year.to_i - 1}-09-01").next_week(:sunday)
+      event2 = create(:event, start_date: last_year, end_date: last_year + 5.days)
+
+      get :year, { year: year }
+
+      expect(assigns(:events)).to eq([event1])
+    end
+
+    it 'redirects to events_path given an invalid year' do
+      %w(2015foo bar2013 wookie 1 12 123).each do |badyear|
+
+        get :year, { year: badyear }
+
+        expect(response).to redirect_to(events_path)
+      end
     end
   end
 
@@ -300,8 +320,83 @@ RSpec.describe EventsController, type: :controller do
 
           expect(assigns(:heading)).to eq("Events at #{loc}")
         end
+
+        it %Q(assigns @events to events at #{loc} location) do
+          event1 = create(:event, location: "#{loc}")
+          event2 = create(:event, location: 'Elsewhere')
+
+          get :location, { location: location }
+
+          expect(assigns(:events)).to eq([event1])
+        end
+      end
+    end
+
+    it 'given an invalid location, it uses the first configured location' do
+      legit_location = Global.location.first
+      event1 = create(:event, location: "#{legit_location}")
+
+      %w(random-place 7th-level-of-hell at-the-pub).each do |place|
+
+        get :location, { location: place }
+
+        expect(assigns(:heading)).to eq("Events at #{legit_location}")
+        expect(assigns(:events)).to eq([event1])
+        expect(response).to render_template(:index)
       end
     end
   end
 
+  describe '#kind' do
+    Global.event.types.each do |type|
+      context ":#{type}" do
+        let(:kind) { type }
+
+        it 'responds with success code' do
+          get :kind, { kind: kind }
+
+          expect(response).to be_success
+        end
+
+        it 'renders :index' do
+          get :kind, { kind: kind }
+
+          expect(response).to render_template(:index)
+        end
+
+        it %Q(assigns @heading to "#{type.pluralize}") do
+          get :kind, { kind: kind }
+
+          expect(assigns(:heading)).to eq("#{type.pluralize}")
+        end
+
+        it %Q(assigns @events to events of type #{type}) do
+          event1 = create(:event, event_type: "#{type}")
+          another_type = type
+          until another_type != type
+            another_type = Global.event.types.sample
+          end
+          event2 = create(:event, event_type: "#{another_type}")
+
+          get :kind, { kind: kind }
+
+          expect(assigns(:events)).to eq([event1])
+        end
+      end
+    end
+
+    it 'given an invalid event type, it assumes the first configured type' do
+      legit_type = Global.event.types.first
+      event1 = create(:event, location: "#{legit_type}")
+
+      %w(lynch-mob circus funeral).each do |invalid_type|
+
+        get :kind, { kind: invalid_type }
+
+        expect(assigns(:heading)).to eq("#{legit_type.pluralize}")
+        expect(assigns(:events)).to eq([event1])
+        expect(response).to render_template(:index)
+      end
+    end
+  end
 end
