@@ -63,8 +63,7 @@ class EventsController < ApplicationController
 
   # GET /events/kind/:kind
   def kind
-    kind = params[:kind]
-    # pluralizing Research in Teams makes it invalid
+    kind = params[:kind].titleize
     unless kind == 'Research in Teams' || Global.event.types.include?(kind.singularize)
       kind = Global.event.types.first
     end
