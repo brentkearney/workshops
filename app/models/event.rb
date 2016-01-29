@@ -40,10 +40,10 @@ class Event < ActiveRecord::Base
   
   scope :kind, ->(kind) { 
     if kind == 'Research in Teams'
-      # this kind stays plural
-      where("event_type = ?", 'Research in Teams').order(:start_date)
+      # RITs stay plural
+      where("event_type = ? AND template = ?", 'Research in Teams', false).order(:start_date)
     else
-      where("event_type = ?", kind.titleize.singularize).order(:start_date)
+      where("event_type = ? AND template = ?", kind.titleize.singularize, false).order(:start_date)
     end
   }
 
