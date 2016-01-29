@@ -350,7 +350,7 @@ RSpec.describe EventsController, type: :controller do
   describe '#kind' do
     Global.event.types.each do |type|
       context ":#{type}" do
-        let(:kind) { type }
+        let(:kind) { type.parameterize }
 
         it 'responds with success code' do
           get :kind, { kind: kind }

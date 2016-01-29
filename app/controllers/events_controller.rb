@@ -64,8 +64,11 @@ class EventsController < ApplicationController
   # GET /events/kind/:kind
   def kind
     kind = params[:kind].titleize
-    unless kind == 'Research in Teams' || Global.event.types.include?(kind.singularize)
-      kind = Global.event.types.first
+
+    if kind == 'Research In Teams'
+      kind = 'Research in Teams'
+    else
+      kind = Global.event.types.first unless Global.event.types.include?(kind.singularize)
     end
 
     @heading = kind.pluralize
