@@ -25,7 +25,7 @@ class EventsController < ApplicationController
   # GET /events/past.json
   def past
     @heading = 'Past Events'
-    @events = policy_scope(Event).past
+    @events = policy_scope(Event).past.reverse_order
     render :index
   end
 
