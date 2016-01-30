@@ -56,10 +56,6 @@ class LegacyConnector
     JSON.parse(RestClient.get "#{@rest_url}/search_person/#{email}")
   end
   
-  # update an event's members
-  def update_members(event_id, members)
-  end
-  
   # add new person record
   def add_person(person)
     email = person["email"]
@@ -88,8 +84,8 @@ class LegacyConnector
     RestClient.post "#{@rest_url}/update_person/#{legacy_id}", remote_person.to_json, :content_type => :json, :accept => :json
   end
 
-  # import memberships for given event
-  def import_members(event_id)
+  # update an event's members
+  def update_members(event_id, members)
   end
 
   # get an events lectures
@@ -101,7 +97,7 @@ class LegacyConnector
     JSON.parse(RestClient.get "#{@rest_url}/legacy_lecture/#{legacy_id}")
   end
 
-  def get_new_lecture_id(lecture)
+  def get_legacy_lecture_id(lecture)
     day = lecture.start_time.strftime("%Y-%m-%d")
     JSON.parse(RestClient.get "#{@rest_url}/new_lecture_id/#{lecture.event.code}/#{day}/#{lecture.id}")
   end
@@ -111,7 +107,7 @@ class LegacyConnector
     event_id = lecture.event.code
     lecture.person_id = lecture.person.legacy_id
     RestClient.post "#{@rest_url}/add_lecture/#{event_id}", lecture.to_json, :content_type => :json, :accept => :json
-    new_lecture = get_new_lecture_id(lecture)
+    new_lecture = get_legacy_lecture_id(lecture)
     new_lecture['legacy_id']
   end
 

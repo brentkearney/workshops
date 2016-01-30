@@ -20,171 +20,185 @@
 require 'rails_helper'
 
 describe "LegacyConnector", :type => :feature do
-  describe "From Legacy DB, it can:" do  
-    before do
-      @lc = LegacyConnector.new
+  before do
+    @lc = LegacyConnector.new
+  end
+
+  context '#list_events' do
+    it 'given invalid year, returns an error' do
+      event_list = @lc.list_events('fake', 'years')
+
+      expect(event_list).to contain_exactly(["error", "Invalid years."])
     end
 
-    it 'get_event_data: retrieves data for a specific event' do    
-      event = @lc.get_event_data('15w5080')
-      expect(event['name']).to eq("New Perspectives for Relational Learning")
-    end
-    
-    it "list_events: get a list of events between years or months" do
-      event_list = @lc.list_events('fake', 'years')
-      expect(event_list).to contain_exactly(["error", "Invalid years."])
-    
+    it 'given two years, it returns a list of valid event_ids' do
       event_list = @lc.list_events('2014', '2015')
       expect(event_list).not_to be_empty
-      event_list.each do |event_id|
-        expect(event_id).to match /^\d{2}\D+\d{3,4}$/
-      end
 
+      event_list.each do |event_id|
+        expect(event_id).to match /#{Global.event.code_pattern}/
+      end
+    end
+
+    it 'handles backwards input' do
       # Handles backwards input
       event_list = @lc.list_events('2015', '2014')
+
       expect(event_list).not_to be_empty
-      
-      event_list = @lc.list_events('201502', '201503')
-      expect(event_list).not_to be_empty
-      expect(event_list.count).to be > 3
-      expect(event_list.count).to be < 12
-    end
-    
-    it "download event data" do
-      event_data = @lc.get_event_data('14w5075')
-      expect(event_data).not_to be_empty
-      expect(event_data).to include('code' => '14w5075')
-      expect(event_data).to include('name')
-      expect(event_data).to include('start_date')
-      expect(event_data).to include('end_date')
-      expect(event_data).to include('event_type')
-      expect(event_data).to include('max_participants')
-      expect(event_data).to include('description')        
-    end
-    
-    it "download all event data in a given year" do
-      event_list = @lc.list_events('2014', '2014')
-      event_data = @lc.get_event_data_for_year('2014')
-      expect(event_data).not_to be_empty
-    
-      event_list.each do |event_id|
-        search = event_data.detect {|event| event['code'] == event_id }
-        expect(search).to include('code' => event_id)
-        expect(search).to include('name')
-        expect(search).to include('description')
-      end
     end
 
-    it "get membership data for a specific event" do
+    it 'accepts months as YYYYMM' do
+      event_list = @lc.list_events('201502', '201503')
+
+      expect(event_list).not_to be_empty
+      expect(event_list.first).to match /#{Global.event.code_pattern}/
+    end
+  end
+
+  context '#get_event_data' do
+    it 'retrieves data for a given event code' do
+      event = @lc.get_event_data('15w5080')
+      expect(event).not_to be_empty
+
+      expect(event).to include("code" => "15w5080")
+      expect(event).to include('name' => "New Perspectives for Relational Learning")
+      expect(event).to include('start_date')
+      expect(event).to include('end_date')
+      expect(event).to include('event_type')
+      expect(event).to include('max_participants')
+      expect(event).to include('description')
+    end
+  end
+
+  context '#get_event_data_for_year' do
+    it 'retrieves data for given year' do
+      event_data = @lc.get_event_data_for_year('2014')
+
+      expect(event_data).not_to be_empty
+      expect(event_data.last['code']).to match /#{Global.event.code_pattern}/
+    end
+  end
+
+  context '#get_members' do
+    it 'retrieves membership data for a given event' do
       members = @lc.get_members('14w5075')
       expect(members).not_to be_empty
-      
-      members.each do |member| 
+
+      members.each do |member|
         expect(member).to include('Workshop')
         expect(member).to include('Membership')
         expect(member).to include('Person')
         expect(member["Person"]["email"]).to match /\w+@\w+\.\w+/
       end
     end
-    
-    it "get data for a specific person by legacy_id" do
-      person = @lc.get_person('7946')
-      expect(person["lastname"]).to eq('Kearney')
-    end
-    
-    it "get data for a specific person by email" do
-      person = @lc.search_person('brentk@birs.ca')
-      expect(person["lastname"]).to eq('Kearney')
-    end
-    
-    it "can create new person records" do
-      ## This works, but we don't want to create new Person records with each run of rspec
-      # remote_person = @lc.search_person('test2@test.birs.ca')
-      #       expect(remote_person).to be_empty
-      #       
-      #       person = Person.new(person_attributes(firstname: "Another", lastname: "TestUser", email: "test2@test.birs.ca", updated_by: 'RSpec tests'))
-      #       
-      #       legacy_id = @lc.add_person(person)
-      #       expect(legacy_id).not_to be_empty
-      #       puts "Legacy_id returned: #{legacy_id}"
-      #            
-      #       remote_person = @lc.get_person(legacy_id)
-      #       expect(remote_person).not_to be_empty
-      #       expect(remote_person["lastname"]).to eq("TestUser")
-    end
+  end
 
-    it 'can retrieve Lectures for an event' do
+  context '#get_person' do
+    it 'retrieves person data for a given legacy_id' do
+      person = @lc.get_person('13167')
+
+      expect(person["lastname"]).to eq('Tester')
+    end
+  end
+
+  context '#search_person' do
+    it 'retrieves person data for a given email address' do
+      person = @lc.search_person('test@test.birs.ca')
+
+      expect(person["lastname"]).to eq('Tester')
+    end
+  end
+
+  ## This works, but we don't want to create new Person records with each run of rspec
+  context '#add_person' do
+    it "can create new person records" do
+      # remote_person = @lc.search_person('test2@test2.birs.ca')
+      # expect(remote_person).to be_empty
+
+      # person = Person.new(person_attributes(firstname: "Another", lastname: "TestUser", email: "test2@test.birs.ca", updated_by: 'RSpec tests'))
+      #
+      # legacy_id = @lc.add_person(person)
+      # expect(legacy_id).not_to be_empty
+      # puts "Legacy_id returned: #{legacy_id}"
+      #
+      # remote_person = @lc.get_person(legacy_id)
+      # expect(remote_person).not_to be_empty
+      # expect(remote_person["lastname"]).to eq("TestUser")
+    end
+  end
+
+  context '#add_member' do
+
+  end
+
+  context '#add_members' do
+
+  end
+
+  context '#update_member' do
+
+  end
+
+  context '#update_members' do
+
+  end
+
+  context '#get_lectures' do
+    it 'can retrieve Lectures for given event' do
       lectures = @lc.get_lectures('15w5013')
-      expect(lectures).not_to be_nil
+
+      expect(lectures).not_to be_empty
       lectures.each do |lecture|
         expect(lecture['event_id']).to eq('15w5013')
       end
     end
+  end
 
-    it 'can retrieve an individual Lecture based on legacy_id' do
-      legacy_id = 0
-      title = 'foo'
-
+  context '#get_legacy_lecture' do
+    it 'can retrieve a Lecture given legacy_id' do
       lectures = @lc.get_lectures('15w5013')
-      expect(lectures).not_to be_nil
-      lectures.each do |lecture|
-        legacy_id = lecture['legacy_id']
-        title = lecture['title']
-      end
+      legacy_id = lectures.last['legacy_id']
+      title = lectures.last['title']
       expect(legacy_id.to_i).to be > 0
-      expect(title).not_to eq('foo')
+      expect(title).not_to be_empty
 
       the_lecture = @lc.get_legacy_lecture(legacy_id)
+
       expect(the_lecture['title']).to eq(title)
     end
+  end
 
-    it 'can add a lecture to the remote db' do
-      event = FactoryGirl.build(:event, code: '14w6661', start_date: '2003-01-05', end_date: '2003-01-10')
-      person = FactoryGirl.create(:person, legacy_id: '7946')
-      lecture = FactoryGirl.create(:lecture, event: event, person: person,
-                                    start_time: (event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
-                                    end_time: (event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
+  context '#add_lecture' do
+    it 'adds a Lecture record to the remote database' do
+      event = build(:event, code: '14w6661', start_date: '2003-01-05', end_date: '2003-01-10')
+      person = build(:person, legacy_id: '13167')
+      lecture = create(:lecture, event: event, person: person, title: 'RSpec Test LegacyConnector#add_lecture',
+                       start_time: (event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
+                       end_time: (event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
 
-      # add_lecture() updates existing lectures, so this doesn't add a new one every run
       lecture_id = @lc.add_lecture(lecture)
+
       expect(lecture_id).not_to be_nil
       expect(lecture_id.to_i).to be > 0
       the_lecture = @lc.get_legacy_lecture(lecture_id)
       expect(the_lecture['title']).to eq(lecture.title)
-      @lc.delete_lecture(lecture_id) # clean up db
     end
-
-    # the after_save callback is disabled in test mode
-    # it 'adding a lecture gets the (new) remote lecture\'s primary id and adds it to the legacy_id field of the local record' do
-    #   event = FactoryGirl.build(:event, code: '14w6661')
-    #   person = FactoryGirl.create(:person, legacy_id: '7946')
-    #   lecture = FactoryGirl.create(:lecture, event: event, person: person,
-    #                                start_time: (event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
-    #                                end_time: (event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
-    #
-    #   # add_lecture() updates existing lectures, so this doesn't add a new one every run
-    #   remote_id = @lc.add_lecture(lecture)
-    #   expect(remote_id).not_to be_nil
-    #
-    #   updated_lecture = Lecture.find(lecture.id)
-    #   expect(lecture.legacy_id).to eq(remote_id)
-    # end
-
-    it 'can remove a lecture from the remote db' do
-      event = FactoryGirl.build(:event, code: '14w6661', start_date: '2003-01-05', end_date: '2003-01-10')
-      person = FactoryGirl.create(:person, legacy_id: '7946')
-      lecture = FactoryGirl.create(:lecture, event: event, person: person, title: '123456789 Yeah',
-                                   start_time: (event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
-                                   end_time: (event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
-      lecture_id = @lc.add_lecture(lecture)
-
-      remote_lecture = @lc.get_legacy_lecture(lecture_id)
-      expect(remote_lecture['title']).to eq('123456789 Yeah')
-
-      @lc.delete_lecture(lecture_id)
-      remote_lecture = @lc.get_legacy_lecture(lecture_id)
-      expect(remote_lecture).to be_empty
-    end
-
   end
+
+  context '#delete_lecture' do
+    it 'deletes a lecture from the remote database' do
+      # I know, this depends on the last test, but in the interest of decreasing database pollution...
+      lecture = @lc.get_lectures('14w6661').last
+      expect(lecture).not_to be_nil
+      expect(lecture['title']).to eq('RSpec Test LegacyConnector#add_lecture')
+
+      # This works, but if we leave it in the db, the previous test won't create a new one every run
+      # lecture_id = lecture['legacy_id']
+      # @lc.delete_lecture(lecture_id)
+
+      # remote_lecture = @lc.get_legacy_lecture(lecture_id)
+      # expect(remote_lecture).to be_empty
+    end
+  end
+
 end
