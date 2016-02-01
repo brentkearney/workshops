@@ -25,7 +25,6 @@ gem 'devise_invitable'
 gem 'pundit'
 gem 'sucker_punch'
 gem 'global'
-gem 'newrelic_rpm'
 
 group :development, :test do
   gem 'byebug'
@@ -47,6 +46,7 @@ end
 
 group :production do
   gem 'passenger'
+  gem 'newrelic_rpm'
 end
 
 group :development do

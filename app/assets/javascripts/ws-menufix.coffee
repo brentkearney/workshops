@@ -6,13 +6,16 @@ $(document).ready ->
 
   $('div.sidebar').find('*').removeClass('active')
 
-  switch window.location.pathname
+  switch path = window.location.pathname
     when '/events' then $('a#all-events').addClass('active')
     when '/events/my_events' then $('a#my-events').addClass('active')
     when '/events/past' then $('a#past-events').addClass('active')
     when '/events/future' then $('a#future-events').addClass('active')
     else
-      if $('body').is('.welcome')
+      if path.match(/\/events\/location/)
+        location = path.split('/').pop()
+        $("#" + location).addClass('active')
+      else if $('body').is('.welcome')
         $('a#home').addClass('active')
       else if $('body').is('.events, .show')
         $('a#event-details').addClass('active')
@@ -20,4 +23,3 @@ $(document).ready ->
         $('a#event-schedule').addClass('active')
       else if $('body').is('.events, .memberships')
         $('a#event-memberships').addClass('active')
-

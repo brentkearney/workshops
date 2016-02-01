@@ -19,10 +19,11 @@
       <% unless Global.location.all.empty? %>
       <li>
         <a href="#"><i class="fa fa-globe fa-fw"></i> Event Locations <span class="fa arrow"></span></a>
-        <ul class="nav nav-second-level">
+        <ul class="nav nav-second-level" id="event-location">
           <% Global.location.all.each do |location| %>
           <li>
-            <%= link_to %Q(<i class="fa fa-location-arrow fa-fw"></i> #{location}).html_safe, events_location_path(location), :id => 'event-location' %>
+            <%= link_to %Q(<i class="fa fa-location-arrow fa-fw"></i> #{location}).html_safe,
+                        events_location_path(location), :id => "#{location}" %>
           </li>
           <% end %>
         </ul>
