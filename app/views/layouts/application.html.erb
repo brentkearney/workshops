@@ -90,17 +90,16 @@
     <div class="row">
       <div class="col-lg-12">
         <% if @event && !@event.name.nil? %>
-            <h3 class="page-header"><%= link_to @event.name, @event %><h3>
+            <h3 class="page-header"><%= link_to @event.name, @event %></h3>
               <div class="page-header-subtitle">
                 <%= image_tag("flags/#{@event.country}.png", height: 22) %>
                 <h4><%= @event.dates('long') %></h4>
               </div>
         <% else %>
-            <% if user_signed_in? && @heading %>
-                <h1 class="page-header"><%= @heading %></h1>
+            <% if user_signed_in? && @welcome_heading %>
+                <h1 class="page-header"><%= @welcome_heading %></h1>
             <% end %>
         <% end %>
-
       </div>
       <!-- /.col-lg-12 -->
     </div>

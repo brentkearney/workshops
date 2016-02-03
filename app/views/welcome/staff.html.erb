@@ -1,6 +1,7 @@
 <article>
   <div class="row">
 
+    <% if current_user.last_sign_in_at.nil? %>
     <div class="col-md-5">
       <div class="well">
         <h3>Dear staff member,</h3>
@@ -15,6 +16,7 @@
       <!-- /.well -->
     </div>
     <!-- /.col-md-5 -->
+    <% end %>
 
     <div class="col-md-7">
       <div class="panel panel-default workshops-panels">

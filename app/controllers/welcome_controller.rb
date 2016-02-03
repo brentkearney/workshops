@@ -4,30 +4,28 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class WelcomeController < ApplicationController
-  before_action :set_attendance, :set_greeting
+  before_action :set_attendance
   before_filter :authenticate_user!
 
   # GET / or /welcome
   def index
-    welcome_page = 'welcome_' + current_user.role + '_path'
-    welcome_page.slice!('super_')
+    @memberships = current_user.person.memberships.includes(:event).sort_by {|m| m.event.start_date }
+    @memberships.delete_if {|m| (m.role !~ /Organizer/ && m.attendance == 'Declined') ||
+        m.role == 'Backup Participant' || m.attendance == 'Not Yet Invited'}
 
-    current_user.person.memberships.each do |membership|
-      if membership.role =~ /Organizer/ && current_user.member?
-        welcome_page = 'welcome_organizers_path'
-      end
-
-      # Update user's events with data from remote database
-      event = membership.event
-      if !event.template
-        SyncEventMembersJob.perform_later(event) if policy(event).sync?
+    @memberships.each do |m|
+      # Update user's events with data from remote database.
+      unless m.event.template
+        SyncEventMembersJob.perform_later(m.event) if policy(m.event).sync?
       end
     end
 
-    redirect_to send(welcome_page)
+    prefix = current_user.last_sign_in_at.nil? ? 'Welcome' : 'Welcome back'
+    @welcome_heading = "#{prefix}, #{current_user.person.firstname}!"
   end
 
   def admin
+    @welcome_heading = "Welcome, #{current_user.person.firstname}!"
     @event_heading = 'Current & Upcoming Events'
     @events = Event.where("start_date >= ? AND template=false", 1.week.ago).order(:start_date).limit(8)
     @next_event = Event.where("start_date >= ?", 5.days.ago).order(:start_date).first
@@ -35,6 +33,7 @@ class WelcomeController < ApplicationController
   end
 
   def staff
+    @welcome_heading = "Welcome, #{current_user.person.firstname}!"
     @event_heading = 'Current & Upcoming Events at ' + current_user.location
     @events = Event.where("start_date >= ? AND template=false AND location = ?", 1.week.ago, current_user.location).order(:start_date).limit(8)
     @next_event = Event.where("start_date >= ?", Time.now).order(:start_date).first
@@ -42,12 +41,14 @@ class WelcomeController < ApplicationController
   end
 
   def participants
+    @welcome_heading = "Welcome, #{current_user.person.firstname}!"
     @event_heading = 'Your Workshops'
     @events = current_user.person.events.where("template=false AND attendance != 'Not Yet Invited' AND attendance != 'Declined'").order(:start_date)
     @next_event = current_user.person.events.where("template=false AND start_date >= ?", 1.week.ago).order(:start_date).first
   end
 
   def organizers
+    @welcome_heading = "Welcome, #{current_user.person.firstname}!"
     @event_heading = 'Your Workshops'
     @events = current_user.person.events.where("template=false").order(:start_date)
     @next_event = current_user.person.events.where("template=false AND start_date >= ?", 1.week.ago).order(:start_date).first

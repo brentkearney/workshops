@@ -8,15 +8,28 @@
   margin-top: 100px;
 }
 
-.your-workshops-heading {
+.event-title {
   font-size: 1.3em;
   font-weight: bold;
 }
-
-.event-date {
-  font-size: 0.7em;
-  color: #333333;
-  font-style: italic;
+.your-workshops {
+  text-align: right;
+  h2 {
+    margin-right: 10px;
+  }
+}
+.event-status {
+  margin-top: -15px;
+  margin-bottom: 20px;
+  background-color: #dddddd;
+}
+.event-status p {
+  color: black;
+  margin: 10px;
+  font-size: 0.9em;
+}
+.event-buttons {
+  margin: 1em;
 }
 
 .panel-primary .event-date {

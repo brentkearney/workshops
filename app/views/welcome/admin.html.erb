@@ -1,6 +1,7 @@
 <article>
   <div class="row">
 
+    <% if current_user.last_sign_in_at.nil? %>
     <div class="col-md-5">
       <div class="well">
         <h3>Dear admin user,</h3>
@@ -9,12 +10,13 @@
         <p>There are also navigation links on the left side of the page (or in the menu on a small screen).</p>
         <p>Template Events can be used to set the default schedule template that workshops will use.</p>
         <p>This application is a work in progress. I hope that you enjoy using it, and I
-          <a href="mailto:<%= Global.email.webmaster %>">welcome any feedback</a> you may have.</p>
+          <%= mail_to Global.email.webmaster, "welcome any feedback" %> you may have.</p>
         <p>&mdash;Brent</p>
       </div>
       <!-- /.well -->
     </div>
     <!-- /.col-md-5 -->
+    <% end %>
 
     <div class="col-md-7">
       <div class="panel panel-default workshops-panels">

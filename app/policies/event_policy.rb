@@ -67,7 +67,7 @@ class EventPolicy
 
   def sync?
     if @event.end_date >= Date.today && !@event.template
-      allow_staff_and_admins unless Rails.env.test?
+      allow_orgs_and_admins unless Rails.env.test?
     end
   end
 
