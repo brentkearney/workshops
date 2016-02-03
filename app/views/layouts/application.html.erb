@@ -96,8 +96,8 @@
                 <h4><%= @event.dates('long') %></h4>
               </div>
         <% else %>
-            <% if user_signed_in? && @welcome_heading %>
-                <h1 class="page-header"><%= @welcome_heading %></h1>
+            <% if user_signed_in? && @heading %>
+                <h1 class="page-header"><%= @heading %></h1>
             <% end %>
         <% end %>
       </div>

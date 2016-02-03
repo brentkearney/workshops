@@ -19,7 +19,7 @@ class WelcomeController < ApplicationController
       redirect_to my_events_path
     else
       prefix = current_user.last_sign_in_at.nil? ? 'Welcome' : 'Welcome back'
-      @welcome_heading = "#{prefix}, #{current_user.person.firstname}!"
+      @heading = "#{prefix}, #{current_user.person.firstname}!"
 
       @memberships.each do |m|
         # Update user's events with data from remote database.
