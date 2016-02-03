@@ -16,10 +16,6 @@ Rails.application.routes.draw do
 
   # Post-login welcome page
   get 'welcome' => 'welcome#index'
-  get 'organizers' => 'welcome#organizers', as: :welcome_organizers
-  get 'admin' => 'welcome#admin', as: :welcome_admin
-  get 'staff' => 'welcome#staff', as: :welcome_staff
-  get 'participants' => 'welcome#participants', as: :welcome_member
 
   # Events, schedules, memberships
   get 'events/my_events' => 'events#my_events', as: :my_events

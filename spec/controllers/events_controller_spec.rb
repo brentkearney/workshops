@@ -210,7 +210,7 @@ RSpec.describe EventsController, type: :controller do
       expect(assigns(:heading)).to eq('Past Events')
     end
 
-    it 'assigns @events only with events from the past and the current event' do
+    it 'assigns @events only with events from the past' do
       past_event = create(:event, start_date: Date.today.prev_year.prev_week(:sunday),
                           end_date: Date.today.prev_year.prev_week(:sunday) + 5.days)
       current_event = create(:event, start_date: Date.today.beginning_of_week(:sunday),
@@ -219,7 +219,7 @@ RSpec.describe EventsController, type: :controller do
                             end_date: Date.today.next_year.next_week(:sunday) + 5.days)
       get :past
 
-      expect(assigns(:events)).to match_array([past_event, current_event])
+      expect(assigns(:events)).to match_array([past_event])
     end
 
     context 'with user roles' do

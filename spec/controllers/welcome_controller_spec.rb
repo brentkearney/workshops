@@ -7,110 +7,42 @@ require 'rails_helper'
 
 RSpec.describe WelcomeController, type: :controller do
 
-  let(:all_events) { 10.times { FactoryGirl.create(:event) } }
-
   before do
     Event.destroy_all
     authenticate_for_controllers # sets @user, @person, @event, @membership
-    all_events
   end
 
-  describe "GET #index" do
+  describe "#index" do
+    it 'responds with success code' do
+      get :index
 
-    context 'if user is a participant' do
-      before do
-        @user.member!
-        @person.memberships.each do |m|
-          m.role = 'Participant'
-          m.attendance = 'Confirmed'
-          m.save
-        end
-        get :index
-        expect(response.status).to eq(302)
-      end
-
-      it 'redirects to welcome page for participants' do
-        expect(response).to redirect_to(welcome_member_path)
-      end
-
-      it 'assigns @events to the participants events' do
-        get :participants
-        events = @user.person.events
-        expect(assigns(:events)).to eq(events)
-      end
-
+      expect(response).to be_success
     end
 
-    context 'if user is an organizer' do
-      before do
-        @user.member!
-        @membership = @user.person.memberships.first
-        @membership.role = 'Organizer'
-        @membership.save!
-        get :index
-        expect(response.status).to eq(302)
-      end
+    it 'renders :index' do
+      get :index
 
-      it 'redirects to welcome page for organizers' do
-        expect(response).to redirect_to(welcome_organizers_path)
-      end
-
-      it 'assigns @events to the organizers events' do
-        get :organizers
-        events = @user.person.events
-        expect(assigns(:events)).to eq(events)
-      end
-
+      expect(response).to render_template(:index)
     end
 
+    it 'assigns @heading' do
+      get :index
 
-    context 'if user is an admin' do
-      before do
-        @user.admin!
-        get :index
-        expect(response.status).to eq(302)
-      end
-
-      it 'redirects to welcome page for admins' do
-        expect(response).to redirect_to(welcome_admin_path)
-      end
-
-      after do
-        @user.member!
-      end
+      expect(assigns(:heading)).not_to be_empty
     end
 
-    context 'if user is a super-admin' do
-      before do
-        @user.super_admin!
-        get :index
-        expect(response.status).to eq(302)
-      end
+    it "assigns @memberships to user's memberships" do
+      get :index
 
-      it 'redirects to welcome page for admins' do
-        expect(response).to redirect_to(welcome_admin_path)
-      end
-
-      after do
-        @user.member!
-      end
+      expect(assigns(:memberships)).to match_array(@person.memberships)
     end
 
-    context 'if user is a staff member' do
-      before do
-        @user.staff!
-        get :index
-        expect(response.status).to eq(302)
-      end
-
-      it 'redirects to welcome page for staff' do
-        expect(response).to redirect_to(welcome_staff_path)
-      end
-
-      after do
-        @user.member!
-      end
-    end
-
+    it 'orders @memberships by event date'
+    it 'excludes from @memberships where attendance is Declined'
+    it 'includes Declined memberships if role is Organizer'
+    it 'excludes from @memberships where attendance is Not Yet Invited'
+    it 'excludes from @memberships where role is Backup Participant'
+    it 'excludes from @memberships where event is from more than 2 weeks ago'
+    it 'runs background job to sync current events with remote db'
   end
 end

@@ -25,11 +25,9 @@ describe 'Post-login Welcome Page', :type => :feature do
   end
 
   it 'Disallows access to non-logged in users' do
-    welcome_paths = ['welcome_member_path', 'welcome_organizers_path', 'welcome_staff_path','welcome_admin_path','welcome_admin_path']
-    welcome_paths.each do |welcome_page|
-      visit send(welcome_page)
-      expect(current_path).to eq(new_user_session_path)
-    end
+    visit welcome_path
+
+    expect(current_path).to eq(new_user_session_path)
   end
 
   context 'As an event participant' do

@@ -57,7 +57,7 @@ describe 'Visitor SignIn', :type => :feature do
   it 'Forwards user to Welcome page after signin' do
     fill_in_form
     expect(page.body).to have_text('Signed in successfully')
-    expect(current_path).to eq(welcome_member_path)
+    expect(current_path).to eq(welcome_path)
   end
 
   it 'Denies logins to non-admin users who have no memberships' do
@@ -81,16 +81,6 @@ describe 'Visitor SignIn', :type => :feature do
     expect(current_path).to eq(sign_in_path)
   end
 
-  it 'Allows organizers with memberships but who have not been invited' do
-    @user.member!
-    @user.person.memberships.destroy_all
-    FactoryGirl.create(:membership, person: @user.person, attendance: 'Not Yet Invited', role: 'Organizer')
-    visit sign_in_path
-    fill_in_form
-    expect(page.body).to have_text('Signed in successfully')
-    expect(current_path).to eq(welcome_organizers_path)
-  end
-
   it 'Allows organizers with memberships and declined attendance' do
     @user.member!
     @user.person.memberships.destroy_all
@@ -98,6 +88,20 @@ describe 'Visitor SignIn', :type => :feature do
     visit sign_in_path
     fill_in_form
     expect(page.body).to have_text('Signed in successfully')
-    expect(current_path).to eq(welcome_organizers_path)
+    expect(current_path).to eq(welcome_path)
+  end
+
+  it 'Forwards users with no current events to My Events' do
+    @user.member!
+    @user.person.memberships.destroy_all
+    event = create(:event, start_date: Date.today.prev_year.prev_week(:sunday),
+                  end_date: Date.today.prev_year.prev_week(:sunday) + 5.days)
+    create(:membership, person: @user.person, event: event, attendance: 'Confirmed')
+
+    visit sign_in_path
+    fill_in_form
+
+    expect(page.body).to have_text('Signed in successfully')
+    expect(current_path).to eq(my_events_path)
   end
 end
