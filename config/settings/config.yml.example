@@ -5,6 +5,7 @@ default:
   title: 'Workshop Manager'
   logo_file: 'logo.png'
   legacy_api: 'https://database.example.com/api/your_api_key'
+  footer: "Copyright © 2016 Example Organization"
 
 development:
   title: 'Workshops Development Mode'
