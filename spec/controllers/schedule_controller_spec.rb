@@ -20,6 +20,11 @@ RSpec.describe ScheduleController, type: :controller do
     @day = @event.start_date + 1.days
   end
 
+  after do
+    Lecture.delete_all
+    Schedule.delete_all
+  end
+
   describe "GET #index" do
 
     context 'as an external user (not-signed in)' do

@@ -12,6 +12,20 @@ class MembershipPolicy
     @event = @membership.event
   end
 
+  # Members cannot see memberships for events to which they
+  # have not yet been invited, have declined invitation, or are
+  # Backup Participants.
+  class Scope < Struct.new(:current_user, :model)
+    def resolve
+      memberships = current_user.person.memberships.includes(:event).sort_by {|m| m.event.start_date }
+
+      memberships.delete_if do |m|
+        m.role == 'Backup Participant' ||
+        (m.role !~ /Organizer/ && (m.attendance == 'Declined' || m.attendance == 'Not Yet Invited'))
+      end
+    end
+  end
+
   def use_email_address?
     @current_user.is_organizer?(@event) || @current_user.is_admin? ||
         (@current_user.staff? && @current_user.location == @event.location) ||

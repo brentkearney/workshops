@@ -9,24 +9,14 @@ class WelcomeController < ApplicationController
 
   # GET / or /welcome
   def index
-    @memberships = current_user.person.memberships.includes(:event).sort_by {|m| m.event.start_date }
-    @memberships.delete_if {|m| (m.role !~ /Organizer/ && m.attendance == 'Declined') ||
-        m.role == 'Backup Participant' || m.attendance == 'Not Yet Invited' ||
-        m.event.start_date < 2.weeks.ago
-    }
+    @memberships = policy_scope(Membership)
+    @memberships.delete_if { |m| m.event.start_date < 2.weeks.ago }
 
     if @memberships.empty?
       redirect_to my_events_path
     else
-      prefix = current_user.last_sign_in_at.nil? ? 'Welcome' : 'Welcome back'
-      @heading = "#{prefix}, #{current_user.person.firstname}!"
-
-      @memberships.each do |m|
-        # Update user's events with data from remote database.
-        unless m.event.template
-          SyncEventMembersJob.perform_later(m.event) if policy(m.event).sync?
-        end
-      end
+      @heading = 'Your Current & Upcoming Events'
+      @memberships.each { |m| SyncEventMembersJob.perform_later(m.event) if policy(m.event).sync? }
     end
   end
 

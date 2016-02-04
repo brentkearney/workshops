@@ -14,6 +14,11 @@ describe 'DefaultSchedule' do
     @membership = FactoryGirl.create(:membership, event: @event, person: @person, role: 'Organizer')
   end
 
+  after do
+    Lecture.delete_all
+    Schedule.delete_all
+  end
+
   it 'accepts event and user objects as a parameter' do
     DS = DefaultSchedule.new(@event, @user)
     expect(DS.class).to eq(DefaultSchedule)

@@ -25,6 +25,11 @@ describe "ScheduleItem" do
     Warden.test_reset!
   end
 
+  after do
+    Lecture.delete_all
+    Schedule.delete_all
+  end
+
   it "accepts a hash of schedule attributes" do
     CSI = ScheduleItem.new(@schedule_attributes)
     expect(CSI.class).to eq(ScheduleItem)
