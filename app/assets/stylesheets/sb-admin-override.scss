@@ -6,5 +6,35 @@
   .sidebar {
     width: 175px;
     margin-top: 2px;
+
+    ul li#event-links {
+      margin-top: 2px;
+      border-top: 1px solid #e7e7e7;
+
+      a>.fa.arrow:before {
+        content: "\f107";
+      }
+    }
+
+    li.active {
+      background-color: #fff;
+      width: 180px;
+      border-bottom: transparent;
+
+      .top-border {
+        width: 175px;
+        border-top: 1px solid #e7e7e7;
+      }
+
+      .bottom-border {
+        width: 175px;
+        border-bottom: 1px solid #e7e7e7;
+      }
+
+      a {
+        color: red;
+      }
+    }
+
   }
 }

@@ -1,49 +1,61 @@
 <div class="navbar-default sidebar" role="navigation">
   <div class="sidebar-nav navbar-collapse">
     <ul class="nav" id="side-menu">
-      <li>
-        <a href="/" id="home"><i class="fa fa-dashboard fa-fw"></i> Home</a>
+      <li id="home">
+        <a href="/"><i class="fa fa-dashboard fa-fw"></i> Home</a>
+        <div class="bottom-border"></div>
       </li>
-      <li>
-        <%= link_to '<i class="fa fa-university fa-fw"></i> All Events'.html_safe, events_path, :id => 'all-events' %>
+      <li id="all-events">
+        <%= link_to '<i class="fa fa-university fa-fw"></i> All Events'.html_safe, events_path %>
+        <div class="bottom-border"></div>
       </li>
-      <li>
-      <%= link_to '<i class="fa fa-suitcase fa-fw"></i> My Events'.html_safe, my_events_path, :id => 'my-events' %>
+      <li id="my-events">
+        <%= link_to '<i class="fa fa-suitcase fa-fw"></i> My Events'.html_safe, my_events_path %>
+        <div class="bottom-border"></div>
       </li>
-      <li>
-        <%= link_to '<i class="fa fa-forward fa-fw"></i> Future Events'.html_safe, events_future_path, :id => 'future-events' %>
+      <li id="future-events">
+        <%= link_to '<i class="fa fa-forward fa-fw"></i> Future Events'.html_safe, events_future_path %>
+        <div class="bottom-border"></div>
       </li>
-      <li>
-        <%= link_to '<i class="fa fa-backward fa-fw"></i> Past Events'.html_safe, events_past_path, :id => 'past-events' %>
+      <li id="past-events">
+        <%= link_to '<i class="fa fa-backward fa-fw"></i> Past Events'.html_safe, events_past_path %>
+        <div class="bottom-border"></div>
       </li>
       <% unless Global.location.all.empty? %>
       <li>
-        <a href="#"><i class="fa fa-globe fa-fw"></i> Event Locations <span class="fa arrow"></span></a>
-        <ul class="nav nav-second-level" id="event-location">
+        <a href="#" id="event-locations-link"><i class="fa fa-globe fa-fw"></i> Event Locations <span class="fa arrow"></span></a>
+        <ul class="nav nav-second-level" id="event-locations-list">
           <% Global.location.all.each do |location| %>
-          <li>
-            <%= link_to %Q(<i class="fa fa-location-arrow fa-fw"></i> #{location}).html_safe,
-                        events_location_path(location), :id => "#{location}" %>
+          <li id="<%= location %>">
+            <div class="top-border"></div>
+            <%= link_to %Q(<i class="fa fa-location-arrow fa-fw"></i> #{location}).html_safe, events_location_path(location) %>
+            <div class="bottom-border"></div>
           </li>
           <% end %>
         </ul>
         <!-- /.nav-second-level -->
       </li>
       <% end %>
-      <!-- /.unless Global.location.all.empty? -->
+      <!-- /.locations -->
 
       <% if @event && @event.id %>
-      <li>
+      <li id="event-links">
         <a href="#"><i class="fa fa-gears fa-fw"></i> <%= @event.code %> <span class="fa arrow"></span></a>
         <ul class="nav nav-second-level">
-          <li>
-            <%= link_to '<i class="fa fa-book fa-fw"></i> Details'.html_safe, event_path(@event), :id => 'event-details' %>
+          <li id="event-details">
+            <div class="top-border"></div>
+            <%= link_to '<i class="fa fa-book fa-fw"></i> Details'.html_safe, event_path(@event) %>
+            <div class="bottom-border"></div>
           </li>
-          <li>
-            <%= link_to '<i class="fa fa-calendar fa-fw"></i> Schedule'.html_safe, event_schedule_index_path(@event), :id => 'event-schedule' %>
+          <li id="event-schedule">
+            <div class="top-border"></div>
+            <%= link_to '<i class="fa fa-calendar fa-fw"></i> Schedule'.html_safe, event_schedule_index_path(@event) %>
+            <div class="bottom-border"></div>
           </li>
-          <li>
-            <%= link_to '<i class="fa fa-users fa-fw"></i> Members'.html_safe, event_memberships_path(@event), :id => 'event-memberships' %>
+          <li id="event-memberships">
+            <div class="top-border"></div>
+            <%= link_to '<i class="fa fa-users fa-fw"></i> Members'.html_safe, event_memberships_path(@event) %>
+            <div class="bottom-border"></div>
           </li>
         </ul>
         <!-- /.nav-second-level -->
