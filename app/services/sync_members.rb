@@ -64,13 +64,13 @@ class SyncMembers
     if remote['Person']['updated_at'].blank?
       remote['Person']['updated_at'] = Time.now
     else
-      remote['Person']['updated_at'] = Time.at(remote['Person']['updated_at'])
+      remote['Person']['updated_at'] = Time.at(remote['Person']['updated_at']).in_time_zone(@event.time_zone)
     end
 
     if remote['Membership']['updated_at'].blank?
       remote['Membership']['updated_at'] = Time.now
     else
-      remote['Membership']['updated_at'] = Time.at(remote['Membership']['updated_at'])
+      remote['Membership']['updated_at'] = Time.at(remote['Membership']['updated_at']).in_time_zone(@event.time_zone)
     end
 
     if remote['Membership']['role'] == 'Backup Participant'
