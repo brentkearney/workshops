@@ -6,6 +6,13 @@ $(document).ready ->
 
   $('div.sidebar').find('*').removeClass('active')
 
+  $('a#event-locations-link').click ->
+    $('li#event-locations').each (index, element) =>
+      $(element).removeClass('active')
+
+    $('span#locations-arrow').toggleClass('arrow')
+    $('span#locations-arrow').toggleClass('arrow-down')
+
   switch path = window.location.pathname
     when '/events' then $('li#all-events').addClass('active')
     when '/events/my_events' then $('li#my-events').addClass('active')
@@ -13,6 +20,8 @@ $(document).ready ->
     when '/events/future' then $('li#future-events').addClass('active')
     else
       if path.match(/\/events\/location/)
+        $('span#locations-arrow').toggleClass('arrow')
+        $('span#locations-arrow').toggleClass('arrow-down')
         location = path.split('/').pop()
         $("li#" + location).addClass('active')
       else if $('body').is('.welcome')

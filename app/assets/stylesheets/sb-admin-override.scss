@@ -1,4 +1,6 @@
-/* Width of Sidebar */
+@import "colours";
+
+/* Sidebar */
 @media(min-width:768px) {
   #page-wrapper {
     margin: 0 0 0 175px;
@@ -19,7 +21,7 @@
     li.active {
       background-color: #fff;
       width: 180px;
-      border-bottom: transparent;
+      border-bottom: none;
 
       .top-border {
         width: 175px;
@@ -34,6 +36,17 @@
       a {
         color: red;
       }
+
+      a#event-locations-link {
+        color: $primary-link-color;
+      }
+    }
+
+    .arrow-down {
+      float: right;
+    }
+    .arrow-down:before {
+      content: "\f107";
     }
 
   }

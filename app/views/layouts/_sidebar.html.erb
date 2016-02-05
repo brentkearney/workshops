@@ -22,8 +22,8 @@
         <div class="bottom-border"></div>
       </li>
       <% unless Global.location.all.empty? %>
-      <li>
-        <a href="#" id="event-locations-link"><i class="fa fa-globe fa-fw"></i> Event Locations <span class="fa arrow"></span></a>
+      <li id="event-locations">
+        <a href="#" id="event-locations-link"><i class="fa fa-globe fa-fw"></i> Event Locations <span id="locations-arrow" class="fa arrow"></span></a>
         <ul class="nav nav-second-level" id="event-locations-list">
           <% Global.location.all.each do |location| %>
           <li id="<%= location %>">
