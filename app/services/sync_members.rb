@@ -87,7 +87,9 @@ class SyncMembers
       local_person = Person.new(remote['Person'])
       save_person(local_person)
     else
-      if remote['Person']['updated_at'] > local_person.updated_at
+      remote_update = remote['Person']['updated_at'].in_time_zone(@event.time_zone)
+      local_update = local_person.updated_at.in_time_zone(@event.time_zone)
+      if remote_update > local_update
         remote['Person'].each_pair do |k,v|
           local_person[k] = v unless v.blank?
         end
@@ -119,7 +121,9 @@ class SyncMembers
       local_membership.person = person
       save_membership(local_membership)
     else
-      if remote['Membership']['updated_at'] > local_membership.updated_at
+      remote_update = remote['Membership']['updated_at'].in_time_zone(@event.time_zone)
+      local_update = local_membership.updated_at.in_time_zone(@event.time_zone)
+      if remote_update > local_update
         remote['Membership'].each_pair do |k,v|
           local_membership[k] = v unless v.blank?
         end
