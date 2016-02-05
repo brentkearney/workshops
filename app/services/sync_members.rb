@@ -31,7 +31,7 @@ class SyncMembers
     @remote_members.each do |remote|
       remote = fix_remote_fields(remote)
       local_person = update_person(remote)
-      update_membership(remote, local_person) unless local_person.id.nil?
+      update_membership(remote, local_person)
     end
 
     if @sync_errors['People'].count > 0 || @sync_errors['Memberships'].count > 0
@@ -82,41 +82,42 @@ class SyncMembers
   
   def update_person(remote)
     local_person = get_local_person(remote)
-    already_up_to_date = false
 
     if local_person.nil?
       local_person = Person.new(remote['Person'])
+      save_person(local_person)
     else
       if remote['Person']['updated_at'] > local_person.updated_at
         remote['Person'].each_pair do |k,v|
           local_person[k] = v unless v.blank?
         end
-      else
-        already_up_to_date = true
+        save_person(local_person)
       end
     end
-
-    if local_person.valid?
-      local_person.save! unless already_up_to_date
-    else
-      @sync_errors['People'] << local_person
-    end
-
+    
     local_person
   end
 
+  def save_person(person)
+    if person.valid? && person.save
+      Rails.logger.debug "* Saved #{@event.code} person: #{person.name}"
+    else
+      @sync_errors['People'] << person
+    end
+  end
+  
   def get_local_person(remote)
     Person.find_by(legacy_id: remote['Person']['legacy_id']) || Person.find_by(email: remote['Person']['email'])
   end
 
-  def update_membership(remote, local_person)
-    local_membership = Membership.where(event: @event, person: local_person).first
-    already_up_to_date = false
+  def update_membership(remote, person)
+    local_membership = Membership.where(event: @event, person: person).first
 
     if local_membership.nil?
       local_membership = Membership.new(remote['Membership'])
       local_membership.event = @event
-      local_membership.person = local_person
+      local_membership.person = person
+      save_membership(local_membership)
     else
       if remote['Membership']['updated_at'] > local_membership.updated_at
         remote['Membership'].each_pair do |k,v|
@@ -125,14 +126,13 @@ class SyncMembers
         save_membership(local_membership)
       end
     end
-    
   end
 
-  def save_membership(local_membership)
-    if local_membership.valid? && local_membership.save
-      Rails.logger.debug "* Saved #{@event.code} membership: #{local_membership.person.name}"
+  def save_membership(membership)
+    if membership.valid? && membership.save
+      Rails.logger.debug "* Saved #{@event.code} membership: #{membership.person.name}"
     else
-      @sync_errors['Memberships'] << local_membership
+      @sync_errors['Memberships'] << membership
     end
   end
   
