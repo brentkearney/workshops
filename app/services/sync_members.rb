@@ -23,7 +23,6 @@
 class SyncMembers
   def initialize(event)
     @event = event
-    @local_members = @event.memberships
     @remote_members = get_remote_members("#{@event.code}")
     @sync_errors = { 'Event' => @event, 'People' => Array.new, 'Memberships' => Array.new }
   end
@@ -111,7 +110,7 @@ class SyncMembers
   end
 
   def update_membership(remote, local_person)
-    local_membership = @local_members.find {|lm| lm.person_id == local_person.id }
+    local_membership = Membership.where(event: @event, person: local_person).first
     already_up_to_date = false
 
     if local_membership.nil?
@@ -123,13 +122,15 @@ class SyncMembers
         remote['Membership'].each_pair do |k,v|
           local_membership[k] = v unless v.blank?
         end
-      else
-        already_up_to_date = true
+        save_membership(local_membership)
       end
     end
+    
+  end
 
-    if local_membership.valid?
-      local_membership.save! unless already_up_to_date
+  def save_membership(local_membership)
+    if local_membership.valid? && local_membership.save
+      Rails.logger.debug "* Saved #{@event.code} membership: #{local_person.name}"
     else
       @sync_errors['Memberships'] << local_membership
     end
