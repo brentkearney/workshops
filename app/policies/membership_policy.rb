@@ -21,7 +21,8 @@ class MembershipPolicy
 
       memberships.delete_if do |m|
         m.role == 'Backup Participant' ||
-        (m.role !~ /Organizer/ && (m.attendance == 'Declined' || m.attendance == 'Not Yet Invited'))
+        (m.role !~ /Organizer/ &&
+          (m.attendance == 'Declined' || m.attendance == 'Not Yet Invited'))
       end
     end
   end

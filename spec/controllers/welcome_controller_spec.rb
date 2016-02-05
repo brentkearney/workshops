@@ -173,7 +173,35 @@ RSpec.describe WelcomeController, type: :controller do
         end
       end
 
-      # it 'runs background job to sync current events with remote db'
+      context ':staff' do
+          it 'redirects to future events' do
+            user.staff!
+
+            get :index
+
+            expect(response).to redirect_to(events_future_path)
+          end
+      end
+
+      context ':admin' do
+        it 'redirects to future events' do
+          user.admin!
+
+          get :index
+
+          expect(response).to redirect_to(events_future_path)
+        end
+      end
+
+      context ':super_admin' do
+        it 'redirects to future events' do
+          user.super_admin!
+
+          get :index
+
+          expect(response).to redirect_to(events_future_path)
+        end
+      end
     end
   end
 end

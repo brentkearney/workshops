@@ -4,7 +4,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class WelcomeController < ApplicationController
-  before_action :set_attendance
+  before_action :set_attendance, :check_staff
   before_filter :authenticate_user!
 
   # GET / or /welcome
@@ -17,6 +17,12 @@ class WelcomeController < ApplicationController
     else
       @heading = 'Your Current & Upcoming Events'
       @memberships.each { |m| SyncEventMembersJob.perform_later(m.event) if policy(m.event).sync? }
+    end
+  end
+
+  def check_staff
+    if current_user && current_user.is_staff?
+      redirect_to events_future_path
     end
   end
 
