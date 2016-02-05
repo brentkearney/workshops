@@ -130,7 +130,7 @@ class SyncMembers
 
   def save_membership(local_membership)
     if local_membership.valid? && local_membership.save
-      Rails.logger.debug "* Saved #{@event.code} membership: #{local_person.name}"
+      Rails.logger.debug "* Saved #{@event.code} membership: #{local_membership.person.name}"
     else
       @sync_errors['Memberships'] << local_membership
     end
