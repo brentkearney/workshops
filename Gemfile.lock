@@ -212,7 +212,7 @@ GEM
     seed_dump (3.2.4)
       activerecord (>= 4)
       activesupport (>= 4)
-    selenium-webdriver (2.51.0)
+    selenium-webdriver (2.52.0)
       childprocess (~> 0.5)
       multi_json (~> 1.0)
       rubyzip (~> 1.0)

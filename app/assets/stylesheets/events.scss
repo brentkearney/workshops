@@ -13,9 +13,14 @@ td#confirmed-column {
   font-size: 1.3em;
 }
 
+h4.event-details {
+  margin-top: 25px;
+}
+
 #event-description {
-  margin-top: -20px;
+  margin-top: -15px;
   border-top: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
 }
 
 #edit-button {
