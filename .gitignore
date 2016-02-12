@@ -16,26 +16,29 @@
 !/log/.keep
 /tmp
 
-# private environment variables
+# private configuration settings
 config/local_env.yml
-config/initializers/local_variables.rb
+config/settings/*.yml
+config/newrelic.yml
+lib/tasks/birs.rake
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.env.db
+.env.web
+.dockerignore
+entrypoint.sh
+Passengerfile.json
+passenger.*
 
 .idea
 app/views/memberships/old-new.html.erb
 app/views/shared/_debugging.erb
 .DS_Store
 doc
-Dockerfile
-docker-compose.yml
-.dockerignore
-entrypoint.sh
-Passengerfile.json
-passenger.*
-.env.db
-.env.web
 sources.list
 public/assets/
-config/settings/*.yml
 app/assets/images/*_logo.png
 public/icons/*
-config/newrelic.yml
+
