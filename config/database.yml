@@ -3,7 +3,6 @@ default: &default
   encoding: unicode
   min_messages: WARNING
   pool: 5
-  username: postgres
   host: db
   port: 5432
   username: <%= ENV['DB_USER'] %>

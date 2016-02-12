@@ -12,9 +12,10 @@ td#confirmed-column {
   background-color: $subdued-color !important;
   font-size: 1.3em;
 }
-table#workshop-details {
-  margin-top: -18px; /* hack to fix mystery spacing */
-  margin-bottom: 10px;
+
+#event-description {
+  margin-top: -20px;
+  border-top: 1px solid lightgrey;
 }
 
 #edit-button {

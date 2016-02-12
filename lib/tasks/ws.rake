@@ -218,6 +218,7 @@ namespace :ws do
 
     events = Array.new
     event_errors = Array.new
+    membership_errors = Array.new
 
     lc = LegacyConnector.new
     lc.list_events(year_month, year_month).each do |code|

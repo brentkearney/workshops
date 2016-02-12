@@ -82,6 +82,8 @@ class EventsController < ApplicationController
     if @event
       authorize(@event) # only staff see template events
       SyncEventMembersJob.perform_later(@event) if policy(@event).sync?
+    else
+      redirect_to root_path, error: 'No valid event specified.'
     end
   end
 
