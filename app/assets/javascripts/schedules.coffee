@@ -1,5 +1,5 @@
 $(document).on "page:change", ->
-  if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1)
+  if /firefox|msie/i.test(navigator.userAgent)
     $('select').each (index, element) ->
       $(element).removeClass('form-control')
       $(element).addClass('selectpicker')
