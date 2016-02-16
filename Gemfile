@@ -25,7 +25,6 @@ gem 'devise_invitable'
 gem 'pundit'
 gem 'sucker_punch'
 gem 'global'
-gem 'bootstrap-select-rails'
 gem 'passenger'
 
 
