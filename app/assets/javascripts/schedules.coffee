@@ -1,7 +1,6 @@
 $(document).on "page:change", ->
   if /firefox|msie/i.test(navigator.userAgent)
-    $('select').each (index, element) ->
-      $(element).removeClass('form-control')
+    $('select').removeClass('form-control')
 
   if $("body.schedule.index").length > 0
     publish_toggle = $('#publish_schedule')

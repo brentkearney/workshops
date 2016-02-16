@@ -27,7 +27,6 @@ gem 'sucker_punch'
 gem 'global'
 gem 'passenger'
 
-
 group :development, :test do
   gem 'byebug'
   gem 'spring'

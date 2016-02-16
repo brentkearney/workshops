@@ -50,7 +50,7 @@
   <%= f.fields_for :lecture do |lecture| %>
       <div class="form-group">
         <%= lecture.label "Speaker (if this is a talk): " %>
-          <%= lecture.collection_select(:person_id, @event.confirmed, :id, :lname, {:prompt=>true, :order => "LOWER(:lname)"}, {class: 'form-control'}) %>
+          <%= lecture.collection_select(:person_id, @event.confirmed, :id, :lname, {:prompt=>true, :order => "LOWER(:lname)"}, { class: 'form-control' }) %>
       </div>
 
       <div class="form-group checkbox" style="margin: 2em 0;">
