@@ -49,6 +49,7 @@ GEM
     bootstrap-sass (3.3.6)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
+    bootstrap-select-rails (1.6.3)
     bootstrap3-datetimepicker-rails (4.14.30)
       momentjs-rails (>= 2.8.1)
     builder (3.2.2)
@@ -258,6 +259,7 @@ DEPENDENCIES
   activerecord-session_store
   bcrypt
   bootstrap-sass
+  bootstrap-select-rails
   bootstrap3-datetimepicker-rails (~> 4.14.30)
   byebug
   capybara

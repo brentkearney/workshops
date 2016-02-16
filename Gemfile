@@ -25,10 +25,12 @@ gem 'devise_invitable'
 gem 'pundit'
 gem 'sucker_punch'
 gem 'global'
+gem 'bootstrap-select-rails'
+gem 'passenger'
+
 
 group :development, :test do
   gem 'byebug'
-  gem 'web-console'
   gem 'spring'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
@@ -45,12 +47,11 @@ group :test do
 end
 
 group :production do
-  gem 'passenger'
   gem 'newrelic_rpm'
 end
 
 group :development do
   gem 'sqlite3'
-  gem 'passenger'
   gem 'seed_dump'
+  gem 'web-console'
 end

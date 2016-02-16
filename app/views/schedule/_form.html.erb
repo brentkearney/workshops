@@ -13,7 +13,7 @@
             <%= f.label "Scheduling Item on" %>:
           </td>
           <td class="form-group select-day">
-            <%= f.select :day, @event.days.map {|day| [ day.strftime("%A, %B %e"), day.to_date ]}, {}, { :class => 'form-control days' } %>
+            <%= f.select :day, @event.days.map {|day| [ day.strftime("%A, %B %e"), day.to_date ]}, {}, { class: 'form-control days' } %>
           </td>
         </tr>
         <tr>
@@ -21,7 +21,7 @@
             <%= f.label :start_time %>:
           </td>
           <td class="form-group select-times">
-            <%= f.time_select :start_time, {}, { :class => 'form-control' } %>
+            <%= f.time_select :start_time, {}, { class: 'form-control' } %>
           </td>
         </tr>
         <tr>
@@ -29,7 +29,7 @@
             <%= f.label :end_time %>:
           </td>
           <td class="form-group select-times">
-            <%= f.time_select :end_time, {}, { :class => 'form-control' } %>
+            <%= f.time_select :end_time, {}, { class: 'form-control' } %>
           </td>
         </tr>
       </table>
@@ -50,7 +50,7 @@
   <%= f.fields_for :lecture do |lecture| %>
       <div class="form-group">
         <%= lecture.label "Speaker (if this is a talk): " %>
-          <%= lecture.collection_select(:person_id, @event.confirmed, :id, :lname, {:prompt=>true, :order => "LOWER(:lname)"}, {:class => 'form-control'}) %>
+          <%= lecture.collection_select(:person_id, @event.confirmed, :id, :lname, {:prompt=>true, :order => "LOWER(:lname)"}, {class: 'form-control'}) %>
       </div>
 
       <div class="form-group checkbox" style="margin: 2em 0;">

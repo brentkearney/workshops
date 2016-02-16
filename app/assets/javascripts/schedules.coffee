@@ -1,4 +1,9 @@
 $(document).on "page:change", ->
+  if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1)
+    $('select').each (index, element) ->
+      $(element).removeClass('form-control')
+      $(element).addClass('selectpicker')
+
   if $("body.schedule.index").length > 0
     publish_toggle = $('#publish_schedule')
     publish_toggle.bootstrapSwitch()
@@ -29,7 +34,6 @@ $(document).on "page:change", ->
 
     $('#print-button').click (event) ->
       print()
-
 
   if $("body.schedule.new").length > 0 || $("body.schedule.edit").length > 0
     date = $('#day').val()
