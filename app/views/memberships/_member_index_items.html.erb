@@ -6,7 +6,7 @@
     <td class="hidden-xs rowlink-skip"><%= link_to member.person.affiliation, event_membership_path(@event, member) %></td>
     <%= show_email(member) %>
     <%= show_invite_button(member) %>
-    <td class="rowlink-skip"><%= member.role %></td>
+    <td class="hidden-xs rowlink-skip"><%= member.role %></td>
   </tr>
   <% i += 1 %>
 <% end %>

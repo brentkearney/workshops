@@ -12,10 +12,10 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
   def index
-    @memberships = @event.memberships
-    @user_membership = @memberships.select {|m| m.person_id == current_user.person_id }.first
+    @memberships = @event.memberships.includes(:person)
     @pending_invites = @memberships.select {|m| m.is_org? && m.sent_invitation == false }.size > 0
 
+    # For the "Email Organizers/Participants" buttons
     if policy(@event).use_email_addresses?
       @member_emails = Array.new
       @organizer_emails = Array.new
