@@ -1,7 +1,7 @@
-Workshops is Copyright (c) 2016 Brent Kearney, and files herein are
-licensed under the Affero General Public License version 3, the text of
-which can be found in the GNU-AGPL-3.0 file, or at:
-https://opensource.org/licenses/AGPL-3.0.
+Workshops is Copyright (c) 2016 Banff International Research Station,
+and files herein are licensed under the Affero General Public License
+version 3, the text of which can be found in the GNU-AGPL-3.0 file, or
+at: https://opensource.org/licenses/AGPL-3.0.
 
 Some components of Workshops, including Ruby on Rails, JQuery, Twitter
 Bootstrap, and Devise are licensed under the MIT License. All unmodified
