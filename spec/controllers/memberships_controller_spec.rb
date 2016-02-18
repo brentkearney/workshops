@@ -298,7 +298,7 @@ RSpec.describe MembershipsController, type: :controller do
 
 
       describe '#new' do
-        it 'assigns a new @member object' do
+        it 'assigns @member' do
           get :new, { event_id: @event.id }
 
           expect(assigns(:membership)).to be_a_new(Membership)
@@ -312,6 +312,81 @@ RSpec.describe MembershipsController, type: :controller do
         end
       end
 
+      describe '#edit' do
+        it 'assigns @member' do
+          membership = create(:membership, event: @event)
+
+          get :edit, { event_id: @event.id, id: membership.id }
+
+          expect(assigns(:membership)).to eq(membership)
+        end
+
+        it 'denies access, redirects with error' do
+          membership = create(:membership, event: @event)
+
+          get :edit, { event_id: @event.id, id: membership.id }
+
+          expect(response).to redirect_to(root_path)
+          expect(flash[:error]).to eq('Access denied.')
+        end
+      end
+
+      describe '#create' do
+        it 'assigns @member' do
+          membership = build(:membership, event: @event)
+
+          post :create, { event_id: @event.id, membership: membership.attributes }
+
+          expect(assigns(:membership)).to be_a_new(Membership)
+        end
+
+        it 'denies access, redirects with error' do
+          membership = build(:membership, event: @event)
+
+          post :create, { event_id: @event.id, membership: membership.attributes }
+
+          expect(response).to redirect_to(root_path)
+          expect(flash[:error]).to eq('Access denied.')
+        end
+      end
+
+      describe '#update' do
+        it 'assigns @member' do
+          membership = create(:membership, event: @event)
+
+          patch :update, { event_id: @event.id, id: membership.id }
+
+          expect(assigns(:membership)).to eq(membership)
+        end
+
+        it 'denies access, redirects with error' do
+          membership = create(:membership, event: @event)
+
+          patch :update, { event_id: @event.id, id: membership.id }
+
+          expect(response).to redirect_to(root_path)
+          expect(flash[:error]).to eq('Access denied.')
+        end
+      end
+
+      describe '#destroy' do
+        it 'assigns @member' do
+          membership = create(:membership, event: @event)
+
+          delete :destroy, { event_id: @event.id, id: membership.id }
+
+          expect(assigns(:membership)).to eq(membership)
+        end
+
+        it 'denies access, redirects with error' do
+          membership = create(:membership, event: @event)
+
+          delete :destroy, { event_id: @event.id, id: membership.id }
+
+          expect(response).to redirect_to(root_path)
+          expect(flash[:error]).to eq('Access denied.')
+        end
+      end
     end
 
 
