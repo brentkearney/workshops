@@ -69,6 +69,7 @@ RSpec.describe MembershipsController, type: :controller do
 
   end
 
+
   context 'As an authenticated user' do
     before do
       @user = create(:user, person: build(:person), role: 'member')
@@ -76,153 +77,201 @@ RSpec.describe MembershipsController, type: :controller do
       allow(controller).to receive(:current_user).and_return(@user)
     end
 
-    describe '#index' do
-      context 'with invalid event id' do
-        it 'redirects to event index' do
-          get :index, { event_id: 'foo' }
+    context 'with invalid event id' do
+      def redirects_with_error
+        get :index, { event_id: 'foo' }
+
+        expect(response).to redirect_to(events_path)
+        expect(flash[:error]).to be_present
+      end
+
+      describe '#index' do
+        it 'responds with redirect and error message' do
+          redirects_with_error
+        end
+      end
+
+      describe '#show' do
+        it 'responds with redirect and error message' do
+          redirects_with_error
+        end
+      end
+
+      describe '#new' do
+        it 'responds with redirect and error message' do
+          redirects_with_error
+        end
+      end
+
+      describe '#edit' do
+        it 'responds with redirect and error message' do
+          redirects_with_error
+        end
+      end
+
+      describe '#create' do
+        it 'responds with redirect and error message' do
+          post :create, { event_id: 'foo', membership: membership.attributes }
 
           expect(response).to redirect_to(events_path)
-        end
-
-        it 'assigns error flash message' do
-          get :index, { event_id: 'foo' }
-
           expect(flash[:error]).to be_present
         end
       end
 
-      context 'with a valid event id' do
+      describe '#update' do
+        it 'responds with redirect and error message' do
+          patch :update, { event_id: 'foo', id: 1 }
 
+          expect(response).to redirect_to(events_path)
+          expect(flash[:error]).to be_present
+        end
+      end
+
+      describe '#destroy' do
+        it 'responds with redirect and error message' do
+          delete :destroy, { event_id: 'foo', id: 1 }
+
+          expect(response).to redirect_to(events_path)
+          expect(flash[:error]).to be_present
+        end
+      end
+    end
+
+
+    context 'with a valid event id' do
+
+      before do
+        @event = create(:event)
+      end
+
+      after :each do
+        @event.memberships.destroy_all
+      end
+
+      it 'responds with success code' do
+        get :index, { event_id: @event.id }
+
+        expect(response).to be_success
+      end
+
+      it 'assigns @memberships to event members' do
+        membership = create(:membership, event: @event)
+
+        get :index, { event_id: @event.id }
+
+        expect(assigns(:memberships)).to match_array(membership)
+      end
+
+
+      context 'as role: member' do
         before do
-          @event = create(:event)
+          @user.member!
         end
 
-        after :each do
-          @event.memberships.destroy_all
-        end
-
-
-        it 'responds with success code' do
-          get :index, { event_id: @event.id }
-
-          expect(response).to be_success
-        end
-
-        it 'assigns @memberships to event members' do
-          membership = create(:membership, event: @event)
-
-          get :index, { event_id: @event.id }
-
-          expect(assigns(:memberships)).to match_array(membership)
-        end
-
-        context 'as role: member' do
-          before do
-            @user.member!
-          end
-
-          it 'does not assign @member_emails' do
-            confirmed_member = create(:membership, event: @event, attendance: 'Confirmed')
-
-            get :index, { event_id: @event.id }
-
-            expect(assigns(:member_emails)).to be_falsey
-          end
-
-          it 'does not assign @organizer_emails' do
-            organizer_member = create(:membership, event: @event, attendance: 'Confirmed', role: 'Organizer')
-
-            get :index, { event_id: @event.id }
-
-            expect(assigns(:organizer_emails)).to be_falsey
-          end
-
-          context 'as @event organizer' do
-            it "assigns @member_emails to confirmed members' emails" do
-              organizer_member = create(:membership, event: @event, role: 'Organizer', person: @user.person)
-              confirmed_member = create(:membership, event: @event, attendance: 'Confirmed')
-
-              get :index, { event_id: @event.id }
-
-              p1 = organizer_member.person
-              p2 = confirmed_member.person
-              expect(assigns(:member_emails)).to eq([%Q{"#{p1.name}" <#{p1.email}>}, %Q{"#{p2.name}" <#{p2.email}>}])
-            end
-
-            it "assigns @organizer_emails to organizer members' emails" do
-              organizer_member = create(:membership, event: @event, role: 'Organizer', person: @user.person)
-
-              get :index, { event_id: @event.id }
-
-              p = organizer_member.person
-              expect(assigns(:organizer_emails)).to eq([%Q{"#{p.name}" <#{p.email}>}])
-            end
-          end
-        end
-
-        # For testing staff and admin users
-        def has_member_emails
-          organizer_member = create(:membership, event: @event, role: 'Organizer')
+        it 'does not assign @member_emails' do
           confirmed_member = create(:membership, event: @event, attendance: 'Confirmed')
 
           get :index, { event_id: @event.id }
 
-          p1 = organizer_member.person
-          p2 = confirmed_member.person
-          expect(assigns(:member_emails)).to eq([%Q{"#{p1.name}" <#{p1.email}>}, %Q{"#{p2.name}" <#{p2.email}>}])
+          expect(assigns(:member_emails)).to be_falsey
         end
 
-        def has_organizer_emails
-          organizer_member = create(:membership, event: @event, role: 'Organizer')
+        it 'does not assign @organizer_emails' do
+          organizer_member = create(:membership, event: @event, attendance: 'Confirmed', role: 'Organizer')
 
           get :index, { event_id: @event.id }
 
-          p = organizer_member.person
-          expect(assigns(:organizer_emails)).to eq([%Q{"#{p.name}" <#{p.email}>}])
+          expect(assigns(:organizer_emails)).to be_falsey
         end
 
-        context 'as role: staff' do
-          before do
-            @user.staff!
-          end
-
+        context 'as @event organizer' do
           it "assigns @member_emails to confirmed members' emails" do
-            has_member_emails
+            organizer_member = create(:membership, event: @event, role: 'Organizer', person: @user.person)
+            confirmed_member = create(:membership, event: @event, attendance: 'Confirmed')
+
+            get :index, { event_id: @event.id }
+
+            p1 = organizer_member.person
+            p2 = confirmed_member.person
+            expect(assigns(:member_emails)).to eq([%Q{"#{p1.name}" <#{p1.email}>}, %Q{"#{p2.name}" <#{p2.email}>}])
           end
 
           it "assigns @organizer_emails to organizer members' emails" do
-            has_organizer_emails
-          end
-        end
+            organizer_member = create(:membership, event: @event, role: 'Organizer', person: @user.person)
 
-        context 'as role: admin' do
-          before do
-            @user.admin!
-          end
+            get :index, { event_id: @event.id }
 
-          it "assigns @member_emails to confirmed members' emails" do
-            has_member_emails
-          end
-
-          it "assigns @organizer_emails to organizer members' emails" do
-            has_organizer_emails
-          end
-        end
-
-        context 'as role: super_admin' do
-          before do
-            @user.super_admin!
-          end
-
-          it "assigns @member_emails to confirmed members' emails" do
-            has_member_emails
-          end
-
-          it "assigns @organizer_emails to organizer members' emails" do
-            has_organizer_emails
+            p = organizer_member.person
+            expect(assigns(:organizer_emails)).to eq([%Q{"#{p.name}" <#{p.email}>}])
           end
         end
       end
+
+      # For testing staff and admin users
+      def has_member_emails
+        organizer_member = create(:membership, event: @event, role: 'Organizer')
+        confirmed_member = create(:membership, event: @event, attendance: 'Confirmed')
+
+        get :index, { event_id: @event.id }
+
+        p1 = organizer_member.person
+        p2 = confirmed_member.person
+        expect(assigns(:member_emails)).to eq([%Q{"#{p1.name}" <#{p1.email}>}, %Q{"#{p2.name}" <#{p2.email}>}])
+      end
+
+      def has_organizer_emails
+        organizer_member = create(:membership, event: @event, role: 'Organizer')
+
+        get :index, { event_id: @event.id }
+
+        p = organizer_member.person
+        expect(assigns(:organizer_emails)).to eq([%Q{"#{p.name}" <#{p.email}>}])
+      end
+
+      context 'as role: staff' do
+        before do
+          @user.staff!
+        end
+
+        it "assigns @member_emails to confirmed members' emails" do
+          has_member_emails
+        end
+
+        it "assigns @organizer_emails to organizer members' emails" do
+          has_organizer_emails
+        end
+      end
+
+      context 'as role: admin' do
+        before do
+          @user.admin!
+        end
+
+        it "assigns @member_emails to confirmed members' emails" do
+          has_member_emails
+        end
+
+        it "assigns @organizer_emails to organizer members' emails" do
+          has_organizer_emails
+        end
+      end
+
+      context 'as role: super_admin' do
+        before do
+          @user.super_admin!
+        end
+
+        it "assigns @member_emails to confirmed members' emails" do
+          has_member_emails
+        end
+
+        it "assigns @organizer_emails to organizer members' emails" do
+          has_organizer_emails
+        end
+      end
     end
+    
+
+
   end
 end
