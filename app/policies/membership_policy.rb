@@ -13,6 +13,11 @@ class MembershipPolicy
     @event = @membership.event
   end
 
+  # Membership modification is not yet implemented
+  def method_missing(name, *args)
+    false
+  end
+
   # Members cannot see memberships for events to which they
   # have not yet been invited, have declined invitation, or are
   # Backup Participants.
@@ -43,10 +48,6 @@ class MembershipPolicy
     allow_staff_and_admins
   end
 
-  # Membership modification is not yet implemented
-  def method_missing(name, *args)
-    false
-  end
 
   private
 

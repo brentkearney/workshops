@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class EventsController < ApplicationController
-  before_action :set_event, :set_attendance
+  before_action :set_event, :set_attendance, :only => [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!, :only => [:my_events, :new, :edit, :create, :update, :destroy]
 
   # GET /events

@@ -89,6 +89,8 @@ class MembershipsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_membership
       @membership = Membership.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      redirect_to event_memberships_path(@event), error: 'Member not found.'
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
