@@ -22,7 +22,8 @@ class ApplicationController < ActionController::Base
     elsif params[:id]
       @event = Event.find(params[:id])
     end
-    @event
+
+    redirect_to events_path, error: 'Event not found.' if @event.nil?
   end
 
   def set_time_zone

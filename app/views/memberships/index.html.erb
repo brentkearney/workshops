@@ -31,9 +31,6 @@
                         <th class="hidden-md hidden-lg" align="middle">Email</th>
                         <th class="hidden-xs hidden-sm">E-mail</th>
                     <% end %>
-                    <% if @pending_invites && policy(@event).show_invite_buttons? %>
-                        <th class="invites"></th>
-                    <% end %>
                     <th class="hidden-xs">Role</th>
                   </tr>
                   </thead>

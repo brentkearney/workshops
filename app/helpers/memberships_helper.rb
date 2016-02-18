@@ -9,18 +9,6 @@ module MembershipsHelper
     f.select :role, Membership::ROLES, {}, { required: 'true', autofocus: 'true', class: 'form-control' }
   end
 
-  def show_invite_button(member)
-    column = ''
-    if @pending_invites && policy(@event).show_invite_buttons?
-      column = '<td class="invite">'
-      if member.is_org? && !member.sent_invitation
-        column << "#{link_to 'Invite', event_memberships_invite_path(@event, member), method: :put, data: { confirm: %Q(This will send an email to #{member.person.name}, inviting #{member.person.him} to set a password and login. Proceed?) }, class: 'btn btn-primary btn-xs invite-btn', id: %Q(org-#{member.id})}"
-      end
-      column << '</td>'
-    end
-    column.html_safe
-  end
-
   def show_email(member)
     column = ''
     if policy(@event).view_email_addresses?

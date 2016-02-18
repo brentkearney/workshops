@@ -5,16 +5,15 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class MembershipsController < ApplicationController
-  before_action :set_membership, only: [:show, :edit, :update, :destroy, :invite]
+  before_filter :authenticate_user!
   before_action :set_event, :set_attendance
-  before_filter :authenticate_user! #, :except => [:index, :show]
-
+  before_action :set_membership, only: [:show, :edit, :update, :destroy, :invite]
 
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
   def index
     @memberships = @event.memberships.includes(:person)
-    @pending_invites = @memberships.select {|m| m.is_org? && m.sent_invitation == false }.size > 0
+    @current_user = current_user
 
     # For the "Email Organizers/Participants" buttons
     if policy(@event).use_email_addresses?
@@ -84,27 +83,6 @@ class MembershipsController < ApplicationController
       format.html { redirect_to memberships_url, notice: 'Membership was successfully destroyed.' }
       format.json { head :no_content }
     end
-  end
-
-  # PUT /events/:event_id/memberships/invite/1
-  def invite
-    authorize @membership
-
-    # Temporary hack to get organizer invites sent out NOW; a new custom mailer class is needed.
-    # See: https://github.com/scambra/devise_invitable/wiki/Customizing-for-different-Invite-use-cases-(emails-etc.)
-    # and: http://stackoverflow.com/questions/21446631/changed-devise-mailer-template-path-now-devise-invitables-e-mail-subject-lines
-    # and: https://github.com/scambra/devise_invitable/blob/master/app/controllers/devise/invitations_controller.rb
-    person = @membership.person
-    if person.user.nil?
-      new_user = User.new(email: person.email, person: person)
-      new_user.skip_confirmation!
-      new_user.save
-    end
-    person.user.invite!
-    @membership.sent_invitation = true
-    @membership.updated_by = current_user.person.name
-    @membership.save
-    redirect_to event_memberships_path(@event)
   end
 
   private
