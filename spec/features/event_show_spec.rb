@@ -20,7 +20,7 @@ describe 'Event Show Page', :type => :feature do
   end
 
   def shows_partial_details
-    expect(page.body).to have_css('div.panel-heading', :text => "#{@event.code} Event Details")
+    expect(page.body).to have_css('h4.event-details', :text => "Event Details")
     expect(page.body).to have_text(@event.code)
     expect(page.body).to have_text(@event.name)
     expect(page.body).to have_text(@event.location)
@@ -40,7 +40,6 @@ describe 'Event Show Page', :type => :feature do
   end
   
   def hides_some_details
-    expect(page.body).not_to have_text(@event.short_name)
     expect(page.body).not_to have_text(@event.door_code)
     expect(page.body).not_to have_text(@event.booking_code)
     expect(page.body).not_to have_text(@event.max_participants)
