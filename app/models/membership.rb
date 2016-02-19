@@ -9,7 +9,7 @@ class Membership < ActiveRecord::Base
   belongs_to :person
   accepts_nested_attributes_for :person
 
-  after_create :update_counter_cache
+  after_save :update_counter_cache
   after_destroy :update_counter_cache
   
   validates :event, presence: true
