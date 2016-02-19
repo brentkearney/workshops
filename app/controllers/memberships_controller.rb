@@ -12,16 +12,18 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
   def index
-    @memberships = @event.memberships.includes(:person)
+    @memberships = SortedMembers.new(@event).memberships
     @current_user = current_user
 
     # For the "Email Organizers/Participants" buttons
     if policy(@event).use_email_addresses?
-      @member_emails = Array.new
-      @organizer_emails = Array.new
-      @memberships.each do |m|
-        @member_emails << "\"#{m.person.name}\" <#{m.person.email}>" if m.attendance == 'Confirmed'
-        @organizer_emails << "\"#{m.person.name}\" <#{m.person.email}>" if m.role =~ /Organizer/
+      @member_emails = []
+      @organizer_emails = []
+      @memberships.each do |key, members|
+        members.each do |m|
+          @member_emails << "\"#{m.person.name}\" <#{m.person.email}>" if m.attendance == 'Confirmed'
+          @organizer_emails << "\"#{m.person.name}\" <#{m.person.email}>" if m.role =~ /Organizer/
+        end
       end
     end
   end
