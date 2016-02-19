@@ -11,7 +11,8 @@
 
   <!-- Membership Tables, one per type of attendance status -->
   <% @attendance.each do |status| %>
-      <% if @event.has_attendance(status) && policy(@event).view_attendance_status?(status) %>
+    <% members = @memberships.select {|m| m.attendance == status} %>
+    <% if members.size > 0 && policy(@event).view_attendance_status?(status) %>
       <div class="row">
         <div class="col-lg-12">
           <div class="panel panel-default">
@@ -35,7 +36,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <%= render partial: 'member_index_items', locals: {status: status } %>
+                  <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
                   </tbody>
                 </table>
               </div>
@@ -54,10 +55,8 @@
         <!-- /.col-lg-12 -->
       </div>
       <!-- /.row -->
-      <% end %>
+    <% end %>
   <% end %>
-
 <% end %>
-
 
 </article>
