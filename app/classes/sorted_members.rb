@@ -13,7 +13,7 @@ class SortedMembers
   end
 
   def memberships
-    get_members_hash && sort_by_attendance
+    get_members_hash && sort_by_attendance && sort_by_name
   end
 
   def get_members_hash
@@ -24,7 +24,6 @@ class SortedMembers
         @memberships["#{m.attendance}"] = [m]
       end
     end
-    @memberships
   end
 
   def sort_by_attendance
@@ -33,6 +32,17 @@ class SortedMembers
       if @memberships.has_key? status
         sorted["#{status}"] = @memberships["#{status}"]
       end
+    end
+    @memberships = sorted
+  end
+
+  def sort_by_name
+    sorted = {}
+    @memberships.each do |status, members|
+      observers = members.select {|m| m.role == 'Observer'}.sort_by {|m| m.person.lastname }
+      members -= observers
+      sorted_members = members.sort_by {|m| [m.role, m.person.lastname]}
+      sorted["#{status}"] = sorted_members + observers
     end
     @memberships = sorted
   end

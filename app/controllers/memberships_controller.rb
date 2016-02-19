@@ -6,7 +6,7 @@
 
 class MembershipsController < ApplicationController
   before_filter :authenticate_user!
-  before_action :set_event, :set_attendance
+  before_action :set_event
   before_action :set_membership, only: [:show, :edit, :update, :destroy, :invite]
 
   # GET /events/:event_id/memberships

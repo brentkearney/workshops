@@ -159,11 +159,11 @@ RSpec.describe MembershipsController, type: :controller do
         end
 
         it 'assigns @memberships to event members' do
-          membership = create(:membership, event: @event)
+          membership = create(:membership, event: @event, role: 'Confirmed')
 
           get :index, { event_id: @event.id }
 
-          expect(assigns(:memberships)).to match_array(membership)
+          expect(assigns(:memberships)).to eq({"Confirmed" => [membership]})
         end
 
 
