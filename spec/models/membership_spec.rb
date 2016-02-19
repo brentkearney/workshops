@@ -109,10 +109,26 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@membership.role).not_to be_nil
   end
 
-  it 'sets an attendance automaticaly, if absent' do
+  it 'sets an attendance automatically, if absent' do
     @membership.attendance = nil
     @membership.save
     expect(@membership.attendance).not_to be_nil
   end
 
+  it "increases associated event's confirmed_cache when Confirmed member is added" do
+    counter_cache = @event.confirmed_count
+
+    member = create(:membership, event: @event, role: 'Confirmed')
+
+    expect(@event.confirmed_count).to eq(counter_cache + 1)
+  end
+
+  it "decreases associated event's confirmed_cache when Confirmed member is deleted" do
+    member = create(:membership, event: @event, role: 'Confirmed')
+    counter_cache = @event.confirmed_count
+
+    @event.memberships.last.destroy
+
+    expect(@event.confirmed_count).to eq(counter_cache - 1)
+  end
 end

@@ -8,6 +8,9 @@ class Membership < ActiveRecord::Base
   belongs_to :event
   belongs_to :person
   accepts_nested_attributes_for :person
+
+  after_create :update_counter_cache
+  after_destroy :update_counter_cache
   
   validates :event, presence: true
   validates :person, presence: true, :uniqueness => { :scope => :event,
@@ -21,6 +24,11 @@ class Membership < ActiveRecord::Base
 
   ROLES = ['Contact Organizer', 'Organizer', 'Participant', 'Observer', 'Backup Participant']
   ATTENDANCE = ['Confirmed', 'Invited', 'Undecided', 'Not Yet Invited', 'Declined']
+
+  def update_counter_cache
+    self.event.confirmed_count = Membership.where("attendance='Confirmed' AND event_id=?", self.event.id).count
+    self.event.save
+  end
 
   def shares_email?
     self.share_email

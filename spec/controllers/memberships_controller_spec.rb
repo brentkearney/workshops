@@ -150,6 +150,7 @@ RSpec.describe MembershipsController, type: :controller do
         @event.memberships.destroy_all
       end
 
+
       describe '#index' do
         it 'responds with success code' do
           get :index, { event_id: @event.id }
@@ -187,6 +188,7 @@ RSpec.describe MembershipsController, type: :controller do
             expect(assigns(:organizer_emails)).to be_falsey
           end
 
+
           context 'as @event organizer' do
             it "assigns @member_emails to confirmed members' emails" do
               organizer_member = create(:membership, event: @event, role: 'Organizer', person: @user.person)
@@ -210,6 +212,7 @@ RSpec.describe MembershipsController, type: :controller do
           end
         end
 
+
         # For testing staff and admin users
         def has_member_emails
           organizer_member = create(:membership, event: @event, role: 'Organizer')
@@ -231,6 +234,7 @@ RSpec.describe MembershipsController, type: :controller do
           expect(assigns(:organizer_emails)).to eq([%Q{"#{p.name}" <#{p.email}>}])
         end
 
+
         context 'as role: staff' do
           before do
             @user.staff!
@@ -245,6 +249,7 @@ RSpec.describe MembershipsController, type: :controller do
           end
         end
 
+
         context 'as role: admin' do
           before do
             @user.admin!
@@ -258,6 +263,7 @@ RSpec.describe MembershipsController, type: :controller do
             has_organizer_emails
           end
         end
+
 
         context 'as role: super_admin' do
           before do
@@ -312,6 +318,7 @@ RSpec.describe MembershipsController, type: :controller do
         end
       end
 
+
       describe '#edit' do
         it 'assigns @member' do
           membership = create(:membership, event: @event)
@@ -330,6 +337,7 @@ RSpec.describe MembershipsController, type: :controller do
           expect(flash[:error]).to eq('Access denied.')
         end
       end
+
 
       describe '#create' do
         it 'assigns @member' do
@@ -350,6 +358,7 @@ RSpec.describe MembershipsController, type: :controller do
         end
       end
 
+
       describe '#update' do
         it 'assigns @member' do
           membership = create(:membership, event: @event)
@@ -368,6 +377,7 @@ RSpec.describe MembershipsController, type: :controller do
           expect(flash[:error]).to eq('Access denied.')
         end
       end
+
 
       describe '#destroy' do
         it 'assigns @member' do
@@ -388,8 +398,5 @@ RSpec.describe MembershipsController, type: :controller do
         end
       end
     end
-
-
-
   end
 end
