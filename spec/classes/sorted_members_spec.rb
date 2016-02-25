@@ -83,13 +83,13 @@ describe "SortedMembers" do
     m1 = create(:membership, event: @event, person: p2, attendance: 'Confirmed')
     m2 = create(:membership, event: @event, person: p1, attendance: 'Confirmed')
     m3 = create(:membership, event: @event, person: p3, attendance: 'Invited')
-    m4 = create(:membership, event: @event, person: p4, attendance: 'Declined')
+    m4 = create(:membership, event: @event, person: p4, attendance: 'Invited')
 
     memberships = SortedMembers.new(@event).memberships
 
     expect(memberships['Confirmed']).to eq([m2, m1]) # alphabetical order
-    expect(memberships['Invited']).to match_array(m3)
-    expect(memberships['Declined']).to match_array(m4)
+    expect(memberships['Invited']).to match_array([m3, m4])
+    expect(memberships['Declined']).to be_falsey
     expect(memberships['Not Yet Invited']).to be_falsey
     expect(memberships['Undecided']).to be_falsey
   end

@@ -62,8 +62,12 @@ class StaffMailer < ApplicationMailer
 
       membership.valid?
       membership_errors = membership.errors.full_messages
-      @error_messages << "Error in #{person_name}'s #{@event_code} membership: #{membership_errors}\n"
-      @error_messages << "   * #{legacy_url}\n\n"
+      membership_errors.each do |error|
+        unless error.start_with?('Person')
+          @error_messages << "Error in #{person_name}'s #{@event_code} membership: #{error}\n"
+          @error_messages << "   * #{legacy_url}\n\n"
+        end
+      end
     end
 
     mail(to: @to_email, cc: @cc_email, subject: @subject)
