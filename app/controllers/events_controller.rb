@@ -58,7 +58,7 @@ class EventsController < ApplicationController
     location = Global.location.first unless Global.location.all.include?(location)
 
     @heading = "Events at #{location}"
-    @events = Event.location(location)
+    @events = Event.location(location).order(:start_date)
     render :index
   end
 
