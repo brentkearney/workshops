@@ -137,4 +137,20 @@ RSpec.describe 'Model validations: Schedule', type: :model do
     @schedule.lecture = lecture
     expect(@schedule).to be_valid
   end
+
+  context '.notify_staff?' do
+    let (:event) { build(:event, start_date: Date.today - 1.day, end_date: Date.today + 4.days) }
+
+    it 'true if item.staff_item' do
+      schedule = build(:schedule, event: event, staff_item: true, start_time: Time.now, end_time: Time.now + 30.minutes)
+
+      expect(schedule.notify_staff?).to be_truthy
+    end
+
+    it 'false if item.staff_item == false' do
+      schedule = build(:schedule, event: event, staff_item: false, start_time: Time.now, end_time: Time.now + 30.minutes)
+
+      expect(schedule.notify_staff?).to be_falsey
+    end
+  end
 end

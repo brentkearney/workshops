@@ -30,7 +30,7 @@ class DefaultSchedule
   end
 
   def build_default_schedule
-    template_event = Event.where(:template => true, :location => @event.location, :event_type => @event.event_type).first
+    template_event = Event.where(template: true, location: @event.location, event_type: @event.event_type).first
 
     unless template_event.nil?
       template_schedules = template_event.schedules.order(:start_time)

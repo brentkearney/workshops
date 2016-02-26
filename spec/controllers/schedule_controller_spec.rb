@@ -15,7 +15,7 @@ RSpec.describe ScheduleController, type: :controller do
     start_time = (@event.start_date + 1.days).to_time.in_time_zone(@event.time_zone).change({ hour: 9, min:0 })
     end_time = (@event.start_date + 1.days).to_time.in_time_zone(@event.time_zone).change({ hour: 9, min:30 })
     @valid_attributes = FactoryGirl.attributes_for(:schedule,
-        event_id: @event.id, start_time: start_time, end_time: end_time).merge(:new_item => true)
+        event_id: @event.id, start_time: start_time, end_time: end_time).merge(new_item: true)
 
     @invalid_attributes = FactoryGirl.attributes_for(:schedule, event_id: @event.id, name: '', start_time: start_time, end_time: end_time)
     @day = @event.start_date + 1.days
@@ -27,7 +27,6 @@ RSpec.describe ScheduleController, type: :controller do
   end
 
   describe "GET #index" do
-
     context 'as an external user (not-signed in)' do
       before do
         sign_out @user
@@ -188,28 +187,73 @@ RSpec.describe ScheduleController, type: :controller do
       let(:new_attributes) {
         @valid_attributes.merge(name: 'A new name', location: 'Back of the bus')
       }
-
-      it "updates the requested schedule" do
-        schedule = Schedule.create! @valid_attributes
-
-        put :update, { :event_id => @event.id, :id => schedule.to_param, :schedule => new_attributes }
-
-        schedule.reload
-        expect(schedule.name).to eq('A new name')
-        expect(schedule.location).to eq('Back of the bus')
-        expect(schedule.updated_by).to eq(@user.name)
+      
+      before do
+        @schedule = Schedule.create! @valid_attributes
       end
 
-      it "assigns the requested schedule as @schedule" do
-        schedule = Schedule.create! @valid_attributes
-        put :update, { :event_id => @event.id, :id => schedule.to_param, :schedule => @valid_attributes }
-        expect(assigns(:schedule)).to eq(schedule)
+      it "updates the schedule" do
+        put :update, { event_id: @event.id, id: @schedule.to_param, schedule: new_attributes }
+        @schedule.reload
+
+        expect(@schedule.name).to eq('A new name')
+        expect(@schedule.location).to eq('Back of the bus')
+        expect(@schedule.updated_by).to eq(@user.name)
       end
 
-      it "redirects to the schedule" do
-        schedule = Schedule.create! @valid_attributes
-        put :update, { :event_id => @event.id, :id => schedule.to_param, :schedule => @valid_attributes }
+      it "assigns @schedule" do
+        put :update, { event_id: @event.id, id: @schedule.to_param, schedule: @valid_attributes }
+
+        expect(assigns(:schedule)).to eq(@schedule)
+      end
+
+      it 'redirects to session[:return_to]' do
+        session[:return_to] = event_schedule_edit_path(@event, @schedule)
+
+        put :update, { event_id: @event.id, id: @schedule.to_param, schedule: @valid_attributes }
+
+        expect(response).to redirect_to(event_schedule_edit_path(@event, @schedule))
+      end
+
+      it 'redirects to the schedule index if session[:return_to] = nil' do
+        session[:return_to] = nil
+
+        put :update, { event_id: @event.id, id: @schedule.to_param, schedule: @valid_attributes }
+
         expect(response).to redirect_to(event_schedule_index_path(@event))
+      end
+
+      it 'updates similar schedule items if params[:change_similar]' do
+        other_item = create(:schedule, event: @event, name: @schedule.name,
+                            start_time: @schedule.start_time + 1.days,
+                            end_time: @schedule.end_time + 1.days)
+        new_start = @valid_attributes[:start_time].change({ hour: 11, min:0 })
+        new_end = @valid_attributes[:end_time].change({ hour: 11, min:30 })
+        attributes = @valid_attributes.merge(start_time: new_start, end_time: new_end)
+
+        put :update, { event_id: @event.id, id: @schedule.to_param, change_similar: true, schedule: attributes }
+
+        other_item.reload
+        @schedule.reload
+        expect(other_item.start_time).to eq(@schedule.start_time + 1.days)
+      end
+
+      it 'invokes StaffMailer if schedule.staff_item and event.is_current?' do
+        @event.start_date = Date.today - 1.day
+        @event.end_date = Date.today + 4.days
+        @event.save
+        schedule = create(:schedule, name: 'New item', event: @event, staff_item: true, start_time: Time.now, end_time: Time.now + 1.hour)
+        attributes = schedule.attributes.merge(name: 'Updated item', start_time: Time.now + 1.hour, end_time: Time.now + 2.hours)
+
+        mailer = double('mailer')
+        mailer.tap do |mail|
+          allow(mailer).to receive(:deliver_now).and_return(true)
+          allow(StaffMailer).to receive(:schedule_change).and_return(mailer)
+        end
+
+        put :update, { event_id: @event.id, id: schedule.to_param, schedule: attributes }
+
+        expect(StaffMailer).to have_received(:schedule_change)
       end
     end
 

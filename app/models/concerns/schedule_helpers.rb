@@ -7,7 +7,11 @@
 module ScheduleHelpers
   extend ActiveSupport::Concern
 
-  # Convert to event's time zone
+  def notify_staff?
+    staff_item && event.is_current?
+  end
+
+    # Convert to event's time zone
   def self.start_time
     super.in_time_zone(self.event.time_zone) if super && self.event.time_zone
   end
@@ -65,6 +69,7 @@ module ScheduleHelpers
                       :myself => self.id.nil? ? 0 : self.id
     ).order(:start_time).each { |other| errors_or_warnings(:start_time, other) }
   end
+
 
   def clean_data
     # remove leading & trailing whitespace

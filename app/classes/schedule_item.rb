@@ -43,7 +43,7 @@ class ScheduleItem
       keywords = params[:lecture_attributes].delete :keywords unless params[:lecture_attributes][:keywords].blank?
     end
 
-    new_schedule = Schedule.new(params.merge(id: @schedule.id))
+    new_schedule = Schedule.new(params.merge(id: @schedule.id, staff_item: @schedule.staff_item))
     if new_schedule.created_at.nil?
       new_schedule.created_at = Time.now
     end

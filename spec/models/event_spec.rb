@@ -173,15 +173,18 @@ RSpec.describe "Model validations: Event ", type: :model do
   ################# instance methods from app/models/concerns/event_decorators.rb #################
   ###
   it '.days returns a collection of Time objects for each day of the event' do
-    e = FactoryGirl.create(:event, start_date: '2015-05-04', end_date: '2015-05-07')
+    e = create(:event, start_date: '2015-05-04', end_date: '2015-05-07')
     edays = e.days
+    
     expect(edays[0].strftime("%A")).to eq("Monday")
     expect(edays[1].strftime("%A")).to eq("Tuesday")
     expect(edays[2].strftime("%A")).to eq("Wednesday")
+    
+    e.destroy
   end
 
   it '.days returns *only* the days of the event' do
-    e = FactoryGirl.create(:event, start_date: '2015-05-04', end_date: '2015-05-07')
+    e = create(:event, start_date: '2015-05-04', end_date: '2015-05-07')
     event_start = e.start_date.to_time.to_i
     event_end = e.end_date.to_time.change({ hour: 15 }).to_i
 
@@ -190,27 +193,32 @@ RSpec.describe "Model validations: Event ", type: :model do
       expect(day.to_i).to be <= event_end
     end
 
+    e.destroy
   end
   
   it ".organizers returns organizer names and afilliations" do
-    e = FactoryGirl.create(:event)
-    p1 = FactoryGirl.create(:person)
-    p2 = FactoryGirl.create(:person)
-    m1 = FactoryGirl.create(:membership, event: e, person: p1, role: 'Contact Organizer')
-    m2 = FactoryGirl.create(:membership, event: e, person: p2, role: 'Organizer')
+    e = create(:event)
+    p1 = create(:person)
+    p2 = create(:person)
+    m1 = create(:membership, event: e, person: p1, role: 'Contact Organizer')
+    m2 = create(:membership, event: e, person: p2, role: 'Organizer')
 
     expect(e.organizers).to include("#{p1.name} (#{p1.affiliation})")
     expect(e.organizers).to include("#{p2.name} (#{p2.affiliation})")
+    
+    e.destroy
   end
 
   it ".attendance returns a collection of members in order of Event:ROLES" do
-    event = FactoryGirl.create(:event_with_roles)
+    event = create(:event_with_roles)
     members = event.attendance
     i = 0
     Membership::ROLES.each do |role|
       expect(members[i].role).to eq(role)
       i += 1
     end
+    
+    event.destroy
   end
 
   it ".num_attendance returns the number of members for a given attendance status" do
@@ -236,6 +244,8 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(e.num_attendance('Confirmed')).to eq(4)
     expect(e.num_attendance('Declined')).to eq(1)
     expect(e.num_attendance('Not Yet Invited')).to eq(2)
+    
+    e.destroy
   end
 
   it ".has_attendance returns true if there are any members for a given attendence status" do
@@ -253,16 +263,39 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(e.has_attendance('Invited')).to be_falsey
     expect(e.has_attendance('Declined')).to be_truthy
     expect(e.has_attendance('Undecided')).to be_falsey
+    
+    e.destroy
   end
 
   it ".dates returns formatted dates" do
-    e = FactoryGirl.create(:event)
+    e = build(:event)
+    
     expect(e.dates).to match(/^\D+ \d+ -.+\d+$/) # e.g. May 8 - 13
   end
 
   it ".arrival_date and .departure_date return formatted start_date and end_date" do
-    e = FactoryGirl.create(:event)
+    e = build(:event)
+
     expect(e.arrival_date).to match(/^\w+,\ \w+\ \d+,\ \d{4}$/) # e.g. Friday, May 8, 2015
     expect(e.departure_date).to match(/^\w+,\ \w+\ \d+,\ \d{4}$/)
+  end
+  
+  context '.is_current?' do
+    it 'false if current time is outside event dates' do
+      e = build(:event, start_date: Date.today.next_week(:sunday),
+                 end_date: Date.today.next_week(:sunday) + 5.days)
+
+      expect(e.is_current?).to be_falsey
+    end
+
+    it 'true if current time is inside event dates' do
+      e = build(:event, start_date: Date.today - 1.day,
+                 end_date: Date.today + 4.days)
+
+      expect(e.is_current?).to be_truthy
+    end
+
+
+
   end
 end

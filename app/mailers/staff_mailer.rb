@@ -8,21 +8,40 @@ class StaffMailer < ApplicationMailer
   require 'sucker_punch/async_syntax'
   default from: Global.email.application
 
+  def schedule_change(original, new)
+    to_email = Global.email.schedule_staff
+    cc_email = Global.email.system_administrator
+    subject = "[#{new.event.code}] Schedule change notice!"
+
+    @change_notice = %Q(
+    THIS:
+      Name: #{original.name}
+      Start time: #{original.start_time}
+      End time: #{original.end_time}
+      Location: #{original.location}
+      Description: #{original.description}
+    
+    CHANGED TO:
+      Name: #{new.name}
+      Start time: #{new.start_time}
+      End time: #{new.end_time}
+      Location: #{new.location}
+      Description: #{new.description}
+      Updated by: #{new.updated_by}
+    )
+
+    mail(to: to_email, cc: cc_email, subject: subject, Importance: 'High', 'X-Priority': 1)
+  end
+
   def event_sync(sync_errors)
-    @to_email = Global.email.program_coordinator
-    @cc_email = Global.email.system_administrator
+    to_email = Global.email.program_coordinator
+    cc_email = Global.email.system_administrator
     @event = sync_errors['Event']
-    @subject = "!! #{@event.code} (#{@event.location}) Data errors !!"
+    subject = "!! #{@event.code} (#{@event.location}) Data errors !!"
 
     @error_messages = ''
 
     sync_errors['People'].each do |person|
-
-      Rails.logger.debug("\n\n********************************************\n\n")
-      Rails.logger.debug("person object is a: #{person.class}\n\n")
-      Rails.logger.debug("person contains:\n#{person.inspect}")
-      Rails.logger.debug("\n\n********************************************\n\n")
-      
       person_name = "#{person[:lastname]}, #{person[:firstname]}"
       legacy_id = person.legacy_id.to_s
       legacy_url = Global.config.legacy_person
@@ -42,12 +61,6 @@ class StaffMailer < ApplicationMailer
     end
 
     sync_errors['Memberships'].each do |membership|
-
-      Rails.logger.debug("\n\n********************************************\n\n")
-      Rails.logger.debug("membership object is a: #{membership.class}\n\n")
-      Rails.logger.debug("membership contains:\n#{membership.inspect}")
-      Rails.logger.debug("\n\n********************************************\n\n")
-
       person_name = membership.person.name
       legacy_id = membership.person.legacy_id.to_s
       legacy_url = Global.config.legacy_person
@@ -70,7 +83,7 @@ class StaffMailer < ApplicationMailer
       end
     end
 
-    mail(to: @to_email, cc: @cc_email, subject: @subject)
+    mail(to: to_email, cc: cc_email, subject: subject)
   end
 
 end

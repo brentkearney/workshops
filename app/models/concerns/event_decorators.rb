@@ -107,4 +107,8 @@ module EventDecorators
     people.sort_by {|p| p.lastname.downcase}
   end
 
+  def is_current?
+    Time.now >= start_date.to_time && Time.now <= end_date.to_time
+  end
+
 end

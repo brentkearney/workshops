@@ -8,3 +8,4 @@ default:
   administrator: 'organization-administrator@example.com'
   director: 'organization-director@example.com'
   videos: 'videos@example.com'
+  schedule_staff: 'barista@example.com, photographer@example.com'

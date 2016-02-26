@@ -18,7 +18,7 @@ RSpec.describe StaffMailer, type: :mailer do
     ActionMailer::Base.deliveries.clear
   end
 
-  context 'Event sync has import errors' do
+  describe '.event_sync' do
     before do
       @event = FactoryGirl.create(:event, code: '15w6661')
     end
@@ -28,15 +28,38 @@ RSpec.describe StaffMailer, type: :mailer do
       StaffMailer.event_sync(@sync_errors).deliver_now
     end
 
-    it 'Sends a summary email to staff' do
+    it 'sends email' do
       expect(ActionMailer::Base.deliveries.count).to eq(1)
     end
 
-    it 'sends to the program coordinator' do
+    it 'To: program coordinator' do
       expect(ActionMailer::Base.deliveries.first.to).to include(Global.email.program_coordinator)
     end
 
-    it 'Cc\'s message to system administrator' do
+    it 'Cc: system administrator' do
+      expect(ActionMailer::Base.deliveries.first.cc).to include(Global.email.system_administrator)
+    end
+  end
+
+  describe '.schedule_change' do
+
+    let(:event) { build(:event) }
+    let(:original_schedule) { build(:schedule) }
+    let(:new_schedule) { build(:schedule, name: 'New name') }
+
+    before :each do
+      StaffMailer.schedule_change(original_schedule, new_schedule).deliver_now
+    end
+
+    it 'sends email' do
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+    end
+
+    it 'To: schedule_staff' do
+      expect(ActionMailer::Base.deliveries.first.to).to match_array(Global.email.schedule_staff.split(', '))
+    end
+
+    it 'Cc: system administrator' do
       expect(ActionMailer::Base.deliveries.first.cc).to include(Global.email.system_administrator)
     end
   end
