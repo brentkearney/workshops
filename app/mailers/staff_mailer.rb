@@ -8,10 +8,11 @@ class StaffMailer < ApplicationMailer
   require 'sucker_punch/async_syntax'
   default from: Global.email.application
 
-  def schedule_change(original, new)
+  def schedule_change(original, new, changed_similar = false)
     to_email = Global.email.schedule_staff
     cc_email = Global.email.system_administrator
-    subject = "[#{new.event.code}] Schedule change notice!"
+    @event = new.event
+    subject = "[#{@event.code}] Schedule change notice!"
 
     @change_notice = %Q(
     THIS:
@@ -29,6 +30,12 @@ class StaffMailer < ApplicationMailer
       Description: #{new.description}
       Updated by: #{new.updated_by}
     )
+
+    if changed_similar
+      @change_notice << %Q(
+**** All "#{original.name}" items at #{original.start_time.strftime("%H:%M")} were changed to the new time. ****
+      )
+    end
 
     mail(to: to_email, cc: cc_email, subject: subject, Importance: 'High', 'X-Priority': 1)
   end

@@ -13,13 +13,14 @@ as well.
 * Workshop data is imported via calls to an external API, and keeps data in sync with external data source.
 * Role-based access control allowing different levels of privilege between admin, staff, organizers and participants.
 * Staff and admin users can login. Workshop organizers can signup and login.
-* Shows an index of all workshops.
-* Shows workshop details: name, location, dates, description, etc..
+* Shows index listings of all events, future events, past events, events at given locations.
+* Background jobs to update members of an event from external data source.
 * Shows workshop members, plus their details to varying degrees depending on user's privilege level.
 * Staff & organizers can click a button to send email all to workshop participants.
 * Staff can edit events if the staff user's location matches the event location.
 * Staff can edit default workshop schedule templates.
 * Organizers can easily edit and publish the schedules of their workshop(s).
+* Staff get email notifications when schedules of currently running workshops are updated.
 * Default times for new schedule items are estimated based on previous schedule entries, to reduce data entry time.
 * JSON API for [an external system](http://www.birs.ca/facilities/automated-video) to update lecture records.
 * Public access to workshop schedules via JSON.
@@ -28,7 +29,6 @@ as well.
 * Organizers can add and invite members to their workshop.
 * Invitations to members include a one-click RSVP link, setup profiles, etc..
 * Staff can assign hotel rooms to workshop participants.
-* Staff get email notifications when schedules of currently running workshops are updated.
 * Admin users can manage (add/remove/change passwords, etc) other users.
 * Staff can manage various email templates.
 * Staff can send emails of various types to organizers and participants.

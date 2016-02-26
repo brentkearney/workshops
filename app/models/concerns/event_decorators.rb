@@ -108,7 +108,7 @@ module EventDecorators
   end
 
   def is_current?
-    Time.now >= start_date.to_time && Time.now <= end_date.to_time
+    Time.now >= start_date.to_time && Time.now <= end_date.to_time.change({ hour: 23, min: 59})
   end
 
 end

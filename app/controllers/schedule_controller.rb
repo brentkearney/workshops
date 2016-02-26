@@ -103,7 +103,7 @@ class ScheduleController < ApplicationController
     respond_to do |format|
       if @schedule.update(merged_params)
         ScheduleItem.update_others(@original_item, merged_params) if params[:change_similar]
-        StaffMailer.schedule_change(@original_item, @schedule).deliver_now if @schedule.notify_staff?
+        StaffMailer.schedule_change(@original_item, @schedule, params[:change_similar]).deliver_now if @schedule.notify_staff?
 
         format.html { redirect_to from_where_we_came, notice: "\"#{@schedule.name}\" was successfully updated." }
         format.json { render :show, status: :ok, location: @schedule }

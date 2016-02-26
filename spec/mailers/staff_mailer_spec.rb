@@ -20,7 +20,7 @@ RSpec.describe StaffMailer, type: :mailer do
 
   describe '.event_sync' do
     before do
-      @event = FactoryGirl.create(:event, code: '15w6661')
+      @event = create(:event, code: '15w6661')
     end
 
     before :each do
@@ -48,7 +48,7 @@ RSpec.describe StaffMailer, type: :mailer do
     let(:new_schedule) { build(:schedule, name: 'New name') }
 
     before :each do
-      StaffMailer.schedule_change(original_schedule, new_schedule).deliver_now
+      StaffMailer.schedule_change(original_schedule, new_schedule, false).deliver_now
     end
 
     it 'sends email' do
