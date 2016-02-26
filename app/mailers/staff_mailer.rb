@@ -46,7 +46,6 @@ class StaffMailer < ApplicationMailer
     subject = "!! #{@event.code} (#{@event.location}) Data errors !!"
 
     @error_messages = ''
-    legacy_base_url = Global.config.legacy_person
 
     sync_errors['People'].each do |person|
       person_name = "#{person[:lastname]}, #{person[:firstname]}"
