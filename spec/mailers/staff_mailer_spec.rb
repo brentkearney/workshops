@@ -20,7 +20,7 @@ RSpec.describe StaffMailer, type: :mailer do
 
   describe '.event_sync' do
     before do
-      @event = create(:event, code: '15w6661')
+      @event = create(:event, code: '15w6661', location: 'BIRS')
     end
 
     before :each do
@@ -33,11 +33,30 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: program coordinator' do
-      expect(ActionMailer::Base.deliveries.first.to).to include(Global.email.program_coordinator)
+      expect(ActionMailer::Base.deliveries.first.to).to include(Global.email.locations.send(@event.location).program_coordinator)
     end
 
     it 'Cc: system administrator' do
       expect(ActionMailer::Base.deliveries.first.cc).to include(Global.email.system_administrator)
+    end
+  end
+
+  describe '.event_sync with person.legacy_id.nil' do
+    it 'notifies sysadmin' do
+      event = create(:event, code: '15w6661', location: 'BIRS')
+      person = build(:person, legacy_id: nil, affiliation: nil)
+      membership = build(:membership, person: person, event: event)
+      sync_errors = { 'Event' => event, 'People' => [person], 'Memberships' => [membership] }
+
+      mailer = double('mailer')
+      mailer.tap do |mail|
+        allow(mailer).to receive(:deliver_now).and_return(true)
+        allow(StaffMailer).to receive(:notify_sysadmin).and_return(mailer)
+      end
+
+      StaffMailer.event_sync(sync_errors).deliver_now
+
+      expect(StaffMailer).to have_received(:notify_sysadmin)
     end
   end
 
@@ -56,11 +75,8 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: schedule_staff' do
-      expect(ActionMailer::Base.deliveries.first.to).to match_array(Global.email.schedule_staff.split(', '))
+      expect(ActionMailer::Base.deliveries.first.to).to match_array(Global.email.locations.send(event.location).schedule_staff.split(', '))
     end
 
-    it 'Cc: system administrator' do
-      expect(ActionMailer::Base.deliveries.first.cc).to include(Global.email.system_administrator)
-    end
   end
 end

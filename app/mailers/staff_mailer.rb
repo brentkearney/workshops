@@ -9,9 +9,8 @@ class StaffMailer < ApplicationMailer
   default from: Global.email.application
 
   def schedule_change(original, new, changed_similar = false)
-    to_email = Global.email.schedule_staff
-    cc_email = Global.email.system_administrator
     @event = new.event
+    to_email = Global.email.locations.send(@event.location).schedule_staff
     subject = "[#{@event.code}] Schedule change notice!"
 
     @change_notice = %Q(
@@ -37,28 +36,28 @@ class StaffMailer < ApplicationMailer
       )
     end
 
-    mail(to: to_email, cc: cc_email, subject: subject, Importance: 'High', 'X-Priority': 1)
+    mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
   end
 
   def event_sync(sync_errors)
-    to_email = Global.email.program_coordinator
-    cc_email = Global.email.system_administrator
     @event = sync_errors['Event']
+    to_email = Global.email.locations.send(@event.location).program_coordinator
+    cc_email = Global.email.system_administrator
     subject = "!! #{@event.code} (#{@event.location}) Data errors !!"
 
     @error_messages = ''
+    legacy_base_url = Global.config.legacy_person
 
     sync_errors['People'].each do |person|
       person_name = "#{person[:lastname]}, #{person[:firstname]}"
-      legacy_id = person.legacy_id.to_s
       legacy_url = Global.config.legacy_person
-      if legacy_id.nil?
-        Rails.logger.error("\n\n********************************************\n\n")
-        Rails.logger.error("No person_id from legacy database for this record!\n\n")
-        Rails.logger.error("#{person.inspect}")
-        Rails.logger.error("\n\n********************************************\n\n")
+
+      if person.legacy_id.nil?
+        message = "During #{@event.code} data synchronization, we found a local person record with no legacy_id:\n\n"
+        message << "#{person.inspect}"
+        StaffMailer.notify_sysadmin(@event, message).deliver_now
       else
-        legacy_url = legacy_url + "#{legacy_id}"
+        legacy_url += "#{person.legacy_id}"
       end
 
       person.valid?
@@ -69,15 +68,9 @@ class StaffMailer < ApplicationMailer
 
     sync_errors['Memberships'].each do |membership|
       person_name = membership.person.name
-      legacy_id = membership.person.legacy_id.to_s
       legacy_url = Global.config.legacy_person
-      if legacy_id.nil?
-        Rails.logger.error("\n\n********************************************\n\n")
-        Rails.logger.error("No person_id from legacy database for this record!\n\n")
-        Rails.logger.error("#{membership.person.inspect}")
-        Rails.logger.error("\n\n********************************************\n\n")
-      else
-        legacy_url = legacy_url + "#{legacy_id}" + '&ps=events'
+      unless membership.person.legacy_id.nil?
+        legacy_url += "#{membership.person.legacy_id}" + '&ps=events'
       end
 
       membership.valid?
@@ -91,6 +84,13 @@ class StaffMailer < ApplicationMailer
     end
 
     mail(to: to_email, cc: cc_email, subject: subject)
+  end
+
+  def notify_sysadmin(event, message)
+    to_email = Global.email.system_administrator
+    subject = "[#{event.code}] (#{event.location}) Data errors !!"
+    @message = message
+    mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1, template_name: 'notify_sysadmin')
   end
 
 end
