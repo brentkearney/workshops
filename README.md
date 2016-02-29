@@ -10,11 +10,11 @@ I will set up a live demo site soon, and provide installation/deployment instruc
 as well.
 
 ### Current Features
-* Workshop data is imported via calls to an external API, and keeps data in sync with external data source.
+* Workshop data is imported via calls to an external API.
 * Role-based access control allowing different levels of privilege between admin, staff, organizers and participants.
 * Staff and admin users can login. Workshop organizers can signup and login.
-* Shows index listings of all events, future events, past events, events at given locations.
-* Background jobs to update members of an event from external data source.
+* Shows index listings of all events, future events, past events, events by location.
+* Background jobs to update event memberships from external data source.
 * Shows workshop members, plus their details to varying degrees depending on user's privilege level.
 * Staff & organizers can click a button to send email all to workshop participants.
 * Staff can edit events if the staff user's location matches the event location.
@@ -22,20 +22,19 @@ as well.
 * Organizers can easily edit and publish the schedules of their workshop(s).
 * Staff get email notifications when schedules of currently running workshops are updated.
 * Default times for new schedule items are estimated based on previous schedule entries, to reduce data entry time.
-* JSON API for [an external system](http://www.birs.ca/facilities/automated-video) to update lecture records.
+* Authenticated JSON API for [an external system](http://www.birs.ca/facilities/automated-video) to update lecture records.
 * Public access to workshop schedules via JSON.
 
 ### Future Features:
-* Organizers can add and invite members to their workshop.
-* Invitations to members include a one-click RSVP link, setup profiles, etc..
-* Staff can assign hotel rooms to workshop participants.
-* Admin users can manage (add/remove/change passwords, etc) other users.
-* Staff can manage various email templates.
-* Staff can send emails of various types to organizers and participants.
-* Staff can schedule the automatic sending of emails. For example, send an RSVP reminder 3 months before the start of every workshop.
+* Staff and admin can create new events.
+* Staff and Organizers can add and invite members to their workshop.
+* Invitations include a one-click RSVP link, allowing members to setup profiles, etc..
+* Staff can assign hotel rooms and manage other hospitality details for workshop participants.
+* Admin users can manage other users (add/remove/change passwords, etc) .
+* An email system to facilitate communication between various parties, including email templates and scheduled sending.
 * When organizers schedule a participant to give a talk, members get notified with a link to fill in the talk title and abstract.
 * Drag & drop interface to re-arrange schedule items.
-* Interface for admin users to manage application settings.
+* Interface for admin users to manage application settings and permissions.
 * Addition of a forum/mail list software for each workshop. Considering embedding [Discourse](http://www.discourse.org), with an updated editor to support mathematics.
 * Crowd-sourcing feature for workshop participants to post open problems to the public, soliciting solutions.
 
