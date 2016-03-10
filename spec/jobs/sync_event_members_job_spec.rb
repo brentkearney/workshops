@@ -10,9 +10,6 @@ RSpec.describe SyncEventMembersJob, type: :job do
   include ActiveJob::TestHelper
 
   let(:event) { create(:event, code: '12w5999') }
-  let(:person) { create(:person) }
-  let(:membership) { create(:membership, person: person, event: event) }
-
   subject(:job) { SyncEventMembersJob.perform_later(event) }
 
   it 'queues the job' do
@@ -26,12 +23,14 @@ RSpec.describe SyncEventMembersJob, type: :job do
 
   it 'executes perform' do
     expect {
-      expect(SyncMembers.new(event)).to receive(:run)
+      allow(LegacyConnector).to receive(:new).and_return(FakeLegacyConnector.new)
+      # expect(SyncMembers.new(event)).to receive(:run)
       perform_enqueued_jobs { job }
-    }.to raise_error(RuntimeError) # Error because 12w5999 has no (remote) members
+    }.to raise_error(RuntimeError) # Error because 12w5999 has no members
   end
 
-  it 'handles no results error' do
+  it 'queues retry given no results error' do
+    allow(LegacyConnector).to receive(:new).and_return(FakeLegacyConnector.new)
     allow(SyncMembers).to receive(:new).and_raise('NoResultsError')
 
     perform_enqueued_jobs do
@@ -40,7 +39,7 @@ RSpec.describe SyncEventMembersJob, type: :job do
     end
   end
 
-  after do
+  after :each do
     clear_enqueued_jobs
     clear_performed_jobs
   end

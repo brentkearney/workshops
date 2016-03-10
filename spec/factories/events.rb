@@ -33,8 +33,15 @@ FactoryGirl.define do
       end
     end
 
-
-
+    factory :event_with_members do
+      after(:create) do |event|
+        create(:membership, event: event, role: 'Contact Organizer')
+        create(:membership, event: event, role: 'Organizer')
+        5.times do
+          create(:membership, event: event, role: 'Participant')
+        end
+      end
+    end
   end
 end
 

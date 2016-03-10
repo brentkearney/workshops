@@ -1,7 +1,5 @@
 # Copyright (c) 2016 Banff International Research Station
 #
-# This file is part of Workshops. Workshops is licensed under
-#
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this
 # software and associated documentation files (the "Software"), to deal in the Software
 # without restriction, including without limitation the rights to use, copy, modify,
@@ -21,32 +19,27 @@
 
 # Updates local database with records from legacy database
 class SyncMembers
+  attr_reader :event, :remote_members, :sync_errors
   def initialize(event)
     @event = event
-    @remote_members = get_remote_members("#{@event.code}")
-    @sync_errors = { 'Event' => @event, 'People' => Array.new, 'Memberships' => Array.new }
+    @sync_errors = ErrorReport.new(self.class)
   end
 
   def run
-    @remote_members.each do |remote|
+    get_remote_members.each do |remote|
       remote = fix_remote_fields(remote)
       local_person = update_person(remote)
       update_membership(remote, local_person)
     end
 
-    if @sync_errors['People'].count > 0 || @sync_errors['Memberships'].count > 0
-      StaffMailer.event_sync(@sync_errors).deliver_now
-    end
+    sync_errors.send_report
   end
 
-  
-  private
-
-  def get_remote_members(code)
+  def get_remote_members
     lc = LegacyConnector.new
-    remote_members = lc.get_members("#{@event.code}")
+    remote_members = lc.get_members(event)
     if remote_members.empty?
-      Rails.logger.error "\n\n****************************\n\n!! Unable to retrieve any remote members for #{@event.code} !!\n\n****************************\n\n"
+      sync_errors.add(lc, "Unable to retrieve any remote members for #{event.code}")
       raise 'NoResultsError'
     end
     remote_members
@@ -87,8 +80,8 @@ class SyncMembers
       local_person = Person.new(remote['Person'])
       save_person(local_person)
     else
-      remote_update = remote['Person']['updated_at'].in_time_zone(@event.time_zone)
-      local_update = local_person.updated_at.in_time_zone(@event.time_zone)
+      remote_update = remote['Person']['updated_at'].in_time_zone(event.time_zone)
+      local_update = local_person.updated_at.in_time_zone(event.time_zone)
       if remote_update > local_update
         remote['Person'].each_pair do |k,v|
           local_person[k] = v unless v.blank?
@@ -104,7 +97,9 @@ class SyncMembers
     if person.valid? && person.save
       Rails.logger.debug "* Saved #{@event.code} person: #{person.name}"
     else
-      @sync_errors['People'] << person
+      Rails.logger.debug "* Error saving #{@event.code} person: #{person.name}, #{person.errors.full_messages}"
+      # @sync_errors['People'] << person
+      sync_errors.add(person)
     end
   end
   
@@ -113,11 +108,11 @@ class SyncMembers
   end
 
   def update_membership(remote, person)
-    local_membership = Membership.where(event: @event, person: person).first
+    local_membership = Membership.where(event: event, person: person).first
 
     if local_membership.nil?
       local_membership = Membership.new(remote['Membership'])
-      local_membership.event = @event
+      local_membership.event = event
       local_membership.person = person
       save_membership(local_membership)
     else
@@ -136,7 +131,9 @@ class SyncMembers
     if membership.valid? && membership.save
       Rails.logger.debug "* Saved #{@event.code} membership: #{membership.person.name}"
     else
-      @sync_errors['Memberships'] << membership
+      Rails.logger.debug "* Error saving #{@event.code} membership: #{membership.person.name}, #{membership.errors.full_messages}"
+      # @sync_errors['Memberships'] << membership
+      sync_errors.add(membership)
     end
   end
   

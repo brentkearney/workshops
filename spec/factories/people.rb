@@ -17,6 +17,7 @@ FactoryGirl.define do
     f.affiliation { Faker::Company.name }
     f.department { Faker::Commerce.department }
     f.academic_status Global.person.academic_status.sample
+    f.legacy_id Random.rand(1000..9999)
     f.updated_by 'FactoryGirl'
   end
 end

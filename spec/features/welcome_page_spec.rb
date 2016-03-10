@@ -123,6 +123,16 @@ describe 'Post-login Welcome Page', :type => :feature do
       @user.logout
     end
 
+    it "shows the user's current and upcoming workshops" do
+      sign_in_as @user
+
+      expect(current_path).to eq(welcome_path)
+      @user.person.memberships.each do |m|
+        expect(page.body).to include("#{m.event.code}")
+        expect(page.body).to include("#{m.event.name}")
+      end
+    end
+
     it 'shows the workshops for which the user is Not Yet Invited' do
       membership = @user.person.memberships.sample
       membership.attendance = 'Not Yet Invited'

@@ -1,7 +1,5 @@
 # Copyright (c) 2016 Banff International Research Station
 #
-# This file is part of Workshops. Workshops is licensed under
-#
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this
 # software and associated documentation files (the "Software"), to deal in the Software
 # without restriction, including without limitation the rights to use, copy, modify,
@@ -42,8 +40,8 @@ class LegacyConnector
   end
   
   # get membership data for an event
-  def get_members(event_id)
-    JSON.parse(RestClient.get "#{@rest_url}/members/#{event_id}")
+  def get_members(event)
+    JSON.parse(RestClient.get "#{@rest_url}/members/#{event.code}")
   end
   
   # get a person record data

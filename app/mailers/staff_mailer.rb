@@ -5,7 +5,6 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class StaffMailer < ApplicationMailer
-  require 'sucker_punch/async_syntax'
   default from: Global.email.application
 
   def schedule_change(original, new, changed_similar = false)

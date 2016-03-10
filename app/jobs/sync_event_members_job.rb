@@ -5,7 +5,6 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class SyncEventMembersJob < ActiveJob::Base
-  require 'sucker_punch/async_syntax'
   queue_as :urgent
 
   rescue_from(RuntimeError) do |error|
