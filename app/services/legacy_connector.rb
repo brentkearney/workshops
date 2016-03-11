@@ -119,5 +119,5 @@ class LegacyConnector
   def send_lectures_report(event_id)
     RestClient.post "#{@rest_url}/send_lectures_report/#{event_id}", 1, :content_type => :json, :accept => :json
   end
-  
+
 end
