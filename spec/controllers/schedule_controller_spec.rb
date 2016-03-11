@@ -279,10 +279,28 @@ RSpec.describe ScheduleController, type: :controller do
       @valid_attributes.delete :new_item
     end
 
+    it 'invokes StaffMailer if schedule.staff_item and event.is_current?' do
+      @event.start_date = Date.today - 1.day
+      @event.end_date = Date.today + 4.days
+      @event.save
+      schedule = create(:schedule, name: 'New item', event: @event, staff_item: true, start_time: Time.now, end_time: Time.now + 1.hour)
+      attributes = schedule.attributes.merge(name: 'Updated item', start_time: Time.now + 1.hour, end_time: Time.now + 2.hours)
+
+      mailer = double('mailer')
+      mailer.tap do |mail|
+        allow(mailer).to receive(:deliver_now).and_return(true)
+        allow(StaffMailer).to receive(:schedule_change).and_return(mailer)
+      end
+
+      delete :destroy, { event_id: @event.id, id: schedule.to_param }
+
+      expect(StaffMailer).to have_received(:schedule_change)
+    end
+
     it "destroys the requested schedule" do
       schedule = Schedule.create! @valid_attributes
       expect {
-        delete :destroy, { :event_id => @event.id, :id => schedule.to_param }
+        delete :destroy, { event_id: @event.id, id: schedule.to_param }
       }.to change(Schedule, :count).by(-1)
     end
 
@@ -295,13 +313,13 @@ RSpec.describe ScheduleController, type: :controller do
       schedule.save
 
       expect {
-        delete :destroy, { :event_id => @event.id, :id => schedule.to_param }
+        delete :destroy, { event_id: @event.id, id: schedule.to_param }
       }.to change(Lecture, :count).by(-1)
     end
 
     it "redirects to the schedule list" do
       schedule = Schedule.create! @valid_attributes
-      delete :destroy, { :event_id => @event.id, :id => schedule.to_param }
+      delete :destroy, { event_id: @event.id, id: schedule.to_param }
       expect(response).to redirect_to(event_schedule_index_path(@event))
     end
   end

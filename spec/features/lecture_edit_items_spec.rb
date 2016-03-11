@@ -15,7 +15,7 @@ describe 'Editing a Lecture Item', :type => :feature do
     9.upto(12) do |t|
       FactoryGirl.create(:schedule,
                          event: @event,
-                         name: "Item at #{t}",
+                         name: "Item at #{t}:00",
                          start_time: (@event.start_date + 2.days).to_time.change({ hour: t }),
                          end_time: (@event.start_date + 2.days).to_time.change({ hour: t+1 })
       )
@@ -28,7 +28,7 @@ describe 'Editing a Lecture Item', :type => :feature do
       s.lecture = lecture
       s.save
     end
-    @item = @event.schedules.last
+    @item = @event.schedules.first
     @lecture = @item.lecture
     visit event_schedule_edit_path(@event, @item)
   end
@@ -37,8 +37,8 @@ describe 'Editing a Lecture Item', :type => :feature do
     Warden.test_reset!
   end
 
-  it 'updates the day of the lecture to the selected day' do
-    new_day = @item.start_time.to_date + 2.days
+  it 'updates the day of the item to the selected day' do
+    new_day = @item.start_time.to_date + 1.day
     page.select new_day.strftime("%A"), :from => 'schedule_day'
     click_button 'Update Schedule'
     expect(Lecture.find(@lecture.id).start_time.to_date).to eq(new_day)

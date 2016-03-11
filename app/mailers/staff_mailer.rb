@@ -5,22 +5,32 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class StaffMailer < ApplicationMailer
-  require 'sucker_punch/async_syntax'
   default from: Global.email.application
 
-  def schedule_change(original, new, changed_similar = false)
-    @event = new.event
+  def schedule_change(type, schedule, message, changed_similar = false)
+    @event = schedule.event
     to_email = Global.email.locations.send(@event.location).schedule_staff
     subject = "[#{@event.code}] Schedule change notice!"
-
+    
     @change_notice = %Q(
     THIS:
-      Name: #{original.name}
-      Start time: #{original.start_time}
-      End time: #{original.end_time}
-      Location: #{original.location}
-      Description: #{original.description}
-    
+      Name: #{schedule.name}
+      Start time: #{schedule.start_time}
+      End time: #{schedule.end_time}
+      Location: #{schedule.location}
+      Description: #{schedule.description}
+    )
+
+    case type
+      when :create
+        @change_notice << %Q(
+    WAS ADDED!
+      By: #{message} at #{Time.now}
+        )
+
+      when :update
+        new = message
+        @change_notice << %Q(
     CHANGED TO:
       Name: #{new.name}
       Start time: #{new.start_time}
@@ -28,12 +38,19 @@ class StaffMailer < ApplicationMailer
       Location: #{new.location}
       Description: #{new.description}
       Updated by: #{new.updated_by}
-    )
+        )
 
-    if changed_similar
-      @change_notice << %Q(
-**** All "#{original.name}" items at #{original.start_time.strftime("%H:%M")} were changed to the new time. ****
+        if changed_similar
+          @change_notice << %Q(
+**** All "#{schedule.name}" items at #{schedule.start_time.strftime("%H:%M")} were changed to the new time. ****
       )
+        end
+
+      when :destroy
+        @change_notice << %Q(
+    WAS DELETED!
+      By: #{message} at #{Time.now}
+        )
     end
 
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)

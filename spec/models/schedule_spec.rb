@@ -139,15 +139,15 @@ RSpec.describe 'Model validations: Schedule', type: :model do
   end
 
   context '.notify_staff?' do
-    let (:event) { build(:event, start_date: Date.today - 1.day, end_date: Date.today + 4.days) }
-
-    it 'true if item.staff_item' do
+    it 'true if event is current' do
+      event = build(:event, start_date: Date.today - 1.day, end_date: Date.today + 4.days)
       schedule = build(:schedule, event: event, staff_item: true, start_time: Time.now, end_time: Time.now + 30.minutes)
 
       expect(schedule.notify_staff?).to be_truthy
     end
 
-    it 'false if item.staff_item == false' do
+    it 'false if event is not current' do
+      event = build(:event, start_date: Date.today - 10.days, end_date: Date.today - 5.days)
       schedule = build(:schedule, event: event, staff_item: false, start_time: Time.now, end_time: Time.now + 30.minutes)
 
       expect(schedule.notify_staff?).to be_falsey

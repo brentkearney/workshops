@@ -61,7 +61,6 @@ RSpec.describe StaffMailer, type: :mailer do
   end
 
   describe '.schedule_change' do
-
     let(:event) { build(:event) }
     let(:original_schedule) { build(:schedule) }
     let(:new_schedule) { build(:schedule, name: 'New name') }

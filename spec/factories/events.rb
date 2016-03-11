@@ -5,8 +5,8 @@ random_code = rand(10..17).to_s + 'w50' + rand(10..99).to_s
 
 FactoryGirl.define do
   sequence(:code) { |n| DateTime.now.strftime("%y") + 'w5' + n.to_s.rjust(3, '0') }
-  sequence(:start_date, 1) { |n| Date.today.advance(weeks: n).beginning_of_week(:sunday) }
-  sequence(:end_date, 1) { |n| Date.today.advance(weeks: n, days: 5).beginning_of_week(:friday) }
+  sequence(:start_date, 1) { |n| Date.new(2016,1,10).advance(weeks: n).beginning_of_week(:sunday) }
+  sequence(:end_date, 1) { |n| Date.new(2016,1,10).advance(weeks: n, days: 5).beginning_of_week(:friday) }
 
   factory :event do |f|
     f.code

@@ -8,7 +8,7 @@ module ScheduleHelpers
   extend ActiveSupport::Concern
 
   def notify_staff?
-    staff_item && event.is_current?
+    event.is_current?
   end
 
     # Convert to event's time zone
