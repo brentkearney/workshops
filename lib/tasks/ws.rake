@@ -180,9 +180,11 @@ namespace :ws do
     
     lc.get_event_data_for_year(year).each do |event|
       puts "Adding event: " + event["code"]
-      events << event["code"]
       e = Event.new(event)
-      unless e.save        
+      
+      if e.save        
+        events << event["code"]
+      else
         event_errors << "#{e.code}: #{e.errors.full_messages.to_s}"
       end
     end
