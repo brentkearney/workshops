@@ -136,5 +136,5 @@ class SyncMembers
       sync_errors.add(membership)
     end
   end
-  
+
 end
