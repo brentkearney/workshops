@@ -7,7 +7,7 @@
 class StaffMailer < ApplicationMailer
   default from: Global.email.application
 
-  def schedule_change(type, schedule, message, changed_similar = false)
+  def schedule_change(schedule, type:, user:, updated_schedule: false, changed_similar: false)
     @event = schedule.event
     to_email = Global.email.locations.send(@event.location).schedule_staff
     subject = "[#{@event.code}] Schedule change notice!"
@@ -25,19 +25,18 @@ class StaffMailer < ApplicationMailer
       when :create
         @change_notice << %Q(
     WAS ADDED!
-      By: #{message} at #{Time.now}
+      By: #{user} at #{Time.now}
         )
 
       when :update
-        new = message
         @change_notice << %Q(
     CHANGED TO:
-      Name: #{new.name}
-      Start time: #{new.start_time}
-      End time: #{new.end_time}
-      Location: #{new.location}
-      Description: #{new.description}
-      Updated by: #{new.updated_by}
+      Name: #{updated_schedule.name}
+      Start time: #{updated_schedule.start_time}
+      End time: #{updated_schedule.end_time}
+      Location: #{updated_schedule.location}
+      Description: #{updated_schedule.description}
+      Updated by: #{updated_schedule.updated_by}
         )
 
         if changed_similar
@@ -49,7 +48,7 @@ class StaffMailer < ApplicationMailer
       when :destroy
         @change_notice << %Q(
     WAS DELETED!
-      By: #{message} at #{Time.now}
+      By: #{user} at #{Time.now}
         )
     end
 
