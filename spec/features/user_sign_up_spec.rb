@@ -32,7 +32,7 @@ describe 'Visitor Signup', :type => :feature do
 
   context 'If the email address is associated with a Person record' do
     context 'and that Person record is an active member of an Event' do
-      before do
+      def enter_credentials
         fill_in 'user_email', with: @person.email
         fill_in 'user_password', with: @password
         fill_in 'user_password_confirmation', :with => @password
@@ -40,16 +40,31 @@ describe 'Visitor Signup', :type => :feature do
       end
 
       it 'allows visitor to signup' do
+        enter_credentials
+        expect(page).to have_text('Account successfully created, pending confirmation')
+      end
+
+      it 'character case in the email address is irrelevant' do
+        fill_in 'user_email', with: @person.email.upcase
+        fill_in 'user_password', with: @password
+        fill_in 'user_password_confirmation', :with => @password
+
+        click_button 'Sign up'
+
         expect(page).to have_text('Account successfully created, pending confirmation')
       end
 
       it 'and it sends a confirmation email' do
+        enter_credentials
         user = User.find_by_email(@person.email)
+
         expect(user.confirmation_token).not_to be_nil
         expect(user.confirmation_sent_at).not_to be_nil
       end
 
       it 'and it redirects to a post-signup landing page' do
+        enter_credentials
+
         expect(current_path).to eq(confirmation_sent_path)
         expect(page.body).to have_text('To verify that it is really you')
       end
