@@ -24,11 +24,9 @@ class MembershipPolicy
   class Scope < Struct.new(:current_user, :model)
     def resolve
       memberships = current_user.person.memberships.includes(:event).sort_by {|m| m.event.start_date }
-
       memberships.delete_if do |m|
-        m.role == 'Backup Participant' ||
-        (m.role !~ /Organizer/ &&
-          (m.attendance == 'Declined' || m.attendance == 'Not Yet Invited'))
+          m.role == 'Backup Participant' ||
+            (m.role !~ /Organizer/ && (m.attendance == 'Declined' || m.attendance == 'Not Yet Invited'))
       end
     end
   end

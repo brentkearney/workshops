@@ -94,10 +94,14 @@ describe 'Visitor SignIn', :type => :feature do
   it 'Allows organizers with memberships and declined attendance' do
     @user.member!
     @user.person.memberships.destroy_all
-    FactoryGirl.create(:membership, person: @user.person, attendance: 'Declined', role: 'Organizer')
+    event = create(:event, start_date: Date.today.next_week(:sunday),
+                   end_date: Date.today.next_week(:sunday) + 5.days )
+    membership = create(:membership, event: event, person: @user.person, attendance: 'Declined', role: 'Organizer')
+
     visit sign_in_path
     fill_in_form
-    expect(page.body).to have_text('Signed in successfully')
+
+    expect(page.body).to have_text(membership.event.name)
     expect(current_path).to eq(welcome_path)
   end
 
