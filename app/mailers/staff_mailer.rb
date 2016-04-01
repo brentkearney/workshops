@@ -11,6 +11,12 @@ class StaffMailer < ApplicationMailer
     @event = schedule.event
     to_email = Global.email.locations.send(@event.location).schedule_staff
     subject = "[#{@event.code}] Schedule change notice!"
+    if schedule.lecture.nil?
+      publish = 'N/A'
+    else
+      publish = schedule.lecture.do_not_publish ? 'OFF' : 'ON'
+    end
+
     
     @change_notice = %Q(
     THIS:
@@ -18,6 +24,7 @@ class StaffMailer < ApplicationMailer
       Start time: #{schedule.start_time}
       End time: #{schedule.end_time}
       Location: #{schedule.location}
+      Lecture publishing: #{publish}
       Description: #{schedule.description}
     )
 
@@ -36,6 +43,7 @@ class StaffMailer < ApplicationMailer
       Start time: #{new.start_time}
       End time: #{new.end_time}
       Location: #{new.location}
+      Lecture publishing: #{publish}
       Description: #{new.description}
       Updated by: #{new.updated_by}
         )
