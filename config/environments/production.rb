@@ -43,6 +43,9 @@ Rails.application.configure do
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
+  config.to_prepare { Devise::SessionsController.force_ssl }
+  config.to_prepare { Devise::RegistrationsController.force_ssl }
+  config.to_prepare { Devise::PasswordsController.force_ssl }
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
@@ -74,7 +77,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Production URL
-  config.action_mailer.default_url_options = { protocol: ENV['APPLICATION_PROTOCOL'], host: ENV['APPLICATION_HOST'] }
+  config.action_mailer.default_url_options = { protocol: 'https', :host => 'workshops.birs.ca' }
 
   ## SMTP Settings
   # Ignore bad email addresses and do not raise email delivery errors.
