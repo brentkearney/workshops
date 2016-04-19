@@ -37,7 +37,6 @@ class FakeLegacyConnector
   end
 
   def get_members(event)
-    Rails.logger.debug "\n*********************** FakeLegacyConnector.get_members(event: #{event.code}) ***********************\n"
     remote_members = []
 
     # Change the existing members and return them
@@ -57,16 +56,11 @@ class FakeLegacyConnector
               "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now}
       }
     end
-    Rails.logger.debug "\n*********************** FakeLegacyConnector.get_members(event) Returning: ***********************\n"
-    Rails.logger.debug "#{remote_members.inspect}\n"
 
     remote_members
   end
 
   def get_members_with_changed_fields(event)
-
-    Rails.logger.debug "\n*********************** FakeLegacyConnector.get_members_with_changed_fields(event: #{event.code}) ***********************\n"
-
     remote_members = self.get_members(event)
     new_remote_members = []
     remote_members.each do |m|
@@ -77,12 +71,31 @@ class FakeLegacyConnector
       m['Membership']['role'] = 'Backup Participant'
       new_remote_members << m
     end
-
-    Rails.logger.debug "\n*********************** FakeLegacyConnector.get_members_with_changed_fields(event) Returning: ***********************\n"
-    Rails.logger.debug "#{new_remote_members.inspect}\n"
-
     new_remote_members
   end
+
+  def get_members_with_remote_person(event: event, m: membership, lastname: lastname)
+    if m.nil?
+      person = Person.new(lastname: lastname, firstname: 'Newperson', email: 'newperson@new9000234.ca', affiliation: 'New Affil', gender: 'F')
+      m = Membership.new(event: event, person: person, role: 'Participant', replied_at: Time.now - 1.days, attendance: 'Confirmed')
+    end
+
+    remote_member = [{
+        "Workshop" => "#{event.code}",
+        "Person" => {
+            "lastname" => lastname, "firstname"=>m.person.firstname, "email"=>m.person.email, "cc_email"=>nil,
+            "gender"=>m.person.gender, "affiliation"=>m.person.affiliation, "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
+            "address1"=>m.person.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
+            "academic_status"=>nil, "department"=>nil, "title"=>nil, "phd_year"=>nil, "biography"=>nil, "research_areas"=>nil,
+            "updated_at"=>Time.now, "legacy_id"=>m.person.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
+            "updated_by"=>'FakeLegacyConnector'},
+        "Membership"=> {
+            "arrival_date"=>event.start_date + 1.day, "departure_date"=>event.end_date - 1.day,
+            "attendance"=>m.attendance, "role"=>m.role, "replied_at"=>m.replied_at,
+            "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now}
+    }]
+  end
+
 
   def get_person(legacy_id)
 

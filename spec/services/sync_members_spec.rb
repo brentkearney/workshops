@@ -74,6 +74,48 @@ describe "SyncMembers" do
       expect(member.role).to eq('Backup Participant')
       expect(member.attendance).to eq('Not Yet Invited')
     end
+  end
 
+  describe '.update_person' do
+    def test_update(local_person)
+      event = create(:event)
+      membership = create(:membership, event: event, person: local_person)
+      lc = FakeLegacyConnector.new
+      allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_remote_person(event: event, m: membership, lastname: 'Remoteperson'))
+      expect(LegacyConnector).to receive(:new).and_return(lc)
+
+      SyncMembers.new(event)
+
+      lp = Person.find(local_person.id)
+      expect(lp.lastname).to eq('Remoteperson')
+    end
+
+    context 'remote person with a legacy_id' do
+      it 'updates the local person' do
+        local_person = create(:person, lastname: 'Localperson', legacy_id: 666)
+        test_update(local_person)
+      end
+    end
+
+    context 'remote person without a legacy_id' do
+      it 'updates the local person (based on email address)' do
+        local_person = create(:person, lastname: 'Localperson', legacy_id: nil)
+        test_update(local_person)
+      end
+    end
+
+    context 'without a local person' do
+      it 'creates a new person record' do
+        event = create(:event)
+        lc = FakeLegacyConnector.new
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_remote_person(event: event, m: nil, lastname: 'Remoteperson'))
+        expect(LegacyConnector).to receive(:new).and_return(lc)
+
+        SyncMembers.new(event)
+
+        lp = Event.find(event.id).members.last
+        expect(lp.lastname).to eq('Remoteperson')
+      end
+    end
   end
 end

@@ -49,7 +49,6 @@ class SyncMembers
   end
 
   def fix_remote_fields(remote)
-
     if remote['Person']['updated_by'].blank?
       remote['Person']['updated_by'] = 'Workshops importer'
     end
