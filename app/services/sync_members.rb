@@ -22,7 +22,8 @@ class SyncMembers
   attr_reader :event, :remote_members, :sync_errors
   def initialize(event)
     @event = event
-    @sync_errors = ErrorReport.new(self.class)
+    @sync_errors = ErrorReport.new(self.class, @event)
+    run
   end
 
   def run
@@ -37,15 +38,18 @@ class SyncMembers
 
   def get_remote_members
     lc = LegacyConnector.new
-    remote_members = lc.get_members(event)
-    if remote_members.empty?
+    @remote_members = lc.get_members(event)
+
+    if @remote_members.empty?
       sync_errors.add(lc, "Unable to retrieve any remote members for #{event.code}")
+      sync_errors.send_report
       raise 'NoResultsError'
     end
-    remote_members
+    @remote_members
   end
 
   def fix_remote_fields(remote)
+
     if remote['Person']['updated_by'].blank?
       remote['Person']['updated_by'] = 'Workshops importer'
     end
@@ -67,7 +71,7 @@ class SyncMembers
     end
 
     if remote['Membership']['role'] == 'Backup Participant'
-      remote['Membership']['attendance'] == 'Not Yet Invited'
+      remote['Membership']['attendance'] = 'Not Yet Invited'
     end
 
     remote
@@ -95,10 +99,9 @@ class SyncMembers
 
   def save_person(person)
     if person.valid? && person.save
-      Rails.logger.debug "* Saved #{@event.code} person: #{person.name}"
+      Rails.logger.debug "\n* Saved #{@event.code} person: #{person.name}\n"
     else
-      Rails.logger.debug "* Error saving #{@event.code} person: #{person.name}, #{person.errors.full_messages}"
-      # @sync_errors['People'] << person
+      Rails.logger.debug "\n* Error saving #{@event.code} person: #{person.name}, #{person.errors.full_messages}\n"
       sync_errors.add(person)
     end
   end
@@ -108,7 +111,7 @@ class SyncMembers
   end
 
   def update_membership(remote, person)
-    local_membership = Membership.where(event: event, person: person).first
+    local_membership = Membership.where(event: event.id, person: person.id).first
 
     if local_membership.nil?
       local_membership = Membership.new(remote['Membership'])
@@ -129,10 +132,9 @@ class SyncMembers
 
   def save_membership(membership)
     if membership.valid? && membership.save
-      Rails.logger.debug "* Saved #{@event.code} membership: #{membership.person.name}"
+      Rails.logger.debug "\n* Saved #{@event.code} membership for #{membership.person.name}\n"
     else
-      Rails.logger.debug "* Error saving #{@event.code} membership: #{membership.person.name}, #{membership.errors.full_messages}"
-      # @sync_errors['Memberships'] << membership
+      Rails.logger.debug "\n* Error saving #{@event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n"
       sync_errors.add(membership)
     end
   end

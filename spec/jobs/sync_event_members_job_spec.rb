@@ -22,11 +22,8 @@ RSpec.describe SyncEventMembersJob, type: :job do
   end
 
   it 'executes perform' do
-    expect {
-      allow(LegacyConnector).to receive(:new).and_return(FakeLegacyConnector.new)
-      # expect(SyncMembers.new(event)).to receive(:run)
-      perform_enqueued_jobs { job }
-    }.to raise_error(RuntimeError) # Error because 12w5999 has no members
+    allow(SyncMembers).to receive(:new).with(event)
+    perform_enqueued_jobs { job }
   end
 
   it 'queues retry given no results error' do

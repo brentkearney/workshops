@@ -37,12 +37,13 @@ class FakeLegacyConnector
   end
 
   def get_members(event)
+    Rails.logger.debug "\n*********************** FakeLegacyConnector.get_members(event: #{event.code}) ***********************\n"
     remote_members = []
 
     # Change the existing members and return them
     event.memberships.each do |m|
       remote_members << {
-          "Workshop" => "#{event_id}",
+          "Workshop" => "#{event.code}",
           "Person" => {
               "lastname"=>m.person.lastname, "firstname"=>m.person.firstname, "email"=>m.person.email, "cc_email"=>nil,
               "gender"=>m.person.gender, "affiliation"=>'New Affiliation', "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
@@ -56,7 +57,31 @@ class FakeLegacyConnector
               "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now}
       }
     end
+    Rails.logger.debug "\n*********************** FakeLegacyConnector.get_members(event) Returning: ***********************\n"
+    Rails.logger.debug "#{remote_members.inspect}\n"
+
     remote_members
+  end
+
+  def get_members_with_changed_fields(event)
+
+    Rails.logger.debug "\n*********************** FakeLegacyConnector.get_members_with_changed_fields(event: #{event.code}) ***********************\n"
+
+    remote_members = self.get_members(event)
+    new_remote_members = []
+    remote_members.each do |m|
+      m['Person']['updated_by'] = ''
+      m['Person']['updated_at'] = nil
+      m['Membership']['updated_by'] = ''
+      m['Membership']['updated_at'] = nil
+      m['Membership']['role'] = 'Backup Participant'
+      new_remote_members << m
+    end
+
+    Rails.logger.debug "\n*********************** FakeLegacyConnector.get_members_with_changed_fields(event) Returning: ***********************\n"
+    Rails.logger.debug "#{new_remote_members.inspect}\n"
+
+    new_remote_members
   end
 
   def get_person(legacy_id)

@@ -62,11 +62,11 @@ RSpec.describe StaffMailer, type: :mailer do
 
   describe '.schedule_change' do
     let(:event) { build(:event) }
-    let(:original_schedule) { build(:schedule) }
-    let(:new_schedule) { original_schedule.merge(name: 'New name') }
+    let(:original_schedule) { build(:schedule, name: 'Original name') }
+    let(:new_schedule) { build(:schedule, name: 'New name') }
 
     before :each do
-      StaffMailer.schedule_change(original_schedule, type: :update, updated_schedule: new_schedule).deliver_now
+      StaffMailer.schedule_change(original_schedule, type: :update, user: 'Test User', updated_schedule: new_schedule).deliver_now
     end
 
     it 'sends email' do

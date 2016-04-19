@@ -35,6 +35,15 @@ describe 'Visitor SignIn', :type => :feature do
     expect(page.body).to have_text('Signed in successfully')
   end
 
+  it "The character case of the email does not matter" do
+    fill_in 'Email', with: @user.email.upcase
+    fill_in 'Password', with: @password
+
+    click_button 'Sign in'
+
+    expect(page.body).to have_text('Signed in successfully')
+  end
+
   it 'Denies a user to login with incorrect credentials' do
     fill_in 'Email', with: 'nonsense@foo.bar'
     fill_in 'Password', with: @password
@@ -55,10 +64,10 @@ describe 'Visitor SignIn', :type => :feature do
     expect(page.body).to have_text('Invalid email or password')
   end
 
-  it 'Forwards user to Welcome page after signin' do
+  it 'Forwards user to "My Events" page after signin' do
     fill_in_form
     expect(page.body).to have_text('Signed in successfully')
-    expect(current_path).to eq(welcome_path)
+    expect(current_path).to eq(my_events_path)
   end
 
   it 'Denies logins to non-admin users who have no memberships' do
@@ -85,10 +94,14 @@ describe 'Visitor SignIn', :type => :feature do
   it 'Allows organizers with memberships and declined attendance' do
     @user.member!
     @user.person.memberships.destroy_all
-    FactoryGirl.create(:membership, person: @user.person, attendance: 'Declined', role: 'Organizer')
+    event = create(:event, start_date: Date.today.next_week(:sunday),
+                   end_date: Date.today.next_week(:sunday) + 5.days )
+    membership = create(:membership, event: event, person: @user.person, attendance: 'Declined', role: 'Organizer')
+
     visit sign_in_path
     fill_in_form
-    expect(page.body).to have_text('Signed in successfully')
+
+    expect(page.body).to have_text(membership.event.name)
     expect(current_path).to eq(welcome_path)
   end
 

@@ -14,7 +14,7 @@ class SyncEventMembersJob < ActiveJob::Base
   end
 
   def perform(event)
-    SyncMembers.new(event).run
+    SyncMembers.new(event)
   end
 end
 

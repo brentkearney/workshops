@@ -8,7 +8,7 @@ class RegistrationsController < Devise::RegistrationsController
 
   def create
     if EmailValidator.valid?(sign_up_params[:email])
-      person = Person.find_by_email(sign_up_params[:email])
+      person = Person.find_by_email(sign_up_params[:email].downcase)
       if person.nil?
         redirect_to register_path, :error => 'We have no record of that email address. Please check the invitation we sent you, to see what email address is in the To: field.'
       else
