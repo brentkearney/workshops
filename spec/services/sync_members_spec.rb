@@ -160,4 +160,47 @@ describe "SyncMembers" do
       end
     end
   end
+
+  describe '.save_membership' do
+    context 'valid membership' do
+      it 'saves the Membership and logs a message' do
+        event = create(:event)
+        person = create(:person, lastname: 'Smith')
+        membership = build(:membership, person: person, event: event, staff_notes: 'Hi there!')
+        lc = FakeLegacyConnector.new
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(event: event, m: membership, lastname: 'Smith'))
+        expect(LegacyConnector).to receive(:new).and_return(lc)
+
+        expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} person: #{person.name}\n")
+        expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} membership for #{membership.person.name}\n")
+        SyncMembers.new(event)
+
+        lm = Event.find(event.id).memberships.last
+        expect(lm.staff_notes).to eq('Hi there!')
+      end
+    end
+
+    context 'invalid membership' do
+      it 'does not save the Membership, logs a message, and adds record to ErrorReport' do
+        event = create(:event)
+        person = create(:person, lastname: 'Smith')
+        membership = build(:membership, person: person, event: event, arrival_date: '1973-01-01')
+
+        lc = FakeLegacyConnector.new
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(event: event, m: membership, lastname: 'Smith'))
+        expect(LegacyConnector).to receive(:new).and_return(lc)
+
+        sync_errors = ErrorReport.new('SyncMembers', event)
+        expect(ErrorReport).to receive(:new).and_return(sync_errors)
+
+
+        membership.valid?
+        expect(Rails.logger).to receive(:error).with("\n* Error saving #{event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n")
+        expect(sync_errors).to receive(:add).with(anything)
+        SyncMembers.new(event)
+
+        expect(Event.find(event.id).memberships.last).to be_nil
+      end
+    end
+  end
 end

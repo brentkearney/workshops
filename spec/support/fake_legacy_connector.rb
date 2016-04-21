@@ -90,9 +90,9 @@ class FakeLegacyConnector
             "updated_at"=>Time.now, "legacy_id"=>m.person.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
             "updated_by"=>'FakeLegacyConnector'},
         "Membership"=> {
-            "arrival_date"=>event.start_date + 1.day, "departure_date"=>event.end_date - 1.day,
+            "arrival_date"=>m.arrival_date, "departure_date"=>m.departure_date,
             "attendance"=>m.attendance, "role"=>m.role, "replied_at"=>m.replied_at,
-            "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now}
+            "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now, "staff_notes"=>m.staff_notes}
     }]
   end
 

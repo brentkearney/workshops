@@ -131,9 +131,9 @@ class SyncMembers
 
   def save_membership(membership)
     if membership.valid? && membership.save
-      Rails.logger.debug "\n* Saved #{@event.code} membership for #{membership.person.name}\n"
+      Rails.logger.info "\n* Saved #{@event.code} membership for #{membership.person.name}\n"
     else
-      Rails.logger.debug "\n* Error saving #{@event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n"
+      Rails.logger.error "\n* Error saving #{@event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n"
       sync_errors.add(membership)
     end
   end
