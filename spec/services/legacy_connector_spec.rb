@@ -21,7 +21,7 @@ require 'rails_helper'
 
 describe "LegacyConnector", :type => :feature do
   before do
-    @lc = FakeLegacyConnector.new
+    @lc = LegacyConnector.new
   end
 
   context '#list_events' do
@@ -81,7 +81,8 @@ describe "LegacyConnector", :type => :feature do
 
   context '#get_members' do
     it 'retrieves membership data for a given event' do
-      members = @lc.get_members(Event.last)
+      event = create(:event, code: '15w5080')
+      members = @lc.get_members(event)
       expect(members).not_to be_empty
 
       members.each do |member|

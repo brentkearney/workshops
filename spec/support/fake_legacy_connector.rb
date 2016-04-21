@@ -25,7 +25,14 @@ class FakeLegacyConnector
   end
 
   def list_events(from_date, to_date)
+    if from_date !~ /\d/ || to_date !~ /\d/
+      error_message = ["error", "Invalid years."]
+      return [error_message]
+    end
 
+    if from_date.length == 4 && to_date.length == 4
+      return ['14w5001', '15w5001']
+    end
   end
 
   def get_event_data(event_id)
