@@ -25,7 +25,6 @@ class ErrorReport
     @from = errors_from
     @event = event
     @errors = {}
-    # @sync_errors = { 'Event' => @event, 'People' => Array.new, 'Memberships' => Array.new }
   end
 
   def add(the_object, error_message = nil)
@@ -42,7 +41,6 @@ class ErrorReport
 
   def send_report
     return if errors.empty?
-    Rails.logger.debug "\n*********************** ErrorReport.send_report(#{errors.inspect}) ***********************\n"
     case "#{@from}"
       when 'SyncMembers'
         if errors.has_key?('LegacyConnector')

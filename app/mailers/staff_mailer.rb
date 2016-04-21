@@ -63,7 +63,6 @@ class StaffMailer < ApplicationMailer
   end
 
   def event_sync(event, error_messages)
-    Rails.logger.debug "\n*********************** StaffMailer received ErrorReport: #{event.code}, #{error_messages} ***********************\n"
     @event = event
     @error_messages = error_messages
     to_email = Global.email.locations.send(event.location).program_coordinator
