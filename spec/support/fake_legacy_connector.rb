@@ -96,6 +96,41 @@ class FakeLegacyConnector
     }]
   end
 
+  def get_members_with_new_membership(event: event, person: person)
+    m = Membership.new(event: event, person: person)
+    remote_member = [{
+                         "Workshop" => "#{event.code}",
+                         "Person" => {
+                             "lastname" => person.lastname, "firstname"=>person.firstname, "email"=>person.email, "cc_email"=>nil,
+                             "gender"=>person.gender, "affiliation"=>person.affiliation, "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
+                             "address1"=>person.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
+                             "academic_status"=>nil, "department"=>nil, "title"=>nil, "phd_year"=>nil, "biography"=>nil, "research_areas"=>nil,
+                             "updated_at"=>Time.now, "legacy_id"=>person.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
+                             "updated_by"=>'FakeLegacyConnector'},
+                         "Membership"=> {
+                             "arrival_date"=>m.arrival_date, "departure_date"=>m.departure_date,
+                             "attendance"=>m.attendance, "role"=>m.role, "replied_at"=>m.replied_at,
+                             "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now, "staff_notes"=>m.staff_notes}
+                     }]
+  end
+
+  def get_members_with_changed_membership(m: membership, sn: staff_notes)
+    
+    remote_member = [{
+                         "Workshop" => "#{m.event.code}",
+                         "Person" => {
+                             "lastname" => m.person.lastname, "firstname"=>m.person.firstname, "email"=>m.person.email, "cc_email"=>nil,
+                             "gender"=>m.person.gender, "affiliation"=>m.person.affiliation, "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
+                             "address1"=>m.person.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
+                             "academic_status"=>nil, "department"=>nil, "title"=>nil, "phd_year"=>nil, "biography"=>nil, "research_areas"=>nil,
+                             "updated_at"=>Time.now, "legacy_id"=>m.person.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
+                             "updated_by"=>'FakeLegacyConnector'},
+                         "Membership"=> {
+                             "arrival_date"=>m.arrival_date, "departure_date"=>m.departure_date,
+                             "attendance"=>m.attendance, "role"=>m.role, "replied_at"=>m.replied_at,
+                             "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now, "staff_notes"=>sn}
+                     }]
+  end
 
   def get_person(legacy_id)
 

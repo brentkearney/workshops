@@ -9,6 +9,7 @@ require 'rails_helper'
 describe "SyncMembers" do
   after :each do
     Event.destroy_all
+    Person.destroy_all
   end
 
   it '.initialize' do
@@ -123,13 +124,15 @@ describe "SyncMembers" do
     context 'valid person' do
       it 'saves the Person and logs a message' do
         event = create(:event)
-        person = create(:person, firstname: 'New', lastname: 'McPerson')
+        person = build(:person, firstname: 'New', lastname: 'McPerson')
         membership = create(:membership, event: event, person: person)
         lc = FakeLegacyConnector.new
         allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(event: event, m: membership, lastname: 'McPerson'))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} person: New McPerson\n")
+        expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} membership for New McPerson\n")
+
         SyncMembers.new(event)
 
         lp = Event.find(event.id).members.last
@@ -152,7 +155,9 @@ describe "SyncMembers" do
 
 
         person.valid?
+        membership.valid?
         expect(Rails.logger).to receive(:error).with("\n* Error saving #{event.code} person: #{person.name}, #{person.errors.full_messages}\n")
+        expect(Rails.logger).to receive(:error).with("\n* Error saving #{event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n")
         expect(sync_errors).to receive(:add).twice.with(anything)
         SyncMembers.new(event)
 
@@ -200,6 +205,35 @@ describe "SyncMembers" do
         SyncMembers.new(event)
 
         expect(Event.find(event.id).memberships.last).to be_nil
+      end
+    end
+  end
+
+  describe '.update_membership' do
+    context 'without a local membership' do
+      it 'creates a new membership' do
+        event = create(:event)
+        person = create(:person)
+        lc = FakeLegacyConnector.new
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_new_membership(event: event, person: person))
+        expect(LegacyConnector).to receive(:new).and_return(lc)
+
+        SyncMembers.new(event)
+
+        expect(Event.find(event.id).members.last).to eq(person)
+      end
+    end
+
+    context 'with a local membership' do
+      it 'updates the local membership' do
+        membership = create(:membership)
+        lc = FakeLegacyConnector.new
+        allow(lc).to receive(:get_members).with(membership.event).and_return(lc.get_members_with_changed_membership(m: membership, sn: 'Hi'))
+        expect(LegacyConnector).to receive(:new).and_return(lc)
+
+        SyncMembers.new(membership.event)
+
+        expect(Event.find(membership.event.id).memberships.last.staff_notes).to eq('Hi')
       end
     end
   end
