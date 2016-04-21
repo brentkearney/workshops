@@ -30,7 +30,7 @@ class ErrorReport
 
   def add(the_object, error_message = nil)
     objects = "#{the_object.class}"
-    objects = 'LegacyConnector' if objects == 'FakeLegacyConnector'
+    objects = 'LegacyConnector' if objects == 'FakeLegacyConnector' # for rspec tests
     error = errorify(the_object, error_message)
 
     if errors.has_key?(objects)
