@@ -74,9 +74,9 @@ class FakeLegacyConnector
     new_remote_members
   end
 
-  def get_members_with_remote_person(event: event, m: membership, lastname: lastname)
+  def get_members_with_person(event: event, m: membership, lastname: lastname)
     if m.nil?
-      person = Person.new(lastname: lastname, firstname: 'Newperson', email: 'newperson@new9000234.ca', affiliation: 'New Affil', gender: 'F')
+      person = Person.new(lastname: lastname, firstname: 'NewPerson', email: 'newperson@new9000234.ca', affiliation: 'New Affil', gender: 'F')
       m = Membership.new(event: event, person: person, role: 'Participant', replied_at: Time.now - 1.days, attendance: 'Confirmed')
     end
 

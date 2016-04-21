@@ -98,9 +98,9 @@ class SyncMembers
 
   def save_person(person)
     if person.valid? && person.save
-      Rails.logger.debug "\n* Saved #{@event.code} person: #{person.name}\n"
+      Rails.logger.info "\n* Saved #{@event.code} person: #{person.name}\n"
     else
-      Rails.logger.debug "\n* Error saving #{@event.code} person: #{person.name}, #{person.errors.full_messages}\n"
+      Rails.logger.error "\n* Error saving #{@event.code} person: #{person.name}, #{person.errors.full_messages}\n"
       sync_errors.add(person)
     end
   end

@@ -54,7 +54,7 @@ class ErrorReport
           if errors.has_key?('Person')
             errors['Person'].each do |person_error|
               person = person_error.object
-              message = person_error.message
+              message = person_error.message.to_s
               legacy_url = Global.config.legacy_person
 
               if person.legacy_id.nil?
@@ -71,14 +71,15 @@ class ErrorReport
 
           # Errors in 'Membership' records
           if errors.has_key?('Membership')
-            sync_errors['Membership'].each do |membership_error|
+            errors['Membership'].each do |membership_error|
               membership = membership_error.object
-              message = membership_error.message
-              #unless message.start_with?('Person')
+              message = membership_error.message.to_s
+
+              unless message.start_with?('["Person')
                 legacy_url = Global.config.legacy_person + "#{membership.person.legacy_id}" + '&ps=events'
-                error_messages << "* #{membership.person.name}: #{message}\n"
+                error_messages << "* Membership of #{membership.person.name}: #{message}\n"
                 error_messages << "   -> #{legacy_url}\n\n"
-              # end
+              end
             end
           end
 
