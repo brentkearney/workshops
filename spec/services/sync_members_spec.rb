@@ -83,7 +83,7 @@ describe "SyncMembers" do
       event = create(:event)
       membership = create(:membership, event: event, person: local_person)
       lc = FakeLegacyConnector.new
-      allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(event: event, m: membership, lastname: 'Remoteperson'))
+      allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(e: event, m: membership, ln: 'Remoteperson'))
       expect(LegacyConnector).to receive(:new).and_return(lc)
 
       SyncMembers.new(event)
@@ -110,7 +110,7 @@ describe "SyncMembers" do
       it 'creates a new person record' do
         event = create(:event)
         lc = FakeLegacyConnector.new
-        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(event: event, m: nil, lastname: 'Remoteperson'))
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(e: event, m: nil, ln: 'Remoteperson'))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         SyncMembers.new(event)
@@ -128,7 +128,7 @@ describe "SyncMembers" do
         person = build(:person, firstname: 'New', lastname: 'McPerson')
         membership = create(:membership, event: event, person: person)
         lc = FakeLegacyConnector.new
-        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(event: event, m: membership, lastname: 'McPerson'))
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(e: event, m: membership, ln: 'McPerson'))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} person: New McPerson\n")
@@ -148,7 +148,7 @@ describe "SyncMembers" do
         membership = build(:membership, event: event, person: person)
 
         lc = FakeLegacyConnector.new
-        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(event: event, m: membership, lastname: 'McPerson'))
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(e: event, m: membership, ln: 'McPerson'))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         sync_errors = ErrorReport.new('SyncMembers', @event)
@@ -174,7 +174,7 @@ describe "SyncMembers" do
         person = create(:person, lastname: 'Smith')
         membership = build(:membership, person: person, event: event, staff_notes: 'Hi there!')
         lc = FakeLegacyConnector.new
-        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(event: event, m: membership, lastname: 'Smith'))
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(e: event, m: membership, ln: 'Smith'))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} person: #{person.name}\n")
@@ -193,7 +193,7 @@ describe "SyncMembers" do
         membership = build(:membership, person: person, event: event, arrival_date: '1973-01-01')
 
         lc = FakeLegacyConnector.new
-        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(event: event, m: membership, lastname: 'Smith'))
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(e: event, m: membership, ln: 'Smith'))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         sync_errors = ErrorReport.new('SyncMembers', event)
@@ -216,7 +216,7 @@ describe "SyncMembers" do
         event = create(:event)
         person = create(:person)
         lc = FakeLegacyConnector.new
-        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_new_membership(event: event, person: person))
+        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_new_membership(e: event, p: person))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         SyncMembers.new(event)

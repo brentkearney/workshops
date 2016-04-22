@@ -104,7 +104,7 @@ class FakeLegacyConnector
   end
 
   def get_members_with_new_membership(e: event, p: person)
-    m = Membership.new(event: e, person: person)
+    m = Membership.new(event: e, person: p)
     remote_member = [{
                          "Workshop" => "#{e.code}",
                          "Person" => {
