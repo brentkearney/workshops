@@ -121,6 +121,18 @@ describe "ErrorReport" do
           expect(message_body).to include(person_error)
           expect(message_body).to include(membership_error)
         end
+
+        it 'includes Membership error if there are no Person errors' do
+          membership = build(:membership, event: @event, arrival_date: '1970-01-01')
+          @er.add(membership)
+          membership_error = @er.errors['Membership'].first.message.to_s
+
+          expect {
+            @er.send_report
+          }.to change { ActionMailer::Base.deliveries.count }.by(1)
+          
+          expect(ActionMailer::Base.deliveries.last.body.raw_source).to include(membership_error)
+        end
       end
 
 
