@@ -20,39 +20,42 @@ class ErrorReport
     objects = 'LegacyConnector' if objects == 'FakeLegacyConnector' # for rspec tests
     error = errorify(the_object, error_message)
 
-    if errors.has_key?(objects)
-      errors["#{objects}"] << error
-    else
-      errors["#{objects}"] = [error]
+    unless error.blank?
+      if errors.has_key?(objects)
+        errors["#{objects}"] << error
+      else
+        errors["#{objects}"] = [error]
+      end
     end
   end
 
   def send_report
     return if errors.empty?
+
     case "#{@from}"
       when 'SyncMembers'
         if errors.has_key?('LegacyConnector')
           error = errors['LegacyConnector'].shift
           StaffMailer.notify_sysadmin(@event, error).deliver_now
-        else
-          error_messages = ''
-          # Errors in 'Person' records
-          if errors.has_key?('Person')
-            errors['Person'].each do |person_error|
-              person = person_error.object
-              message = person_error.message.to_s
-              legacy_url = Global.config.legacy_person
+        end
 
-              if person.legacy_id.nil?
-                person_error.message << "\n\nDuring #{event.code} data synchronization, we found a local person record with no legacy_id!\n\n"
-                StaffMailer.notify_sysadmin(event, person_error).deliver_now
-              else
-                legacy_url += "#{person.legacy_id}"
-              end
+        error_messages = ''
+        # Errors in 'Person' records
+        if errors.has_key?('Person')
+          errors['Person'].each do |person_error|
+            person = person_error.object
+            message = person_error.message.to_s
+            legacy_url = Global.config.legacy_person
 
-              error_messages << "* #{person.name}: #{message}\n"
-              error_messages << "   -> #{legacy_url}\n\n"
+            if person.legacy_id.nil?
+              person_error.message << "\n\nDuring #{event.code} data synchronization, we found a local person record with no legacy_id!\n\n"
+              StaffMailer.notify_sysadmin(event, person_error).deliver_now
+            else
+              legacy_url += "#{person.legacy_id}"
             end
+
+            error_messages << "* #{person.name}: #{message}\n"
+            error_messages << "   -> #{legacy_url}\n\n"
           end
 
           # Errors in 'Membership' records
@@ -76,6 +79,8 @@ class ErrorReport
 
   Error = Struct.new(:object, :message)
   def errorify(the_object, error_message)
-    Error.new(the_object, error_message.nil? ? the_object.errors.full_messages : error_message)
+    the_object.valid? if the_object.is_a?(ActiveRecord::Base)
+    message = error_message.nil? ? the_object.errors.full_messages : error_message
+    Error.new(the_object, message) unless message.blank?
   end
 end

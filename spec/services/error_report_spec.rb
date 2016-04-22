@@ -23,22 +23,78 @@ describe "ErrorReport" do
   end
 
   describe '.add, .errors' do
-    it '.add accepts objects with associated errors, .errors retrieves the object and its errors' do
-      er = ErrorReport.new(self.class, @event)
-      person = build(:person, lastname: '')
-      person.valid?
+    before do
+      @er = ErrorReport.new(self.class, @event)
+    end
+    
+    it '.add accepts objects, instance.errors retrieves the object and its errors' do
+      3.times do
+        person = build(:person, lastname: '')
+        @er.add(person)
+      end
 
-      er.add(person)
+      expect(@er.errors).not_to be_empty
+      expect(@er.errors).to be_a(Hash)
+      expect(@er.errors['Person']).not_to be_empty
+      @er.errors['Person'].each do |p|
+        expect(p.message).to eq(["Lastname can't be blank"])
+        expect(p.object).to be_a(Person)
+      end
+    end
+    
+    it '.add accepts custom error messages' do
+      person = build(:person)
 
-      expect(er.errors).not_to be_empty
-      expect(er.errors).to be_a(Hash)
-      expect(er.errors['Person']).not_to be_empty
-      expect(er.errors['Person'].first.message).to eq(["Lastname can't be blank"])
-      expect(er.errors['Person'].first.object).to eq(person)
+      @er.add(person, 'Custom error message')
+
+      expect(@er.errors['Person'].first.message).to eq('Custom error message')
     end
   end
 
   describe '.send_report' do
-    it 'sends email reports with Staff Mailer'
+    context 'from SyncMembers' do
+      before do
+        @er = ErrorReport.new('SyncMembers', @event)
+      end
+
+      it 'notifies sysadmin of LegacyConnector errors' do
+        lc = FakeLegacyConnector.new
+        mailer = double('mailer')
+        mailer.tap do |mail|
+          allow(mailer).to receive(:deliver_now).and_return(true)
+          allow(StaffMailer).to receive(:notify_sysadmin).and_return(mailer)
+        end
+
+        @er.add(lc, 'Error connecting to remote API')
+        @er.send_report
+
+        expect(StaffMailer).to have_received(:notify_sysadmin)
+      end
+
+      it 'notifies staff of Person and Membership errors' do
+        mailer = double('mailer')
+        mailer.tap do |mail|
+          allow(mailer).to receive(:deliver_now).and_return(true)
+          allow(StaffMailer).to receive(:event_sync).and_return(mailer)
+        end
+        person = build(:person, lastname: '')
+        membership = build(:membership, event: @event, person: nil)
+
+        @er.add(person)
+        @er.add(membership)
+        @er.send_report
+
+        expect(StaffMailer).to have_received(:event_sync)
+      end
+
+      it 'does not send message if there are no errors' do
+        person = create(:person)
+
+        @er.add(person)
+        @er.send_report
+
+        expect(ActionMailer::Base.deliveries.count).to eq(0)
+      end
+    end
   end
 end

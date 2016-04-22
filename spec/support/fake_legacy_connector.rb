@@ -21,7 +21,7 @@ require 'factory_girl'
 
 class FakeLegacyConnector
   def initialize
-    Rails.logger.debug "\n*********************** FakeLegacyConnector initialized ***********************\n"
+    Rails.logger.info "\n*********************** FakeLegacyConnector initialized ***********************\n"
   end
 
   def list_events(from_date, to_date)
@@ -81,16 +81,16 @@ class FakeLegacyConnector
     new_remote_members
   end
 
-  def get_members_with_person(event: event, m: membership, lastname: lastname)
+  def get_members_with_person(e: event, m: membership, ln: lastname)
     if m.nil?
-      person = Person.new(lastname: lastname, firstname: 'NewPerson', email: 'newperson@new9000234.ca', affiliation: 'New Affil', gender: 'F')
-      m = Membership.new(event: event, person: person, role: 'Participant', replied_at: Time.now - 1.days, attendance: 'Confirmed')
+      person = Person.new(lastname: ln, firstname: 'NewPerson', email: 'newperson@new9000234.ca', affiliation: 'New Affil', gender: 'F')
+      m = Membership.new(event: e, person: person, role: 'Participant', replied_at: Time.now - 1.days, attendance: 'Confirmed')
     end
 
     remote_member = [{
-        "Workshop" => "#{event.code}",
+        "Workshop" => "#{e.code}",
         "Person" => {
-            "lastname" => lastname, "firstname"=>m.person.firstname, "email"=>m.person.email, "cc_email"=>nil,
+            "lastname" => ln, "firstname"=>m.person.firstname, "email"=>m.person.email, "cc_email"=>nil,
             "gender"=>m.person.gender, "affiliation"=>m.person.affiliation, "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
             "address1"=>m.person.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
             "academic_status"=>nil, "department"=>nil, "title"=>nil, "phd_year"=>nil, "biography"=>nil, "research_areas"=>nil,
@@ -103,16 +103,16 @@ class FakeLegacyConnector
     }]
   end
 
-  def get_members_with_new_membership(event: event, person: person)
-    m = Membership.new(event: event, person: person)
+  def get_members_with_new_membership(e: event, p: person)
+    m = Membership.new(event: e, person: person)
     remote_member = [{
-                         "Workshop" => "#{event.code}",
+                         "Workshop" => "#{e.code}",
                          "Person" => {
-                             "lastname" => person.lastname, "firstname"=>person.firstname, "email"=>person.email, "cc_email"=>nil,
-                             "gender"=>person.gender, "affiliation"=>person.affiliation, "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
-                             "address1"=>person.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
+                             "lastname" => p.lastname, "firstname"=>p.firstname, "email"=>p.email, "cc_email"=>nil,
+                             "gender"=>p.gender, "affiliation"=>p.affiliation, "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
+                             "address1"=>p.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
                              "academic_status"=>nil, "department"=>nil, "title"=>nil, "phd_year"=>nil, "biography"=>nil, "research_areas"=>nil,
-                             "updated_at"=>Time.now, "legacy_id"=>person.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
+                             "updated_at"=>Time.now, "legacy_id"=>p.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
                              "updated_by"=>'FakeLegacyConnector'},
                          "Membership"=> {
                              "arrival_date"=>m.arrival_date, "departure_date"=>m.departure_date,
