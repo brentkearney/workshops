@@ -57,26 +57,27 @@ class ErrorReport
             error_messages << "* #{person.name}: #{message}\n"
             error_messages << "   -> #{legacy_url}\n\n"
           end
+        end
 
-          # Errors in 'Membership' records
-          if errors.has_key?('Membership')
-            errors['Membership'].each do |membership_error|
-              membership = membership_error.object
-              message = membership_error.message.to_s
+        # Errors in 'Membership' records
+        if errors.has_key?('Membership')
+          errors['Membership'].each do |error_obj|
+            membership = error_obj.object
+            message = error_obj.message.to_s
 
-              unless duplicate_error(membership.person, message)
-                if membership.person.nil?
-                  error_messages << "* #{@event.code} membership has no associated person record!\n\n#{membership.inspect}\n"
-                else
-                  legacy_url = Global.config.legacy_person + "#{membership.person.legacy_id}" + '&ps=events'
-                  error_messages << "* Membership of #{membership.person.name}: #{message}\n"
-                  error_messages << "   -> #{legacy_url}\n\n"
-                end
+            unless duplicate_error(membership.person, message)
+              if membership.person.nil?
+                error_messages << "* #{@event.code} membership has no associated person record!\n\n#{membership.inspect}\n"
+              else
+                legacy_url = Global.config.legacy_person + "#{membership.person.legacy_id}" + '&ps=events'
+                error_messages << "* Membership of #{membership.person.name}: #{message}\n"
+                error_messages << "   -> #{legacy_url}\n\n"
               end
             end
           end
-          StaffMailer.event_sync(@event, error_messages).deliver_now
         end
+
+        StaffMailer.event_sync(@event, error_messages).deliver_now
     end
   end
 
@@ -84,7 +85,11 @@ class ErrorReport
     if errors.has_key?("#{obj.class}")
       errors["#{obj.class}"].each do |item|
         if item.object == obj
-          return false unless item.message.to_s.downcase == message.to_s.gsub(/Person\ /, '')
+          if item.message.to_s.downcase == message.gsub(/Person\ /, '')
+            return true
+          else
+            return false
+          end
         end
       end
     end

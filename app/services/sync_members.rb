@@ -33,7 +33,7 @@ class SyncMembers
       update_membership(remote, local_person)
     end
 
-    @sync_errors.send_report
+    sync_errors.send_report
   end
 
   def get_remote_members
@@ -41,8 +41,8 @@ class SyncMembers
     @remote_members = lc.get_members(event)
 
     if @remote_members.empty?
-      @sync_errors.add(lc, "Unable to retrieve any remote members for #{event.code}")
-      @sync_errors.send_report
+      sync_errors.add(lc, "Unable to retrieve any remote members for #{event.code}")
+      sync_errors.send_report
       raise 'NoResultsError'
     end
     @remote_members
@@ -101,7 +101,7 @@ class SyncMembers
       Rails.logger.info "\n* Saved #{@event.code} person: #{person.name}\n"
     else
       Rails.logger.error "\n* Error saving #{@event.code} person: #{person.name}, #{person.errors.full_messages}\n"
-      @sync_errors.add(person)
+      sync_errors.add(person)
     end
   end
   
@@ -134,7 +134,7 @@ class SyncMembers
       Rails.logger.info "\n* Saved #{@event.code} membership for #{membership.person.name}\n"
     else
       Rails.logger.error "\n* Error saving #{@event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n"
-      @sync_errors.add(membership)
+      sync_errors.add(membership)
     end
   end
 

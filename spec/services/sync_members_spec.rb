@@ -40,9 +40,11 @@ describe "SyncMembers" do
         lc = FakeLegacyConnector.new
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
-        expect { @sm = SyncMembers.new(new_event) }.to raise_error('NoResultsError')
-
-        expect(ActionMailer::Base.deliveries.count).to eq(1)
+        expect {
+          expect{
+            SyncMembers.new(new_event)
+          }.to change { ActionMailer::Base.deliveries.count }.by(1)
+        }.to raise_error('NoResultsError')
       end
     end
 

@@ -88,27 +88,21 @@ describe "ErrorReport" do
       end
 
       context 'overlapping Membership and Person errors' do
-        before do
-          mailer = double('mailer')
-          mailer.tap do |mail|
-            allow(mailer).to receive(:deliver_now).and_return(true)
-            allow(StaffMailer).to receive(:event_sync).and_return(mailer)
-          end
-        end
-
         it 'omits the Membership error if it is the same as the Person error' do
           person = build(:person, affiliation: '')
-          membership = build(:membership, person: person, event: @event) #, arrival_date: '1970-01-01')
+          membership = build(:membership, person: person, event: @event)
           @er.add(person)
           @er.add(membership)
+          person_error = @er.errors['Person'].first.message.to_s
+          membership_error = @er.errors['Membership'].first.message.to_s
 
-          person_message = @er.errors['Person'].first.message
-          legacy_url = Global.config.legacy_person + "#{person.legacy_id}"
-          error_message = "* #{person.name}: #{person_message}\n"
-          error_message << "   -> #{legacy_url}\n\n"
+          expect {
+            @er.send_report
+          }.to change { ActionMailer::Base.deliveries.count }.by(1)
 
-          @er.send_report
-          expect(StaffMailer).to have_received(:event_sync).with(@event, error_message)
+          message_body = ActionMailer::Base.deliveries.last.body.raw_source
+          expect(message_body).to include(person_error)
+          expect(message_body).not_to include(membership_error)
         end
 
         it 'includes the Membership error if it has messages additional to the Person error' do
@@ -116,30 +110,26 @@ describe "ErrorReport" do
           membership = build(:membership, person: person, event: @event, arrival_date: '1970-01-01')
           @er.add(person)
           @er.add(membership)
+          person_error = @er.errors['Person'].first.message.to_s
+          membership_error = @er.errors['Membership'].first.message.to_s
 
-          person_message = @er.errors['Person'].first.message
-          legacy_url = Global.config.legacy_person + "#{person.legacy_id}"
-          error_message = "* #{person.name}: #{person_message}\n"
-          error_message << "   -> #{legacy_url}\n\n"
+          expect {
+            @er.send_report
+          }.to change { ActionMailer::Base.deliveries.count }.by(1)
 
-          membership_message = @er.errors['Membership'].first.message
-          legacy_url = Global.config.legacy_person + "#{membership.person.legacy_id}" + '&ps=events'
-          error_message << "* Membership of #{membership.person.name}: #{membership_message}\n"
-          error_message << "   -> #{legacy_url}\n\n"
-
-          @er.send_report
-          expect(StaffMailer).to have_received(:event_sync).with(@event, error_message)
+          message_body = ActionMailer::Base.deliveries.last.body.raw_source
+          expect(message_body).to include(person_error)
+          expect(message_body).to include(membership_error)
         end
       end
 
 
       it 'does not send message if there are no errors' do
         person = create(:person)
-
         @er.add(person)
-        @er.send_report
-
-        expect(ActionMailer::Base.deliveries.count).to eq(0)
+        expect {
+          @er.send_report
+        }.not_to change { ActionMailer::Base.deliveries.count }
       end
     end
   end
