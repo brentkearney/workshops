@@ -87,6 +87,52 @@ describe "ErrorReport" do
         expect(StaffMailer).to have_received(:event_sync)
       end
 
+      context 'overlapping Membership and Person errors' do
+        before do
+          mailer = double('mailer')
+          mailer.tap do |mail|
+            allow(mailer).to receive(:deliver_now).and_return(true)
+            allow(StaffMailer).to receive(:event_sync).and_return(mailer)
+          end
+        end
+
+        it 'omits the Membership error if it is the same as the Person error' do
+          person = build(:person, affiliation: '')
+          membership = build(:membership, person: person, event: @event) #, arrival_date: '1970-01-01')
+          @er.add(person)
+          @er.add(membership)
+
+          person_message = @er.errors['Person'].first.message
+          legacy_url = Global.config.legacy_person + "#{person.legacy_id}"
+          error_message = "* #{person.name}: #{person_message}\n"
+          error_message << "   -> #{legacy_url}\n\n"
+
+          @er.send_report
+          expect(StaffMailer).to have_received(:event_sync).with(@event, error_message)
+        end
+
+        it 'includes the Membership error if it has messages additional to the Person error' do
+          person = build(:person, affiliation: '')
+          membership = build(:membership, person: person, event: @event, arrival_date: '1970-01-01')
+          @er.add(person)
+          @er.add(membership)
+
+          person_message = @er.errors['Person'].first.message
+          legacy_url = Global.config.legacy_person + "#{person.legacy_id}"
+          error_message = "* #{person.name}: #{person_message}\n"
+          error_message << "   -> #{legacy_url}\n\n"
+
+          membership_message = @er.errors['Membership'].first.message
+          legacy_url = Global.config.legacy_person + "#{membership.person.legacy_id}" + '&ps=events'
+          error_message << "* Membership of #{membership.person.name}: #{membership_message}\n"
+          error_message << "   -> #{legacy_url}\n\n"
+
+          @er.send_report
+          expect(StaffMailer).to have_received(:event_sync).with(@event, error_message)
+        end
+      end
+
+
       it 'does not send message if there are no errors' do
         person = create(:person)
 

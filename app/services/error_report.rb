@@ -64,16 +64,29 @@ class ErrorReport
               membership = membership_error.object
               message = membership_error.message.to_s
 
-              unless message.start_with?('["Person')
-                legacy_url = Global.config.legacy_person + "#{membership.person.legacy_id}" + '&ps=events'
-                error_messages << "* Membership of #{membership.person.name}: #{message}\n"
-                error_messages << "   -> #{legacy_url}\n\n"
+              unless duplicate_error(membership.person, message)
+                if membership.person.nil?
+                  error_messages << "* #{@event.code} membership has no associated person record!\n\n#{membership.inspect}\n"
+                else
+                  legacy_url = Global.config.legacy_person + "#{membership.person.legacy_id}" + '&ps=events'
+                  error_messages << "* Membership of #{membership.person.name}: #{message}\n"
+                  error_messages << "   -> #{legacy_url}\n\n"
+                end
               end
             end
           end
-
           StaffMailer.event_sync(@event, error_messages).deliver_now
         end
+    end
+  end
+
+  def duplicate_error(obj, message)
+    if errors.has_key?("#{obj.class}")
+      errors["#{obj.class}"].each do |item|
+        if item.object == obj
+          return false unless item.message.to_s.downcase == message.to_s.gsub(/Person\ /, '')
+        end
+      end
     end
   end
 
