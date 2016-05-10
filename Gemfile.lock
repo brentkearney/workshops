@@ -130,7 +130,6 @@ GEM
       railties (>= 3.1)
     multi_json (1.11.2)
     netrc (0.11.0)
-    newrelic_rpm (3.14.3.313)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
     orm_adapter (0.5.0)
@@ -217,6 +216,8 @@ GEM
       multi_json (~> 1.0)
       rubyzip (~> 1.0)
       websocket (~> 1.0)
+    skylight (0.10.3)
+      activesupport (>= 3.0.0)
     spring (1.6.3)
     sprockets (3.5.2)
       concurrent-ruby (~> 1.0)
@@ -275,7 +276,6 @@ DEPENDENCIES
   jquery-rails
   jquery-turbolinks
   momentjs-rails (>= 2.9.0)
-  newrelic_rpm
   paper_trail
   passenger
   pg
@@ -287,6 +287,7 @@ DEPENDENCIES
   sdoc
   seed_dump
   selenium-webdriver
+  skylight
   spring
   sqlite3
   sucker_punch
@@ -295,4 +296,4 @@ DEPENDENCIES
   web-console
 
 BUNDLED WITH
-   1.11.2
+   1.12.3

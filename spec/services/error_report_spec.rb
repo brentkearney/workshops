@@ -130,7 +130,7 @@ describe "ErrorReport" do
           expect {
             @er.send_report
           }.to change { ActionMailer::Base.deliveries.count }.by(1)
-          
+
           expect(ActionMailer::Base.deliveries.last.body.raw_source).to include(membership_error)
         end
       end
