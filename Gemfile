@@ -45,8 +45,8 @@ group :test do
 end
 
 group :production do
+  gem 'newrelic_rpm'
   gem 'skylight'
-  # bundle exec skylight setup 9scHFSFAKD62
 end
 
 group :development do
