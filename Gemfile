@@ -32,6 +32,12 @@ group :development, :test do
   gem 'spring'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
+  gem 'pronto'
+  gem 'pronto-rubocop'
+  gem 'pronto-flay'
+  gem 'pronto-reek'
+  gem 'pronto-brakeman'
+  gem 'pronto-poper'
 end
 
 group :test do
