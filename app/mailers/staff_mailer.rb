@@ -42,6 +42,7 @@ class StaffMailer < ApplicationMailer
       Start time: #{updated_schedule.start_time}
       End time: #{updated_schedule.end_time}
       Location: #{updated_schedule.location}
+      Lecture publishing: #{publish}
       Description: #{updated_schedule.description}
       Updated by: #{updated_schedule.updated_by}
     )
