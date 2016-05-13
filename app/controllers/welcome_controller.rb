@@ -18,6 +18,7 @@ class WelcomeController < ApplicationController
     else
       @heading = 'Your Current & Upcoming Events'
       @memberships.each { |m| SyncEventMembersJob.perform_later(m.event) if policy(m.event).sync? }
+      # welcome#index
     end
   end
 

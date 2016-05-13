@@ -8,16 +8,16 @@ require 'rails_helper'
 
 describe 'Visitor SignIn', :type => :feature do
   before do
-    @person = FactoryGirl.create(:person)
+    @person = create(:person)
     @password = Faker::Internet.password(12)
-    @user = FactoryGirl.create(:user, password: @password, password_confirmation: @password, person: @person)
+    @user = create(:user, password: @password, password_confirmation: @password, person: @person)
     @user.confirmed_at = Time.now
     @user.save
     expect(@user).to be_valid
     expect(@user.person).to eq(@person)
 
-    @event = FactoryGirl.create(:event)
-    @membership = FactoryGirl.create(:membership, event: @event, person: @person, attendance: 'Invited')
+    @event = create(:event)
+    @membership = create(:membership, event: @event, person: @person, attendance: 'Invited')
   end
 
   before :each do
@@ -64,12 +64,6 @@ describe 'Visitor SignIn', :type => :feature do
     expect(page.body).to have_text('Invalid email or password')
   end
 
-  it 'Forwards user to "My Events" page after signin' do
-    fill_in_form
-    expect(page.body).to have_text('Signed in successfully')
-    expect(current_path).to eq(my_events_path)
-  end
-
   it 'Denies logins to non-admin users who have no memberships' do
     @user.member!
     @person.memberships.destroy_all
@@ -84,7 +78,7 @@ describe 'Visitor SignIn', :type => :feature do
     @user.member!
     @user.person.memberships.destroy_all
     expect(@user.person.memberships).to be_empty
-    m = FactoryGirl.create(:membership, person: @user.person, attendance: 'Not Yet Invited', role: 'Participant')
+    m = create(:membership, person: @user.person, attendance: 'Not Yet Invited', role: 'Participant')
     visit sign_in_path
     fill_in_form
     expect(page.body).not_to have_text('Signed in successfully')
@@ -105,7 +99,18 @@ describe 'Visitor SignIn', :type => :feature do
     expect(current_path).to eq(welcome_path)
   end
 
-  it 'Forwards users with no current events to My Events' do
+
+  it 'Forwards users with current events to welcome#index page signin' do
+    future_event = create(:event, start_date: Date.today.next_week(:sunday),
+                          end_date: Date.today.next_week(:sunday) + 5.days)
+    create(:membership, event: future_event, person: @person)
+    fill_in_form
+
+    expect(page.body).to have_text('Signed in successfully')
+    expect(current_path).to eq(welcome_path)
+  end
+
+  it 'Forwards users with no current events to My Events (so they see their past events)' do
     @user.member!
     @user.person.memberships.destroy_all
     event = create(:event, start_date: Date.today.prev_year.prev_week(:sunday),
