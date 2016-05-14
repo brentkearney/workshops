@@ -282,15 +282,13 @@ RSpec.describe "Model validations: Event ", type: :model do
   
   context '.is_current?' do
     it 'false if current time is outside event dates' do
-      e = build(:event, start_date: Date.today.next_week(:sunday),
-                 end_date: Date.today.next_week(:sunday) + 5.days)
+      e = build(:event, future: true)
 
       expect(e.is_current?).to be_falsey
     end
 
     it 'true if current time is inside event dates' do
-      e = build(:event, start_date: Date.today - 1.day,
-                 end_date: Date.today + 4.days)
+      e = build(:event, current: true)
 
       expect(e.is_current?).to be_truthy
     end

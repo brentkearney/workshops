@@ -68,14 +68,11 @@ RSpec.describe WelcomeController, type: :controller do
 
         it 'excludes past events from memberships list' do
           person.memberships.delete_all
-          past_event = create(:event, start_date: Date.today.prev_year.prev_week(:sunday),
-                              end_date: Date.today.prev_year.prev_week(:sunday) + 5.days)
+          past_event = create(:event, past: true)
           past_membership = create(:membership, person: person, event: past_event)
-          current_event = create(:event, start_date: Date.today.beginning_of_week(:sunday),
-                                 end_date: Date.today.beginning_of_week(:sunday) + 5.days)
+          current_event = create(:event, current: true)
           current_membership = create(:membership, person: person, event: current_event)
-          future_event = create(:event, start_date: Date.today.next_year.next_week(:sunday),
-                                end_date: Date.today.next_year.next_week(:sunday) + 5.days)
+          future_event = create(:event, future: true)
           future_membership = create(:membership, person: person, event: future_event)
 
           get :index

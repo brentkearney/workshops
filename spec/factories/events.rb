@@ -24,6 +24,25 @@ FactoryGirl.define do
     f.updated_by 'FactoryGirl'
     f.template false
 
+    transient do
+      past    false
+      future  false
+      current false
+    end
+
+    after(:build) do |event, evaluator|
+      if evaluator.past
+        event.start_date = Date.today.prev_year.prev_week(:sunday)
+        event.end_date = Date.today.prev_year.prev_week(:sunday) + 5.days
+      elsif evaluator.future
+        event.start_date = Date.today.next_year.next_week(:sunday)
+        event.end_date = Date.today.next_year.next_week(:sunday) + 5.days
+      elsif evaluator.current
+        event.start_date = Date.today.beginning_of_week(:sunday)
+        event.end_date = Date.today.beginning_of_week(:sunday) + 7.days
+      end
+    end
+
     factory :event_with_roles do
       after(:create) do |event|
         Membership::ROLES.shuffle.each do |role|

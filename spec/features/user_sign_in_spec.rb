@@ -88,8 +88,7 @@ describe 'Visitor SignIn', :type => :feature do
   it 'Allows organizers with memberships and declined attendance' do
     @user.member!
     @user.person.memberships.destroy_all
-    event = create(:event, start_date: Date.today.next_week(:sunday),
-                   end_date: Date.today.next_week(:sunday) + 5.days )
+    event = create(:event, future: true)
     membership = create(:membership, event: event, person: @user.person, attendance: 'Declined', role: 'Organizer')
 
     visit sign_in_path
@@ -101,8 +100,7 @@ describe 'Visitor SignIn', :type => :feature do
 
 
   it 'Forwards users with current events to welcome#index page signin' do
-    future_event = create(:event, start_date: Date.today.next_week(:sunday),
-                          end_date: Date.today.next_week(:sunday) + 5.days)
+    future_event = create(:event, current: true)
     create(:membership, event: future_event, person: @person)
     fill_in_form
 
@@ -113,8 +111,7 @@ describe 'Visitor SignIn', :type => :feature do
   it 'Forwards users with no current events to My Events (so they see their past events)' do
     @user.member!
     @user.person.memberships.destroy_all
-    event = create(:event, start_date: Date.today.prev_year.prev_week(:sunday),
-                  end_date: Date.today.prev_year.prev_week(:sunday) + 5.days)
+    event = create(:event, past: true)
     create(:membership, person: @user.person, event: event, attendance: 'Confirmed')
 
     visit sign_in_path

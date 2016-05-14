@@ -34,14 +34,18 @@ RSpec.describe EventsController, type: :controller do
       expect(assigns(:events)).to match_array(event)
     end
 
+    def excludes_template_events_test
+      event1 = create(:event, template: false)
+      event2 = create(:event, template: true)
+
+      get :index
+
+      expect(assigns(:events)).to match_array(event1)
+    end
+
     context 'as an unauthenticated user' do
       it '@events excludes template events' do
-        event1 = create(:event, template: false)
-        event2 = create(:event, template: true)
-
-        get :index
-
-        expect(assigns(:events)).to match_array(event1)
+        excludes_template_events_test
       end
     end
 
@@ -60,12 +64,7 @@ RSpec.describe EventsController, type: :controller do
         end
 
         it '@events excludes template events' do
-          event1 = create(:event, template: false)
-          event2 = create(:event, template: true)
-
-          get :index
-
-          expect(assigns(:events)).to match_array(event1)
+          excludes_template_events_test
         end
       end
 
@@ -212,12 +211,10 @@ RSpec.describe EventsController, type: :controller do
     end
 
     it 'assigns @events only with events from the past' do
-      past_event = create(:event, start_date: Date.today.prev_year.prev_week(:sunday),
-                          end_date: Date.today.prev_year.prev_week(:sunday) + 5.days)
-      current_event = create(:event, start_date: Date.today.beginning_of_week(:sunday),
-                             end_date: Date.today.beginning_of_week(:sunday) + 5.days)
-      future_event = create(:event, start_date: Date.today.next_year.next_week(:sunday),
-                            end_date: Date.today.next_year.next_week(:sunday) + 5.days)
+      past_event = create(:event, past: true)
+      current_event = create(:event, current: true)
+      future_event = create(:event, future: true)
+
       get :past
 
       expect(assigns(:events)).to match_array([past_event])
@@ -291,12 +288,9 @@ RSpec.describe EventsController, type: :controller do
     end
 
     it 'assigns @events only with the current event and future events' do
-      past_event = create(:event, start_date: Date.today.prev_year.prev_week(:sunday),
-                          end_date: Date.today.prev_year.prev_week(:sunday) + 5.days)
-      current_event = create(:event, start_date: Date.today.beginning_of_week(:sunday),
-                             end_date: Date.today.beginning_of_week(:sunday) + 6.days)
-      future_event = create(:event, start_date: Date.today.next_year.next_week(:sunday),
-                            end_date: Date.today.next_year.next_week(:sunday) + 5.days)
+      past_event = create(:event, past: true)
+      current_event = create(:event, current: true)
+      future_event = create(:event, future: true)
 
       get :future
 

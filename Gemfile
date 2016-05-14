@@ -32,12 +32,6 @@ group :development, :test do
   gem 'spring'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
-  gem 'pronto'
-  gem 'pronto-rubocop'
-  gem 'pronto-flay'
-  gem 'pronto-reek'
-  gem 'pronto-brakeman'
-  gem 'pronto-poper'
 end
 
 group :test do
@@ -45,9 +39,6 @@ group :test do
   gem 'selenium-webdriver'
   gem 'faker'
   gem 'database_cleaner'
-  #gem 'rack_session_access'
-  #gem 'guard-rspec'
-  #gem 'launchy'
 end
 
 group :production do
@@ -59,4 +50,10 @@ group :development do
   gem 'sqlite3'
   gem 'seed_dump'
   gem 'web-console'
+  gem 'pronto'
+  gem 'pronto-rubocop'
+  gem 'pronto-flay'
+  gem 'pronto-reek'
+  gem 'pronto-brakeman'
+  gem 'pronto-poper'
 end
