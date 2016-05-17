@@ -25,6 +25,13 @@ describe 'Post-login Welcome Page', :type => :feature do
     click_button 'Sign in'
   end
 
+  def expect_current_and_upcoming
+    @user.person.memberships.each do |m|
+      expect(page.body).to include("#{m.event.code}")
+      expect(page.body).to include("#{m.event.name}")
+    end
+  end
+
   it 'Disallows access to non-logged in users' do
     visit welcome_path
 
@@ -35,7 +42,10 @@ describe 'Post-login Welcome Page', :type => :feature do
     before do
       Event.destroy_all
       @user.member!
-      5.times { create(:membership, person: @user.person, role: 'Participant') }
+      5.times {
+        event = create(:event, future: true)
+        create(:membership, event: event, person: @user.person, role: 'Participant')
+      }
     end
 
     after(:each) do
@@ -52,10 +62,7 @@ describe 'Post-login Welcome Page', :type => :feature do
       sign_in_as @user
 
       expect(current_path).to eq(welcome_path)
-      @user.person.memberships.each do |m|
-        expect(page.body).to include("#{m.event.code}")
-        expect(page.body).to include("#{m.event.name}")
-      end
+      expect_current_and_upcoming
     end
 
     it "excludes the user's past workshops" do
@@ -127,10 +134,7 @@ describe 'Post-login Welcome Page', :type => :feature do
       sign_in_as @user
 
       expect(current_path).to eq(welcome_path)
-      @user.person.memberships.each do |m|
-        expect(page.body).to include("#{m.event.code}")
-        expect(page.body).to include("#{m.event.name}")
-      end
+      expect_current_and_upcoming
     end
 
     it 'shows the workshops for which the user is Not Yet Invited' do

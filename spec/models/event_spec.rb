@@ -8,54 +8,54 @@ require 'rails_helper'
 
 RSpec.describe "Model validations: Event ", type: :model do
   it "has valid factory" do
-    event = FactoryGirl.build(:event)
+    event = build(:event)
     expect(event).to be_valid
   end
 
   it "factory produces legitimate start and end dates" do
-    event = FactoryGirl.create(:event)
+    event = create(:event)
     expect(event.start_date.to_time.to_i).to be < event.end_date.to_time.to_i
   end
   
   it "is invalid without a name" do
-    expect(FactoryGirl.build(:event, name: nil)).not_to be_valid
+    expect(build(:event, name: nil)).not_to be_valid
   end
   
   it "is invalid without a start date" do
-    expect(FactoryGirl.build(:event, start_date: nil)).not_to be_valid
+    expect(build(:event, start_date: nil)).not_to be_valid
   end
   
   it "is invalid without an end date" do
-    expect(FactoryGirl.build(:event, end_date: nil)).not_to be_valid
+    expect(build(:event, end_date: nil)).not_to be_valid
   end
   
   it "is invalid without a location" do
-    expect(FactoryGirl.build(:event, location: nil)).not_to be_valid
+    expect(build(:event, location: nil)).not_to be_valid
   end
   
   it "is invalid without max participants" do
-    expect(FactoryGirl.build(:event, max_participants: nil)).not_to be_valid
+    expect(build(:event, max_participants: nil)).not_to be_valid
   end
 
   it 'is invalid without a time zone' do
-    expect(FactoryGirl.build(:event, time_zone: nil)).not_to be_valid
+    expect(build(:event, time_zone: nil)).not_to be_valid
   end
   
   it "is invalid if the name is longer than 68 characters and it has no short name" do
-    e = FactoryGirl.build(:event, name: Faker::Lorem.paragraph(5), short_name: nil)
+    e = build(:event, name: Faker::Lorem.paragraph(5), short_name: nil)
     expect(e).not_to be_valid
     expect(e.errors).to include(:short_name)
   end
   
   it "is invalid if the short name is also longer than 68 characters" do
-    e = FactoryGirl.build(:event, name: Faker::Lorem.paragraph(5), short_name: Faker::Lorem.paragraph(5))
+    e = build(:event, name: Faker::Lorem.paragraph(5), short_name: Faker::Lorem.paragraph(5))
     expect(e).not_to be_valid
     expect(e.errors).to include(:short_name)
   end
   
   it "is invalid if the code is not unique" do
-    first_event = FactoryGirl.create(:event)
-    dupe_event = FactoryGirl.build(:event, code: first_event.code)
+    first_event = create(:event)
+    dupe_event = build(:event, code: first_event.code)
     expect(dupe_event).not_to be_valid
     expect(dupe_event.errors).to include(:code)
   end
@@ -73,43 +73,43 @@ RSpec.describe "Model validations: Event ", type: :model do
 	it "is valid if the event code has proper format" do
 	  event_codes = %w[13w2145 14w5042 12ss130 10rit100 15frg129 13pl003] # valid codes
 	  event_codes.each do |code|
-	    e = FactoryGirl.build(:event, code: code)
+	    e = build(:event, code: code)
 	    expect(e.valid?).to be_truthy
 	    expect(e.errors[:code].any?).to be_falsey
     end
   end
   
   it "is invalid without an event type" do
-    expect(FactoryGirl.build(:event, event_type: nil)).not_to be_valid
+    expect(build(:event, event_type: nil)).not_to be_valid
   end
   
   it "is invalid if the event type is not part of Event::EVENT_TYPES" do
-    expect(FactoryGirl.build(:event, event_type: 'Keg Party')).not_to be_valid
+    expect(build(:event, event_type: 'Keg Party')).not_to be_valid
   end
 
   it 'has a country based on its location' do
-    e = FactoryGirl.build(:event)
+    e = build(:event)
     expect(e.country).not_to be_nil
   end
   
   it "can find based on code (instead of just id)" do
-    e = FactoryGirl.create(:event)
+    e = create(:event)
     found = Event.find(e.code)
     expect(found.name).to eq(e.name)
   end
   
   it "members returns a collection of person objects" do
-    e = FactoryGirl.create(:event)
-    p1 = FactoryGirl.create(:person)
-    p2 = FactoryGirl.create(:person)
-    m1 = FactoryGirl.create(:membership, event: e, person: p1)
-    m2 = FactoryGirl.create(:membership, event: e, person: p2)
+    e = create(:event)
+    p1 = create(:person)
+    p2 = create(:person)
+    m1 = create(:membership, event: e, person: p1)
+    m2 = create(:membership, event: e, person: p2)
     
     expect(e.members).to include(p1, p2)
   end
   
   it "automatically truncates leading and trailing whitespace around text fields" do
-    e = FactoryGirl.create(:event, name: ' Test Name ', short_name: ' Test ', description: ' A workshop with whitespace  ')
+    e = create(:event, name: ' Test Name ', short_name: ' Test ', description: ' A workshop with whitespace  ')
     
     expect(e.name).to eq('Test Name')
     expect(e.short_name).to eq('Test')
@@ -121,30 +121,30 @@ RSpec.describe "Model validations: Event ", type: :model do
   end
   
   it ":past scope returns events in the past" do
-    e1 = FactoryGirl.create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
-    e2 = FactoryGirl.create(:event, code: '11w5001', start_date: '2011-05-15', end_date: '2011-05-20')
-    e3 = FactoryGirl.create(:event, code: '20w5001', start_date: '2020-05-15', end_date: '2020-05-20')
-    e4 = FactoryGirl.create(:event, code: '21w5001', start_date: '2021-05-15', end_date: '2021-05-20')
+    e1 = create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
+    e2 = create(:event, code: '11w5001', start_date: '2011-05-15', end_date: '2011-05-20')
+    e3 = create(:event, code: '20w5001', start_date: '2020-05-15', end_date: '2020-05-20')
+    e4 = create(:event, code: '21w5001', start_date: '2021-05-15', end_date: '2021-05-20')
     events = Event.past
     expect(events).to include(e1, e2)
     expect(events).not_to include(e3, e4)
   end
   
   it ":future scope returns events in the future" do
-    e1 = FactoryGirl.create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
-    e2 = FactoryGirl.create(:event, code: '11w5001', start_date: '2011-05-15', end_date: '2011-05-20')
-    e3 = FactoryGirl.create(:event, code: '20w5001', start_date: '2020-05-15', end_date: '2020-05-20')
-    e4 = FactoryGirl.create(:event, code: '21w5001', start_date: '2021-05-15', end_date: '2021-05-20')
+    e1 = create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
+    e2 = create(:event, code: '11w5001', start_date: '2011-05-15', end_date: '2011-05-20')
+    e3 = create(:event, code: '20w5001', start_date: '2020-05-15', end_date: '2020-05-20')
+    e4 = create(:event, code: '21w5001', start_date: '2021-05-15', end_date: '2021-05-20')
     events = Event.future
     expect(events).to include(e3, e4)
     expect(events).not_to include(e1, e2)
   end
   
   it ":year scope returns events in a given year" do
-    e1 = FactoryGirl.create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
-    e2 = FactoryGirl.create(:event, code: '10w5002', start_date: '2010-05-25', end_date: '2010-05-30')
-    e3 = FactoryGirl.create(:event, code: '10w5003', start_date: '2010-06-01', end_date: '2010-06-05')
-    e4 = FactoryGirl.create(:event, code: '21w5004', start_date: '2021-06-15', end_date: '2021-06-20')
+    e1 = create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
+    e2 = create(:event, code: '10w5002', start_date: '2010-05-25', end_date: '2010-05-30')
+    e3 = create(:event, code: '10w5003', start_date: '2010-06-01', end_date: '2010-06-05')
+    e4 = create(:event, code: '21w5004', start_date: '2021-06-15', end_date: '2021-06-20')
     events = Event.year(2010)
     expect(events).to include(e1, e2, e3)
     expect(events).not_to include(e4)
@@ -156,10 +156,10 @@ RSpec.describe "Model validations: Event ", type: :model do
   end
   
   it ":kind scope returns events of a given kind" do
-    e1 = FactoryGirl.create(:event, code: '10w5001', event_type: '5 Day Workshop')
-    e2 = FactoryGirl.create(:event, code: '10w5002', event_type: '5 Day Workshop')
-    e3 = FactoryGirl.create(:event, code: '10w2001', event_type: '2 Day Workshop')
-    e4 = FactoryGirl.create(:event, code: '10w2002', event_type: '2 Day Workshop')
+    e1 = create(:event, code: '10w5001', event_type: '5 Day Workshop')
+    e2 = create(:event, code: '10w5002', event_type: '5 Day Workshop')
+    e3 = create(:event, code: '10w2001', event_type: '2 Day Workshop')
+    e4 = create(:event, code: '10w2002', event_type: '2 Day Workshop')
     events = Event.kind('5 Day Workshop')
     expect(events).to include(e1, e2)
     expect(events).not_to include(e3, e4)
@@ -222,22 +222,22 @@ RSpec.describe "Model validations: Event ", type: :model do
   end
 
   it ".num_attendance returns the number of members for a given attendance status" do
-    e = FactoryGirl.create(:event)
+    e = create(:event)
     2.times do
-      p = FactoryGirl.create(:person)
-      FactoryGirl.create(:membership, event: e, person: p, attendance: 'Not Yet Invited')
+      p = create(:person)
+      create(:membership, event: e, person: p, attendance: 'Not Yet Invited')
     end
     1.times do
-      p = FactoryGirl.create(:person)
-      FactoryGirl.create(:membership, event: e, person: p, attendance: 'Declined')
+      p = create(:person)
+      create(:membership, event: e, person: p, attendance: 'Declined')
     end
     4.times do
-      p = FactoryGirl.create(:person)
-      FactoryGirl.create(:membership, event: e, person: p, attendance: 'Confirmed')
+      p = create(:person)
+      create(:membership, event: e, person: p, attendance: 'Confirmed')
     end
     3.times do
-      p = FactoryGirl.create(:person)
-      FactoryGirl.create(:membership, event: e, person: p, attendance: 'Invited')
+      p = create(:person)
+      create(:membership, event: e, person: p, attendance: 'Invited')
     end
 
     expect(e.num_attendance('Invited')).to eq(3)
@@ -249,14 +249,14 @@ RSpec.describe "Model validations: Event ", type: :model do
   end
 
   it ".has_attendance returns true if there are any members for a given attendence status" do
-    e = FactoryGirl.create(:event)
+    e = create(:event)
     2.times do
-      p = FactoryGirl.create(:person)
-      FactoryGirl.create(:membership, event: e, person: p, attendance: 'Not Yet Invited')
+      p = create(:person)
+      create(:membership, event: e, person: p, attendance: 'Not Yet Invited')
     end
     1.times do
-      p = FactoryGirl.create(:person)
-      FactoryGirl.create(:membership, event: e, person: p, attendance: 'Declined')
+      p = create(:person)
+      create(:membership, event: e, person: p, attendance: 'Declined')
     end
 
     expect(e.has_attendance('Not Yet Invited')).to be_truthy
@@ -292,8 +292,5 @@ RSpec.describe "Model validations: Event ", type: :model do
 
       expect(e.is_current?).to be_truthy
     end
-
-
-
   end
 end

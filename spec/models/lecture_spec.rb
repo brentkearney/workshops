@@ -8,10 +8,10 @@ require 'rails_helper'
 
 RSpec.describe Lecture, type: :model do
   before :each do
-    @event = FactoryGirl.build(:event)
-    @lecture = FactoryGirl.create(:lecture, event: @event,
-                                    start_time: (@event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
-                                    end_time: (@event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
+    @event = build(:event)
+    @lecture = build(:lecture, event: @event,
+      start_time: (@event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
+      end_time: (@event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
   end
 
   it 'has valid factory' do
@@ -90,15 +90,15 @@ RSpec.describe Lecture, type: :model do
   end
 
   it 'is invalid if the end time is equal to the start time (causes infinite loop!)' do
-    lecture = FactoryGirl.build(:lecture)
-    lecture2 = Lecture.new(lecture.attributes.merge(start_time: lecture.end_time + 60.minutes, end_time: lecture.end_time + 60.minutes))
-    expect(lecture2).not_to be_valid
+    lecture = build(:lecture, event: @event, start_time: @event.start_date.at_midday, end_time: @event.start_date.at_midday)
+
+    expect(lecture).not_to be_valid
+    expect(lecture.errors.full_messages).to eq(['End time - must be greater than start time'])
   end
 
   context 'if times overlap with another scheduled lecture' do
     before do
       @lecture1 = @lecture
-      expect(@lecture1).to be_valid
     end
 
     it 'is invalid if the start time is >= other start time and < other end time' do
@@ -109,7 +109,8 @@ RSpec.describe Lecture, type: :model do
 
     it 'is valid if the start time is == other end time' do
       lecture2 = Lecture.new(@lecture1.attributes.
-          merge(id: 666, start_time: @lecture1.end_time, end_time: @lecture1.end_time + 5.minutes))
+          merge(id: 666, event: @lecture.event, start_time: @lecture1.end_time, end_time: @lecture1.end_time + 5.minutes))
+
       expect(lecture2).to be_valid
     end
 
@@ -121,7 +122,8 @@ RSpec.describe Lecture, type: :model do
 
     it 'is valid if the end time is == other start time' do
       lecture2 = Lecture.new(@lecture1.attributes.
-          merge(id: 666, start_time: @lecture1.start_time - 25.minutes, end_time: @lecture1.start_time))
+          merge(id: 666, event: @lecture.event, start_time: @lecture1.start_time - 25.minutes, end_time: @lecture1.start_time))
+
       expect(lecture2).to be_valid
     end
 
