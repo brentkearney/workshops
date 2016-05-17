@@ -61,6 +61,19 @@ FactoryGirl.define do
         end
       end
     end
+
+    factory :event_with_schedule do
+      after(:create) do |event|
+        9.upto(12) do |t|
+          create(:schedule,
+            event: event,
+            name: "Item at #{t}",
+            start_time: (event.start_date + 2.days).to_time.change({ hour: t }),
+            end_time: (event.start_date + 2.days).to_time.change({ hour: t+1 })
+          )
+        end
+      end
+    end
   end
 end
 

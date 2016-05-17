@@ -9,22 +9,11 @@ require 'rails_helper'
 describe 'Editing a Lecture Item', :type => :feature do
   before do
     authenticate_user
-
-    @event = FactoryGirl.create(:event)
-
-    9.upto(12) do |t|
-      FactoryGirl.create(:schedule,
-                         event: @event,
-                         name: "Item at #{t}:00",
-                         start_time: (@event.start_date + 2.days).to_time.change({ hour: t }),
-                         end_time: (@event.start_date + 2.days).to_time.change({ hour: t+1 })
-      )
-    end
-
+    @event = create(:event_with_schedule)
     @event.schedules.each do |s|
-      person = FactoryGirl.create(:person)
-      FactoryGirl.create(:membership, event: @event, person: person)
-      lecture = FactoryGirl.create(:lecture, event: @event, person: person, start_time: s.start_time, end_time: s.end_time)
+      person = create(:person)
+      create(:membership, event: @event, person: person)
+      lecture = create(:lecture, event: @event, person: person, start_time: s.start_time, end_time: s.end_time)
       s.lecture = lecture
       s.save
     end

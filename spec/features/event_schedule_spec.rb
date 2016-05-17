@@ -9,17 +9,7 @@ require 'rails_helper'
 describe 'Event Schedule Page', :type => :feature do
   before do
     authenticate_user
-
-    @event = FactoryGirl.create(:event)
-    9.upto(12) do |t|
-      FactoryGirl.create(:schedule,
-                         event: @event,
-                         name: "Item at #{t}",
-                         start_time: (@event.start_date + 2.days).to_time.change({ hour: t }),
-                         end_time: (@event.start_date + 2.days).to_time.change({ hour: t+1 })
-      )
-    end
-
+    @event = create(:event_with_schedule)
     visit event_schedule_index_path(@event)
   end
 

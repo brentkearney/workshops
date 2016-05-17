@@ -9,10 +9,10 @@ require 'rails_helper'
 # DefaultSchedule creates a default schedule template for events that have none
 describe 'DefaultSchedule' do
   before(:all) do
-    @event = FactoryGirl.create(:event)
+    @event = create(:event)
     authenticate_user # sets @user & @person
     @user.member!
-    @membership = FactoryGirl.create(:membership, event: @event, person: @person, role: 'Organizer')
+    @membership = create(:membership, event: @event, person: @person, role: 'Organizer')
   end
 
   after do
@@ -42,26 +42,14 @@ describe 'DefaultSchedule' do
 
   context 'If there is a Template Schedule in the database' do
     before(:all) do
-      @tevent = FactoryGirl.create(:event,
-                                   code: '15w0001',
-                                   name: 'Testing Schedule Template event',
-                                   event_type: @event.event_type,
-                                   start_date: '2015-01-04',
-                                   end_date: '2015-01-09',
-                                   template: true
+      @tevent = create(:event_with_schedule,
+        code: '15w0001',
+        name: 'Testing Schedule Template event',
+        event_type: @event.event_type,
+        start_date: '2015-01-04',
+        end_date: '2015-01-09',
+        template: true
       )
-      expect(@tevent.template).to be_truthy
-
-      expect(@tevent.schedules).to be_empty
-      9.upto(12) do |t|
-        FactoryGirl.create(:schedule,
-                           event: @tevent,
-                           name: "Item at #{t}",
-                           start_time: (@tevent.start_date + 2.days).to_time.change({ hour: t }),
-                           end_time: (@tevent.start_date + 2.days).to_time.change({ hour: t+1 })
-        )
-      end
-      expect(@tevent.schedules).not_to be_empty
     end
 
     context 'And the user IS an organizer of the event' do
@@ -72,9 +60,9 @@ describe 'DefaultSchedule' do
 
       context 'If the event has at least one schedule item' do
         before(:all) do
-          item = FactoryGirl.build(:schedule, name: 'This one item', event_id: @event.id,
-                                   start_time: (@event.start_date + 2.days).to_time.change({ hour: 9 }),
-                                   end_time: (@event.start_date + 2.days).to_time.change({ hour: 10 })
+          item = build(:schedule, name: 'This one item', event_id: @event.id,
+            start_time: (@event.start_date + 2.days).to_time.change({ hour: 9 }),
+            end_time: (@event.start_date + 2.days).to_time.change({ hour: 10 })
           )
           @event.schedules.create(item.attributes)
         end
