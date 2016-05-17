@@ -228,8 +228,7 @@ RSpec.describe EventsController, type: :controller do
         allow(request.env['warden']).to receive(:authenticate!).and_return(user)
         allow(controller).to receive(:current_user).and_return(user)
 
-        @event1 = create(:event, location: user.location, start_date: Date.today.prev_month.prev_week(:sunday),
-                         end_date: Date.today.prev_month.prev_week(:sunday) + 5.days)
+        @event1 = create(:event, past: true, location: user.location)
         @event2 = create(:event, location: 'elsewhere', start_date: @event1.start_date - 1.week,
                          end_date: @event1.end_date - 1.week)
       end

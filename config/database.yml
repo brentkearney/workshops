@@ -3,7 +3,7 @@ default: &default
   encoding: unicode
   min_messages: WARNING
   pool: 5
-  host: localhost
+  host: db
   port: 5432
   username: <%= ENV['DB_USER'] %>
   password: <%= ENV['DB_PASS'] %>

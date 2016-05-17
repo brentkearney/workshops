@@ -29,9 +29,10 @@ RSpec.describe WelcomeController, type: :controller do
       context ':member' do
         before do
           user.member!
-          @event = create(:event, start_date: Date.today.next_week.next_week(:sunday),
-                          end_date: Date.today.next_week.next_week(:sunday) + 5.days)
-          @membership = create(:membership, person: person, event: @event, role: 'Participant')
+          @pe = create(:event, past: true)
+          @ce = create(:event, current: true)
+          @fe = create(:event, future: true)
+          @membership = create(:membership, person: person, event: @ce, role: 'Participant')
         end
 
         it 'responds with success code' do
@@ -68,12 +69,9 @@ RSpec.describe WelcomeController, type: :controller do
 
         it 'excludes past events from memberships list' do
           person.memberships.delete_all
-          past_event = create(:event, past: true)
-          past_membership = create(:membership, person: person, event: past_event)
-          current_event = create(:event, current: true)
-          current_membership = create(:membership, person: person, event: current_event)
-          future_event = create(:event, future: true)
-          future_membership = create(:membership, person: person, event: future_event)
+          past_membership = create(:membership, person: person, event: @pe)
+          current_membership = create(:membership, person: person, event: @ce)
+          future_membership = create(:membership, person: person, event: @fe)
 
           get :index
 
@@ -82,91 +80,97 @@ RSpec.describe WelcomeController, type: :controller do
 
 
         context 'role="Participant"' do
-          before do
-            Event.destroy_all
+          before :each do
+            person.memberships.delete_all
           end
 
           it 'excludes from @memberships where attendance="Declined"' do
-            @declined_membership = create(:membership, person: person, attendance: 'Declined', role: 'Participant')
-            @confirmed_membership = create(:membership, person: person, attendance: 'Confirmed', role: 'Participant')
+            declined_membership = create(:membership, person: person, event: @ce, attendance: 'Declined', role: 'Participant')
+            confirmed_membership = create(:membership, person: person, event: @fe, attendance: 'Confirmed', role: 'Participant')
 
             get :index
 
-            expect(assigns(:memberships)).to match_array([@confirmed_membership])
+            expect(assigns(:memberships)).to match_array([confirmed_membership])
           end
 
           it 'excludes from @memberships where attendance="Not Yet Invited"' do
-            @nyi_membership = create(:membership, person: person, attendance: 'Not Yet Invited', role: 'Participant')
-            @confirmed_membership = create(:membership, person: person, attendance: 'Confirmed', role: 'Participant')
+            nyi_membership = create(:membership, person: person, event: @fe, attendance: 'Not Yet Invited', role: 'Participant')
+            confirmed_membership = create(:membership, person: person, event: @ce, attendance: 'Confirmed', role: 'Participant')
 
             get :index
 
-            expect(assigns(:memberships)).to match_array([@confirmed_membership])
+            expect(assigns(:memberships)).to match_array([confirmed_membership])
           end
         end
 
         context 'role="Backup Participant"' do
-          before do
-            Event.destroy_all
-          end
-
           it 'excludes from @memberships' do
-            @backup_membership = create(:membership, person: person, role: 'Backup Participant')
-            @participant_membership = create(:membership, person: person, role: 'Participant')
+            person.memberships.delete_all
+            backup_membership = create(:membership, person: person, event: @fe, role: 'Backup Participant')
+            participant_membership = create(:membership, person: person, event: @ce, role: 'Participant')
 
             get :index
 
-            expect(assigns(:memberships)).to match_array([@participant_membership])
+            expect(assigns(:memberships)).to match_array([participant_membership])
           end
         end
 
         context 'role="Observer"' do
-          before do
-            Event.destroy_all
+          before :each do
+            person.memberships.delete_all
           end
 
           it 'excludes from @memberships where attendance="Declined"' do
-            @declined_membership = create(:membership, person: person, attendance: 'Declined', role: 'Observer')
-            @confirmed_membership = create(:membership, person: person, attendance: 'Confirmed', role: 'Observer')
+            declined_membership = create(:membership, person: person, event: @fe, attendance: 'Declined', role: 'Observer')
+            confirmed_membership = create(:membership, person: person, event: @ce, attendance: 'Confirmed', role: 'Observer')
 
             get :index
 
-            expect(assigns(:memberships)).to match_array([@confirmed_membership])
+            expect(assigns(:memberships)).to match_array([confirmed_membership])
           end
 
           it 'excludes from @memberships where attendance="Not Yet Invited"' do
-            @nyi_membership = create(:membership, person: person, attendance: 'Not Yet Invited', role: 'Observer')
-            @confirmed_membership = create(:membership, person: person, attendance: 'Confirmed', role: 'Observer')
+            nyi_membership = create(:membership, person: person, event: @fe, attendance: 'Not Yet Invited', role: 'Observer')
+            confirmed_membership = create(:membership, person: person, event: @ce, attendance: 'Confirmed', role: 'Observer')
 
             get :index
 
-            expect(assigns(:memberships)).to match_array([@confirmed_membership])
+            expect(assigns(:memberships)).to match_array([confirmed_membership])
           end
         end
 
         context 'role="Organizer" or "Contact Organizer"' do
-          before do
-            Event.destroy_all
+          before :each do
+            person.memberships.delete_all
           end
 
-          it 'includes in @memberships where attendance="Declined"' do
-            @declined_org_membership = create(:membership, person: person, attendance: 'Declined', role: 'Organizer')
-            @declined_contact_org_membership = create(:membership, person: person, attendance: 'Declined', role: 'Contact Organizer')
-            @confirmed_membership = create(:membership, person: person, attendance: 'Confirmed', role: 'Organizer')
+          it 'excludes events older than 2 weeks ago in @memberships' do
+            recent_event = create(:event, start_date: 1.week.ago.beginning_of_week(:sunday),
+                              end_date: 1.week.ago.beginning_of_week(:sunday) + 5.days)
+            recent_membership = create(:membership, event: recent_event, person: person)
+            old_membership = create(:membership, event: @pe, person: person) # last year
 
             get :index
 
-            expect(assigns(:memberships)).to match_array([@declined_org_membership, @declined_contact_org_membership, @confirmed_membership])
+            expect(assigns(:memberships)).to match_array([recent_membership])
           end
 
-          it 'includes in @memberships where attendance="Not Yet Invited"' do
-            @nyi_org_membership = create(:membership, person: person, attendance: 'Not Yet Invited', role: 'Organizer')
-            @nyi_contact_org_membership = create(:membership, person: person, attendance: 'Not Yet Invited', role: 'Contact Organizer')
-            @confirmed_membership = create(:membership, person: person, attendance: 'Confirmed', role: 'Organizer')
+          it 'includes in @memberships where attendance="[Declined|Not Yet Invited]" for Contact Organizers' do
+            declined_membership = create(:membership, person: person, event: @ce, attendance: 'Declined', role: 'Contact Organizer')
+            nyi_membership = create(:membership, person: person, event: @fe, attendance: 'Not Yet Invited', role: 'Contact Organizer')
 
             get :index
 
-            expect(assigns(:memberships)).to match_array([@nyi_org_membership, @nyi_contact_org_membership, @confirmed_membership])
+            expect(assigns(:memberships)).to match_array([declined_membership, nyi_membership])
+          end
+
+          it 'includes in @memberships where attendance="[Declined|Not Yet Invited]" for Organizers' do
+            declined_membership = create(:membership, person: person, event: @ce, attendance: 'Declined', role: 'Organizer')
+            nyi_membership = create(:membership, person: person, event: @fe, attendance: 'Not Yet Invited', role: 'Organizer')
+
+            get :index
+
+            expect(assigns(:memberships)).to match_array([declined_membership, nyi_membership])
           end
         end
       end

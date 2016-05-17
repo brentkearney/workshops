@@ -51,15 +51,17 @@ RSpec.describe ScheduleController, type: :controller do
         @event.save
 
         get :index, { :event_id => @event.id }
+
         expect(response.status).to eq(302)
         expect(subject).to redirect_to(sign_in_path)
       end
 
-      it 'assigns @schedules if event.publish_schedule is true' do
+      it 'if event.publish_schedule is true, assigns @schedules' do
         @event.publish_schedule = true
         @event.save
 
         get :index, { :event_id => @event.id }
+
         expect(response.status).to eq(200)
         expect(response).to render_template('index')
         expect(assigns(:schedules)).not_to be_empty
@@ -75,11 +77,12 @@ RSpec.describe ScheduleController, type: :controller do
       end
 
       it 'assigns @schedules copied from template event upon first visit' do
-        expect(@event.schedules).to be_empty
+        @event.schedules.destroy_all
         template = Event.find_by(template: true)
         expect(template.schedules).not_to be_empty
 
         get :index, { :event_id => @event.id }
+
         expect(response.status).to eq(200)
         expect(response).to render_template('index')
         expect(assigns(:schedules)).not_to be_empty
