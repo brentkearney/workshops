@@ -17,6 +17,7 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+# Connects to internal API for legacy database
 class LegacyConnector
   require 'rest_client'
     
@@ -26,7 +27,7 @@ class LegacyConnector
   
   # get a list of events within a given date range
   def list_events(from_date, to_date)
-     JSON.parse(RestClient.get "#{@rest_url}/event_list", {:params => {'year1' => from_date, 'year2' => to_date}})
+     JSON.parse(RestClient.get "#{@rest_url}/event_list", {params: {year1: from_date, year2: to_date}})
   end
 
   # get data for specific events
@@ -56,22 +57,21 @@ class LegacyConnector
   
   # add new person record
   def add_person(person)
-    email = person["email"]
-    RestClient.post "#{@rest_url}/add_person", person.to_json, :content_type => :json, :accept => :json
-    # Return the legacy_id for the new remote person record
-    new_person = search_person(email)
-    new_person["legacy_id"]
+    JSON.parse(RestClient.post "#{@rest_url}/add_person", person.to_json, content_type: :json, accept: :json)
   end
   
   # add new member to event
-  def add_member(membership, event_id, legacy_id, updated_by)    
-    remote_membership = membership.attributes.merge('workshop_id' => "#{event_id}", 'person_id' => "#{legacy_id}", 'updated_by' => "#{updated_by}")
-    RestClient.post "#{@rest_url}/add_member/#{event_id}", remote_membership.to_json, :content_type => :json, :accept => :json    
+  def add_member(membership:, event_code:, person:, updated_by:)
+    remote_membership = membership.attributes.merge('workshop_id' => "#{event_code}", 'person' => person.as_json, 'updated_by' => "#{updated_by}")
+    JSON.parse(RestClient.post "#{@rest_url}/add_member/#{event_code}", remote_membership.to_json, :content_type => :json, :accept => :json)
   end
 
   # add new members to event
-  def add_members(event_id, members)
-    RestClient.post "#{@rest_url}/add_members/#{event_id}", members.to_json, :content_type => :json, :accept => :json
+  def add_members(event_code:, members:, updated_by:)
+    responses = Array.new
+    members.each do |member|
+      responses[] = add_member(membership: member, event_code: event_code, legacy_id: member.legacy_id, updated_by: updated_by)
+    end
   end
 
   # update membership & person record
@@ -79,7 +79,7 @@ class LegacyConnector
     add_member(membership, event_id, legacy_id, updated_by) # add_member updates existing memberships
     remote_person = person.attributes.merge('updated_by' => "#{updated_by}")
     remote_person.delete("legacy_id")
-    RestClient.post "#{@rest_url}/update_person/#{legacy_id}", remote_person.to_json, :content_type => :json, :accept => :json
+    JSON.parse(RestClient.post "#{@rest_url}/update_person/#{legacy_id}", remote_person.to_json, :content_type => :json, :accept => :json)
   end
 
   # update an event's members
@@ -91,11 +91,11 @@ class LegacyConnector
     JSON.parse(RestClient.get "#{@rest_url}/event_lectures/#{event_id}")
   end
 
-  def get_legacy_lecture(legacy_id)
-    JSON.parse(RestClient.get "#{@rest_url}/legacy_lecture/#{legacy_id}")
+  def get_lecture(legacy_id)
+    JSON.parse(RestClient.get "#{@rest_url}/get_lecture/#{legacy_id}")
   end
 
-  def get_legacy_lecture_id(lecture)
+  def get_lecture_id(lecture)
     day = lecture.start_time.strftime("%Y-%m-%d")
     JSON.parse(RestClient.get "#{@rest_url}/new_lecture_id/#{lecture.event.code}/#{day}/#{lecture.id}")
   end
@@ -104,13 +104,11 @@ class LegacyConnector
   def add_lecture(lecture)
     event_id = lecture.event.code
     lecture.person_id = lecture.person.legacy_id
-    RestClient.post "#{@rest_url}/add_lecture/#{event_id}", lecture.to_json, :content_type => :json, :accept => :json
-    new_lecture = get_legacy_lecture_id(lecture)
-    new_lecture['legacy_id']
+    JSON.parse(RestClient.post "#{@rest_url}/add_lecture/#{event_id}", lecture.to_json, :content_type => :json, :accept => :json)
   end
 
   def delete_lecture(lecture_id)
-    RestClient.get "#{@rest_url}/delete_lecture/#{lecture_id}"
+    JSON.parse(RestClient.get "#{@rest_url}/delete_lecture/#{lecture_id}")
   end
 
   # send a report of lectures and video filenames for given event

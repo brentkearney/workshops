@@ -49,18 +49,18 @@ class FakeLegacyConnector
     # Change the existing members and return them
     event.memberships.each do |m|
       remote_members << {
-          "Workshop" => "#{event.code}",
-          "Person" => {
-              "lastname"=>m.person.lastname, "firstname"=>m.person.firstname, "email"=>m.person.email, "cc_email"=>nil,
-              "gender"=>m.person.gender, "affiliation"=>'New Affiliation', "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
-              "address1"=>m.person.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
-              "academic_status"=>nil, "department"=>nil, "title"=>nil, "phd_year"=>nil, "biography"=>nil, "research_areas"=>nil,
-              "updated_at"=>Time.now, "legacy_id"=>m.person.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
-              "updated_by"=>'FakeLegacyConnector'},
-          "Membership"=> {
-              "arrival_date"=>event.start_date + 1.day, "departure_date"=>event.end_date - 1.day,
-              "attendance"=>m.attendance, "role"=>m.role, "replied_at"=>m.replied_at,
-              "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now}
+          'Workshop' => '#{event.code}',
+          'Person' => {
+              'lastname'=>m.person.lastname, 'firstname'=>m.person.firstname, 'email'=>m.person.email, 'cc_email'=>nil,
+              'gender'=>m.person.gender, 'affiliation'=>'New Affiliation', 'salutation'=>nil, 'url'=>nil, 'phone'=>nil, 'fax'=>nil,
+              'address1'=>m.person.address1, 'address2'=>nil, 'address3'=>nil, 'city'=>nil, 'region'=>nil, 'country'=>nil, 'postal_code'=>nil,
+              'academic_status'=>nil, 'department'=>nil, 'title'=>nil, 'phd_year'=>nil, 'biography'=>nil, 'research_areas'=>nil,
+              'updated_at'=>Time.now, 'legacy_id'=>m.person.legacy_id, 'emergency_contact'=>nil, 'emergency_phone'=>nil,
+              'updated_by'=>'FakeLegacyConnector'},
+          'Membership'=> {
+              'arrival_date'=>event.start_date + 1.day, 'departure_date'=>event.end_date - 1.day,
+              'attendance'=>m.attendance, 'role'=>m.role, 'replied_at'=>m.replied_at,
+              'updated_by'=>'FakeLegacyConnector', 'updated_at'=>Time.now}
       }
     end
 
@@ -88,54 +88,54 @@ class FakeLegacyConnector
     end
 
     remote_member = [{
-        "Workshop" => "#{e.code}",
-        "Person" => {
-            "lastname" => ln, "firstname"=>m.person.firstname, "email"=>m.person.email, "cc_email"=>nil,
-            "gender"=>m.person.gender, "affiliation"=>m.person.affiliation, "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
-            "address1"=>m.person.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
-            "academic_status"=>nil, "department"=>nil, "title"=>nil, "phd_year"=>nil, "biography"=>nil, "research_areas"=>nil,
-            "updated_at"=>Time.now, "legacy_id"=>m.person.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
-            "updated_by"=>'FakeLegacyConnector'},
-        "Membership"=> {
-            "arrival_date"=>m.arrival_date, "departure_date"=>m.departure_date,
-            "attendance"=>m.attendance, "role"=>m.role, "replied_at"=>m.replied_at,
-            "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now, "staff_notes"=>m.staff_notes}
+        'Workshop' => '#{e.code}',
+        'Person' => {
+            'lastname' => ln, 'firstname'=>m.person.firstname, 'email'=>m.person.email, 'cc_email'=>nil,
+            'gender'=>m.person.gender, 'affiliation'=>m.person.affiliation, 'salutation'=>nil, 'url'=>nil, 'phone'=>nil, 'fax'=>nil,
+            'address1'=>m.person.address1, 'address2'=>nil, 'address3'=>nil, 'city'=>nil, 'region'=>nil, 'country'=>nil, 'postal_code'=>nil,
+            'academic_status'=>nil, 'department'=>nil, 'title'=>nil, 'phd_year'=>nil, 'biography'=>nil, 'research_areas'=>nil,
+            'updated_at'=>Time.now, 'legacy_id'=>m.person.legacy_id, 'emergency_contact'=>nil, 'emergency_phone'=>nil,
+            'updated_by'=>'FakeLegacyConnector'},
+        'Membership'=> {
+            'arrival_date'=>m.arrival_date, 'departure_date'=>m.departure_date,
+            'attendance'=>m.attendance, 'role'=>m.role, 'replied_at'=>m.replied_at,
+            'updated_by'=>'FakeLegacyConnector', 'updated_at'=>Time.now, 'staff_notes'=>m.staff_notes}
     }]
   end
 
   def get_members_with_new_membership(e: event, p: person)
     m = Membership.new(event: e, person: p)
     remote_member = [{
-                         "Workshop" => "#{e.code}",
-                         "Person" => {
-                             "lastname" => p.lastname, "firstname"=>p.firstname, "email"=>p.email, "cc_email"=>nil,
-                             "gender"=>p.gender, "affiliation"=>p.affiliation, "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
-                             "address1"=>p.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
-                             "academic_status"=>nil, "department"=>nil, "title"=>nil, "phd_year"=>nil, "biography"=>nil, "research_areas"=>nil,
-                             "updated_at"=>Time.now, "legacy_id"=>p.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
-                             "updated_by"=>'FakeLegacyConnector'},
-                         "Membership"=> {
-                             "arrival_date"=>m.arrival_date, "departure_date"=>m.departure_date,
-                             "attendance"=>m.attendance, "role"=>m.role, "replied_at"=>m.replied_at,
-                             "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now, "staff_notes"=>m.staff_notes}
+                         'Workshop' => '#{e.code}',
+                         'Person' => {
+                             'lastname' => p.lastname, 'firstname'=>p.firstname, 'email'=>p.email, 'cc_email'=>nil,
+                             'gender'=>p.gender, 'affiliation'=>p.affiliation, 'salutation'=>nil, 'url'=>nil, 'phone'=>nil, 'fax'=>nil,
+                             'address1'=>p.address1, 'address2'=>nil, 'address3'=>nil, 'city'=>nil, 'region'=>nil, 'country'=>nil, 'postal_code'=>nil,
+                             'academic_status'=>nil, 'department'=>nil, 'title'=>nil, 'phd_year'=>nil, 'biography'=>nil, 'research_areas'=>nil,
+                             'updated_at'=>Time.now, 'legacy_id'=>p.legacy_id, 'emergency_contact'=>nil, 'emergency_phone'=>nil,
+                             'updated_by'=>'FakeLegacyConnector'},
+                         'Membership'=> {
+                             'arrival_date'=>m.arrival_date, 'departure_date'=>m.departure_date,
+                             'attendance'=>m.attendance, 'role'=>m.role, 'replied_at'=>m.replied_at,
+                             'updated_by'=>'FakeLegacyConnector', 'updated_at'=>Time.now, 'staff_notes'=>m.staff_notes}
                      }]
   end
 
   def get_members_with_changed_membership(m: membership, sn: staff_notes)
     
     remote_member = [{
-                         "Workshop" => "#{m.event.code}",
-                         "Person" => {
-                             "lastname" => m.person.lastname, "firstname"=>m.person.firstname, "email"=>m.person.email, "cc_email"=>nil,
-                             "gender"=>m.person.gender, "affiliation"=>m.person.affiliation, "salutation"=>nil, "url"=>nil, "phone"=>nil, "fax"=>nil,
-                             "address1"=>m.person.address1, "address2"=>nil, "address3"=>nil, "city"=>nil, "region"=>nil, "country"=>nil, "postal_code"=>nil,
-                             "academic_status"=>nil, "department"=>nil, "title"=>nil, "phd_year"=>nil, "biography"=>nil, "research_areas"=>nil,
-                             "updated_at"=>Time.now, "legacy_id"=>m.person.legacy_id, "emergency_contact"=>nil, "emergency_phone"=>nil,
-                             "updated_by"=>'FakeLegacyConnector'},
-                         "Membership"=> {
-                             "arrival_date"=>m.arrival_date, "departure_date"=>m.departure_date,
-                             "attendance"=>m.attendance, "role"=>m.role, "replied_at"=>m.replied_at,
-                             "updated_by"=>'FakeLegacyConnector', "updated_at"=>Time.now, "staff_notes"=>sn}
+                         'Workshop' => '#{m.event.code}',
+                         'Person' => {
+                             'lastname' => m.person.lastname, 'firstname'=>m.person.firstname, 'email'=>m.person.email, 'cc_email'=>nil,
+                             'gender'=>m.person.gender, 'affiliation'=>m.person.affiliation, 'salutation'=>nil, 'url'=>nil, 'phone'=>nil, 'fax'=>nil,
+                             'address1'=>m.person.address1, 'address2'=>nil, 'address3'=>nil, 'city'=>nil, 'region'=>nil, 'country'=>nil, 'postal_code'=>nil,
+                             'academic_status'=>nil, 'department'=>nil, 'title'=>nil, 'phd_year'=>nil, 'biography'=>nil, 'research_areas'=>nil,
+                             'updated_at'=>Time.now, 'legacy_id'=>m.person.legacy_id, 'emergency_contact'=>nil, 'emergency_phone'=>nil,
+                             'updated_by'=>'FakeLegacyConnector'},
+                         'Membership'=> {
+                             'arrival_date'=>m.arrival_date, 'departure_date'=>m.departure_date,
+                             'attendance'=>m.attendance, 'role'=>m.role, 'replied_at'=>m.replied_at,
+                             'updated_by'=>'FakeLegacyConnector', 'updated_at'=>Time.now, 'staff_notes'=>sn}
                      }]
   end
 
@@ -172,11 +172,11 @@ class FakeLegacyConnector
 
   end
 
-  def get_legacy_lecture(legacy_id)
+  def get_lecture(legacy_id)
 
   end
 
-  def get_legacy_lecture_id(lecture)
+  def get_lecture_id(lecture)
 
   end
 
