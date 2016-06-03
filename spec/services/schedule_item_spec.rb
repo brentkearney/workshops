@@ -13,8 +13,8 @@ describe "ScheduleItem" do
     @person = create(:person)
     @schedule_attributes = {
           event_id: @event.id,
-        start_time: second_day_at_nine,
-          end_time: (second_day_at_nine + 1.hour),
+        start_time: second_day_at(9,00),
+          end_time: second_day_at(10,00),
               name: 'Good morning!',
        description: 'The first item of the day.',
           location: 'TCPL 201',
@@ -23,7 +23,7 @@ describe "ScheduleItem" do
     @new_params = {
           new_item: true,
           event_id: @event.id,
-        start_time: @event.start_date.to_time,
+        start_time: event_timezone_at(9,00),
         updated_by: @user.name
     }
   end
@@ -37,12 +37,12 @@ describe "ScheduleItem" do
     Schedule.delete_all
   end
 
-  def second_day_at_nine
-    event_timezone_at(9) + 1.day
+  def second_day_at(hour, min)
+    event_timezone_at(hour, min) + 1.day
   end
 
-  def event_timezone_at(hour)
-    @event.start_date.to_time.in_time_zone(@event.time_zone).change({ hour: hour, min: 0})
+  def event_timezone_at(hour, min)
+    @event.start_date.to_time.in_time_zone(@event.time_zone).change({ hour: hour, min: min})
   end
 
   it '.new' do
@@ -108,12 +108,12 @@ describe "ScheduleItem" do
       end
 
       it 'is the same length as the lecture scheduled at the same time the previous day' do
-        end_time = second_day_at_nine + 23.minutes
+        end_time = second_day_at(9,23)
         @schedule_attributes[:lecture_attributes] = { person_id: @person.id }
         first_item = ScheduleItem.new(@schedule_attributes.merge(end_time: end_time)).schedule
         first_item.save
 
-        second_item_start = second_day_at_nine + 1.day
+        second_item_start = second_day_at(9,00) + 1.day
         @new_params[:lecture_attributes] = { person_id: @person.id }
         second_item = ScheduleItem.new(@new_params.merge(start_time: second_item_start, name: 'Second item')).schedule
 
@@ -135,7 +135,7 @@ describe "ScheduleItem" do
           new_item.save
         end
 
-        start_time = second_day_at_nine + 4.days
+        start_time = second_day_at(9,00) + 4.days
         attributes = @new_params.merge(start_time: start_time, end_time: nil)
         attributes[:lecture_attributes] = { person_id: @person.id }
         test_item = ScheduleItem.new(attributes).schedule
@@ -156,66 +156,65 @@ describe "ScheduleItem" do
 
         new_item = ScheduleItem.new(params).schedule
 
-        expect(new_item.start_time).to eq(event_timezone_at(9))
+        expect(new_item.start_time).to eq(event_timezone_at(9,00))
       end
 
       it 'is the end time of the last scheduled item before 09:00 on the same day' do
-        attributes = @schedule_attributes.merge(start_time: second_day_at_nine - 2.hours,
-                                                  end_time: second_day_at_nine - 1.hour)
+        attributes = @schedule_attributes.merge(start_time: second_day_at(7,00),
+                                                  end_time: second_day_at(8,00))
         previous_item1 = Schedule.create(attributes)
         attributes = @schedule_attributes.merge(start_time: previous_item1.end_time,
-                                                end_time: previous_item1.end_time + 30.minutes)
+                                                  end_time: previous_item1.end_time + 30.minutes)
         previous_item2 = Schedule.create(attributes)
 
-        attributes = @new_params.merge(start_time: second_day_at_nine, end_time: nil)
+        attributes = @new_params.merge(start_time: second_day_at(9,00), end_time: nil)
         new_item = ScheduleItem.new(attributes).schedule
 
         expect(new_item.start_time).to eq(previous_item2.end_time)
       end
 
-      context "There are no scheduled Lectures on the given day" do
-
+      context "If there are no scheduled Lectures on the given day" do
         context "and there is a scheduled non-lecture after 09:30" do
           it "should set the start_time to 09:00" do
-            schedule = Schedule.create!(@schedule_attributes.
-                          merge(start_time: "#{@event.start_date} 17:00", end_time: "#{@event.start_date} 17:30"))
+            schedule = Schedule.create!(@schedule_attributes.merge(start_time: "#{@event.start_date} 17:00",
+                                                                   end_time: "#{@event.start_date} 17:30"))
+
             new_item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
-            expect(new_item.start_time).to eq(event_timezone_at(9))
+            expect(new_item.start_time).to eq(event_timezone_at(9,00))
           end
 
           it "unless there are preceding items, then it should use the first available slot" do
-            schedule1 = Schedule.create!(@schedule_attributes.
-                        merge(start_time: "#{@event.start_date} 09:35", end_time: "#{@event.start_date} 10:00"))
-            schedule2 = Schedule.create!(@schedule_attributes.
-                       merge(start_time: "#{@event.start_date} 09:00", end_time: "#{@event.start_date} 09:15"))
-
-            new_item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
-            expect(new_item.start_time).to eq(schedule2.end_time)
-
-            schedule3 = Schedule.create!(@schedule_attributes.
-                       merge(start_time: "#{@event.start_date} 09:15", end_time: "#{@event.start_date} 09:35"))
+            schedule1 = Schedule.create!(@schedule_attributes.merge(start_time: event_timezone_at(9,00),
+                                                                      end_time: event_timezone_at(9,15)))
+            schedule2 = Schedule.create!(@schedule_attributes.merge(start_time: event_timezone_at(9,35),
+                                                                      end_time: event_timezone_at(10,00)))
 
             new_item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
             expect(new_item.start_time).to eq(schedule1.end_time)
+
+            schedule3 = Schedule.create!(@schedule_attributes.merge(start_time: event_timezone_at(9,15),
+                                                                      end_time: event_timezone_at(9,35)))
+
+            new_item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
+            expect(new_item.start_time).to eq(schedule2.end_time)
           end
         end
 
-        context "there are scheduled lectures on other days" do
+        context "If there are scheduled lectures on other days" do
           it "should set the start_time to the most popular start time" do
-            day = @event.start_date + 1.day
-            lecture_time = day.to_time.in_time_zone(@event.time_zone).change({ hour: 14, min: 0})
+            lecture_time = second_day_at(14,00)
             lecture1 = create(:lecture, event: @event, start_time: lecture_time, end_time: lecture_time + 30.minutes)
             create(:schedule, event: @event, lecture: lecture1, start_time: lecture1.start_time, end_time: lecture1.end_time)
 
             lecture2 = create(:lecture, event: @event, start_time: lecture_time + 1.day, end_time: lecture_time + 1.day + 30.minutes)
             create(:schedule, event: @event, lecture: lecture2, start_time: lecture2.start_time, end_time: lecture2.end_time)
 
-            other_lecture_time = (lecture_time + 2.days) - 3.hours
+            other_lecture_time = event_timezone_at(11,00) + 3.days
             lecture3 = create(:lecture, event: @event, start_time: other_lecture_time, end_time: other_lecture_time + 30.minutes)
             create(:schedule, event: @event, lecture: lecture3, start_time: lecture3.start_time, end_time: lecture3.end_time)
 
-            new_lecture_day = day + 3.days
-            expect(Schedule.select {|s| s.start_time.to_date == new_lecture_day.to_date }).to be_empty
+            new_lecture_day = (lecture_time + 3.days).to_date
+            expect(Schedule.select {|s| s.start_time.to_date == new_lecture_day }).to be_empty
 
             new_item_params = @new_params.merge(start_time: new_lecture_day)
             new_item = ScheduleItem.new(new_item_params).schedule
@@ -226,17 +225,12 @@ describe "ScheduleItem" do
 
       end
 
-      context "There are scheduled Lectures on the given day," do
-        before :each do
-          @day = second_day_at_nine + 1.day
-          @event.schedule_on(@day).each do |item|
-            item.delete
-          end
-          @lecture_attributes = build(:lecture, event: @event).attributes
-          @lecture_time = @day.change({ hour: 14, min: 0})
-
-          @lecture1 = Lecture.new(@lecture_attributes.merge(start_time: @lecture_time, end_time: @lecture_time.change({ hour: 14, min: 30})))
+      context "If there are scheduled Lectures on the same day" do
+        before do
+          lecture_time = second_day_at(9,00)
+          @lecture1 = create(:lecture, event: @event, start_time: lecture_time, end_time: lecture_time + 30.minutes)
           create(:schedule, event: @event, lecture: @lecture1, start_time: @lecture1.start_time, end_time: @lecture1.end_time)
+          @day = lecture_time.to_date
         end
 
         it "it should set the start_time to the end_time of the last scheduled lecture" do
@@ -266,11 +260,8 @@ describe "ScheduleItem" do
         end
 
         context "and there is a non-lecture scheduled after the preceding lecture, but not immediately after" do
-          before do
-            @item1 = create(:schedule, event: @event, start_time: @lecture1.end_time + 60.minutes, end_time: @lecture1.end_time + 90.minutes)
-          end
-
-          it "it should set the start_time to the end_time of the previous lecture (not after the non-lecture)" do
+          it "it should set the start_time to the end_time of the previous lecture (but not after the non-lecture)" do
+            create(:schedule, event: @event, start_time: @lecture1.end_time + 3.hours, end_time: @lecture1.end_time + 4.hours)
             new_item = ScheduleItem.new(@new_params.merge(event_id: @event.id, start_time: @day)).schedule
             expect(new_item.start_time).to eq(@lecture1.end_time)
           end
