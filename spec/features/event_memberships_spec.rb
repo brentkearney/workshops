@@ -8,39 +8,10 @@ require 'rails_helper'
 
 describe 'Event Membership Page', :type => :feature do
   before do
-    @event = FactoryGirl.create(:event)
-
-    # Create some Confirmed Members
-    6.times do
-      person = FactoryGirl.create(:person)
-      membership = FactoryGirl.create(:membership, event: @event, person: person, arrival_date: @event.start_date,
-                departure_date: @event.end_date)
-    end
-    org = @event.memberships.first
-    org.role = 'Contact Organizer'
-    org.save
-    @organizer = FactoryGirl.create(:user, email: org.person.email, person: org.person)
-
-    # Create some Members with different attendance statuses
-    5.times do
-      person = FactoryGirl.create(:person)
-      membership = FactoryGirl.create(:membership, event: @event, person: person, attendance: 'Not Yet Invited')
-      user = FactoryGirl.create(:user, email: person.email, person: person)
-    end
-    3.times do
-      person = FactoryGirl.create(:person)
-      membership = FactoryGirl.create(:membership, event: @event, person: person, attendance: 'Declined')
-    end
-    2.times do
-      person = FactoryGirl.create(:person)
-      membership = FactoryGirl.create(:membership, event: @event, person: person, role: 'Observer')
-    end
-
+    @event = create(:event_with_members)
     @member = @event.memberships.where("role='Participant'").first
-    @user = FactoryGirl.create(:user, email: @member.person.email, person: @member.person)
-    expect(@user).not_to be_nil
-
-    @non_member_user = FactoryGirl.create(:user)
+    @user = create(:user, email: @member.person.email, person: @member.person)
+    @non_member_user = create(:user)
   end
 
   after(:each) do
@@ -67,15 +38,24 @@ describe 'Event Membership Page', :type => :feature do
 
   def shows_all_members
     @event.memberships.each do |member|
-      #puts "Looking for member: #{member.person.lname}, status: #{member.attendance}"
       expect(page.body).to include(member.person.lname)
     end
   end
 
+  def shows_email_buttons
+    expect(page.body).to have_css('a', text: 'Email Organizers')
+    expect(page.body).to have_css('a', text: 'Email Confirmed Members')
+  end
+
+  def hides_email_buttons
+    expect(page.body).not_to have_css('a', text: 'Email Organizers')
+    expect(page.body).not_to have_css('a', text: 'Email Confirmed Members')
+  end
+
   def shows_limited_profile(member)
-    expect(page.body).to have_css('div.profile-name', :text => "#{member.person.name}")
-    expect(page.body).to have_css('div.profile-affil', :text => "#{member.person.affil_with_title}")
-    expect(page.body).to have_css('div.profile-url', :text => "#{member.person.url}")
+    expect(page.body).to have_css('div.profile-name', text: "#{member.person.name}")
+    expect(page.body).to have_css('div.profile-affil', text: "#{member.person.affil_with_title}")
+    expect(page.body).to have_css('div.profile-url', text: "#{member.person.url}")
 
     expect(page.body).not_to include('Arriving on')
     expect(page.body).not_to include(member.arrival_date.to_s)
@@ -86,10 +66,10 @@ describe 'Event Membership Page', :type => :feature do
   end
 
   def shows_full_profile(member)
-    expect(page.body).to have_css('div.profile-name', :text => "#{member.person.name}")
-    expect(page.body).to have_css('div.profile-affil', :text => "#{member.person.affil_with_title}")
-    expect(page.body).to have_css('div.profile-email', :text => "#{member.person.email}")
-    expect(page.body).to have_css('div.profile-url', :text => "#{member.person.url}")
+    expect(page.body).to have_css('div.profile-name', text: "#{member.person.name}")
+    expect(page.body).to have_css('div.profile-affil', text: "#{member.person.affil_with_title}")
+    expect(page.body).to have_css('div.profile-email', text: "#{member.person.email}")
+    expect(page.body).to have_css('div.profile-url', text: "#{member.person.url}")
 
     expect(page.body).to include('Arriving on')
     expect(page.body).to include(member.arrival_date.to_s)
@@ -107,6 +87,10 @@ describe 'Event Membership Page', :type => :feature do
     it 'does not show member email addresses' do
       does_not_list_members
     end
+
+    it 'hides email buttons' do
+      hides_email_buttons
+    end
   end
 
   context 'As a logged-in user who is not a member of the event' do
@@ -117,6 +101,10 @@ describe 'Event Membership Page', :type => :feature do
 
     it 'shows confirmed members' do
       shows_confirmed_members
+    end
+
+    it 'hides email buttons' do
+      hides_email_buttons
     end
 
     it 'does not show non-confirmed members' do
@@ -141,6 +129,10 @@ describe 'Event Membership Page', :type => :feature do
       shows_confirmed_members
     end
 
+    it 'hides email buttons' do
+      hides_email_buttons
+    end
+
     it 'does not show non-confirmed members' do
       hides_nonconfirmed_members
     end
@@ -155,12 +147,18 @@ describe 'Event Membership Page', :type => :feature do
 
   context 'As an organizer of the event' do
     before do
-      login_as @organizer, scope: :user
+      organizer = @event.memberships.where("role='Organizer'").first.person
+      user = create(:user, email: organizer.email, person: organizer)
+      login_as user, scope: :user
       visit event_memberships_path(@event)
     end
 
     it 'shows all members of the event' do
       shows_all_members
+    end
+
+    it 'shows email buttons' do
+      shows_email_buttons
     end
 
     it 'creates sections for attendance status' do
@@ -193,6 +191,10 @@ describe 'Event Membership Page', :type => :feature do
         shows_all_members
       end
 
+      it 'shows email buttons' do
+        shows_email_buttons
+      end
+
       it 'clicking a member shows full profile information' do
         member = @event.memberships.where("role='Participant' AND attendance='Confirmed'").last
         click_link "#{member.person.lname}"
@@ -209,6 +211,10 @@ describe 'Event Membership Page', :type => :feature do
 
       it 'shows only confirmed members' do
         hides_nonconfirmed_members
+      end
+
+      it 'hides email buttons' do
+        hides_email_buttons
       end
 
       it 'clicking a member shows limited profile information, excludes the email address' do
@@ -229,6 +235,10 @@ describe 'Event Membership Page', :type => :feature do
 
     it 'shows all members of the event' do
       shows_all_members
+    end
+
+    it 'shows email buttons' do
+      shows_email_buttons
     end
 
     it 'clicking a member shows full profile information' do

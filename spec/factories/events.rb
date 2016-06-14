@@ -51,13 +51,23 @@ FactoryGirl.define do
         end
       end
     end
-
+    
     factory :event_with_members do
       after(:create) do |event|
-        create(:membership, event: event, role: 'Contact Organizer')
-        create(:membership, event: event, role: 'Organizer')
+        arrival = event.start_date
+        departure = event.end_date
+        create(:membership, event: event, role: 'Contact Organizer', arrival_date: arrival, departure_date: departure)
+        create(:membership, event: event, role: 'Organizer', arrival_date: arrival, departure_date: departure)
+        create(:membership, event: event, role: 'Observer', attendance: 'Confirmed', arrival_date: arrival, departure_date: departure)
+        create(:membership, event: event, role: 'Observer', attendance: 'Not Yet Invited')
         5.times do
-          create(:membership, event: event, role: 'Participant')
+          create(:membership, event: event, role: 'Participant', attendance: 'Confirmed', arrival_date: arrival, departure_date: departure)
+        end
+        4.times do
+          create(:membership, event: event, role: 'Participant', attendance: 'Not Yet Invited')
+        end
+        3.times do
+          membership = create(:membership, event: event, role: 'Participant', attendance: 'Declined')
         end
       end
     end

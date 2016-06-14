@@ -59,7 +59,7 @@ class EventPolicy
 
   # Allow the use of emails when they are not shared by the member
   def use_email_addresses?
-    allow_orgs_and_admins
+    @current_user.is_organizer?(@event) || allow_staff_and_admins
   end
 
   def show_invite_buttons?

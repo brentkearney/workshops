@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class MembershipPolicy
-  attr_reader :current_user, :model
+  attr_reader :current_user, :membership, :event, :model
 
   def initialize(current_user, model)
     @current_user = current_user
@@ -25,8 +25,8 @@ class MembershipPolicy
     def resolve
       memberships = current_user.person.memberships.includes(:event).sort_by {|m| m.event.start_date }
       memberships.delete_if do |m|
-          m.role == 'Backup Participant' ||
-            (m.role !~ /Organizer/ && (m.attendance == 'Declined' || m.attendance == 'Not Yet Invited'))
+        (m.role !~ /Organizer/ && (m.attendance == 'Declined' || m.attendance == 'Not Yet Invited')) ||
+            m.role == 'Backup Participant'
       end
     end
   end
@@ -45,7 +45,6 @@ class MembershipPolicy
   def invite?
     allow_staff_and_admins
   end
-
 
   private
 
