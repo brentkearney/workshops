@@ -35,6 +35,10 @@ class EventPolicy
     end
   end
 
+  def edit?
+    allow_orgs_and_staff
+  end
+  
   def show?
     if @event.template
       allow_staff_and_admins
@@ -43,8 +47,12 @@ class EventPolicy
     end
   end
 
+  def delete?
+    current_user.super_admin?
+  end
+
   def view_attendance_status?(status)
-    if allow_orgs_and_admins
+    if allow_orgs_and_staff
       true
     else
       ['Confirmed', 'Invited', 'Undecided'].include?(status)
@@ -68,7 +76,7 @@ class EventPolicy
 
   def sync?
     if @event.end_date >= Date.today && !@event.template
-      allow_orgs_and_admins unless Rails.env.test?
+      allow_orgs_and_staff unless Rails.env.test?
     end
   end
 
@@ -81,7 +89,7 @@ class EventPolicy
   end
 
   private
-
+  
   def staff_at_location
     @current_user.staff? && @current_user.location == @event.location
   end
@@ -92,7 +100,7 @@ class EventPolicy
     end
   end
 
-  def allow_orgs_and_admins
+  def allow_orgs_and_staff
     if @current_user
       @current_user.is_organizer?(@event) || @current_user.is_admin?  || staff_at_location
     end

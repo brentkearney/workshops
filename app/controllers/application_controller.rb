@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead of :exception.
   protect_from_forgery with: :exception
-  rescue_from ActionController::InvalidAuthenticityToken, :with => :invalid_auth_token
+  rescue_from ActionController::InvalidAuthenticityToken, with: :invalid_auth_token
 
   # Authorization module
   include Pundit
@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
   private
 
   def invalid_auth_token
-    render :text => 'Invalid CSRF token', :status => :unauthorized
+    render text: 'Invalid CSRF token', status: :unauthorized
   end
 
   def user_not_authorized(exception)
@@ -61,6 +61,5 @@ class ApplicationController < ActionController::Base
   def after_sign_out_path_for(resource)
     sign_in_path
   end
-
 
 end

@@ -8,11 +8,10 @@ require 'rails_helper'
 
 describe 'Event Edit Page', :type => :feature do
   before do
-    @event = FactoryGirl.create(:event)
-    person = FactoryGirl.create(:person)
-    @member = FactoryGirl.create(:membership, event: @event, person: person, role: 'Participant', attendance: 'Confirmed')
-    @user = FactoryGirl.create(:user, email: person.email, person: person)
-    @non_member_user = FactoryGirl.create(:user)
+    @event = create(:event_with_members)
+    @member = @event.memberships.where("role='Participant'").first
+    @user = create(:user, email: @member.person.email, person: @member.person)
+    @non_member_user = create(:user)
   end
 
   after(:each) do
@@ -20,47 +19,134 @@ describe 'Event Edit Page', :type => :feature do
   end
 
   def access_denied
-    expect(page.body).to have_css('div.alert.alert-alert', :text => 'You need to sign in or sign up before continuing.')
+    expect(page.body).to have_css('div.alert.alert-error.flash', text: 'Access denied.')
     expect(page.body).not_to include(@event.description)
   end
 
-  def not_ready_yet
-    expect(page.body).to have_css('div.alert.alert-error', :text => 'This functionality is not ready for you, yet.')
-    expect(page.body).not_to include(@event.description)
+  def has_edit_button
+    visit event_path(@event)
+    expect(page.body).to have_css('a', text: 'Edit Event')
   end
 
-  it 'Only allows access to admin users' do
-    visit edit_event_path(@event)
-    access_denied
+  def has_no_edit_button
+    visit event_path(@event)
+    expect(page.body).not_to have_css('a', text: 'Edit Event')
+  end
 
-    login_as @user, scope: :user
-    visit edit_event_path(@event)
-    not_ready_yet
+  def has_no_delete_button
+    expect(page.body).not_to have_css('a', text: 'Delete This Event')
+  end
 
-    @member.role = 'Organizer'
-    @member.save!
-    visit edit_event_path(@event)
-    not_ready_yet
+  context 'Not logged-in' do
+    it 'denies access' do
+      visit edit_event_path(@event)
+      expect(page.body).to have_css('div.alert.alert-alert.flash', text: 'You need to sign in or sign up before continuing.')
+      expect(current_path).to eq(user_session_path)
+    end
 
-    login_as @non_member_user, scope: :user
-    visit edit_event_path(@event)
-    not_ready_yet
+    it '#show does not have an Edit Event button' do
+      has_no_edit_button
+    end
+  end
 
-    @non_member_user.staff!
-    @non_member_user.location = @event.location
-    visit edit_event_path(@event)
-    not_ready_yet
+  context 'As a logged-in user who is not a member of the event' do
+    before do
+      login_as @non_member_user, scope: :user
+      visit edit_event_path(@event)
+    end
 
-    @non_member_user.location = 'Elsewhere'
-    visit edit_event_path(@event)
-    not_ready_yet
+    it 'denies access' do
+      access_denied
+    end
 
-    @non_member_user.admin!
-    visit edit_event_path(@event)
-    expect(page.body).not_to have_css('div.alert.alert-alert', :text => 'You need to sign in or sign up before continuing.')
-    expect(page.body).not_to have_css('div.alert.alert-error', :text => 'This functionality is not ready for you, yet.')
-    expect(page.body).to include(@event.description)
-    expect(page.body).to have_button('Update Event')
+    it '#show does not have an Edit Event button' do
+      has_no_edit_button
+    end
+  end
+
+  context 'As a logged-in user who is a member of the event' do
+    before do
+      login_as @user, scope: :user
+      visit edit_event_path(@event)
+    end
+
+    it 'denies access' do
+      access_denied
+    end
+
+    it '#show does not have an Edit Event button' do
+      has_no_edit_button
+    end
+  end
+
+  context 'As an organizer of the event' do
+    before do
+      organizer = @event.memberships.where("role='Organizer'").first.person
+      user = create(:user, email: organizer.email, person: organizer)
+      login_as user, scope: :user
+      visit edit_event_path(@event)
+    end
+
+    it 'has no Delete button' do
+      has_no_delete_button
+    end
+
+    it 'disables: code, door_code, booking_code, max_participants, name, dates, press_release' do
+      expect(page.body).to have_css('input#event_code[disabled]')
+      expect(page.body).to have_css('input#event_door_code[disabled]')
+      expect(page.body).to have_css('input#event_booking_code[disabled]')
+      expect(page.body).to have_css('input#event_max_participants[disabled]')
+      expect(page.body).to have_css('textarea#event_name[disabled]')
+      expect(page.body).not_to have_css('input#start_date')
+      expect(page.body).not_to have_css('input#end_date')
+      expect(page.body).not_to have_css('textarea#event_press_release')
+    end
+
+    it '#show has an Edit Event button' do
+      has_edit_button
+    end
+  end
+
+  context 'As a staff user' do
+    before do
+      @non_member_user.staff!
+      login_as @non_member_user, scope: :user
+    end
+
+    context 'whose location matches the event location' do
+      before do
+        @non_member_user.location = @event.location
+        @non_member_user.save!
+        visit edit_event_path(@event)
+      end
+
+      it 'has no Delete button' do
+        has_no_delete_button
+      end
+
+      it 'allows editing'
+      it 'denies editing some details'
+
+      it '#show has an Edit Event button' do
+        has_edit_button
+      end
+    end
+
+    context 'whose location does NOT match the event location' do
+      before do
+        @non_member_user.location = 'Somewhere else'
+        @non_member_user.save!
+        visit edit_event_path(@event)
+      end
+
+      it 'denies access' do
+        access_denied
+      end
+
+      it '#show does not have an Edit Event button' do
+        has_no_edit_button
+      end
+    end
   end
 
 end

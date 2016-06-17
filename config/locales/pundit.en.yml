@@ -3,8 +3,6 @@ en:
     default: 'Access denied.'
     event_policy:
       show?: 'Access to that event is restricted.'
-      edit?: 'This functionality is not ready for you, yet.'
-      update?: 'This functionality is not ready for you, yet.'
     schedule_policy:
       new?: 'Only staff and event organizers may modify the schedule.'
       create?: 'Only staff and event organizers may modify the schedule.'
