@@ -5,8 +5,9 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class EventsController < ApplicationController
-  before_action :set_event, :set_attendance, :only => [:show, :edit, :update, :destroy]
-  before_filter :authenticate_user!, :only => [:my_events, :new, :edit, :create, :update, :destroy]
+  before_action :set_event, :set_attendance, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!, only: [:my_events, :new, :edit, :create, :update, :destroy]
+  after_action :verify_policy_scoped, only: [:index, :past, :future, :year, :kind]
 
   # GET /events
   # GET /events.json
@@ -97,6 +98,7 @@ class EventsController < ApplicationController
   # GET /events/1/edit
   def edit
     authorize @event
+    @editable_fields = policy(@event).may_edit
   end
 
   # POST /events

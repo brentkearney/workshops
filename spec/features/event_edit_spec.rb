@@ -91,12 +91,12 @@ describe 'Event Edit Page', :type => :feature do
       has_no_delete_button
     end
 
-    it 'disables: code, door_code, booking_code, max_participants, name, dates, press_release' do
-      expect(page.body).to have_css('input#event_code[disabled]')
-      expect(page.body).to have_css('input#event_door_code[disabled]')
-      expect(page.body).to have_css('input#event_booking_code[disabled]')
-      expect(page.body).to have_css('input#event_max_participants[disabled]')
-      expect(page.body).to have_css('textarea#event_name[disabled]')
+    it 'excludes: code, door_code, booking_code, max_participants, name, dates, press_release' do
+      expect(page.body).not_to have_css('input#event_code')
+      expect(page.body).not_to have_css('input#event_door_code')
+      expect(page.body).not_to have_css('input#event_booking_code')
+      expect(page.body).not_to have_css('input#event_max_participants')
+      expect(page.body).not_to have_css('textarea#event_name')
       expect(page.body).not_to have_css('input#start_date')
       expect(page.body).not_to have_css('input#end_date')
       expect(page.body).not_to have_css('textarea#event_press_release')

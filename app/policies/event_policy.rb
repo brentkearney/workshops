@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class EventPolicy
-  attr_reader :current_user, :model
+  attr_reader :current_user, :event
 
   def initialize(current_user, model)
     @current_user = current_user
@@ -13,11 +13,11 @@ class EventPolicy
   end
 
   def method_missing(name, *args)
-    if @current_user
+    if current_user
       if staff_at_location
-        @event.template && name =~ /edit|update/
+        event.template && name =~ /edit|update/
       else
-        @current_user.is_admin?
+        current_user.is_admin?
       end
     end
   end
@@ -38,9 +38,27 @@ class EventPolicy
   def edit?
     allow_orgs_and_staff
   end
+
+  def may_edit
+    all_fields = event.attributes.keys - %w(id updated_by created_at updated_at confirmed_count publish_schedule)
+    case current_user.role
+      when 'admin', 'super_admin'
+        all_fields
+      when 'staff'
+        all_fields - %w(code start_date end_date location event_type time_zone max_participants template)
+      when 'member'
+        if current_user.is_organizer?(event)
+          %w(name short_name description press_release)
+        else
+          []
+        end
+      else
+        []
+    end
+  end
   
   def show?
-    if @event.template
+    if event.template
       allow_staff_and_admins
     else
       true
@@ -60,14 +78,14 @@ class EventPolicy
   end
 
   def view_email_addresses?
-    if @current_user
-      @current_user.is_member?(@event) || @current_user.is_admin? || staff_at_location
+    if current_user
+      current_user.is_member?(event) || current_user.is_admin? || staff_at_location
     end
   end
 
   # Allow the use of emails when they are not shared by the member
   def use_email_addresses?
-    @current_user.is_organizer?(@event) || allow_staff_and_admins
+    current_user.is_organizer?(event) || allow_staff_and_admins
   end
 
   def show_invite_buttons?
@@ -75,7 +93,7 @@ class EventPolicy
   end
 
   def sync?
-    if @event.end_date >= Date.today && !@event.template
+    if event.end_date >= Date.today && !event.template
       allow_orgs_and_staff unless Rails.env.test?
     end
   end
@@ -91,18 +109,18 @@ class EventPolicy
   private
   
   def staff_at_location
-    @current_user.staff? && @current_user.location == @event.location
+    current_user.staff? && current_user.location == event.location
   end
 
   def allow_staff_and_admins
-    if @current_user
-      @current_user.is_admin?  || staff_at_location
+    if current_user
+      current_user.is_admin?  || staff_at_location
     end
   end
 
   def allow_orgs_and_staff
-    if @current_user
-      @current_user.is_organizer?(@event) || @current_user.is_admin?  || staff_at_location
+    if current_user
+      current_user.is_organizer?(event) || current_user.is_admin?  || staff_at_location
     end
   end
 

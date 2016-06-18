@@ -1,115 +1,19 @@
 <%= render "shared/errors", object: @event %>
 
-<%= form_for @event, :html => { :role => "form", :class => "form" } do |f| %>
+<%= form_for @event, html: { role: 'form', class: 'form' } do |f| %>
 <fieldset>
-  <div class="row">
-    <div class='col-md-2'>
-      <div class="form-group">
-        <%= f.label "Event Code" %>
-        <%= f.text_field :code, class: 'form-control', disabled: !policy(@event).edit_all? %>
-      </div>
-    </div>
-    <div class='col-md-2'>
-      <div class="form-group">
-        <%= f.label :door_code %>
-        <%= f.text_field :door_code, class: 'form-control', disabled: !policy(@event).event_staff? %>
-      </div>
-    </div>
-    <div class='col-md-2'>
-      <div class="form-group">
-        <%= f.label "Booking code" %>
-        <%= f.text_field :booking_code, class: 'form-control', disabled: !policy(@event).event_staff? %>
-      </div>
-    </div>
-  </div>
-
-  <div class="row event-dates">
-  <% if policy(@event).edit_all? %>Q
-    <div class='col-md-3'>
-      <div class="form-group">
-        <%= f.label :start_date %>
-          <div class='input-group date' id='start_date'>
-          <input type='text' name="event[start_date]" class="form-control" value="<%= @event.start_date.strftime("%Y-%m-%d") if @event.start_date %>" />
-          <span class="input-group-addon">
-            <span class="glyphicon glyphicon-calendar"></span>
-          </span>
-        </div>
-      </div>
-    </div>
-    <div class='col-md-3'>
-      <div class="form-group">
-        <%= f.label :end_date %>
-        <div class='input-group date' id='end_date'>
-          <input type='text' name="event[end_date]" class="form-control" value="<%= @event.end_date.strftime("%Y-%m-%d") if @event.end_date %>" />
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
-        </div>
-      </div>
-    </div>
-    <% else %>
-    <div class='col-md-6'>
-      <div class="form-group">
-        <strong>Event Dates:</strong>
-        <p><%= @event.dates('long') %></p>
-      </div>
-    </div>
-    <% end %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :name %>
-    <%= f.text_area :name, class: 'form-control', disabled: !policy(@event).edit_all? %>
-  </div>
-  <div class="form-group">
-    <%= f.label "Short name (less than 67 characters) for name tags" %>
-    <%= f.text_field :short_name, class: 'form-control' %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :location %>
-    <div style="width: 6em;">
-    <%= f.select(:location, Global.location.all, {}, { class: 'form-control', disabled: !policy(@event).edit_all? }) %>
-    </div>
-  </div>
-  <div class="form-group">
-    <%= f.label :time_zone, class: "control-label" %>
-    <div class="controls" style="width: 375px;">
-      <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: 'form-control', disabled: !policy(@event).edit_all? } %>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :event_type %>
-    <div style="width: 17em;">
-      <%= f.select(:event_type, Global.event.types, {}, { class: 'form-control', disabled: !policy(@event).edit_all? }) %>
-    </div>
-  </div>
-  <div class="form-group">
-    <%= f.label :max_participants %>
-    <div style="width: 6em;">
-      <%= f.number_field :max_participants, class: 'form-control', disabled: !policy(@event).edit_all? %>
-    </div>
-  </div>
-  <div class="form-group">
-    <%= f.label :description %>
-    <%= f.text_area :description, rows: 20, class: 'form-control', disabled: !policy(@event).edit? %>
-  </div>
-  <% if policy(@event).event_staff? %>Q
-  <div class="form-group">
-    <%= f.label :press_release %>
-    <%= f.text_area :press_release, rows: 10, class: 'form-control', disabled: !policy(@event).edit? %>
-  </div>
+  <% @editable_fields.each do |field| %>
+    <%= render partial: 'event_edit_items', locals: { form: f, field_name: field } %>
   <% end %>
 
   <div class="row buttons">
     <div class="form-group">
       <%= f.submit (f.object.new_record? ? "Add New Event" : "Update Event"), class: 'btn btn-sm btn-default' %>
       <% unless f.object.new_record? %>
-        | <%= link_to "Back to Details", event_path(@event), class: 'btn btn-sm btn-default' %>
-        <% if policy(@event).delete? %>
-        | <%= link_to 'Delete This Event', event_path(@event, @schedule), method: :delete, class: 'btn btn-sm btn-default', data: { confirm: "Are you sure you want to delete #{@event.code} and all of its associated data?" } %>
-        <% end %>
+          | <%= link_to "Back to Details", event_path(@event), class: 'btn btn-sm btn-default' %>
+          <% if policy(@event).delete? %>
+              | <%= link_to 'Delete This Event', event_path(@event, @schedule), method: :delete, class: 'btn btn-sm btn-default', data: { confirm: "Are you sure you want to delete #{@event.code} and all of its associated data?" } %>
+          <% end %>
       <% end %>
     </div>
   </div>
