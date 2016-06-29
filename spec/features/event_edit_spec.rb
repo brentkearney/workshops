@@ -8,6 +8,8 @@ require 'rails_helper'
 
 describe 'Event Edit Page', type: :feature do
   before do
+    Event.destroy_all
+    Person.destroy_all
     @event = create(:event_with_members)
     @member = @event.memberships.where("role='Participant'").first
     @user = create(:user, email: @member.person.email, person: @member.person)
