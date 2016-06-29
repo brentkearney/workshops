@@ -10,7 +10,7 @@
     <div class="form-group">
       <%= f.submit (f.object.new_record? ? "Add New Event" : "Update Event"), class: 'btn btn-sm btn-default' %>
       <% unless f.object.new_record? %>
-          | <%= link_to "Back to Details", event_path(@event), class: 'btn btn-sm btn-default' %>
+          | <%= link_to 'Cancel', event_path(@event), class: 'btn btn-sm btn-default' %>
           <% if policy(@event).delete? %>
               | <%= link_to 'Delete This Event', event_path(@event, @schedule), method: :delete, class: 'btn btn-sm btn-default', data: { confirm: "Are you sure you want to delete #{@event.code} and all of its associated data?" } %>
           <% end %>

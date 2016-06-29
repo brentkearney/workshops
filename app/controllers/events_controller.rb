@@ -99,6 +99,7 @@ class EventsController < ApplicationController
   def edit
     authorize @event
     @editable_fields = policy(@event).may_edit
+    @event.short_name = @event.name.truncate(67, separator: ' ') if @event.short_name.blank?
   end
 
   # POST /events
@@ -122,8 +123,9 @@ class EventsController < ApplicationController
   # PATCH/PUT /events/1.json
   def update
     authorize @event
+    @editable_fields = policy(@event).may_edit
     respond_to do |format|
-      if @event.update(event_params.merge(:updated_by => current_user.name))
+      if @event.update(event_params.assert_valid_keys(*@editable_fields).merge(updated_by: current_user.name))
         format.html { redirect_to @event, notice: 'Event was successfully updated.' }
         format.json { render :show, status: :ok, location: @event }
       else

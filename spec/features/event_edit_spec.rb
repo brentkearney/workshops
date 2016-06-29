@@ -6,7 +6,7 @@
 
 require 'rails_helper'
 
-describe 'Event Edit Page', :type => :feature do
+describe 'Event Edit Page', type: :feature do
   before do
     @event = create(:event_with_members)
     @member = @event.memberships.where("role='Participant'").first
@@ -23,16 +23,6 @@ describe 'Event Edit Page', :type => :feature do
     expect(page.body).not_to include(@event.description)
   end
 
-  def has_edit_button
-    visit event_path(@event)
-    expect(page.body).to have_css('a', text: 'Edit Event')
-  end
-
-  def has_no_edit_button
-    visit event_path(@event)
-    expect(page.body).not_to have_css('a', text: 'Edit Event')
-  end
-
   def has_no_delete_button
     expect(page.body).not_to have_css('a', text: 'Delete This Event')
   end
@@ -42,10 +32,6 @@ describe 'Event Edit Page', :type => :feature do
       visit edit_event_path(@event)
       expect(page.body).to have_css('div.alert.alert-alert.flash', text: 'You need to sign in or sign up before continuing.')
       expect(current_path).to eq(user_session_path)
-    end
-
-    it '#show does not have an Edit Event button' do
-      has_no_edit_button
     end
   end
 
@@ -57,11 +43,9 @@ describe 'Event Edit Page', :type => :feature do
 
     it 'denies access' do
       access_denied
+      expect(current_path).to eq(my_events_path)
     end
 
-    it '#show does not have an Edit Event button' do
-      has_no_edit_button
-    end
   end
 
   context 'As a logged-in user who is a member of the event' do
@@ -72,10 +56,7 @@ describe 'Event Edit Page', :type => :feature do
 
     it 'denies access' do
       access_denied
-    end
-
-    it '#show does not have an Edit Event button' do
-      has_no_edit_button
+      expect(current_path).to eq(my_events_path)
     end
   end
 
@@ -84,26 +65,42 @@ describe 'Event Edit Page', :type => :feature do
       organizer = @event.memberships.where("role='Organizer'").first.person
       user = create(:user, email: organizer.email, person: organizer)
       login_as user, scope: :user
+      @allowed_fields = %w(short_name description press_release)
+      @not_allowed_fields = %w(name code door_code booking_code max_participants start_date end_date)
       visit edit_event_path(@event)
+    end
+
+    it 'allows access' do
+      expect(current_path).to eq(edit_event_path(@event))
     end
 
     it 'has no Delete button' do
       has_no_delete_button
     end
 
-    it 'excludes: code, door_code, booking_code, max_participants, name, dates, press_release' do
-      expect(page.body).not_to have_css('input#event_code')
-      expect(page.body).not_to have_css('input#event_door_code')
-      expect(page.body).not_to have_css('input#event_booking_code')
-      expect(page.body).not_to have_css('input#event_max_participants')
-      expect(page.body).not_to have_css('textarea#event_name')
-      expect(page.body).not_to have_css('input#start_date')
-      expect(page.body).not_to have_css('input#end_date')
-      expect(page.body).not_to have_css('textarea#event_press_release')
+    it 'excludes disallowed fields' do
+      @not_allowed_fields.each do |field|
+        expect(page.body).not_to have_field("event[#{field}]")
+      end
     end
 
-    it '#show has an Edit Event button' do
-      has_edit_button
+    it 'includes allowed fields' do
+      @allowed_fields.each do |field|
+        expect(page.body).to have_field("event[#{field}]")
+      end
+    end
+
+    it 'updates the allowed fields' do
+      @allowed_fields.each do |field|
+        page.fill_in "event_#{field}", with: 'Some new text'
+      end
+
+      click_button 'Update Event'
+
+      event = Event.find(@event.id)
+      @allowed_fields.each do |field|
+        expect(event.send(field)).to eq('Some new text')
+      end
     end
   end
 
@@ -111,6 +108,8 @@ describe 'Event Edit Page', :type => :feature do
     before do
       @non_member_user.staff!
       login_as @non_member_user, scope: :user
+      @allowed_fields = %w(short_name description press_release door_code booking_code)
+      @not_allowed_fields = %w(name code max_participants start_date end_date time_zone location template)
     end
 
     context 'whose location matches the event location' do
@@ -120,15 +119,24 @@ describe 'Event Edit Page', :type => :feature do
         visit edit_event_path(@event)
       end
 
+      it 'allows access' do
+        expect(current_path).to eq(edit_event_path(@event))
+      end
+
       it 'has no Delete button' do
         has_no_delete_button
       end
 
-      it 'allows editing'
-      it 'denies editing some details'
+      it 'excludes disallowed fields' do
+        @not_allowed_fields.each do |field|
+          expect(page.body).not_to have_field("event[#{field}]")
+        end
+      end
 
-      it '#show has an Edit Event button' do
-        has_edit_button
+      it 'includes allowed fields' do
+        @allowed_fields.each do |field|
+          expect(page.body).to have_field("event[#{field}]")
+        end
       end
     end
 
@@ -142,11 +150,52 @@ describe 'Event Edit Page', :type => :feature do
       it 'denies access' do
         access_denied
       end
+    end
+  end
 
-      it '#show does not have an Edit Event button' do
-        has_no_edit_button
+  context 'As an admin user' do
+    before do
+      @non_member_user.admin!
+      login_as @non_member_user, scope: :user
+      @allowed_fields = %w(short_name description press_release door_code booking_code name code max_participants start_date end_date time_zone location template)
+      @not_allowed_fields = %w(id updated_by created_at updated_at confirmed_count publish_schedule)
+      visit edit_event_path(@event)
+    end
+
+    it 'allows access' do
+      expect(current_path).to eq(edit_event_path(@event))
+    end
+
+    it 'has no Delete button' do
+      has_no_delete_button
+    end
+
+    it 'excludes disallowed fields' do
+      @not_allowed_fields.each do |field|
+        expect(page.body).not_to have_field("event[#{field}]")
+      end
+    end
+
+    it 'includes allowed fields' do
+      @allowed_fields.each do |field|
+        expect(page.body).to have_field("event[#{field}]")
       end
     end
   end
 
+  context 'As a super-admin user' do
+    before do
+      @non_member_user.super_admin!
+      login_as @non_member_user, scope: :user
+      visit edit_event_path(@event)
+    end
+
+    it 'allows access' do
+      expect(current_path).to eq(edit_event_path(@event))
+    end
+
+    it 'has a Delete button' do
+      expect(page.body).to have_css('a', text: 'Delete This Event')
+    end
+  end
 end

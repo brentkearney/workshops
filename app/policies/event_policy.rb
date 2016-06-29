@@ -35,6 +35,10 @@ class EventPolicy
     end
   end
 
+  def update?
+    allow_orgs_and_staff
+  end
+
   def edit?
     allow_orgs_and_staff
   end
@@ -45,10 +49,10 @@ class EventPolicy
       when 'admin', 'super_admin'
         all_fields
       when 'staff'
-        all_fields - %w(code start_date end_date location event_type time_zone max_participants template)
+        all_fields - %w(code name start_date end_date location event_type time_zone max_participants template)
       when 'member'
         if current_user.is_organizer?(event)
-          %w(name short_name description press_release)
+            %w(short_name description press_release)
         else
           []
         end

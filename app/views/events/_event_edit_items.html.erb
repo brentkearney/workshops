@@ -1,8 +1,17 @@
 <div class="row">
   <div class='col-md-12'>
     <div class="form-group">
-      <%= form.label "#{field_name.titleize}" %>
-      <%= form.text_field field_name.to_sym, class: 'form-control' %>
+      <% if field_name == 'short_name' %>
+        <%= form.label 'Event Name to appear on name tags (must be under 68 characters)' %>
+        <%= form.text_field field_name, maxlength: 67, class: 'form-control' %>
+      <% else %>
+        <%= form.label "#{field_name.titleize}" %>
+        <% if %w(description press_release).include?(field_name) %>
+          <%= form.text_area field_name, rows: 12, class: 'form-control' %>
+        <% else %>
+          <%= form.text_field field_name, class: 'form-control' %>
+        <% end %>
+      <% end %>
     </div>
   </div>
 </div>
