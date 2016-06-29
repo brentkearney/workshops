@@ -313,7 +313,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'denies access, redirects with error' do
           get :new, { event_id: @event.id }
 
-          expect(response).to redirect_to(root_path)
+          expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
         end
       end
@@ -333,7 +333,7 @@ RSpec.describe MembershipsController, type: :controller do
 
           get :edit, { event_id: @event.id, id: membership.id }
 
-          expect(response).to redirect_to(root_path)
+          expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
         end
       end
@@ -353,7 +353,7 @@ RSpec.describe MembershipsController, type: :controller do
 
           post :create, { event_id: @event.id, membership: membership.attributes }
 
-          expect(response).to redirect_to(root_path)
+          expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
         end
       end
@@ -373,7 +373,7 @@ RSpec.describe MembershipsController, type: :controller do
 
           patch :update, { event_id: @event.id, id: membership.id }
 
-          expect(response).to redirect_to(root_path)
+          expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
         end
       end
@@ -393,7 +393,7 @@ RSpec.describe MembershipsController, type: :controller do
 
           delete :destroy, { event_id: @event.id, id: membership.id }
 
-          expect(response).to redirect_to(root_path)
+          expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
         end
       end

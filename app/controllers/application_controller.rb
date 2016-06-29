@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html {
         flash[:error] = t "#{policy_name}.#{exception.query}", scope: "pundit", default: :default
-        redirect_to (request.referrer || root_path)
+        redirect_to (request.referrer || my_events_path)
       }
       format.json { head 403 }
     end
