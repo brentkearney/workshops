@@ -6,13 +6,12 @@
 
 require 'rails_helper'
 
-describe 'Event Show Page', :type => :feature do
+describe 'Event Show Page', type: :feature do
   before do
-    @event = FactoryGirl.create(:event)
-    person = FactoryGirl.create(:person)
-    @member = FactoryGirl.create(:membership, event: @event, person: person, role: 'Participant', attendance: 'Confirmed')
-    @user = FactoryGirl.create(:user, email: person.email, person: person)
-    @non_member_user = FactoryGirl.create(:user)
+    @event = create(:event_with_members)
+    @member = @event.memberships.where("role='Participant'").first
+    @user = create(:user, email: @member.person.email, person: @member.person)
+    @non_member_user = create(:user)
   end
 
   after(:each) do
@@ -20,7 +19,7 @@ describe 'Event Show Page', :type => :feature do
   end
 
   def shows_partial_details
-    expect(page.body).to have_css('h4.event-details', :text => "Event Details")
+    expect(page.body).to have_css('h4.event-details', text: "Event Details")
     expect(page.body).to have_text(@event.code)
     expect(page.body).to have_text(@event.name)
     expect(page.body).to have_text(@event.location)
@@ -126,13 +125,8 @@ describe 'Event Show Page', :type => :feature do
       shows_full_details
     end
 
-    it 'has no edit button' do
-      has_no_edit_button
-    end
-
-
-    it 'has schedule button' do
-      has_schedule_button
+    it 'has edit button' do
+      has_edit_button
     end
   end
 
@@ -154,12 +148,8 @@ describe 'Event Show Page', :type => :feature do
         expect(page.body).to have_text(@event.booking_code)
       end
 
-      it 'has no edit button' do
-        has_no_edit_button
-      end
-
-      it 'has schedule button' do
-        has_schedule_button
+      it 'has edit button' do
+        has_edit_button
       end
     end
 
