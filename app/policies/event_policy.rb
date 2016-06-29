@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class EventPolicy
-  attr_reader :current_user, :event
+  attr_reader :current_user, :event, :model
 
   def initialize(current_user, model)
     @current_user = current_user
