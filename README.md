@@ -1,34 +1,32 @@
 # Workshops
 
-"Workshops" is a niche application for managing scientific (or other) workshops. 
+"Workshops" is a web-based conference/workshop management application, built with [Ruby on Rails](http://rubyonrails.org). 
 A _workshop_ is like a conference, only with less people, typically experts in a subject
-domain who are sharing research with their peers.
-
-**This application is in the early stages of development.**
-
-I will set up a live demo site soon, and provide installation/deployment instructions
-as well.
+domain who are invited to an event to share their research with peers. This software is intended for institutions/organizations
+who host workshops.
 
 ### Current Features
 * Workshop data is imported via calls to an external API.
 * Role-based access control allowing different levels of privilege between admin, staff, organizers and participants.
-* Staff and admin users can login. Workshop organizers can signup and login.
-* Shows index listings of all events, future events, past events, events by location.
-* Background jobs to update event memberships from external data source.
+* Staff and admin users can login, and Workshop organizers can signup and login.
+* Shows index listings of all events, future events, past events, events by location, and by year.
+* Background jobs to update event membership data from external data source.
 * Shows workshop members, plus their details to varying degrees depending on user's privilege level.
 * Staff & organizers can click a button to send email all to workshop participants.
 * Staff can edit events if the staff user's location matches the event location.
+* Organizers can edit some of their event's data.
 * Staff can edit default workshop schedule templates.
 * Organizers can easily edit and publish the schedules of their workshop(s).
 * Staff get email notifications when schedules of currently running workshops are updated.
 * Default times for new schedule items are estimated based on previous schedule entries, to reduce data entry time.
-* Authenticated JSON API for [an external system](http://www.birs.ca/facilities/automated-video) to update lecture records.
-* Public access to workshop schedules via JSON.
+* Authenticated JSON API for [an external video recording system](http://www.birs.ca/facilities/automated-video) to update lecture records.
+* Public access to workshop event information and schedules via JSON.
 
 ### Future Features:
+* Application settings to be stored in the database, with UI for staff/admin to change them.
 * Staff and admin can create new events.
 * Staff and Organizers can add and invite members to their workshop.
-* Invitations include a one-click RSVP link, allowing members to setup profiles, etc..
+* Invitations will include a one-click RSVP link, allowing members to setup profiles, etc..
 * Staff can assign hotel rooms and manage other hospitality details for workshop participants.
 * Admin users can manage other users (add/remove/change passwords, etc) .
 * An email system to facilitate communication between various parties, including email templates and scheduled sending.
