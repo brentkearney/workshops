@@ -203,9 +203,10 @@ RSpec.describe "Model validations: Event ", type: :model do
     m1 = create(:membership, event: e, person: p1, role: 'Contact Organizer')
     m2 = create(:membership, event: e, person: p2, role: 'Organizer')
 
-    expect(e.organizers).to include("#{p1.name} (#{p1.affiliation})")
-    expect(e.organizers).to include("#{p2.name} (#{p2.affiliation})")
-    
+    organizers = e.organizers
+    expect(organizers).to include("#{p1.name} (#{p1.affiliation})")
+    expect(organizers).to include("#{p2.name} (#{p2.affiliation})")
+
     e.destroy
   end
 

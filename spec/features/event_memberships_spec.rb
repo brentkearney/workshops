@@ -6,7 +6,7 @@
 
 require 'rails_helper'
 
-describe 'Event Membership Page', :type => :feature do
+describe 'Event Membership Page', type: :feature do
   before do
     @event = create(:event_with_members)
     @member = @event.memberships.where("role='Participant'").first
