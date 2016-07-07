@@ -62,9 +62,7 @@ module PersonDecorators
   def uri
     uri = url
     unless uri.blank?
-      if uri !~ /^http/
-        uri = 'http://' + uri
-      end
+      uri = 'http://' + uri if uri !~ /^http/
     end
     uri
   end

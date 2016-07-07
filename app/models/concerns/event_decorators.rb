@@ -62,7 +62,7 @@ module EventDecorators
   
   def confirmed_members
     members = []
-    memberships.joins(:person).where("attendance = 'Confirmed'").order("role ASC, lastname").each do |m|
+    memberships.joins(:person).where("attendance = 'Confirmed'").order("lastname").each do |m|
       p = m.person
       member = {}
       member['firstname'] = p.firstname
