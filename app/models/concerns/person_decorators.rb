@@ -59,4 +59,14 @@ module PersonDecorators
     gender == 'M' ? 'his' : 'her'
   end
 
+  def uri
+    uri = url
+    unless uri.blank?
+      if uri !~ /^http/
+        uri = 'http://' + uri
+      end
+    end
+    uri
+  end
+
 end

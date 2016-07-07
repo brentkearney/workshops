@@ -82,6 +82,7 @@ class EventsController < ApplicationController
   # GET /events/1.json
   def show
     @organizers = @event.organizers
+    @members = @event.confirmed_members
     if @event
       authorize(@event) # only staff see template events
       SyncEventMembersJob.perform_later(@event) if policy(@event).sync?

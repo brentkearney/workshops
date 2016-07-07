@@ -8,46 +8,46 @@ require 'rails_helper'
 
 RSpec.describe "Model validations: Person", type: :model do
   it "has valid factory" do
-    expect(FactoryGirl.create(:person)).to be_valid
+    expect(create(:person)).to be_valid
   end
 
   it 'requires a firstname' do
-    p = FactoryGirl.build(:person, firstname: '')
+    p = build(:person, firstname: '')
     expect(p.valid?).to be_falsey
   end
 
   it "requires a lastname" do
-    p = FactoryGirl.build(:person, lastname: '')
+    p = build(:person, lastname: '')
     expect(p.valid?).to be_falsey
   end
 
   it "requires an email" do
-    p = FactoryGirl.build(:person, email: '')
+    p = build(:person, email: '')
     expect(p.valid?).to be_falsey
   end
 
   it "requires a gender" do
-    p = FactoryGirl.build(:person, gender: '')
+    p = build(:person, gender: '')
     expect(p.valid?).to be_falsey
   end
 
   it "requires an affiliation" do
-    p = FactoryGirl.build(:person, affiliation: '')
+    p = build(:person, affiliation: '')
     expect(p.valid?).to be_falsey
   end
 
   it "requires a unique, case insensitive email address" do
-    person1 = FactoryGirl.create(:person)
+    person1 = create(:person)
     expect(person1).not_to be_nil
 
-    person2 = FactoryGirl.build(:person, email: person1.email.upcase)
+    person2 = build(:person, email: person1.email.upcase)
     expect(person2.valid?).to be_falsey
     expect(person2.errors[:email].first).to eq("has already been taken")
   end
   
   context 'Decorator functions' do
     before do
-      @person = FactoryGirl.create(:person)
+      @person = create(:person)
     end
     
     it ".name returns 'firstname lastname'" do
@@ -131,24 +131,18 @@ RSpec.describe "Model validations: Person", type: :model do
         expect(@person.his_her).to eq('her')
       end
     end
+
+    context '.uri' do
+      it 'if url is valid, returns it' do
+        expect(@person.uri).to eq(@person.url)
+      end
+
+      it 'if url is missing protocol, prepends it' do
+        @person.url = 'google.com'
+        @person.save
+
+        expect(@person.uri).to eq('http://google.com')
+      end
+    end
   end
-
-
-  #it "should have an is_admin? method that returns true if person is an admin user and false otherwise"
-  # do
-  #   person = FactoryGirl.create(:person)
-  #   Account.create!(account_attributes(person:person))
-  #
-  #   expect(person.is_admin?).to be(false)
-  #   person.account.admin_level = 5
-  #   person.save!
-  #   expect(person.is_admin?).to be(true)
-  # end
-
-  # describe "Synchronizes with Legacy Database (ldb)" do
-  #   it "uses existing ldb record, if one exists, instead of creating a new one"
-  #   it "adds new records to ldb, if they don't already exist"
-  #   it "updates ldb version of record, unless it is newer"
-  #   it "updates local record when ldb record is updated"
-  # end
 end

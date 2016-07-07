@@ -54,10 +54,24 @@ module EventDecorators
       organizer['firstname'] = p.firstname
       organizer['lastname'] = p.lastname
       organizer['affiliation'] = p.affiliation
-      organizer['url'] = p.url
+      organizer['url'] = p.uri
       organizers.push(organizer)
     end
     organizers
+  end
+  
+  def confirmed_members
+    members = []
+    memberships.joins(:person).where("attendance = 'Confirmed'").order("role ASC, lastname").each do |m|
+      p = m.person
+      member = {}
+      member['firstname'] = p.firstname
+      member['lastname'] = p.lastname
+      member['affiliation'] = p.affiliation
+      member['url'] = p.uri
+      members.push(member)
+    end
+    members
   end
 
   def dates(format = 'short')
