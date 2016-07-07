@@ -49,9 +49,15 @@ module EventDecorators
   def organizers
     organizers = []
     memberships.joins(:person).where("role LIKE '%Org%'").order("role ASC, lastname").each do |member|
-      organizers.push("#{member.person.name} (#{member.person.affiliation})")
+      p = member.person
+      organizer = {}
+      organizer['firstname'] = p.firstname
+      organizer['lastname'] = p.lastname
+      organizer['affiliation'] = p.affiliation
+      organizer['url'] = p.url
+      organizers.push(organizer)
     end
-    organizers.join('|').split('|')
+    organizers
   end
 
   def dates(format = 'short')
