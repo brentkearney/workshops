@@ -6,15 +6,18 @@
 
 module EventsHelper
 
-  def get_description
-    if @event.description.blank?
-      if policy(@event).event_staff?
-        description << %q( Please set one by clicking the "Edit Event" button! )
+  def get_text(field)
+    if field.blank?
+      field = ''
+      if policy(@event).edit?
+        field << %q( Please set one by clicking the "Edit Event" button! )
       else
-        description = 'No description is set.'
+        field = 'No description is set.'
       end
     else
-      simple_format(@event.description).gsub(/<br><br>/, '').html_safe
+      field = simple_format(field).gsub(/<br><br>/, '').html_safe
     end
+    field
   end
+
 end

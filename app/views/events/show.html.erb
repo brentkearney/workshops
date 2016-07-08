@@ -62,17 +62,34 @@
  </div>
  <!-- /.table-responsive -->
 
- <div id="event-description">
-   <h5>Event Description:</h5>
-   <div id="text">
-     <%= get_description %>
-   </div>
- </div>
+<div class="row" id="event-description">
+  <div class="col-lg-6">
+      <h5>Event Description:</h5>
+  </div>
+  <div class="col-lg-6 event-edit-icon">
+    <%= link_to ' Edit', edit_event_path(@event), class: 'fa fa-pencil-square-o' %>
+  </div>
+  <div class="col-lg-12">
+       <%= get_text(@event.description) %>
+  </div>
+</div>
+
+<div class="row" id="event-press-release">
+  <div class="col-lg-6">
+    <h5>Event Press Release:</h5>
+  </div>
+  <div class="col-lg-6 event-edit-icon">
+    <%= link_to ' Edit', edit_event_path(@event), class: 'fa fa-pencil-square-o' %>
+  </div>
+  <div class="col-lg-12">
+    <%= get_text(@event.press_release) %>
+  </div>
+</div>
 
   <% if user_signed_in? && policy(@event).edit? %>
   <div class="row buttons">
     <div class="form-group">
-    <%= link_to 'Edit Event', edit_event_path(@event), class: 'btn btn-sm btn-default' %>
+    <%= link_to 'Edit Event Details', edit_event_path(@event), class: 'btn btn-sm btn-default' %>
     </div>
   </div>
   <% else %>
