@@ -196,18 +196,20 @@ RSpec.describe "Model validations: Event ", type: :model do
     e.destroy
   end
   
-  it ".organizers returns organizer names and afilliations" do
+  it ".member_info returns hash of names and afilliations" do
     e = create(:event)
     p1 = create(:person)
     p2 = create(:person)
     m1 = create(:membership, event: e, person: p1, role: 'Contact Organizer')
     m2 = create(:membership, event: e, person: p2, role: 'Organizer')
 
-    organizers = e.organizers
-    expect(organizers[0]['lastname']).to eq("#{p1.lastname}")
-    expect(organizers[0]['affiliation']).to eq("#{p1.affiliation}")
-    expect(organizers[1]['lastname']).to eq("#{p2.lastname}")
-    expect(organizers[1]['affiliation']).to eq("#{p2.affiliation}")
+    e.members.each do |person|
+      info = e.member_info(person)
+      expect(info['firstname']).to eq(person.firstname)
+      expect(info['lastname']).to eq(person.lastname)
+      expect(info['affiliation']).to eq(person.affiliation)
+      expect(info['url']).to eq(person.url)
+    end
 
     e.destroy
   end

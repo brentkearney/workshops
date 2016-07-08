@@ -46,32 +46,13 @@ module EventDecorators
     self.num_attendance(status) > 0
   end
 
-  def organizers
-    organizers = []
-    memberships.joins(:person).where("role LIKE '%Org%'").order("role ASC, lastname").each do |member|
-      p = member.person
-      organizer = {}
-      organizer['firstname'] = p.firstname
-      organizer['lastname'] = p.lastname
-      organizer['affiliation'] = p.affiliation
-      organizer['url'] = p.uri
-      organizers.push(organizer)
-    end
-    organizers
-  end
-  
-  def confirmed_members
-    members = []
-    memberships.joins(:person).where("attendance = 'Confirmed'").order("lastname").each do |m|
-      p = m.person
-      member = {}
-      member['firstname'] = p.firstname
-      member['lastname'] = p.lastname
-      member['affiliation'] = p.affiliation
-      member['url'] = p.uri
-      members.push(member)
-    end
-    members
+  def member_info(person)
+    person_profile = {}
+    person_profile['firstname'] = person.firstname
+    person_profile['lastname'] = person.lastname
+    person_profile['affiliation'] = person.affiliation
+    person_profile['url'] = person.uri
+    person_profile
   end
 
   def dates(format = 'short')

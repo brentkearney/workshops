@@ -81,10 +81,14 @@ class EventsController < ApplicationController
   # GET /events/1
   # GET /events/1.json
   def show
-    @organizers = @event.organizers
-    @members = @event.confirmed_members
     if @event
       authorize(@event) # only staff see template events
+      @organizers = []
+      @members = []
+      @event.memberships.includes(:person).each do |member|
+        @organizers << @event.member_info(member.person) if member.role =~ /Organizer/
+        @members << @event.member_info(member.person) if member.attendance == 'Confirmed'
+      end
       SyncEventMembersJob.perform_later(@event) if policy(@event).sync?
     else
       redirect_to root_path, error: 'No valid event specified.'
