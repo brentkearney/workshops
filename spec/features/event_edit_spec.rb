@@ -157,7 +157,7 @@ describe 'Event Edit Page', type: :feature do
     before do
       @non_member_user.admin!
       login_as @non_member_user, scope: :user
-      @allowed_fields = %w(short_name description press_release door_code booking_code name code max_participants start_date end_date time_zone location template)
+      @allowed_fields = %w(short_name description press_release door_code booking_code name code max_participants start_date end_date time_zone location)
       @not_allowed_fields = %w(id updated_by created_at updated_at confirmed_count publish_schedule)
       visit edit_event_path(@event)
     end
