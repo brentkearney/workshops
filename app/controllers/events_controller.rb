@@ -106,7 +106,6 @@ class EventsController < ApplicationController
     authorize @event
     @editable_fields = policy(@event).may_edit
     @edit_form = current_user.is_admin? ? 'admin_form' : 'member_form'
-    @event.short_name = @event.name.truncate(67, separator: ' ') if @event.short_name.blank?
   end
 
   # POST /events

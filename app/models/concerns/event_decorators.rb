@@ -113,7 +113,7 @@ module EventDecorators
   end
 
   def is_upcoming?
-    (start_date.to_time.to_i - Time.now.to_i) >= 7.days.to_i
+    (start_date.to_time.to_i - Time.now.to_i) <= 7.days.to_i
   end
 
 end
