@@ -85,7 +85,7 @@ class StaffMailer < ApplicationMailer
     @updated_by = params[:updated_by]
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
     @event_url = Global.config.events_url + '/' + event.code
-    @workshops_url = event_path(event)
+    @workshops_url = event_url(event)
 
     to_email = Global.email.locations.send(event.location).event_updates
     subject = "[#{event.code}] Event updated!"
@@ -94,13 +94,14 @@ class StaffMailer < ApplicationMailer
   end
 
   def nametag_update(original_event: event, params: params)
-    @event = original_event
+    event = original_event
     @short_name = params[:short_name]
     @updated_by = params[:updated_by]
-    @event_name = "#{@event.code}: #{@event.name}\n#{@event}"
+    @event_name = "#{event.code}: #{event.name} (#{event.dates})"
+    @workshops_url = event_url(event)
 
-    to_email = Global.email.locations.send(@event.location).name_tags
-    subject = "[#{@event.code}] Name tag change notice!"
+    to_email = Global.email.locations.send(event.location).name_tags
+    subject = "[#{event.code}] Name tag change notice!"
 
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
   end
