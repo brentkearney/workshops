@@ -50,8 +50,8 @@ RSpec.describe StaffMailer, type: :mailer do
 
   describe '.schedule_change' do
     let(:event) { build(:event) }
-    let(:original_schedule) { build(:schedule, name: 'Original name') }
-    let(:new_schedule) { build(:schedule, name: 'New name') }
+    let(:original_schedule) { build(:schedule, event: event, name: 'Original name') }
+    let(:new_schedule) { build(:schedule, event: event, name: 'New name') }
 
     before :each do
       StaffMailer.schedule_change(original_schedule, type: :update, user: 'Test User', updated_schedule: new_schedule).deliver_now
@@ -63,6 +63,40 @@ RSpec.describe StaffMailer, type: :mailer do
 
     it 'To: schedule_staff' do
       expect(ActionMailer::Base.deliveries.first.to).to match_array(Global.email.locations.send(event.location).schedule_staff.split(', '))
+    end
+  end
+
+  describe '.nametag_update' do
+    let(:event) { build(:event) }
+
+    before :each do
+      params = { short_name: 'Shorter name' }
+      StaffMailer.nametag_update(original_event: event, params: params).deliver_now
+    end
+
+    it 'sends email' do
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+    end
+
+    it 'To: nametag_updates' do
+      expect(ActionMailer::Base.deliveries.first.to).to match_array(Global.email.locations.send(event.location).name_tags.split(', '))
+    end
+  end
+
+  describe '.event_update' do
+    let(:event) { build(:event) }
+
+    before :each do
+      params = { description: 'New description', press_release: 'New press release' }
+      StaffMailer.event_update(original_event: event, params: params).deliver_now
+    end
+
+    it 'sends email' do
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+    end
+
+    it 'To: event_updates' do
+      expect(ActionMailer::Base.deliveries.first.to).to match_array(Global.email.locations.send(event.location).event_updates.split(', '))
     end
 
   end

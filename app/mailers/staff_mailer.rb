@@ -80,4 +80,28 @@ class StaffMailer < ApplicationMailer
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1, template_name: 'notify_sysadmin')
   end
 
+  def event_update(original_event: event, params: params)
+    event = original_event
+    @updated_by = params[:updated_by]
+    @event_name = "#{event.code}: #{event.name} (#{event.dates})"
+    @event_url = Global.config.events_url + '/' + event.code
+    @workshops_url = event_path(event)
+
+    to_email = Global.email.locations.send(event.location).event_updates
+    subject = "[#{event.code}] Event updated!"
+
+    mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
+  end
+
+  def nametag_update(original_event: event, params: params)
+    @event = original_event
+    @short_name = params[:short_name]
+    @updated_by = params[:updated_by]
+    @event_name = "#{@event.code}: #{@event.name}\n#{@event}"
+
+    to_email = Global.email.locations.send(@event.location).name_tags
+    subject = "[#{@event.code}] Name tag change notice!"
+
+    mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
+  end
 end

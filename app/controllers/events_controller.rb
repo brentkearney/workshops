@@ -130,9 +130,15 @@ class EventsController < ApplicationController
   # PATCH/PUT /events/1.json
   def update
     authorize @event
+
+    original_event = @event.dup
     @editable_fields = policy(@event).may_edit
+    @edit_form = current_user.is_admin? ? 'admin_form' : 'member_form'
+    update_params = event_params.assert_valid_keys(*@editable_fields).merge(updated_by: current_user.name)
+
     respond_to do |format|
-      if @event.update(event_params.assert_valid_keys(*@editable_fields).merge(updated_by: current_user.name))
+      if @event.update(update_params)
+        notify_staff(event: original_event, params: update_params)
         format.html { redirect_to @event, notice: 'Event was successfully updated.' }
         format.json { render :show, status: :ok, location: @event }
       else
@@ -154,6 +160,13 @@ class EventsController < ApplicationController
   end
 
   private
+
+    def notify_staff(event: original_event, params: update_params)
+      if params[:short_name] != event.short_name
+        StaffMailer.nametag_update(event: event, params: params).deliver_now if event.is_upcoming?
+      end
+      StaffMailer.event_update(event: event, params: params).deliver_now
+    end
 
     def event_params
       params.require(:event).permit(:code, :name, :short_name, :start_date, :end_date, :time_zone, :event_type, :location, :description, :press_release, :max_participants, :door_code, :booking_code, :updated_by)
