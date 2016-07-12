@@ -84,7 +84,7 @@ class StaffMailer < ApplicationMailer
     event = original_event
     @updated_by = params[:updated_by]
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
-    @event_url = Global.config.events_url + '/' + event.code
+    @event_url = Global.config.event_url + '/' + event.code
     @workshops_url = event_url(event)
 
     to_email = Global.email.locations.send(event.location).event_updates

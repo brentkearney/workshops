@@ -1,7 +1,8 @@
 # Rename to config.yml and customize
 default:
   legacy_person: 'https://www.example.com/db/?section=Updates&sub=person&id='
-  events: 'http://www.example.com/events'
+  events_url: 'http://www.example.com/events'
+  event_url: 'http://www.example.com/event'
   title: 'Workshop Manager'
   logo_file: 'logo.png'
   legacy_api: 'https://database.example.com/api/your_api_key'
