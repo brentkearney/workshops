@@ -242,6 +242,8 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
+    rollbar (2.12.0)
+      multi_json
     rspec-core (3.4.2)
       rspec-support (~> 3.4.0)
     rspec-expectations (3.4.0)
@@ -292,8 +294,6 @@ GEM
       rubyzip (~> 1.0)
       websocket (~> 1.0)
     sexp_processor (4.7.0)
-    skylight (0.10.3)
-      activesupport (>= 3.0.0)
     spring (1.6.3)
     sprockets (3.5.2)
       concurrent-ruby (~> 1.0)
@@ -372,12 +372,12 @@ DEPENDENCIES
   pundit
   rails (= 4.2.4)
   rest-client
+  rollbar
   rspec-rails
   sass-rails
   sdoc
   seed_dump
   selenium-webdriver
-  skylight
   spring
   sqlite3
   sucker_punch
@@ -386,4 +386,4 @@ DEPENDENCIES
   web-console
 
 BUNDLED WITH
-   1.12.3
+   1.12.5
