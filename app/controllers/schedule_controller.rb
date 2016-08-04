@@ -8,7 +8,7 @@ class ScheduleController < ApplicationController
   before_action :set_schedule, only: [:show, :update, :destroy]
   before_action :set_event, :set_attendance, :set_time_zone
 
-  before_filter :authenticate_user!, :except => [:index]
+  before_filter :authenticate_user!, except: [:index]
   after_filter :flash_notice, only: [:create, :update, :edit]
 
   # GET /events/:event_id/schedule

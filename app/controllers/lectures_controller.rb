@@ -5,30 +5,15 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class LecturesController < ApplicationController
-  before_action :set_lecture, only: [:show, :edit, :update, :destroy]
-  before_action :set_time_zone, only: [:create, :update]
-  before_filter :authenticate_user! #, :except => [:index, :show]
+  before_action :set_event, :set_time_zone
+  before_action :set_lecture, only: [:update, :destroy]
+  before_filter :authenticate_user!, except: [:index]
 
-  # GET /lectures
-  # GET /lectures.json
+  # GET /events/:event_id/lectures
+  # GET /events/:event_id/lectures.json
   def index
-    @lectures = Lecture.all
-  end
-
-  # GET /lectures/1
-  # GET /lectures/1.json
-  def show
-  end
-
-  # GET /lectures/new
-  def new
-    @lecture = Lecture.new
-    authorize @lecture
-  end
-
-  # GET /lectures/1/edit
-  def edit
-    authorize @lecture
+    redirect_to event_schedule_index_path(@event) if request.format.html?
+    @lectures = Lecture.where(event: @event)
   end
 
   # POST /lectures

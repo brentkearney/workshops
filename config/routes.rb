@@ -32,9 +32,9 @@ Rails.application.routes.draw do
     get 'schedule/send/videos' => 'schedule#send_video_filenames'
     post 'schedule/publish_schedule' => 'schedule#publish_schedule'
     resources :schedule
-    #resources :lectures
     resources :memberships
     put 'memberships/invite/:id' => 'memberships#invite', as: :memberships_invite
+    get 'lectures' => 'lectures#index'
   end
 
   # API
