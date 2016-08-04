@@ -74,7 +74,7 @@
   <% end %>
 
   <% if user_signed_in? && @event.location == 'CMO' %>
-  <div class="row" id="send_video_button">
+  <div class="row dont-print" id="send_video_button">
     <div class="col-md-3 col-md-offset-9">
     <%= link_to "Send Video Filenames to #{@event.location}", event_schedule_send_videos_path(@event), class: 'btn btn-sm btn-default add-item' %>
     </div>
