@@ -15,7 +15,7 @@
       </div>
   <% else %>
     <% @event.days.each do |day| %>
-      <div class="row day-table<%= ' first-day' if day == @event.days.first %>">
+      <div class="row day-table<%= ' dont-print' if skip_day?(day) %>">
         <div class="col-lg-12">
           <div class="panel panel-default">
             <div class="panel-heading table-heading">

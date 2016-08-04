@@ -4,13 +4,17 @@ body {
   -webkit-print-color-adjust: exact;
 }
 
+header {
+  position: running(header);
+}
+
 @page {
-  size: 8.5in 11in;
-  margin: 2cm;
+  size: auto;
+  @top-left { content: element(header); }
 }
 
 nav, .footer, .add-item-buttons, .delete-item-buttons,
-.first-day, .bottom-buttons, .fa-toggle-down {
+.dont-print, .bottom-buttons, .fa-toggle-down {
   display: none;
 }
 
