@@ -28,10 +28,10 @@ module ScheduleHelpers
   end
 
   def times_within_event
-    schedule_start = start_time.to_time.in_time_zone(self.event.time_zone).to_i
-    schedule_end = end_time.to_time.in_time_zone(self.event.time_zone).to_i
-    event_start = event.start_date.to_time.in_time_zone(self.event.time_zone).to_i
-    event_end = event.end_date.to_time.in_time_zone(self.event.time_zone).change({ hour: 15 }).to_i
+    schedule_start = start_time.to_time.in_time_zone(event.time_zone).to_i
+    schedule_end = end_time.to_time.in_time_zone(event.time_zone).to_i
+    event_start = event.start_date.to_time.in_time_zone(event.time_zone).to_i
+    event_end = event.end_date.to_time.in_time_zone(event.time_zone).change({ hour: 17 }).to_i
 
     if schedule_start < event_start || schedule_start > event_end
       errors.add(:start_time, "- must be within the event dates")
