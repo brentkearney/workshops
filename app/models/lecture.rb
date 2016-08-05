@@ -7,7 +7,7 @@
 class Lecture < ActiveRecord::Base
   belongs_to :event
   belongs_to :person
-  has_one :schedule, :dependent => :destroy
+  has_one :schedule, dependent: :destroy
 
   before_save :clean_data
   after_save :update_legacy_db
@@ -36,12 +36,12 @@ class Lecture < ActiveRecord::Base
     if Rails.env.production?
       lc = LegacyConnector.new
       remote_id = lc.add_lecture(self)
-      self.update_column('legacy_id', remote_id) unless self.legacy_id == remote_id
+      self.update_column(:legacy_id, remote_id) unless self.legacy_id == remote_id
     end
   end
 
   def delete_from_legacy_db
-    unless Rails.env.test?
+    if Rails.env.production?
       lc = LegacyConnector.new
       lc.delete_lecture(self.legacy_id)
     end

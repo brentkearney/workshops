@@ -95,16 +95,19 @@ class LegacyConnector
     JSON.parse(RestClient.get "#{@rest_url}/get_lecture/#{legacy_id}")
   end
 
+  # get legacy_id of a given lecture
   def get_lecture_id(lecture)
     day = lecture.start_time.strftime("%Y-%m-%d")
-    JSON.parse(RestClient.get "#{@rest_url}/new_lecture_id/#{lecture.event.code}/#{day}/#{lecture.id}")
+    lecture_hash = JSON.parse(RestClient.get "#{@rest_url}/new_lecture_id/#{lecture.event.code}/#{day}/#{lecture.id}")
+    lecture_hash["legacy_id"].to_i
   end
 
   # add a lecture
   def add_lecture(lecture)
     event_id = lecture.event.code
     lecture.person_id = lecture.person.legacy_id
-    JSON.parse(RestClient.post "#{@rest_url}/add_lecture/#{event_id}", lecture.to_json, :content_type => :json, :accept => :json)
+    lecture_hash = JSON.parse(RestClient.post "#{@rest_url}/add_lecture/#{event_id}", lecture.to_json, content_type: :json, accept: :json)
+    lecture_hash["legacy_id"].to_i
   end
 
   def delete_lecture(lecture_id)
@@ -113,7 +116,7 @@ class LegacyConnector
 
   # send a report of lectures and video filenames for given event
   def send_lectures_report(event_id)
-    RestClient.post "#{@rest_url}/send_lectures_report/#{event_id}", 1, :content_type => :json, :accept => :json
+    RestClient.post "#{@rest_url}/send_lectures_report/#{event_id}", 1, content_type: :json, accept: :json
   end
 
 end
