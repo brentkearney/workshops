@@ -13,7 +13,7 @@ class LecturesController < ApplicationController
   # GET /events/:event_id/lectures.json
   def index
     redirect_to event_schedule_index_path(@event) if request.format.html?
-    @lectures = @event.lectures.includes(:person)
+    @lectures = @event.lectures.includes(:person).order(:start_time)
   end
 
   # POST /lectures
