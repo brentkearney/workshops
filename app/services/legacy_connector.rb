@@ -63,7 +63,7 @@ class LegacyConnector
   # add new member to event
   def add_member(membership:, event_code:, person:, updated_by:)
     remote_membership = membership.attributes.merge('workshop_id' => "#{event_code}", 'person' => person.as_json, 'updated_by' => "#{updated_by}")
-    JSON.parse(RestClient.post "#{@rest_url}/add_member/#{event_code}", remote_membership.to_json, :content_type => :json, :accept => :json)
+    JSON.parse(RestClient.post "#{@rest_url}/add_member/#{event_code}", remote_membership.to_json, content_type: :json, accept: :json)
   end
 
   # add new members to event
@@ -79,7 +79,7 @@ class LegacyConnector
     add_member(membership, event_id, legacy_id, updated_by) # add_member updates existing memberships
     remote_person = person.attributes.merge('updated_by' => "#{updated_by}")
     remote_person.delete("legacy_id")
-    JSON.parse(RestClient.post "#{@rest_url}/update_person/#{legacy_id}", remote_person.to_json, :content_type => :json, :accept => :json)
+    JSON.parse(RestClient.post "#{@rest_url}/update_person/#{legacy_id}", remote_person.to_json, content_type: :json, accept: :json)
   end
 
   # update an event's members
@@ -106,8 +106,8 @@ class LegacyConnector
   def add_lecture(lecture)
     event_id = lecture.event.code
     lecture.person_id = lecture.person.legacy_id
-    lecture_hash = JSON.parse(RestClient.post "#{@rest_url}/add_lecture/#{event_id}", lecture.to_json, content_type: :json, accept: :json)
-    lecture_hash["legacy_id"].to_i
+    RestClient.post "#{@rest_url}/add_lecture/#{event_id}", lecture.to_json, content_type: :json, accept: :json
+    get_lecture_id(lecture)
   end
 
   def delete_lecture(lecture_id)
