@@ -162,11 +162,11 @@ class EventsController < ApplicationController
 
     def notify_staff(event: original_event, params: update_params)
       if params[:short_name] != event.short_name
-        StaffMailer.nametag_update(original_event: event, params: params).deliver_now if event.is_upcoming?
+        StaffMailer.nametag_update(original_event: event, args: params).deliver_now if event.is_upcoming?
       end
 
       if params[:description] != event.description || params[:press_release] != event.press_release
-        StaffMailer.event_update(original_event: event, params: params).deliver_now
+        StaffMailer.event_update(original_event: event, args: params).deliver_now
       end
     end
 

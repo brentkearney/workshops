@@ -36,7 +36,7 @@ RSpec.describe ScheduleController, type: :controller do
           start_time = (@event.start_date + 1.days).to_time.in_time_zone(@event.time_zone).change({ hour: hour, min:0})
           end_time = (@event.start_date + 1.days).to_time.in_time_zone(@event.time_zone).change({ hour: hour, min:30})
           name = "Schedule Item at #{hour}"
-          FactoryGirl.create(:schedule, event: @event, start_time: start_time, end_time: end_time, name: name)
+          create(:schedule, event: @event, start_time: start_time, end_time: end_time, name: name)
         end
         expect(@event.schedules).not_to be_empty
       end
@@ -56,15 +56,26 @@ RSpec.describe ScheduleController, type: :controller do
         expect(subject).to redirect_to(sign_in_path)
       end
 
-      it 'if event.publish_schedule is true, assigns @schedules' do
+      it 'if event.publish_schedule is true, it assigns @schedules' do
         @event.publish_schedule = true
         @event.save
 
-        get :index, { :event_id => @event.id }
+        get :index, event_id: @event.id
 
         expect(response.status).to eq(200)
         expect(response).to render_template('index')
         expect(assigns(:schedules)).not_to be_empty
+      end
+
+      it 'if event.publish_schedule is true, but @schedules is empty, it redirects to sign-in' do
+        @event.publish_schedule = true
+        @event.schedules.delete_all
+        @event.save
+
+        get :index, format: :html, event_id: @event.id
+
+        expect(response.status).to eq(302)
+        expect(subject).to redirect_to(sign_in_path)
       end
 
     end

@@ -31,7 +31,7 @@ module ScheduleHelper
   end
 
   def skip_day?(day)
-    day == @event.days.first && @current_user.is_staff? && @event.location == 'BIRS'
+    day == @event.days.first && @current_user && @current_user.is_staff? && @event.location == 'BIRS'
   end
 
 end

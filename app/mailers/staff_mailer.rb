@@ -80,9 +80,9 @@ class StaffMailer < ApplicationMailer
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1, template_name: 'notify_sysadmin')
   end
 
-  def event_update(original_event: event, params: params)
+  def event_update(original_event: event, args: params)
     event = original_event
-    @updated_by = params[:updated_by]
+    @updated_by = args[:updated_by]
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
     @event_url = Global.config.event_url + '/' + event.code
     @workshops_url = event_url(event)
@@ -93,10 +93,10 @@ class StaffMailer < ApplicationMailer
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
   end
 
-  def nametag_update(original_event: event, params: params)
+  def nametag_update(original_event: event, args: params)
     event = original_event
-    @short_name = params[:short_name]
-    @updated_by = params[:updated_by]
+    @short_name = args[:short_name]
+    @updated_by = args[:updated_by]
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
     @workshops_url = event_url(event)
 

@@ -171,11 +171,12 @@ describe "LegacyConnector", :type => :feature do
 
   it '#add_lecture' do
     lecture = build(:lecture)
-    stub_rest_client(:post, ['666'])
+    stub_rest_client(:post, nil)
+    allow(RestClient).to receive(:get).and_return({ legacy_id: 666 }.to_json)
 
     results = @lc.add_lecture(lecture)
 
-    expect(results.first.to_i).to be > 0
+    expect(results).to eq(666)
   end
 
   context '#delete_lecture' do
