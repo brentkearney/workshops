@@ -75,7 +75,13 @@ class StaffMailer < ApplicationMailer
 
   def notify_sysadmin(event, error)
     to_email = Global.email.system_administrator
-    subject = "[#{event.code}] (#{event.location}) error from #{error.object.class}"
+
+    if event.nil?
+      subject = "Workshops error!"
+    else
+      subject = "[#{event.code}] (#{event.location}) error from #{error.object.class}"
+    end
+
     @message = error.object.inspect.to_s + "\n\n" + error.message.to_s
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1, template_name: 'notify_sysadmin')
   end

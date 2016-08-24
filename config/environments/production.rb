@@ -80,8 +80,6 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { protocol: 'https', :host => 'workshops.birs.ca' }
 
   ## SMTP Settings
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
@@ -90,7 +88,7 @@ Rails.application.configure do
     :enable_starttls_auto => ENV['EMAIL_STARTTLS']
   }
 
-  # Devise should only use SSL
+  # Devise should always use SSL
   config.to_prepare { Devise::SessionsController.force_ssl }
   config.to_prepare { Devise::RegistrationsController.force_ssl }
   config.to_prepare { Devise::PasswordsController.force_ssl }

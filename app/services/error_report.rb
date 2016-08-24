@@ -76,8 +76,13 @@ class ErrorReport
             end
           end
         end
-
         StaffMailer.event_sync(@event, error_messages).deliver_now
+      else
+        # Iterate over Errors hash, send report for each type of error
+        errors.each do |string, array|
+          error_object = errors[string].shift
+          StaffMailer.notify_sysadmin(@event, error_object).deliver_now
+        end
     end
   end
 
