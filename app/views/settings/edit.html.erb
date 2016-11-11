@@ -1,0 +1,11 @@
+<%= render "settings_nav" %>
+<div class="tab">
+  <%= form_for(@setting, url: setting_path(@setting.var), method: 'patch') do |f| %>
+    <% @setting.value.each do |field, data| %>
+      <label><%= field %></label>
+      <p><%= f.text_field :field, size: 50, value: data %></p>
+    <% end %>
+  <%= f.submit %>
+  <% end %>
+</div>
+

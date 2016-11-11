@@ -1,0 +1,13 @@
+@import "colours";
+
+h1.app-settings {
+  margin-bottom: 1em;
+}
+
+.tab {
+  border-left: 1px solid;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  border-color: $light-border;
+  padding: 1em;
+}

@@ -1,0 +1,16 @@
+<h1 class="app-settings">Application Settings</h1>
+
+<ul class="nav nav-tabs">
+    <li id="profile" class="<%= 'active' if action_name == 'index' %>">
+      <%= link_to 'My Profile', settings_path %>
+    </li>
+    <% @settings.each_key do |key| %>
+      <li id="<%= key %>" class="<%= 'active' if key == params[:id] %>">
+        <%= link_to key.titleize, edit_setting_path(key),
+          data: { toggle: 'tooltip' } %>
+      </li>
+    <% end %>
+    <li id="new" class="<%= 'active' if action_name == 'new' %>">
+      <a href="#">Add New Setting</a>
+    </li>
+</ul>

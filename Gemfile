@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.4'
+gem 'rails', '4.2.7'
 gem 'pg'
 gem 'sass-rails'
 gem 'bootstrap-sass'
@@ -24,8 +24,10 @@ gem 'devise-encryptable'
 gem 'devise_invitable'
 gem 'pundit'
 gem 'sucker_punch'
-gem 'global'
 gem 'passenger'
+gem 'global'
+gem 'rails-settings-cached'
+
 
 group :development, :test do
   gem 'byebug'
@@ -41,10 +43,10 @@ group :test do
   gem 'database_cleaner'
 end
 
-group :production do
-  gem 'newrelic_rpm'
-  gem 'rollbar'
-end
+# group :production do
+#   gem 'newrelic_rpm'
+#   gem 'rollbar'
+# end
 
 group :development do
   gem 'sqlite3'

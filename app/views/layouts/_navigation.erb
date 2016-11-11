@@ -20,6 +20,7 @@
       </a>
       <ul class="dropdown-menu dropdown-user">
         <% if user_signed_in? %>
+            <li><%= link_to ' Settings', settings_path, class: 'fa fa-gear fw' %></li>
             <li><%= link_to ' Change Password', edit_user_registration_path, class: 'fa fa-gear fw' %></li>
             <li class="divider"></li>
             <li><%= link_to " Sign Out", sign_out_path, method: :delete, class: 'fa fa-sign-out fw' %></li>
