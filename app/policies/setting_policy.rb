@@ -9,15 +9,12 @@ class SettingPolicy
 
   def initialize(current_user, model)
     @current_user = current_user
-    # Rails.logger.debug "***************************************************"
-    # Rails.logger.debug "SettingPolicy received model: #{model}"
-    # Rails.logger.debug "***************************************************"
     @setting = model.nil? ? Setting.new : model
   end
 
-  # def edit?
-  #   current_user.is_admin?
-  # end
+  def edit?
+    current_user.is_admin?
+  end
 
   def method_missing(name, *args)
     current_user.is_admin?

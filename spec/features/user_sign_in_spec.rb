@@ -6,21 +6,24 @@
 
 require 'rails_helper'
 
-describe 'Visitor SignIn', :type => :feature do
+describe 'SignIn', type: :feature do
   before do
     @person = create(:person)
     @password = Faker::Internet.password(12)
-    @user = create(:user, password: @password, password_confirmation: @password, person: @person)
+    @user = create(:user, password: @password, password_confirmation:
+      @password, person: @person)
     @user.confirmed_at = Time.now
     @user.save
     expect(@user).to be_valid
     expect(@user.person).to eq(@person)
 
     @event = create(:event)
-    @membership = create(:membership, event: @event, person: @person, attendance: 'Invited')
+    @membership = create(:membership, event: @event, person: @person,
+      attendance: 'Invited')
   end
 
   before :each do
+    logout(@user)
     visit sign_in_path
   end
 
@@ -35,7 +38,7 @@ describe 'Visitor SignIn', :type => :feature do
     expect(page.body).to have_text('Signed in successfully')
   end
 
-  it "The character case of the email does not matter" do
+  it 'The character case of the email does not matter' do
     fill_in 'Email', with: @user.email.upcase
     fill_in 'Password', with: @password
 
@@ -44,30 +47,29 @@ describe 'Visitor SignIn', :type => :feature do
     expect(page.body).to have_text('Signed in successfully')
   end
 
-  it 'Denies a user to login with incorrect credentials' do
+  it 'Denies a user with incorrect credentials' do
     fill_in 'Email', with: 'nonsense@foo.bar'
     fill_in 'Password', with: @password
     click_button 'Sign in'
     expect(page.body).not_to have_text('Signed in successfully')
-    expect(page.body).to have_text('Invalid email or password')
+    expect(page.body).to have_text('Invalid Email or password')
 
     fill_in 'Email', with: @user.email
     fill_in 'Password', with: 'Rubbish'
     click_button 'Sign in'
     expect(page.body).not_to have_text('Signed in successfully')
-    expect(page.body).to have_text('Invalid email or password')
+    expect(page.body).to have_text('Invalid Email or password')
 
     fill_in 'Email', with: 'nonsense@foo.bar'
     fill_in 'Password', with: 'Rubbish'
     click_button 'Sign in'
     expect(page.body).not_to have_text('Signed in successfully')
-    expect(page.body).to have_text('Invalid email or password')
+    expect(page.body).to have_text('Invalid Email or password')
   end
 
   it 'Denies logins to non-admin users who have no memberships' do
     @user.member!
     @person.memberships.destroy_all
-    expect(@user.person.memberships).to be_empty
 
     fill_in_form
     expect(page.body).not_to have_text('Signed in successfully')
@@ -78,7 +80,8 @@ describe 'Visitor SignIn', :type => :feature do
     @user.member!
     @user.person.memberships.destroy_all
     expect(@user.person.memberships).to be_empty
-    m = create(:membership, person: @user.person, attendance: 'Not Yet Invited', role: 'Participant')
+    m = create(:membership, person: @user.person,
+      attendance: 'Not Yet Invited', role: 'Participant')
     visit sign_in_path
     fill_in_form
     expect(page.body).not_to have_text('Signed in successfully')
@@ -89,7 +92,8 @@ describe 'Visitor SignIn', :type => :feature do
     @user.member!
     @user.person.memberships.destroy_all
     event = create(:event, future: true)
-    membership = create(:membership, event: event, person: @user.person, attendance: 'Declined', role: 'Organizer')
+    membership = create(:membership, event: event,
+      person: @user.person, attendance: 'Declined', role: 'Organizer')
 
     visit sign_in_path
     fill_in_form
@@ -108,11 +112,12 @@ describe 'Visitor SignIn', :type => :feature do
     expect(current_path).to eq(welcome_path)
   end
 
-  it 'Forwards users with no current events to My Events (so they see their past events)' do
+  it 'Forwards users with no current events to My Events' do
     @user.member!
     @user.person.memberships.destroy_all
     event = create(:event, past: true)
-    create(:membership, person: @user.person, event: event, attendance: 'Confirmed')
+    create(:membership, person: @user.person, event: event,
+       attendance: 'Confirmed')
 
     visit sign_in_path
     fill_in_form
@@ -121,3 +126,4 @@ describe 'Visitor SignIn', :type => :feature do
     expect(current_path).to eq(my_events_path)
   end
 end
+

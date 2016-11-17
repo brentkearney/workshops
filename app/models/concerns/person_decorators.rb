@@ -38,7 +38,7 @@ module PersonDecorators
   def him
     self.gender == 'M' ? 'him' : 'her'
   end
-  
+
   def affil
     affil = String.new(affiliation)
     affil << ", #{department}" unless department.blank?

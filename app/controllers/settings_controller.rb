@@ -10,11 +10,12 @@ class SettingsController < ApplicationController
 
   def index
     @settings = Setting.get_all
+    @person = current_user.person
   end
 
   def edit
-    @settings = Setting.get_all
     authorize @setting
+    @settings = Setting.get_all
   end
 
   def update

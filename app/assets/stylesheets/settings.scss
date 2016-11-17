@@ -1,4 +1,9 @@
 @import "colours";
+@import "memberships.scss";
+
+.profile {
+  margin-bottom: 1em;
+}
 
 h1.app-settings {
   margin-bottom: 1em;
@@ -10,4 +15,22 @@ h1.app-settings {
   border-bottom: 1px solid;
   border-color: $light-border;
   padding: 1em;
+}
+
+.profile-name {
+  display: inline;
+  padding-bottom: 0.8em;
+}
+
+.profile-edit {
+  display: inline;
+}
+
+th {
+  text-align: right;
+  width: 13em;
+}
+
+td {
+  vertical-align: middle;
 }
