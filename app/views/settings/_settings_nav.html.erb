@@ -11,6 +11,6 @@
       </li>
     <% end %>
     <li id="new" class="<%= 'active' if action_name == 'new' %>">
-      <a href="#">Add New Setting</a>
+      <%= link_to 'Add Setting', new_setting_path if policy(Setting).new? %>
     </li>
 </ul>

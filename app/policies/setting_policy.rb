@@ -12,6 +12,10 @@ class SettingPolicy
     @setting = model.nil? ? Setting.new : model
   end
 
+  def new?
+    current_user.is_admin?
+  end
+
   def edit?
     current_user.is_admin?
   end

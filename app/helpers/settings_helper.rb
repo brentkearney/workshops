@@ -16,8 +16,8 @@ module SettingsHelper
     address << person.address3 + "<br />\n" unless person.address3.blank?
     address << person.city unless person.city.blank?
     address << ', ' + person.region unless person.region.blank?
-    address << ', ' + person.postal_code unless person.postal_code.blank?
-    address << "<br />\n" + person.country unless person.postal_code.blank?
+    address << '  ' + person.postal_code unless person.postal_code.blank?
+    address << "<br />\n" + person.country unless person.country.blank?
     address
   end
 end
