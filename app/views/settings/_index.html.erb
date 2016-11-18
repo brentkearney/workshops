@@ -1,0 +1,58 @@
+<div class="tab col-md-12 profile">
+  <div class="row">
+    <div class="md-col-2 profile-name"><%= @person.name %></div>
+    <div class="md-col-10 buttons profile-edit">
+      <%= link_to 'Edit Profile', edit_setting_path(@person), class: 'btn btn-sm btn-default' %>
+    </div>
+  </div>
+
+  <div class="row table-responsive profile-details">
+    <table class="table">
+      <tr>
+        <th>Gender:</th><td><%= @person.gender %></td>
+      </tr>
+      <tr>
+        <th>Email:</th><td><%= @person.email %></td>
+      </tr>
+      <tr>
+        <th>Cc Email:</th><td><%= @person.cc_email %></td>
+      </tr>
+      <tr>
+        <th>URI:</th><td><%= person_url(@person) %></td>
+      </tr>
+      <tr>
+        <th>Phone:</th><td><%= @person.phone %></td>
+      </tr>
+      <tr>
+        <th>Address:</th><td><%= person_address(@person) %></td>
+      </tr>
+      <tr>
+        <th>Affiliation:</th><td><%= @person.affiliation %></td>
+      </tr>
+      <tr>
+        <th>Department:</th><td><%= @person.department %></td>
+      </tr>
+      <tr>
+        <th>Title:</th><td><%= @person.title %></td>
+      </tr>
+      <tr>
+        <th>Academic Status:</th><td><%= @person.academic_status %></td>
+      </tr>
+      <tr>
+        <th>Year of Ph.D.:</th><td><%= @person.phd_year %></td>
+      </tr>
+      <tr>
+        <th>Research Areas:</th><td><%= @person.research_areas %></td>
+      </tr>
+      <tr>
+        <th>Emergency Contact:</th><td><%= @person.emergency_contact %></td>
+      </tr>
+      <tr>
+        <th>Emergency Phone:</th><td><%= @person.emergency_phone %></td>
+      </tr>
+      <tr>
+        <th>Biography:</th><td><%= @person.biography %></td>
+      </tr>
+    </table>
+  </div>
+</div>
