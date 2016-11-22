@@ -23,8 +23,10 @@ class SettingsController < ApplicationController
   end
 
   def update
-    if @setting.value != params[:setting][:value]
-        @setting.value = params[:setting][:value]
+    authorize @setting
+    updated_setting = update_params["#{@setting.var}"]
+    if @setting.value != updated_setting
+        @setting.value = updated_setting
         @setting.save
         redirect_to settings_path, notice: 'Setting has been updated.'
       else
@@ -53,8 +55,22 @@ class SettingsController < ApplicationController
 
   private
 
-  def setting_params
-    params.require(:setting).permit(:var, :value)
+  def update_params
+    setting_fields = []
+    @setting.value.each do |field_name, value|
+      setting_fields << field_name
+    end
+    params.require(:setting).permit("#{@setting.var}": setting_fields)
   end
 
+  def setting_params
+    data = params.require(:setting).permit(:var, :value)
+    data['var'] = data['var'].to_s.strip
+    if data['value'] =~ /^\[(.+)\]$/
+      data['value'] = data['value'].gsub(/^\[|\]$/, '').split(',')
+    elsif data['value'].respond_to?(:to_unsafe_h)
+      data['value'] = data['value'].to_unsafe_h
+    end
+    data
+  end
 end

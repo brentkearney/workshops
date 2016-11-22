@@ -1,11 +1,13 @@
 <%= render "settings_nav" %>
 <div class="tab">
-  <%= form_for(@setting, url: setting_path(@setting.var), method: 'patch') do |f| %>
-    <% @setting.value.each do |field, data| %>
-      <label><%= field %></label>
-      <p><%= f.text_field :field, size: 50, value: data %></p>
+  <%= form_for(@setting, url: setting_path(@setting.var), method: 'patch') do |setting_form| %>
+    <% @setting.value.each do |field_name, data| %>
+      <label><%= field_name.to_s.titleize %></label>
+      <p><%= setting_form.fields_for @setting.var do |field_form| %>
+        <%= field_form.text_field field_name, value: data, class: 'form-control' %></p>
+        <% end %>
     <% end %>
-  <%= f.submit %>
+    <%= setting_form.submit 'Update Settings', class: 'btn btn-default' %>
   <% end %>
 </div>
 
