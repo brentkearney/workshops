@@ -2,10 +2,10 @@
 <div class="tab">
   <%= form_for(@setting, url: setting_path(@setting.var), method: 'patch') do
     |setting_form| %>
-    <% @setting.value.each do |field_name, data| %>
+    <% @setting.value.each do |field_name, field_value| %>
       <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
       <p><%= setting_form.fields_for @setting.var do |field_form| %>
-        <%= field_form.text_field field_name, value: data,
+        <%= field_form.text_field field_name, value: field_value.to_s,
           class: 'form-control' %></p>
         <% end %>
     <% end %>
@@ -21,6 +21,8 @@
           <div class="form-group">
             <label for="new_field">Field value:</label>
             <%= field_form.text_field :new_value, class: 'form-control' %>
+            <span id="helpBlock1" class="help-block">For arrays, use:
+            [One, Two, 3, four]</span>
           </div>
         </div>
       </div>
