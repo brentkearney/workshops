@@ -9,19 +9,24 @@ class SettingsController < ApplicationController
   before_action :get_setting, only: [:edit, :update]
   before_action :get_settings
 
+  # GET /settings
   def index
     @person = current_user.person
   end
 
+  # GET /settings/:id/edit
   def edit
     authorize @setting
   end
 
+  # GET /settings/new
   def new
     @setting = Setting.new
     authorize @setting
+    # @setting_sections = Setting.all.map {|s| [s.var, s.id] }
   end
 
+  # PATCH /settings
   def update
     authorize @setting
 
@@ -35,16 +40,27 @@ class SettingsController < ApplicationController
     end
   end
 
+  # POST /settings
   def create
     @setting = Setting.new(setting_params)
     authorize @setting
     if @setting.save
       redirect_to settings_path, notice: %(Added "#{@setting.var}" setting!)
     else
-      flash[:error] = %(Error saving setting: #{setting.errors})
+      flash[:error] = %(Error saving setting: #{@setting.errors})
       render :new
     end
   end
+
+  # POST /settings/delete
+  def delete
+    setting = Setting.find(delete_params['id'])
+    authorize setting
+    setting.destroy
+    redirect_to settings_path, notice: %(Deleted "#{setting.var_was}" setting!)
+  end
+
+  private
 
   def get_setting
     @setting = Setting.find_by(var: params[:id]) ||
@@ -55,7 +71,6 @@ class SettingsController < ApplicationController
     @settings = Setting.get_all
   end
 
-  private
 
   def update_values
     updated_setting = update_params
@@ -77,14 +92,13 @@ class SettingsController < ApplicationController
   end
 
   def setting_params
-    data = params.require(:setting).permit(:var, :value)
+    data = params.require(:setting).permit(:var)
     data['var'] = data['var'].to_s.strip
     data['value'] = {}
-    # if data['value'] =~ /^\[(.+)\]$/
-    #   data['value'] = data['value'].gsub(/^\[|\]$/, '').split(',')
-    # elsif data['value'].respond_to?(:to_unsafe_h)
-    #   data['value'] = data['value'].to_unsafe_h
-    # end
     data
+  end
+
+  def delete_params
+    params.require(:setting).permit(:id)
   end
 end

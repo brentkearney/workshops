@@ -3,7 +3,7 @@
   <%= form_for(@setting, url: setting_path(@setting.var), method: 'patch') do
     |setting_form| %>
     <% @setting.value.each do |field_name, data| %>
-      <label><%= field_name.to_s.titleize %></label>
+      <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
       <p><%= setting_form.fields_for @setting.var do |field_form| %>
         <%= field_form.text_field field_name, value: data,
           class: 'form-control' %></p>
@@ -13,7 +13,7 @@
     <%= setting_form.fields_for @setting.var do |field_form| %>
       <div class="panel panel-default">
         <div class="panel-body">
-          <h4>Add New "<%= @setting.var %>" Field:</h4>
+          <h4>Add New "<%= @setting.var.titleize %>" Field:</h4>
           <div class="form-group">
             <label for="new_field">Field name:</label>
             <%= field_form.text_field :new_field, class: 'form-control' %>

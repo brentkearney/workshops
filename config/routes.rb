@@ -38,6 +38,7 @@ Rails.application.routes.draw do
   end
 
   resources :settings
+  post 'settings/delete' => 'settings#delete'
 
   # Errors
   match "/404", :to => "errors#not_found", via: :all

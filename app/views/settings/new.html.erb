@@ -1,21 +1,55 @@
 <%= render "settings_nav" %>
 <div class="tab col-md-12 new-setting">
-<%= form_for @setting, class: 'form-horizontal' do |f| %>
-<fieldset>
-<div id="setting-name" class="form-group">
-  <%= f.label :var, 'Setting Name:', class: 'col-sm-2 control-label' %>
-  <div class="col-sm-10">
-    <%= f.text_field :var, class: 'form-control' %>
-    <span id="helpBlock1" class="help-block">
-      Enter the name of the new setting
-    </span>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <h4 class="panel-heading">Add New Setting</h4>
+      <%= form_for @setting, method: :create, class: 'form-horizontal' do |f| %>
+      <fieldset>
+      <div id="setting-name" class="form-group">
+        <%= f.label :var, 'Setting Name:', class: 'col-sm-2 control-label' %>
+        <div class="col-sm-10">
+          <%= f.text_field :var, class: 'form-control' %>
+          <span id="helpBlock1" class="help-block">
+            Enter the name of the new setting
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <%= button_tag 'Add Setting', class: 'btn btn-default' %>
+        </div>
+      </div>
+      </fieldset>
+      <% end %>
+    </div>
   </div>
-</div>
-<div class="form-group">
-  <div class="col-sm-offset-2 col-sm-10">
-    <%= button_tag 'Add Setting', class: 'btn btn-default' %>
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <h4 class="panel-heading">Delete Setting</h4>
+      <%= form_for @setting, url: settings_delete_path,
+            html: { method: :post, id: 'delete-setting',
+            class: 'form-horizontal' } do |f| %>
+      <fieldset>
+      <div id="setting-name" class="form-group">
+        <%= f.label :var, 'Setting Name:', class: 'col-sm-2 control-label' %>
+        <div class="col-sm-10">
+          <%= f.collection_select :id, Setting.all, :id, :var, {},
+            {class: 'form-control'} %>
+          <span id="helpBlock1" class="help-block">
+            Select the setting to be removed. All settings within that section
+            will be permanently deleted. <strong>Warning: There is no
+            confirmation step!</strong>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <%= button_tag 'Delete Setting', class: 'btn btn-default' %>
+        </div>
+      </div>
+      </fieldset>
+      <% end %>
+    </div>
   </div>
-</div>
-</fieldset>
-<% end %>
 </div>

@@ -42,8 +42,8 @@ describe 'Settings page', type: :feature do
       expect(page.body).to have_link('Edit Profile')
     end
 
-    it 'has no "Add Setting" link for non-admin users' do
-      expect(page.body).not_to have_link('Add Setting')
+    it 'has no "+/- Setting" link for non-admin users' do
+      expect(page.body).not_to have_link('+/- Setting')
     end
   end
 
@@ -54,30 +54,75 @@ describe 'Settings page', type: :feature do
       login_as @user, scope: :user
     end
 
-    it 'has an "Add Setting" link' do
+    it 'has an "+/- Setting" link' do
       visit settings_path
 
-      expect(page.body).to have_link('Add Setting')
+      expect(page.body).to have_link('+/- Setting')
     end
 
-    it '"Add Setting" link opens new_setting_path' do
+    it '"+/- Setting" link opens new_setting_path' do
       visit settings_path
-      click_link 'Add Setting'
+      click_link '+/- Setting'
 
       expect(current_path).to eq(new_setting_path)
     end
 
-    it '"Add Setting" section has a form that adds settings' do
+    it '"+/- Setting" section has a form that adds settings' do
       visit new_setting_path
 
       fill_in 'Setting Name:', with: 'Testing'
-      fill_in 'Setting Value:', with: 'This is a test value.'
       click_button 'Add Setting'
 
       expect(page.body).to have_text('Added "Testing" setting!')
+      expect(page.body).to have_link('Testing')
     end
 
-    it 'has a link for each Setting name'
+    it '"+/- Setting" section has a form that deletes settings' do
+      Setting.Testing = { 'foo': 'bar'}
+      visit new_setting_path
+
+      select 'Testing', from: 'setting[id]'
+      click_button 'Delete Setting'
+
+      expect(page.body).to have_text('Deleted "Testing" setting!')
+      expect(page.body).not_to have_link('Testing')
+    end
+
+
+    it 'has a link (tab) for each Setting name' do
+      Setting.foo = { 'bar': 'baz1'}
+      Setting.foo2 = { 'bar': 'baz2'}
+      Setting.foo3 = { 'bar': 'baz3'}
+
+      visit settings_path
+
+      expect(page).to have_link('Foo')
+      expect(page).to have_link('Foo2')
+      expect(page).to have_link('Foo3')
+    end
+
+    it 'setting sections have an "Add New Field" form' do
+      Setting.foo = { 'bar': 'baz1' }
+
+      visit settings_path
+      click_link 'Foo'
+
+      expect(page).to have_text('Add New "Foo" Field')
+      expect(page).to have_field('setting[foo][new_field]')
+      expect(page).to have_field('setting[foo][new_value]')
+    end
+
+    it 'the "Add New Field" form adds new fields' do
+      Setting.foo = { 'bar': 'baz1' }
+
+      visit edit_setting_path('foo')
+      fill_in 'setting[foo][new_field]', with: 'Breakfast'
+      fill_in 'setting[foo][new_value]', with: 'Lunch'
+      click_button 'Update Settings'
+
+      expect(page).to have_text('Setting has been updated')
+      expect(find_field('setting[foo][Breakfast]').value).to eq('Lunch')
+    end
   end
 
 end
