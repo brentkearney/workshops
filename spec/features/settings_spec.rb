@@ -123,6 +123,18 @@ describe 'Settings page', type: :feature do
       expect(page).to have_text('Setting has been updated')
       expect(find_field('setting[foo][Breakfast]').value).to eq('Lunch')
     end
-  end
 
+    it 'allows the addition of array values' do
+      Setting.foo = { 'bar': 'baz1' }
+
+      visit edit_setting_path('foo')
+      fill_in 'setting[foo][new_field]', with: 'Breakfast'
+      fill_in 'setting[foo][new_value]', with: '[Lunch, Dinner, Desert]'
+      click_button 'Update Settings'
+
+      expect(page).to have_text('Setting has been updated')
+      setting = Setting.find_by_var('foo')
+      expect(setting.value['Breakfast'].class).to eq(Array)
+    end
+  end
 end
