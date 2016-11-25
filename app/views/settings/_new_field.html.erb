@@ -1,0 +1,17 @@
+<%= setting_form.fields_for @setting.var do |field_form| %>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <h4>Add New Field to "<%= @setting.var %>":</h4>
+      <div class="form-group">
+        <label for="new_field">Field name:</label>
+        <%= field_form.text_field :new_field, class: 'form-control' %>
+      </div>
+      <div class="form-group">
+        <label for="new_field">Field value:</label>
+        <%= field_form.text_field :new_value, class: 'form-control' %>
+        <span id="helpBlock1" class="help-block">For arrays, use:
+        [One, Two, 3, four]</span>
+      </div>
+    </div>
+  </div>
+<% end %>

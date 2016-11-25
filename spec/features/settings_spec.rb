@@ -8,6 +8,11 @@ require 'rails_helper'
 
 describe 'Settings page', type: :feature do
 
+  it 'initializes with some default settings' do
+    expect(Setting.Site).not_to be_nil
+    expect(Setting.Site).not_to be_empty
+  end
+
   context 'As an external user' do
     it 'disallows users who are not logged in' do
       visit settings_path
@@ -90,26 +95,22 @@ describe 'Settings page', type: :feature do
 
 
     it 'has a link (tab) for each Setting name' do
-      Setting.foo = { 'bar': 'baz1'}
-      Setting.foo2 = { 'bar': 'baz2'}
-      Setting.foo3 = { 'bar': 'baz3'}
-
       visit settings_path
 
-      expect(page).to have_link('Foo')
-      expect(page).to have_link('Foo2')
-      expect(page).to have_link('Foo3')
+      Setting.get_all.each do |type, value|
+        puts "Setting: #{type}"
+        expect(page).to have_link(type)
+      end
     end
 
     it 'setting sections have an "Add New Field" form' do
-      Setting.foo = { 'bar': 'baz1' }
+      Setting.Testing = { 'foo': 'bar'}
 
-      visit settings_path
-      click_link 'Foo'
+      visit edit_setting_path('Testing')
 
-      expect(page).to have_text('Add New "Foo" Field')
-      expect(page).to have_field('setting[foo][new_field]')
-      expect(page).to have_field('setting[foo][new_value]')
+      expect(page).to have_text("Add New Field to \"Testing\"")
+      expect(page).to have_field("setting[Testing][new_field]")
+      expect(page).to have_field("setting[Testing][new_value]")
     end
 
     it 'the "Add New Field" form adds new fields' do

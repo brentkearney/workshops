@@ -23,7 +23,6 @@ class SettingsController < ApplicationController
   def new
     @setting = Setting.new
     authorize @setting
-    # @setting_sections = Setting.all.map {|s| [s.var, s.id] }
   end
 
   # PATCH /settings
