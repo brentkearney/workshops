@@ -29,7 +29,8 @@ class SettingsController < ApplicationController
   def update
     authorize @setting
 
-    @setting.value = update_values
+    @setting.value = update_params
+    # redirect_to edit_setting_path(params[:id])
     if @setting.save
       redirect_to edit_setting_path(params[:id]),
         notice: 'Setting has been updated.'
@@ -59,32 +60,18 @@ class SettingsController < ApplicationController
     redirect_to settings_path, notice: %(Deleted "#{setting.var_was}" setting!)
   end
 
+
   private
 
-  def get_setting
-    @setting = Setting.find_by(var: params[:id]) ||
-      Setting.new(var: params[:id])
-  end
-
-  def get_settings
-    @settings = Setting.get_all
-  end
-
-
-  def update_values
-    updated_setting = update_params
-    new_field = updated_setting.delete('new_field')
-    new_value = updated_setting.delete('new_value')
-    unless new_field.empty?
-      updated_setting.merge!("#{new_field}": "#{new_value}")
-    end
-    updated_setting
-  end
-
   def update_params
-    setting_fields = ['new_field', 'new_value']
+    setting_fields = []
     @setting.value.each do |field_name, value|
-      setting_fields << field_name
+      if value.is_a?(Hash)
+        setting_fields << { "#{field_name}": value.keys <<
+          [:new_field, :new_value, :new_key] }
+      else
+        setting_fields << field_name
+      end
     end
     data = params.require(:setting).permit("#{@setting.var}": setting_fields)
     data["#{@setting.var}"]
@@ -99,5 +86,15 @@ class SettingsController < ApplicationController
 
   def delete_params
     params.require(:setting).permit(:id)
+  end
+
+
+  def get_setting
+    @setting = Setting.find_by(var: params[:id]) ||
+      Setting.new(var: params[:id])
+  end
+
+  def get_settings
+    @settings = Setting.get_all
   end
 end

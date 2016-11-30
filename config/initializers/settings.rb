@@ -16,15 +16,17 @@ if Setting.Emails.blank?
     'application': 'workshops@example.com',
     'webmaster': 'webmaster@example.com',
     'system_administrator': 'sysadmin@example.com',
-    'EO': {
-      'program_coordinator': 'organization@example.com',
-      'secretary': 'organization-secretary@example.com',
-      'administrator': 'organization-administrator@example.com',
-      'director': 'organization-director@example.com',
-      'videos': 'videos@example.com',
-      'schedule_staff': 'barista@example.com, photographer@example.com',
-      'event_updates': 'webmaster@example.com, communications@example.com',
-      'name_tags': 'organization-secretary@example.com'
+    'locations': {
+      'EO': {
+        'program_coordinator': 'organization@example.com',
+        'secretary': 'organization-secretary@example.com',
+        'administrator': 'organization-administrator@example.com',
+        'director': 'organization-director@example.com',
+        'videos': 'videos@example.com',
+        'schedule_staff': 'barista@example.com, photographer@example.com',
+        'event_updates': 'webmaster@example.com, communications@example.com',
+        'name_tags': 'organization-secretary@example.com'
+      }
     }
   }
 end

@@ -47,7 +47,7 @@ describe 'Settings page', type: :feature do
       expect(page.body).to have_link('Edit Profile')
     end
 
-    it 'has no "+/- Setting" link for non-admin users' do
+    it 'has no "+/- Setting" link' do
       expect(page.body).not_to have_link('+/- Setting')
     end
   end

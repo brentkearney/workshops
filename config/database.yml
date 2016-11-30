@@ -8,14 +8,14 @@ default: &default
   username: <%= ENV['DB_USER'] %>
   password: <%= ENV['DB_PASS'] %>
 
-production: 
-  <<: *default 
+production:
+  <<: *default
   database: workshops_production
-  
-development: 
-  <<: *default 
+
+development:
+  <<: *default
   database: workshops_development
-    
+
 test:
   <<: *default
   database: workshops_test
