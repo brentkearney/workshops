@@ -1,19 +1,11 @@
 <%= render "settings_nav" %>
 <div class="tab">
   <%= form_for(@setting, url: setting_path(@setting.var), method: 'patch') do
-    |setting_form| %>
-
-    <% if lookup_context.exists?(@setting.var.downcase, ['settings/'], true) %>
-      <%= render partial: @setting.var.downcase,
-                   locals: { setting_form: setting_form } %>
+      |setting_form| %>
+    <% if @setting.var == 'Site' %>
+      <%= render partial: 'site', locals: { setting_form: setting_form } %>
     <% else %>
-      <%= render partial: 'edit_form',
-                  locals: { setting_form: setting_form } %>
-      <%= render partial: 'new_field', locals: { setting_form: setting_form } %>
-      <%= setting_form.submit 'Update Settings', class: 'btn btn-default' %>
+      <%= render partial: 'edit_form', locals: { setting_form: setting_form } %>
     <% end %>
-
-
   <% end %>
 </div>
-

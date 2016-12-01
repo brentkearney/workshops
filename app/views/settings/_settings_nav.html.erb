@@ -1,12 +1,9 @@
 <h1 class="app-settings">Application Settings</h1>
 
 <ul class="nav nav-tabs">
-    <li id="profile" class="<%= 'active' if action_name == 'index' %>">
-      <%= link_to 'My Profile', settings_path %>
-    </li>
-    <% @settings.each_key do |key| %>
-      <li id="<%= key %>" class="<%= 'active' if key == params[:id] %>">
-        <%= link_to key.titleize, edit_setting_path(key),
+    <% ['Site', 'Emails', 'Locations', 'Rooms'].each do |tab| %>
+      <li id="<%= tab %>" class="<%= 'active' if tab == params[:id] %>">
+        <%= link_to tab.titleize, edit_setting_path(tab),
           data: { toggle: 'tooltip' } %>
       </li>
     <% end %>

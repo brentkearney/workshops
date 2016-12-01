@@ -6,12 +6,12 @@
 
 class SettingsController < ApplicationController
   before_filter :authenticate_user!
-  before_action :get_setting, only: [:edit, :update]
   before_action :get_settings
+  before_action :get_setting, only: [:edit, :update]
 
   # GET /settings
   def index
-    @person = current_user.person
+    redirect_to edit_setting_path('Site')
   end
 
   # GET /settings/:id/edit
@@ -64,7 +64,7 @@ class SettingsController < ApplicationController
   private
 
   def update_params
-    setting_fields = []
+    setting_fields = [:new_field, :new_value]
     @setting.value.each do |field_name, value|
       if value.is_a?(Hash)
         setting_fields << { "#{field_name}": value.keys <<
@@ -92,6 +92,7 @@ class SettingsController < ApplicationController
   def get_setting
     @setting = Setting.find_by(var: params[:id]) ||
       Setting.new(var: params[:id])
+    @setting.value = @setting.value.except!(:"")
   end
 
   def get_settings

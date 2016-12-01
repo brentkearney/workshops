@@ -1,10 +1,47 @@
-   <%= setting_form.fields_for @setting.var do |field_form| %>
-     <% @setting.value.each do |field_name, field_value| %>
-        <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
-        <p>
-          <%= field_form.text_field field_name, value: field_value.to_s,
-            class: 'form-control' %>
-        </p>
+<h3>Settings:</h3>
+<pre><%= @setting.value %></pre>
+
+<% @setting.value.each do |key, values| %>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <h3><%= "#{key}: " + @setting.var %></h3>
+    <%= setting_form.fields_for @setting.var do |var_form| %>
+      <%= var_form.fields_for key do |var_field| %>
+      <div class="row">
+          <div class="col-xs-2">
+            <label>Location code:</label>
+          </div>
+          <div class="col-xs-2">
+        <p><%= var_field.text_field 'new_key', size: 5, value: key,
+                class: 'form-control input-sm' %></p>
+          </div>
+        </div>
+        <% values.each do |field_name, field_value| %>
+          <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
+          <p><%= var_field.text_field field_name, value: field_value,
+              class: 'form-control' %></p>
+        <% end %><!-- values -->
+
+      <% end %><!-- var_form -->
+      <%= var_form.fields_for key do |new_field_form| %>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <h4>Add New Field to "<%= key %>":</h4>
+            <div class="form-group">
+              <label for="new_field">Field name:</label>
+              <%= new_field_form.text_field :new_field, class: 'form-control' %>
+            </div>
+            <div class="form-group">
+              <label for="new_field">Field value:</label>
+              <%= new_field_form.text_field :new_value, class: 'form-control' %>
+              <span class="help-block">For arrays, use: [One, Two, 3, four]</span>
+            </div>
+          </div>
+        </div>
       <% end %>
 
-    <% end %>
+      <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>
+    <% end %><!-- setting_form -->
+  </div>
+</div>
+<% end %><!-- @setting ->

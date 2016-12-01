@@ -1,37 +1,35 @@
 # Sets up some defaults to populate the Settings section
 
-if Setting.Site.blank?
+if Setting.find_by(var: 'Site').nil?
   Setting.Site = {
     'Title': 'Workshop Manager',
     'Logo': 'logo.png',
     'Footer': 'Copyright © 2016 Example Organization',
     'events_url': 'http://www.example.com/events',
     'legacy_api': 'https://database.example.com/api/your_api_key',
-    'legacy_person': 'https://www.example.com/db/?section=Updates&sub=person&id='
+    'legacy_person': 'https://www.example.com/db/?section=Updates&sub=person&id=',
+    'application_email': 'workshops@example.com',
+    'webmaster_email': 'webmaster@example.com',
+    'sysadmin_email': 'sysadmin@example.com'
   }
 end
 
-if Setting.Emails.blank?
+if Setting.find_by(var: 'Emails').nil?
   Setting.Emails = {
-    'application': 'workshops@example.com',
-    'webmaster': 'webmaster@example.com',
-    'system_administrator': 'sysadmin@example.com',
-    'locations': {
-      'EO': {
-        'program_coordinator': 'organization@example.com',
-        'secretary': 'organization-secretary@example.com',
-        'administrator': 'organization-administrator@example.com',
-        'director': 'organization-director@example.com',
-        'videos': 'videos@example.com',
-        'schedule_staff': 'barista@example.com, photographer@example.com',
-        'event_updates': 'webmaster@example.com, communications@example.com',
-        'name_tags': 'organization-secretary@example.com'
-      }
+    'EO': {
+      'program_coordinator': 'organization@example.com',
+      'secretary': 'organization-secretary@example.com',
+      'administrator': 'organization-administrator@example.com',
+      'director': 'organization-director@example.com',
+      'videos': 'videos@example.com',
+      'schedule_staff': 'barista@example.com, photographer@example.com',
+      'event_updates': 'webmaster@example.com, communications@example.com',
+      'name_tags': 'organization-secretary@example.com'
     }
   }
 end
 
-if Setting.Locations.blank?
+if Setting.find_by(var: 'Locations').nil?
   Setting.Locations = {
     'EO': {
       'Name': 'Example Organization',
@@ -46,7 +44,7 @@ if Setting.Locations.blank?
   }
 end
 
-if Setting.Rooms.blank?
+if Setting.find_by(var: 'Rooms').nil?
   Setting.Rooms = {
     'EO': {
       '5 Day Workshop': 'TCPL 201',
