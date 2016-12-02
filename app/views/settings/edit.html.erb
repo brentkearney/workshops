@@ -5,7 +5,12 @@
     <% if @setting.var == 'Site' %>
       <%= render partial: 'site', locals: { setting_form: setting_form } %>
     <% else %>
-      <%= render partial: 'edit_form', locals: { setting_form: setting_form } %>
+      <%= render partial: 'edit_form',
+                  locals: { setting_form: setting_form } %>
+      <% if @setting.var == 'Locations' %>
+        <%= render partial: 'new_location_form',
+                    locals: { setting_form: setting_form } %>
+      <% end %>
     <% end %>
   <% end %>
 </div>

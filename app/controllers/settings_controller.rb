@@ -64,7 +64,7 @@ class SettingsController < ApplicationController
   private
 
   def update_params
-    setting_fields = [:new_field, :new_value]
+    setting_fields = [:new_field, :new_value, :new_location]
     @setting.value.each do |field_name, value|
       if value.is_a?(Hash)
         setting_fields << { "#{field_name}": value.keys <<
