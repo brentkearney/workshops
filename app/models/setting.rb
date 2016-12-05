@@ -26,7 +26,6 @@ class Setting < RailsSettings::Base
 
     if self.value.first.second.is_a?(Hash)
       settings = self.value.except(:'')
-
       self.value.except(:'').each do |param_key, param_value|
         new_field = param_value.delete(:new_field)
         new_value = param_value.delete(:new_value)
@@ -38,7 +37,6 @@ class Setting < RailsSettings::Base
           settings["#{new_key}"] = settings.delete("#{param_key}")
         end
       end
-
       self.value = settings
     else
       settings = self.value

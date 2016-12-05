@@ -1,17 +1,11 @@
-<div class="panel panel-default">
-  <div class="panel-body">
-    <h3>Create New Location:</h3>
-    <%= setting_form.fields_for @setting.var do |nl_form| %>
+<div role="tabpanel" class="tab-pane" id="NEW">
+  <h3>Create New Location:</h3>
+  <%= setting_form.fields_for 'Locations' do |nl_form| %>
     <div class="form-group">
-      <label for="exampleInputEmail1">Abbreviation for new location:</label>
+      <label for="new_location">Abbreviation for new location:</label>
       <%= nl_form.text_field 'new_location', placeholder: 'XMPL', size: 5,
           class: 'form-control input-xs' %>
     </div>
-
-
-    <%= nl_form.submit "Create New Location", class: 'btn btn-default' %>
-    <% end %>
-  </div>
+  <%= nl_form.submit "Create New Location", class: 'btn btn-default' %>
+  <% end %>
 </div>
-
-

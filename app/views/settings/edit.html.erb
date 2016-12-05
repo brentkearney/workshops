@@ -7,10 +7,6 @@
     <% else %>
       <%= render partial: 'edit_form',
                   locals: { setting_form: setting_form } %>
-      <% if @setting.var == 'Locations' %>
-        <%= render partial: 'new_location_form',
-                    locals: { setting_form: setting_form } %>
-      <% end %>
     <% end %>
   <% end %>
-</div>
+</div><!-- Settings: div class="tab" -->

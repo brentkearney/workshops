@@ -1,9 +1,10 @@
 <h3><%= @setting.var %> Settings:</h3>
-<pre><%= @setting.value %></pre>
 
+<%= render partial: 'locations_nav', locals: {tabs: @setting.value.keys} %>
+
+<div class="tab tab-content">
 <% @setting.value.each do |key, values| %>
-<div class="panel panel-default">
-  <div class="panel-body">
+  <div role="tabpanel" class="tab-pane<%= ' active' if key == @setting.value.keys.first %>" id="<%= key %>">
     <h3><%= @setting.name(key) %></h3>
     <%= setting_form.fields_for @setting.var do |var_form| %>
       <%= var_form.fields_for key do |var_field| %>
@@ -42,6 +43,9 @@
 
       <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>
     <% end %><!-- setting_form -->
-  </div>
-</div>
+  </div><!-- tabpanel -->
+
 <% end %><!-- @setting -->
+<%= render partial: 'new_location_form', locals: {setting_form: setting_form } if policy(Setting).new? %>
+
+</div><!-- tab-content -->

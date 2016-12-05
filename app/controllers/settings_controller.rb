@@ -92,7 +92,7 @@ class SettingsController < ApplicationController
   def get_setting
     @setting = Setting.find_by(var: params[:id]) ||
       Setting.new(var: params[:id])
-    @setting.value = @setting.value.except!(:"")
+    # @setting.value = @setting.value.except!(:"") unless @setting.value.nil?
   end
 
   def get_settings
