@@ -1,11 +1,35 @@
 <div role="tabpanel" class="tab-pane" id="NEW">
-  <h3>Create New Location:</h3>
-  <%= setting_form.fields_for 'Locations' do |nl_form| %>
-    <div class="form-group">
-      <label for="new_location">Abbreviation for new location:</label>
-      <%= nl_form.text_field 'new_location', placeholder: 'XMPL', size: 5,
-          class: 'form-control input-xs' %>
+  <div class="panel panel-default">
+    <div class="panel-body">
+    <h3>Create New Location:</h3>
+    <%= setting_form.fields_for @setting.var do |nl_form| %>
+      <div class="form-group">
+        <label for="new_location">Location to Add to
+            <%= @setting.var %> Settings:</label>
+        <%= nl_form.text_field 'new_location', size: 5,
+                              class: 'form-control input-xs' %>
+        <span class="help-block">Use a short abbreviation, like "BIRS".</span>
+      </div>
+    <%= nl_form.submit "Create New Location", class: 'btn btn-default' %>
+    <% end %>
     </div>
-  <%= nl_form.submit "Create New Location", class: 'btn btn-default' %>
-  <% end %>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+    <h3>Delete Location:</h3>
+    <%= setting_form.fields_for @setting.var do |dl_form| %>
+      <div class="form-group">
+        <label for="new_location">Location to Delete
+          from <%= @setting.var %> Settings:</label>
+        <%= dl_form.select 'remove_location',
+              @setting.value.keys.map{|v| [ v, v ]},
+              { include_blank: true }, { class: 'form-control' } %>
+
+        <span class="help-block">Warning: there is no confirmation step!</span>
+      </div>
+      <%= dl_form.submit "Delete Location", class: 'btn btn-default' %>
+    <% end %>
+    </div>
+  </div>
 </div>

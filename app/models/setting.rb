@@ -2,7 +2,7 @@
 class Setting < RailsSettings::Base
   TTL = 1.minute
   attr_accessor :new_field, :new_value
-  before_save :merge_fields, :convert_type
+  before_save :add_or_remove_locations, :merge_fields, :convert_type
   after_update :rewrite_cache
   after_create :rewrite_cache
   namespace Rails.env
@@ -22,8 +22,6 @@ class Setting < RailsSettings::Base
 
 
   def merge_fields
-    add_new_location
-
     if self.value.first.second.is_a?(Hash)
       settings = self.value.except(:'')
       self.value.except(:'').each do |param_key, param_value|
@@ -46,19 +44,35 @@ class Setting < RailsSettings::Base
     end
   end
 
-  def add_new_location
-    if self.value.keys.include? 'new_location'
+  def add_or_remove_locations
+    remove_location if self.value.keys.include? 'remove_location'
+    add_location if self.value.keys.include? 'new_location'
+  end
+
+  def add_location
+    settings = self.value
+    new_location_key = settings.delete(:new_location)
+
+    skeleton = {}
+    settings["#{settings.keys.first}"].each do |key, value|
+      skeleton[:"#{key}"] = ''
+    end
+
+    new_location = {"#{new_location_key}":
+                    skeleton.except(:new_field, :new_value, :new_key)}
+    self.value = settings.merge(new_location)
+  end
+
+  def remove_location
+    if self.value.keys.include? 'remove_location'
       settings = self.value
-      new_location_key = settings.delete(:new_location)
+      location_key = settings.delete(:remove_location)
+      logger.debug '|' * 50
+      logger.debug "Removing #{location_key}"
+      logger.debug "#{self.var} value will be set to: #{settings}"
+      logger.debug '|' * 50
 
-      skeleton = {}
-      settings["#{settings.keys.first}"].each do |key, value|
-        skeleton[:"#{key}"] = ''
-      end
-
-      new_location = {"#{new_location_key}":
-                      skeleton.except(:new_field, :new_value, :new_key)}
-      self.value = settings.merge(new_location)
+      self.value = settings.except(:"#{location_key}")
     end
   end
 

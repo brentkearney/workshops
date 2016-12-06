@@ -1,46 +1,47 @@
-@import "colours";
-@import "memberships.scss";
+.settings {
+  @import "colours";
+  @import "memberships.scss";
 
-.profile {
-  margin-bottom: 1em;
+  .profile {
+    margin-bottom: 1em;
+  }
+
+  h1.app-settings, h3 {
+    margin-bottom: 1em;
+  }
+
+  .tab {
+    border-left: 1px solid;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+    border-color: $light-border;
+    padding: 1em;
+  }
+
+  .profile-name {
+    display: inline;
+    padding-bottom: 0.8em;
+  }
+
+  .profile-edit {
+    display: inline;
+  }
+
+  th {
+    text-align: right;
+    width: 13em;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+
+  .new-setting {
+    padding-top: 3em;
+  }
+
+  .panel-heading {
+    padding: 0;
+    margin-bottom: 1em;
+  }
 }
-
-h1.app-settings, h3 {
-  margin-bottom: 1em;
-}
-
-.tab {
-  border-left: 1px solid;
-  border-right: 1px solid;
-  border-bottom: 1px solid;
-  border-color: $light-border;
-  padding: 1em;
-}
-
-.profile-name {
-  display: inline;
-  padding-bottom: 0.8em;
-}
-
-.profile-edit {
-  display: inline;
-}
-
-th {
-  text-align: right;
-  width: 13em;
-}
-
-td {
-  vertical-align: middle;
-}
-
-.new-setting {
-  padding-top: 3em;
-}
-
-.panel-heading {
-  padding: 0;
-  margin-bottom: 1em;
-}
-

@@ -44,8 +44,11 @@
       <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>
     <% end %><!-- setting_form -->
   </div><!-- tabpanel -->
-
 <% end %><!-- @setting -->
-<%= render partial: 'new_location_form', locals: {setting_form: setting_form } if policy(Setting).new? %>
+
+  <% if policy(Setting).new? %>
+    <%= render partial: 'new_location_form',
+          locals: {setting_form: setting_form } %>
+  <% end %>
 
 </div><!-- tab-content -->

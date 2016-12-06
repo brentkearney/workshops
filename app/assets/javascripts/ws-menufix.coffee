@@ -1,4 +1,4 @@
-$(document).ready ->
+$(document).on 'turbolinks:load', ->
   sign_in_link = $('ul.dropdown-user li a').attr('href')
   if sign_in_link == '/sign_in'
     $('#page-wrapper').css('margin-left','0')
