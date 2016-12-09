@@ -2,7 +2,7 @@
 <div class="tab col-md-12 new-setting">
   <div class="panel panel-default">
     <div class="panel-body">
-      <h4 class="panel-heading">Add New Setting</h4>
+      <h4 class="panel-heading">Add New Setting Section</h4>
       <%= form_for @setting, method: :create, class: 'form-horizontal' do |f| %>
       <fieldset>
       <div id="setting-name" class="form-group">
@@ -26,7 +26,7 @@
 
   <div class="panel panel-default">
     <div class="panel-body">
-      <h4 class="panel-heading">Delete Setting</h4>
+      <h4 class="panel-heading">Delete Setting Section</h4>
       <%= form_for @setting, url: settings_delete_path,
             html: { method: :post, id: 'delete-setting',
             class: 'form-horizontal' } do |f| %>

@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
   private
 
   def invalid_auth_token
-    render text: 'Invalid CSRF token', status: :unauthorized
+    redirect_to sign_in_path, error: 'Login expired'
   end
 
   def user_not_authorized(exception)

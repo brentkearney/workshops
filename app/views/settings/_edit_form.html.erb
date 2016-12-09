@@ -1,6 +1,6 @@
 <h3><%= @setting.var %> Settings:</h3>
 
-<%= render partial: 'locations_nav', locals: {tabs: @setting.value.keys} %>
+<%= render partial: 'locations_nav', locals: {tabs: @setting.value.keys.uniq} %>
 
 <div class="tab tab-content">
 <% @setting.value.each do |key, values| %>
@@ -8,21 +8,22 @@
     <h3><%= @setting.name(key) %></h3>
     <%= setting_form.fields_for @setting.var do |var_form| %>
       <%= var_form.fields_for key do |var_field| %>
-      <div class="row">
-        <div class="col-xs-2">
-            <label>Location code:</label>
+        <div class="row">
+          <div class="col-xs-2">
+              <label>Location code:</label>
+            </div>
+          <div class="col-xs-2">
+          <p><%= var_field.text_field 'new_key', size: 5, value: key,
+                  class: 'form-control input-sm' %></p>
           </div>
-        <div class="col-xs-2">
-        <p><%= var_field.text_field 'new_key', size: 5, value: key,
-                class: 'form-control input-sm' %></p>
         </div>
-      </div>
-      <% values.each do |field_name, field_value| %>
-        <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
-        <p><%= var_field.text_field field_name, value: field_value,
-            class: 'form-control' %></p>
-      <% end %><!-- values -->
-
+        <% unless values.empty? %>
+          <% values.each do |field_name, field_value| %>
+            <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
+            <p><%= var_field.text_field field_name, value: field_value,
+                class: 'form-control' %></p>
+          <% end %><!-- values -->
+        <% end %>
       <% end %><!-- var_form -->
       <%= var_form.fields_for key do |new_field_form| %>
         <div class="panel panel-default">
@@ -44,6 +45,8 @@
       <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>
     <% end %><!-- setting_form -->
   </div><!-- tabpanel -->
+
+
 <% end %><!-- @setting -->
 
   <% if policy(Setting).new? %>

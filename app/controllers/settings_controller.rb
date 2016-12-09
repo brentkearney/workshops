@@ -90,12 +90,14 @@ class SettingsController < ApplicationController
 
 
   def get_setting
-    @setting = Setting.find_by(var: params[:id]) ||
-      Setting.new(var: params[:id])
+    @setting = Setting.find_by_var(params[:id]) || Setting.new(var: params[:id])
+    # rails-settings-cached sometimes adds empty values
     # @setting.value = @setting.value.except!(:"") unless @setting.value.nil?
   end
 
   def get_settings
     @settings = Setting.get_all
+    @tabs = ['Site', 'Emails', 'Locations', 'Rooms']
+    @tabs.concat @settings.keys - @tabs
   end
 end

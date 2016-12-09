@@ -8,12 +8,13 @@ class Setting < RailsSettings::Base
   namespace Rails.env
 
   def name(key)
-    location = Setting.find_by(var: 'Locations').value
-    if location.key? key
-      location["#{key}"]['Name']
-    else
-      key
-    end
+    # location = Setting.find_by_var('Locations').value
+    # if location.key? key
+    #   location["#{key}"][:Name]
+    # else
+    #   key
+    # end
+    key
   end
 
   def rewrite_cache
@@ -22,25 +23,28 @@ class Setting < RailsSettings::Base
 
 
   def merge_fields
-    if self.value.first.second.is_a?(Hash)
-      settings = self.value.except(:'')
-      self.value.except(:'').each do |param_key, param_value|
-        new_field = param_value.delete(:new_field)
-        new_value = param_value.delete(:new_value)
-        param_value.merge!("#{new_field}": new_value) unless new_field.blank?
+    unless self.value.empty?
+      if self.value.first.second.is_a?(Hash)
+        settings = self.value.except(:'')
+        self.value.except(:'').each do |param_key, param_value|
+          new_field = param_value.delete(:new_field)
+          new_value = param_value.delete(:new_value)
+          param_value.merge!("#{new_field}": new_value) unless new_field.blank?
+          settings[:"#{param_key}"] = param_value
 
-        new_key = param_value.delete(:new_key)
-        settings["#{param_key}"] = param_value
-        if !new_key.blank? && new_key != param_key
-          settings["#{new_key}"] = settings.delete("#{param_key}")
+          new_key = param_value.delete(:new_key)
+          if !new_key.blank? && new_key != param_key
+            settings[:"#{new_key}"] = settings.delete("#{param_key}")
+          end
         end
+
+        self.value = settings
+      else
+        settings = self.value
+        new_string_field = settings.delete(:new_field)
+        new_string_value = settings.delete(:new_value)
+        self.value = settings.merge("#{new_string_field}": new_string_value)
       end
-      self.value = settings
-    else
-      settings = self.value
-      new_string_field = settings.delete(:new_field)
-      new_string_value = settings.delete(:new_value)
-      self.value = settings.merge("#{new_string_field}": new_string_value)
     end
   end
 
@@ -50,12 +54,14 @@ class Setting < RailsSettings::Base
   end
 
   def add_location
-    settings = self.value
+    settings = self.value.except(:'')
     new_location_key = settings.delete(:new_location)
 
     skeleton = {}
-    settings["#{settings.keys.first}"].each do |key, value|
-      skeleton[:"#{key}"] = ''
+    unless settings.keys.empty?
+      settings["#{settings.keys.first}"].each do |key, value|
+        skeleton[:"#{key}"] = ''
+      end
     end
 
     new_location = {"#{new_location_key}":

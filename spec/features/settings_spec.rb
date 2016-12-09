@@ -7,10 +7,9 @@
 require 'rails_helper'
 
 describe 'Settings page', type: :feature do
-
-  it 'initializes with some default settings' do
-    expect(Setting.Site).not_to be_nil
-    expect(Setting.Site).not_to be_empty
+  before do
+    load "#{Rails.root}/config/initializers/settings.rb"
+    expect(Setting.get_all).not_to be_empty
   end
 
   context 'As an external user' do
@@ -23,32 +22,15 @@ describe 'Settings page', type: :feature do
   end
 
   context 'As a member user' do
-    before do
-      @person = create(:person)
-      @user = create(:user, person: @person, role: 'member')
-      login_as @user, scope: :user
-    end
+    it 'denies access' do
+      person = create(:person)
+      user = create(:user, person: person, role: 'member')
+      login_as user, scope: :user
 
-    before :each do
       visit settings_path
-    end
 
-    it 'allows logged-in users' do
-      expect(current_path).to eq(settings_path)
-    end
-
-    it 'default tab is user profile settings' do
-      expect(page.body).to have_text(@person.name)
-      expect(page.body).to have_text('Gender:')
-      expect(page.body).to have_text('Affiliation:')
-      expect(page.body).to have_text(@person.affiliation)
-      expect(page.body).to have_text('Email:')
-      expect(page.body).to have_text(@person.email)
-      expect(page.body).to have_link('Edit Profile')
-    end
-
-    it 'has no "+/- Setting" link' do
-      expect(page.body).not_to have_link('+/- Setting')
+      expect(page.body).to have_text('Access denied.')
+      expect(current_path).to eq(my_events_path)
     end
   end
 
@@ -59,83 +41,52 @@ describe 'Settings page', type: :feature do
       login_as @user, scope: :user
     end
 
-    it 'has an "+/- Setting" link' do
+    it 'has tabs for each Setting section' do
       visit settings_path
 
-      expect(page.body).to have_link('+/- Setting')
-    end
-
-    it '"+/- Setting" link opens new_setting_path' do
-      visit settings_path
-      click_link '+/- Setting'
-
-      expect(current_path).to eq(new_setting_path)
-    end
-
-    it '"+/- Setting" section has a form that adds settings' do
-      visit new_setting_path
-
-      fill_in 'Setting Name:', with: 'Testing'
-      click_button 'Add Setting'
-
-      expect(page.body).to have_text('Added "Testing" setting!')
-      expect(page.body).to have_link('Testing')
-    end
-
-    it '"+/- Setting" section has a form that deletes settings' do
-      Setting.Testing = { 'foo': 'bar'}
-      visit new_setting_path
-
-      select 'Testing', from: 'setting[id]'
-      click_button 'Delete Setting'
-
-      expect(page.body).to have_text('Deleted "Testing" setting!')
-      expect(page.body).not_to have_link('Testing')
-    end
-
-
-    it 'has a link (tab) for each Setting name' do
-      visit settings_path
-
-      Setting.get_all.each do |type, value|
-        puts "Setting: #{type}"
-        expect(page).to have_link(type)
+      Setting.get_all.keys.each do |tab|
+        expect(page).to have_link(tab)
       end
     end
 
-    it 'setting sections have an "Add New Field" form' do
-      Setting.Testing = { 'foo': 'bar'}
+    it 'it shows the fields of the Site settings' do
+      visit edit_setting_path('Site')
 
-      visit edit_setting_path('Testing')
-
-      expect(page).to have_text("Add New Field to \"Testing\"")
-      expect(page).to have_field("setting[Testing][new_field]")
-      expect(page).to have_field("setting[Testing][new_value]")
+      Setting.Site.keys.each do |field|
+        expect(page).to have_field("setting[Site][#{field}]")
+      end
     end
 
-    it 'the "Add New Field" form adds new fields' do
-      Setting.foo = { 'bar': 'baz1' }
+    it 'the Locations tab has a sub-tab for each location' do
+      visit edit_setting_path('Locations')
 
-      visit edit_setting_path('foo')
-      fill_in 'setting[foo][new_field]', with: 'Breakfast'
-      fill_in 'setting[foo][new_value]', with: 'Lunch'
-      click_button 'Update Settings'
+      Setting.Locations.keys.each do |tab|
+        expect(page).to have_link(tab)
+      end
+    end
+
+    it 'the "Location code" field updates the key representing that location' do
+      visit edit_setting_path('Locations')
+
+      fill_in "setting[Locations][EO][new_key]", with: 'TEST'
+      click_button 'Update EO Settings'
 
       expect(page).to have_text('Setting has been updated')
-      expect(find_field('setting[foo][Breakfast]').value).to eq('Lunch')
+      expect(Setting.find_by_var('Locations').value.keys.first).to eq('TEST')
     end
 
-    it 'allows the addition of array values' do
-      Setting.foo = { 'bar': 'baz1' }
+    it 'has a +/- Locations tab to add new locations' do
+      visit edit_setting_path('Locations')
 
-      visit edit_setting_path('foo')
-      fill_in 'setting[foo][new_field]', with: 'Breakfast'
-      fill_in 'setting[foo][new_value]', with: '[Lunch, Dinner, Desert]'
-      click_button 'Update Settings'
+      click_link '+/- Location'
+      fill_in 'setting[Locations][new_location]', with: 'TEST2'
+      click_button 'Create New Location'
 
       expect(page).to have_text('Setting has been updated')
-      setting = Setting.find_by_var('foo')
-      expect(setting.value['Breakfast'].class).to eq(Array)
+      expect(page).to have_link('TEST2')
+      expect(Setting.find_by_var('Locations').value.keys).to include('TEST2')
     end
+
   end
+
 end
