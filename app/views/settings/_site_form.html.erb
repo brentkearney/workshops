@@ -1,11 +1,13 @@
 <h3>Site Settings</h3>
 <%= setting_form.fields_for @setting.var do |field_form| %>
   <% @setting.value.each do |field_name, field_value| %>
-    <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
-    <p>
-      <%= field_form.text_field field_name, value: field_value.to_s,
-        class: 'form-control' %>
-    </p>
+    <% unless field_name.blank? %>
+      <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
+      <p>
+        <%= field_form.text_field field_name, value: field_value.to_s,
+          class: 'form-control' %>
+      </p>
+    <% end %>
   <% end %>
   <%= render partial: 'new_field', locals: { setting_form: setting_form } %>
   <%= setting_form.submit 'Update Settings', class: 'btn btn-default' %>

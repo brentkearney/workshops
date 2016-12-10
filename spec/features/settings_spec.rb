@@ -34,6 +34,11 @@ describe 'Settings page', type: :feature do
     end
   end
 
+  context 'As a staff user' do
+    it 'allows access to the Rooms section'
+    it ''
+  end
+
   context 'As an admin user' do
     before do
       @person = create(:person)
@@ -49,44 +54,90 @@ describe 'Settings page', type: :feature do
       end
     end
 
-    it 'it shows the fields of the Site settings' do
-      visit edit_setting_path('Site')
+    context 'Site tab' do
+      it 'shows the fields of the Site settings' do
+        visit edit_setting_path('Site')
 
-      Setting.Site.keys.each do |field|
-        expect(page).to have_field("setting[Site][#{field}]")
+        Setting.Site.keys.each do |field|
+          expect(page).to have_field("setting[Site][#{field}]")
+        end
       end
-    end
 
-    it 'the Locations tab has a sub-tab for each location' do
-      visit edit_setting_path('Locations')
+      it 'has the minimum necessary fields for the app to function'
+      it 'updates the data in the given fields'
 
-      Setting.Locations.keys.each do |tab|
-        expect(page).to have_link(tab)
+      it 'accepts array values' do
+        visit edit_setting_path('Site')
+
+        fill_in 'setting[Site][new_field]', with: 'Breakfast'
+        fill_in 'setting[Site][new_value]', with: '[Lunch, Dinner, Desert]'
+        click_button 'Update Settings'
+
+        expect(page).to have_text('Setting has been updated')
+        setting = Setting.find_by_var('Site')
+        expect(setting.value['Breakfast'].class).to eq(Array)
       end
+
+      it 'has an "Add New Field" form that adds new fields'
+      it 'has a way to delete existing fields'
     end
 
-    it 'the "Location code" field updates the key representing that location' do
-      visit edit_setting_path('Locations')
-
-      fill_in "setting[Locations][EO][new_key]", with: 'TEST'
-      click_button 'Update EO Settings'
-
-      expect(page).to have_text('Setting has been updated')
-      expect(Setting.find_by_var('Locations').value.keys.first).to eq('TEST')
+    context 'Emails tab' do
+      it 'has a sub-tab for each location'
     end
 
-    it 'has a +/- Locations tab to add new locations' do
-      visit edit_setting_path('Locations')
+    context 'Locations tab' do
+      it 'has a sub-tab for each location' do
+        visit edit_setting_path('Locations')
 
-      click_link '+/- Location'
-      fill_in 'setting[Locations][new_location]', with: 'TEST2'
-      click_button 'Create New Location'
+        Setting.Locations.keys.each do |tab|
+          expect(page).to have_link(tab)
+        end
+      end
 
-      expect(page).to have_text('Setting has been updated')
-      expect(page).to have_link('TEST2')
-      expect(Setting.find_by_var('Locations').value.keys).to include('TEST2')
+      it 'has a form field for each key:value pair of the location'
+      it 'updates the data in the given field'
+      it 'has an "Add New Field" form that adds new fields'
+
+
+      it 'the "Location code" field updates the key representing that location' do
+        visit edit_setting_path('Locations')
+
+        fill_in "setting[Locations][EO][new_key]", with: 'TEST'
+        click_button 'Update EO Settings'
+
+        expect(page).to have_text('Setting has been updated')
+        expect(Setting.find_by_var('Locations').value.keys.first).to eq('TEST')
+      end
+
+      it 'has a "+/- Location" tab to add new locations' do
+        visit edit_setting_path('Locations')
+
+        click_link '+/- Location'
+        fill_in 'setting[Locations][new_location]', with: 'TEST2'
+        click_button 'Create New Location'
+
+        expect(page).to have_text('Setting has been updated')
+        expect(page).to have_link('TEST2')
+        expect(Setting.find_by_var('Locations').value.keys).to include('TEST2')
+      end
+
+      it 'updates the locations of the other Setting sections as well'
     end
 
+    context 'Rooms tab' do
+      it 'has sub-tabs for each location'
+      it 'has a form for adding new rooms'
+    end
+
+    context '+/- Setting tab' do
+      it 'has a form for adding new setting sections'
+      it 'a new tab appears for the new setting section'
+      it 'asks if the new section is location-dependent'
+      it 'if location dependent, populates new section with location tabs'
+      it 'the Add New field sub-tab is pre-selected in the new section'
+      it 'has a form for deleting existing setting sections'
+    end
   end
 
 end

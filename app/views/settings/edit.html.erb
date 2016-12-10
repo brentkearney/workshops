@@ -2,11 +2,13 @@
 <div class="tab">
   <%= form_for(@setting, url: setting_path(@setting.var), method: 'patch') do
       |setting_form| %>
-    <% if @setting.var == 'Site' %>
-      <%= render partial: 'site', locals: { setting_form: setting_form } %>
+    <% if lookup_context.exists?("#{@setting.var.downcase}_form",
+        ['settings/'], true) %>
+
+      <%= render partial: "#{@setting.var.downcase}_form",
+                locals: { setting_form: setting_form } %>
     <% else %>
-      <%= render partial: 'edit_form',
-                  locals: { setting_form: setting_form } %>
+      <%= render partial: 'edit_form',locals: { setting_form: setting_form } %>
     <% end %>
   <% end %>
 </div><!-- Settings: div class="tab" -->
