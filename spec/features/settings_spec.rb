@@ -36,7 +36,6 @@ describe 'Settings page', type: :feature do
 
   context 'As a staff user' do
     it 'allows access to the Rooms section'
-    it ''
   end
 
   context 'As an admin user' do
@@ -63,8 +62,26 @@ describe 'Settings page', type: :feature do
         end
       end
 
-      it 'has the minimum necessary fields for the app to function'
-      it 'updates the data in the given fields'
+      it 'has the minimum necessary fields for the app to function' do
+        required_fields = %w(title footer events_url legacy_person legacy_api
+            application_email webmaster_email sysadmin_email)
+
+        visit edit_setting_path('Site')
+
+        required_fields.each do |field|
+          expect(page).to have_field("setting[Site][#{field}]")
+        end
+      end
+
+      it 'updates data' do
+        visit edit_setting_path('Site')
+        fill_in 'setting[Site][title]', with: 'Test Title'
+        click_button 'Update Settings'
+
+        expect(page).to have_text('Setting has been updated')
+        setting = Setting.find_by_var('Site')
+        expect(setting.value['title']).to eq('Test Title')
+      end
 
       it 'accepts array values' do
         visit edit_setting_path('Site')
@@ -78,8 +95,7 @@ describe 'Settings page', type: :feature do
         expect(setting.value['Breakfast'].class).to eq(Array)
       end
 
-      it 'has an "Add New Field" form that adds new fields'
-      it 'has a way to delete existing fields'
+      it 'has a way to delete fields'
     end
 
     context 'Emails tab' do
@@ -100,7 +116,7 @@ describe 'Settings page', type: :feature do
       it 'has an "Add New Field" form that adds new fields'
 
 
-      it 'the "Location code" field updates the key representing that location' do
+      it '"Location code" field updates the key representing that location' do
         visit edit_setting_path('Locations')
 
         fill_in "setting[Locations][EO][new_key]", with: 'TEST'

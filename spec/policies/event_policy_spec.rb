@@ -7,6 +7,10 @@
 require 'rails_helper'
 
 describe "EventPolicy" do
+  before do
+    @location = Setting.Locations.keys.first
+  end
+
   subject { EventPolicy }
 
   let (:normal_user) { build_stubbed :user }
@@ -33,7 +37,8 @@ describe "EventPolicy" do
 
     it 'allows staff to edit template events' do
       allow(staff_user).to receive(:is_organizer?).and_return(false)
-      expect(subject).to permit(staff_user, Event.new(template: true, location: 'BIRS'))
+      event = Event.new(template: true, location: @location)
+      expect(subject).to permit(staff_user, event)
     end
 
     it 'allows organizers to edit their events' do
@@ -68,7 +73,8 @@ describe "EventPolicy" do
 
     it 'allows staff to update template events' do
       allow(staff_user).to receive(:is_organizer?).and_return(false)
-      expect(subject).to permit(staff_user, Event.new(template: true, location: 'BIRS'))
+      expect(subject).to permit(staff_user, Event.new(template: true,
+        location: @location))
     end
 
     it 'allows organizers to edit their events' do
@@ -134,7 +140,8 @@ describe "EventPolicy" do
     end
 
     it 'allows staff and admin users to view template events' do
-      expect(subject).to permit(staff_user, Event.new(template: true, location: 'BIRS'))
+      expect(subject).to permit(staff_user, Event.new(template: true,
+        location: @location))
       expect(subject).to permit(admin_user, Event.new(template: true))
     end
   end

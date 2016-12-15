@@ -2,15 +2,18 @@
 
 if Setting.find_by(var: 'Site').nil?
   Setting.Site = {
-    'Title': 'Workshop Manager',
-    'Logo': 'logo.png',
-    'Footer': 'Copyright © 2016 Example Organization',
+    'title': 'Workshop Manager',
+    'logo': 'logo.png',
+    'footer': 'Copyright © 2016 Example Organization',
     'events_url': 'http://www.example.com/events',
     'legacy_api': 'https://database.example.com/api/your_api_key',
     'legacy_person': 'https://www.example.com/db/?section=Updates&sub=person&id=',
     'application_email': 'workshops@example.com',
     'webmaster_email': 'webmaster@example.com',
-    'sysadmin_email': 'sysadmin@example.com'
+    'sysadmin_email': 'sysadmin@example.com',
+    'event_types': ['5 Day Workshop', '2 Day Workshop', 'Research in Teams',
+      'Focussed Research Group', 'Summer School', 'Public Lecture'],
+    'code_pattern': '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z'
   }
 end
 

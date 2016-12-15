@@ -61,13 +61,13 @@ describe "ScheduleItem" do
 
   describe '.new(params).schedule' do
     it '.set_default_location sets the room according to the event type & location' do
-      new_event_type = Global.event.types.third
+      new_event_type = Setting.Site[:event_types].third
       @event.event_type = new_event_type
       @event.save
 
       item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
 
-      new_room = Global.location.rooms.send(@event.location).send(new_event_type)
+      new_room = Setting.Rooms[@event.location.to_sym][new_event_type.to_sym]
       expect(item.location).to eq(new_room)
     end
 

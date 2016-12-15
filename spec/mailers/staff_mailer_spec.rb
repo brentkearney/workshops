@@ -8,6 +8,10 @@ require "rails_helper"
 include ActiveJob::TestHelper
 
 RSpec.describe StaffMailer, type: :mailer do
+  before do
+    @sysadmin_email = Setting.Site[:sysadmin_email]
+  end
+
   before :each do
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
@@ -21,14 +25,16 @@ RSpec.describe StaffMailer, type: :mailer do
 
   describe '.event_sync' do
     it 'sends email to program coordinator and system administrator' do
-      event = create(:event, code: '15w6661', location: 'BIRS')
+      event = create(:event, code: '15w6661')
 
-      @sync_errors = { 'Event' => event, 'People' => Array.new, 'Memberships' => Array.new }
+      @sync_errors = { 'Event' => event, 'People' => Array.new,
+        'Memberships' => Array.new }
       StaffMailer.event_sync(event, @sync_errors).deliver_now
 
       expect(ActionMailer::Base.deliveries.count).to eq(1)
-      expect(ActionMailer::Base.deliveries.first.to).to include(Global.email.locations.send(event.location).program_coordinator)
-      expect(ActionMailer::Base.deliveries.first.cc).to include(Global.email.system_administrator)
+      pc = Setting.Emails[event.location.to_sym][:program_coordinator]
+      expect(ActionMailer::Base.deliveries.first.to).to include(pc)
+      expect(ActionMailer::Base.deliveries.first.cc).to include(@sysadmin_email)
     end
   end
 
@@ -44,17 +50,20 @@ RSpec.describe StaffMailer, type: :mailer do
       StaffMailer.notify_sysadmin(@event, @error).deliver_now
 
       expect(ActionMailer::Base.deliveries.count).to eq(1)
-      expect(ActionMailer::Base.deliveries.first.to).to include(Global.email.system_administrator)
+      expect(ActionMailer::Base.deliveries.first.to).to include(@sysadmin_email)
     end
   end
 
   describe '.schedule_change' do
     let(:event) { build(:event) }
-    let(:original_schedule) { build(:schedule, event: event, name: 'Original name') }
+    let(:original_schedule) { build(:schedule, event: event,
+      name: 'Original name') }
     let(:new_schedule) { build(:schedule, event: event, name: 'New name') }
 
     before :each do
-      StaffMailer.schedule_change(original_schedule, type: :update, user: 'Test User', updated_schedule: new_schedule).deliver_now
+      StaffMailer.schedule_change(original_schedule,
+        type: :update, user: 'Test User',
+        updated_schedule: new_schedule).deliver_now
     end
 
     it 'sends email' do
@@ -62,7 +71,9 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: schedule_staff' do
-      expect(ActionMailer::Base.deliveries.first.to).to match_array(Global.email.locations.send(event.location).schedule_staff.split(', '))
+      schedule_staff = Setting.Emails[event.location.to_sym][:schedule_staff]
+      mailto = ActionMailer::Base.deliveries.first.to
+      expect(mailto).to eq(schedule_staff.split(', '))
     end
   end
 
@@ -71,7 +82,8 @@ RSpec.describe StaffMailer, type: :mailer do
 
     before :each do
       params = { short_name: 'Shorter name' }
-      StaffMailer.nametag_update(original_event: event, args: params).deliver_now
+      StaffMailer.nametag_update(original_event: event,
+          args: params).deliver_now
     end
 
     it 'sends email' do
@@ -79,7 +91,8 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: nametag_updates' do
-      expect(ActionMailer::Base.deliveries.first.to).to match_array(Global.email.locations.send(event.location).name_tags.split(', '))
+      name_tags = Setting.Emails[event.location.to_sym][:name_tags]
+      expect(ActionMailer::Base.deliveries.first.to).to match_array(name_tags)
     end
   end
 
@@ -87,7 +100,8 @@ RSpec.describe StaffMailer, type: :mailer do
     let(:event) { build(:event) }
 
     before :each do
-      params = { description: 'New description', press_release: 'New press release' }
+      params = { description: 'New description',
+        press_release: 'New press release' }
       StaffMailer.event_update(original_event: event, args: params).deliver_now
     end
 
@@ -96,7 +110,9 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: event_updates' do
-      expect(ActionMailer::Base.deliveries.first.to).to match_array(Global.email.locations.send(event.location).event_updates.split(', '))
+      event_updates = Setting.Emails[event.location.to_sym][:event_updates]
+      mailto = ActionMailer::Base.deliveries.first.to
+      expect(mailto).to eq(event_updates.split(', '))
     end
 
   end

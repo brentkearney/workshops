@@ -16,23 +16,23 @@ RSpec.describe "Model validations: Event ", type: :model do
     event = create(:event)
     expect(event.start_date.to_time.to_i).to be < event.end_date.to_time.to_i
   end
-  
+
   it "is invalid without a name" do
     expect(build(:event, name: nil)).not_to be_valid
   end
-  
+
   it "is invalid without a start date" do
     expect(build(:event, start_date: nil)).not_to be_valid
   end
-  
+
   it "is invalid without an end date" do
     expect(build(:event, end_date: nil)).not_to be_valid
   end
-  
+
   it "is invalid without a location" do
     expect(build(:event, location: nil)).not_to be_valid
   end
-  
+
   it "is invalid without max participants" do
     expect(build(:event, max_participants: nil)).not_to be_valid
   end
@@ -40,19 +40,19 @@ RSpec.describe "Model validations: Event ", type: :model do
   it 'is invalid without a time zone' do
     expect(build(:event, time_zone: nil)).not_to be_valid
   end
-  
+
   it "is invalid if the name is longer than 68 characters and it has no short name" do
     e = build(:event, name: Faker::Lorem.paragraph(5), short_name: nil)
     expect(e).not_to be_valid
     expect(e.errors).to include(:short_name)
   end
-  
+
   it "is invalid if the short name is also longer than 68 characters" do
     e = build(:event, name: Faker::Lorem.paragraph(5), short_name: Faker::Lorem.paragraph(5))
     expect(e).not_to be_valid
     expect(e.errors).to include(:short_name)
   end
-  
+
   it "is invalid if the code is not unique" do
     first_event = create(:event)
     dupe_event = build(:event, code: first_event.code)
@@ -60,7 +60,8 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(dupe_event.errors).to include(:code)
   end
 
-  # This is going to be organization-specific; set regex in config/settings/event.yml
+  # This is going to be organization-specific; set regex in
+  # Setting.Site.code_pattern
   it "is invalid if the code has improper format" do
 	  event_codes = %w[LSD w5042 12s9230 14w51234 15frg12] # invalid codes
 	  event_codes.each do |code|
@@ -69,20 +70,20 @@ RSpec.describe "Model validations: Event ", type: :model do
 	    expect(e.errors[:code].any?).to be_truthy
     end
 	end
-	
+
 	it "is valid if the event code has proper format" do
-	  event_codes = %w[13w2145 14w5042 12ss130 10rit100 15frg129 13pl003] # valid codes
+	  event_codes = %w[13w2145 14w5042 12ss130 10rit100 15frg129 13pl003] # valid
 	  event_codes.each do |code|
 	    e = build(:event, code: code)
 	    expect(e.valid?).to be_truthy
 	    expect(e.errors[:code].any?).to be_falsey
     end
   end
-  
+
   it "is invalid without an event type" do
     expect(build(:event, event_type: nil)).not_to be_valid
   end
-  
+
   it "is invalid if the event type is not part of Event::EVENT_TYPES" do
     expect(build(:event, event_type: 'Keg Party')).not_to be_valid
   end
@@ -91,35 +92,35 @@ RSpec.describe "Model validations: Event ", type: :model do
     e = build(:event)
     expect(e.country).not_to be_nil
   end
-  
+
   it "can find based on code (instead of just id)" do
     e = create(:event)
     found = Event.find(e.code)
     expect(found.name).to eq(e.name)
   end
-  
+
   it "members returns a collection of person objects" do
     e = create(:event)
     p1 = create(:person)
     p2 = create(:person)
     m1 = create(:membership, event: e, person: p1)
     m2 = create(:membership, event: e, person: p2)
-    
+
     expect(e.members).to include(p1, p2)
   end
-  
+
   it "automatically truncates leading and trailing whitespace around text fields" do
     e = create(:event, name: ' Test Name ', short_name: ' Test ', description: ' A workshop with whitespace  ')
-    
+
     expect(e.name).to eq('Test Name')
     expect(e.short_name).to eq('Test')
     expect(e.description).to eq('A workshop with whitespace')
-    
+
     e.name = ' Testing save function too  '
     e.save
     expect(e.name).to eq('Testing save function too')
   end
-  
+
   it ":past scope returns events in the past" do
     e1 = create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
     e2 = create(:event, code: '11w5001', start_date: '2011-05-15', end_date: '2011-05-20')
@@ -129,7 +130,7 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(events).to include(e1, e2)
     expect(events).not_to include(e3, e4)
   end
-  
+
   it ":future scope returns events in the future" do
     e1 = create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
     e2 = create(:event, code: '11w5001', start_date: '2011-05-15', end_date: '2011-05-20')
@@ -139,7 +140,7 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(events).to include(e3, e4)
     expect(events).not_to include(e1, e2)
   end
-  
+
   it ":year scope returns events in a given year" do
     e1 = create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
     e2 = create(:event, code: '10w5002', start_date: '2010-05-25', end_date: '2010-05-30')
@@ -148,13 +149,13 @@ RSpec.describe "Model validations: Event ", type: :model do
     events = Event.year(2010)
     expect(events).to include(e1, e2, e3)
     expect(events).not_to include(e4)
-    
+
     # Bonus - also works when year is a string:
     events = Event.year('2010')
     expect(events).to include(e1, e2, e3)
     expect(events).not_to include(e4)
   end
-  
+
   it ":kind scope returns events of a given kind" do
     e1 = create(:event, code: '10w5001', event_type: '5 Day Workshop')
     e2 = create(:event, code: '10w5002', event_type: '5 Day Workshop')
@@ -163,7 +164,7 @@ RSpec.describe "Model validations: Event ", type: :model do
     events = Event.kind('5 Day Workshop')
     expect(events).to include(e1, e2)
     expect(events).not_to include(e3, e4)
-    
+
     events = Event.kind('2 Day Workshop')
     expect(events).to include(e3, e4)
     expect(events).not_to include(e1, e2)
@@ -175,11 +176,11 @@ RSpec.describe "Model validations: Event ", type: :model do
   it '.days returns a collection of Time objects for each day of the event' do
     e = create(:event, start_date: '2015-05-04', end_date: '2015-05-07')
     edays = e.days
-    
+
     expect(edays[0].strftime("%A")).to eq("Monday")
     expect(edays[1].strftime("%A")).to eq("Tuesday")
     expect(edays[2].strftime("%A")).to eq("Wednesday")
-    
+
     e.destroy
   end
 
@@ -195,7 +196,7 @@ RSpec.describe "Model validations: Event ", type: :model do
 
     e.destroy
   end
-  
+
   it ".member_info returns hash of names and afilliations" do
     e = create(:event)
     p1 = create(:person)
@@ -222,7 +223,7 @@ RSpec.describe "Model validations: Event ", type: :model do
       expect(members[i].role).to eq(role)
       i += 1
     end
-    
+
     event.destroy
   end
 
@@ -249,7 +250,7 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(e.num_attendance('Confirmed')).to eq(4)
     expect(e.num_attendance('Declined')).to eq(1)
     expect(e.num_attendance('Not Yet Invited')).to eq(2)
-    
+
     e.destroy
   end
 
@@ -268,13 +269,13 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(e.has_attendance('Invited')).to be_falsey
     expect(e.has_attendance('Declined')).to be_truthy
     expect(e.has_attendance('Undecided')).to be_falsey
-    
+
     e.destroy
   end
 
   it ".dates returns formatted dates" do
     e = build(:event)
-    
+
     expect(e.dates).to match(/^\D+ \d+ -.+\d+$/) # e.g. May 8 - 13
   end
 
@@ -284,7 +285,7 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(e.arrival_date).to match(/^\w+,\ \w+\ \d+,\ \d{4}$/) # e.g. Friday, May 8, 2015
     expect(e.departure_date).to match(/^\w+,\ \w+\ \d+,\ \d{4}$/)
   end
-  
+
   context '.is_current?' do
     it 'false if current time is outside event dates' do
       e = build(:event, future: true)

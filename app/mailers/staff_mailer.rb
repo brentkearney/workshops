@@ -5,11 +5,12 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class StaffMailer < ApplicationMailer
-  default from: Global.email.application
+  default from: Setting.Site[:application_email]
 
   def schedule_change(schedule, type:, user:, updated_schedule: false, changed_similar: false)
     @event = schedule.event
-    to_email = Global.email.locations.send(@event.location).schedule_staff
+    # to_email = Global.email.locations.send(@event.location).schedule_staff
+    to_email = Setting.Emails[@event.location.to_sym][:schedule_staff]
     subject = "[#{@event.code}] Schedule change notice!"
     if schedule.lecture.nil?
       publish = 'N/A'
@@ -17,7 +18,7 @@ class StaffMailer < ApplicationMailer
       publish = schedule.lecture.do_not_publish ? 'OFF' : 'ON'
     end
 
-    
+
     @change_notice = %Q(
     THIS:
       Name: #{schedule.name}
@@ -66,15 +67,17 @@ class StaffMailer < ApplicationMailer
   def event_sync(event, error_messages)
     @event = event
     @error_messages = error_messages
-    to_email = Global.email.locations.send(event.location).program_coordinator
-    cc_email = Global.email.system_administrator
+    # to_email = Global.email.locations.send(event.location).program_coordinator
+    to_email = Setting.Emails[event.location.to_sym][:program_coordinator]
+    # cc_email = Global.email.system_administrator
+    cc_email = Setting.Site[:sysadmin_email]
     subject = "!! #{event.code} (#{event.location}) Data errors !!"
 
     mail(to: to_email, cc: cc_email, subject: subject)
   end
 
   def notify_sysadmin(event, error)
-    to_email = Global.email.system_administrator
+    to_email = Setting.Site[:sysadmin_email]
 
     if event.nil?
       subject = "Workshops error!"
@@ -90,10 +93,12 @@ class StaffMailer < ApplicationMailer
     event = original_event
     @updated_by = args[:updated_by]
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
-    @event_url = Global.config.event_url + '/' + event.code
+    # @event_url = Global.config.event_url + '/' + event.code
+    @event_url = Setting.Site[:event_url]
     @workshops_url = event_url(event)
 
-    to_email = Global.email.locations.send(event.location).event_updates
+    # to_email = Global.email.locations.send(event.location).event_updates
+    to_email = Setting.Emails[event.location.to_sym][:event_updates]
     subject = "[#{event.code}] Event updated!"
 
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
@@ -106,7 +111,8 @@ class StaffMailer < ApplicationMailer
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
     @workshops_url = event_url(event)
 
-    to_email = Global.email.locations.send(event.location).name_tags
+    # to_email = Global.email.locations.send(event.location).name_tags
+    to_email = Setting.Emails[event.location.to_sym][:name_tags]
     subject = "[#{event.code}] Name tag change notice!"
 
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)

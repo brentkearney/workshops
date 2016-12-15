@@ -91,8 +91,8 @@ module EventDecorators
   end
 
   def country
-    if Global.location.country.key?(self.location)
-      Global.location.country.send(self.location)
+    unless Setting.Locations[self.location.to_sym].nil?
+      Setting.Locations[self.location.to_sym][:Country]
     end
   end
 

@@ -249,6 +249,6 @@ class ScheduleItem
   end
 
   def set_default_location
-    location = Global.location.rooms.send(@event.location).send("#{@event.event_type}")
+    location = Setting.Rooms[@event.location.to_sym][@event.event_type.to_sym]
   end
 end

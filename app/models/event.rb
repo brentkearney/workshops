@@ -14,7 +14,7 @@ class Event < ActiveRecord::Base
 
   validates :name, :start_date, :end_date, :location, :max_participants, :time_zone, presence: true
   validates :short_name, presence: true, :if => :has_long_name
-  
+
   validates :code, uniqueness: true, format: {
     with: /#{Global.event.code_pattern}/,
     message: "- invalid code format. Must match: #{Global.event.code_pattern}"
@@ -33,13 +33,13 @@ class Event < ActiveRecord::Base
   def self.find(param)
     param =~ /\D/ ? find_by_code(param) : super
   end
-  
+
   scope :past, -> { where("end_date < ? AND template = ?", Time.now, false).order(:start_date) }
   scope :future, -> { where("end_date >= ? AND template = ?", Time.now, false).order(:start_date) }
   scope :year, ->(year) { where("start_date >= '?-01-01' AND end_date <= '?-12-31' AND template = ?", year.to_i, year.to_i, false) }
   scope :location, ->(location) { where("location = ? AND template = ?", location, false) }
-  
-  scope :kind, ->(kind) { 
+
+  scope :kind, ->(kind) {
     if kind == 'Research in Teams'
       # RITs stay plural
       where("event_type = ? AND template = ?", 'Research in Teams', false).order(:start_date)
@@ -53,31 +53,31 @@ class Event < ActiveRecord::Base
   end
 
   def check_event_type
-    if Global.event.types.include?(event_type)
+    if Setting.Site[:event_types].include?(event_type)
       return true
     else
-      types = Global.event.types.join(", ")
+      types = Setting.Site[:event_types].join(', ')
       errors.add(:event_type, "- event type must be one of: #{types}")
       return false
     end
   end
-  
+
   def has_long_name
     if name && name.length > 68
-      if short_name.blank? 
+      if short_name.blank?
         errors.add(:short_name, "- if the name is > 68 characters, a shorter name is required to fit on name tags")
       elsif short_name.length > 68
         errors.add(:short_name, "must be less than 68 characters long")
       end
     end
   end
-  
+
   private
-  
+
   def clean_data
     # remove leading & trailing whitespace
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }
     true
   end
-  
+
 end
