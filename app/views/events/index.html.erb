@@ -11,7 +11,7 @@
 	    <td><%= link_to event.code, event_path(event) %></td>
 	    <td><%= link_to event.name, event_path(event) %></td>
 	    <td width="125"><%= event.dates %></td>
-	    <td id="confirmed-column"><%= event.confirmed_count %></td>
+	    <td class="confirmed"><%= event.confirmed_count %></td>
 	</tr>
   <% end %>
 	</tbody>
