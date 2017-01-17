@@ -1,7 +1,7 @@
 # spec/factories/events.rb
 require 'faker'
 
-# random_code = rand(10..17).to_s + 'w50' + rand(10..99).to_s
+random_code = rand(10..17).to_s + 'w50' + rand(10..99).to_s
 
 FactoryGirl.define do
   sequence(:code) { |n| DateTime.now.strftime("%y") + 'w5' + n.to_s.rjust(3, '0') }
@@ -16,10 +16,10 @@ FactoryGirl.define do
     f.door_code 1234
     f.start_date
     f.end_date
-    f.event_type Setting.get_all['Site']['event_types'].first
+    f.event_type Global.event.types.first
     f.max_participants 42
-    f.location Setting.get_all['Locations'].keys.first
-    f.time_zone 'Mountain Time (US & Canada)'
+    f.location Global.location.first
+    f.time_zone Global.location.timezone.send(Global.location.first)
     f.description { Faker::Lorem.sentence(6) }
     f.updated_by 'FactoryGirl'
     f.template false
@@ -31,16 +31,20 @@ FactoryGirl.define do
     end
 
     after(:build) do |event, evaluator|
+      date = Date.today
       if evaluator.past
-        event.start_date = Date.today.prev_year.prev_week(:sunday)
-        event.end_date = Date.today.prev_year.prev_week(:sunday) + 5.days
+        date = date.prev_year
+        event.start_date = date.prev_week(:sunday)
+        event.end_date = date.prev_week(:sunday) + 5.days
       elsif evaluator.future
-        event.start_date = Date.today.next_year.next_week(:sunday)
-        event.end_date = Date.today.next_year.next_week(:sunday) + 5.days
+        date = date.next_year
+        event.start_date = date.next_week(:sunday)
+        event.end_date = date.next_week(:sunday) + 5.days
       elsif evaluator.current
-        event.start_date = Date.today.beginning_of_week(:sunday)
-        event.end_date = Date.today.beginning_of_week(:sunday) + 7.days
+        event.start_date = date.beginning_of_week(:sunday)
+        event.end_date = date.beginning_of_week(:sunday) + 7.days
       end
+      event.code.gsub!(/^\d{2}/, date.strftime('%y'))
     end
 
     factory :event_with_roles do
