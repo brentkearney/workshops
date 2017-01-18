@@ -46,7 +46,7 @@ describe 'Event List', type: :feature do
         expect(page.body).to have_link('Event Years')
       end
 
-      it 'the link expands to show event years' do
+      it 'expands to show event years' do
         visit root_path
         years = page.all('ul#event-years-list a').map(&:text)
 
@@ -133,21 +133,95 @@ describe 'Event List', type: :feature do
   end
 
   describe 'Future Events' do
-    it 'lists events in the future'
+    it 'lists current event + events in the future' do
+      visit root_path
+
+      click_link 'Future Events'
+
+      expect(page.body).to have_text(@current.name)
+      expect(page.body).not_to have_text(@past.name)
+      expect(page.body).to have_text(@future.name)
+    end
   end
 
   describe 'Past Events' do
-    it 'lists events in the past'
+    it 'lists events in the past' do
+      visit root_path
+
+      click_link 'Past Events'
+
+      expect(page.body).not_to have_text(@current.name)
+      expect(page.body).to have_text(@past.name)
+      expect(page.body).not_to have_text(@future.name)
+    end
   end
 
   describe 'Event Years' do
-    it 'lists events for selected year'
-    it 'allows toggle by location'
+    it 'lists events for selected year' do
+      year = @past.year
+
+      visit root_path
+      click_link 'Event Years'
+      click_link "#{year}"
+
+      expect(current_path).to eq(events_year_path(year))
+      expect(page.body).to have_text(@past.name)
+    end
+
+    it 'location view can toggle by year' do
+      location = @past.location
+      @future.location = location
+      @future.save
+
+      visit events_location_path(location)
+
+      click_link 'Event Years'
+      click_link @past.year
+
+      expect(page.body).not_to have_text(@future.name)
+    end
+
   end
 
   describe 'Event Locations' do
-    it 'shows a link for each location of events'
-    it 'lists events for selected location'
-    it 'allows toggle by year'
+    it 'lists events for selected location' do
+      location = @current.location
+
+      visit root_path
+      click_link 'Event Locations'
+      click_link "#{location}"
+
+      expect(current_path).to eq(events_location_path(location))
+      expect(page.body).to have_text(@current.name)
+    end
+
+    it 'past events view can toggle by location' do
+      start_date = @past.start_date.advance(weeks: 1)
+      end_date = start_date.advance(days: 5)
+      past2 = create(:event, start_date: start_date, 
+        end_date: end_date, location: 'XOXO')
+
+      visit events_past_path
+      click_link 'Event Locations'
+      click_link @past.location
+
+      expect(page.body).to have_text(@past.name)
+      expect(page.body).not_to have_text(past2.name)
+      expect(page.body).not_to have_text(@future.name)
+    end
+
+    it 'year view can toggle by location' do
+      event1 = create(:event)
+      event2 = create(:event, location: 'XOXO')
+      
+      visit events_year_path(event1.year)
+      expect(page.body).to have_text(event1.name)
+      expect(page.body).to have_text(event2.name)
+
+      click_link 'Event Years'
+      click_link event1.location
+
+      expect(page.body).not_to have_text(event2.name)
+    end
   end
 end
