@@ -7,6 +7,10 @@
 module EventDecorators
   extend ActiveSupport::Concern
 
+  def year
+    start_date.strftime('%Y')
+  end
+
   def days
     day = start_date.to_time.noon
     days = [day]

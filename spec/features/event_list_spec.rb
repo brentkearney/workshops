@@ -40,14 +40,37 @@ describe 'Event List', type: :feature do
       expect(page.body).to have_link('Past Events')
     end
 
-    it '#Event Years' do
-      visit root_path
-      expect(page.body).to have_link('Event Years')
+    describe '#Event Years' do
+      it 'has a link' do
+        visit root_path
+        expect(page.body).to have_link('Event Years')
+      end
+
+      it 'the link expands to show event years' do
+        visit root_path
+        years = page.all('ul#event-years-list a').map(&:text)
+
+        expect(years).to include(@past.year)
+        expect(years).to include(@current.year)
+        expect(years).to include(@future.year)
+      end
     end
 
-    it '#Event Locations' do
-      visit root_path
-      expect(page.body).to have_link('Event Locations')
+    describe '#Event Locations' do
+      it 'has a link' do
+        visit root_path
+        expect(page.body).to have_link('Event Locations')
+      end
+
+      it 'expands to show event locations' do
+        visit root_path
+        locations =
+          page.all('ul#event-locations-list a').map(&:text)
+
+        expect(locations).to include(@past.location)
+        expect(locations).to include(@current.location)
+        expect(locations).to include(@future.location)
+      end
     end
   end
 
@@ -92,14 +115,20 @@ describe 'Event List', type: :feature do
   describe 'My Events' do
     it 'lists the current user\'s events' do
       person = create(:person)
-      create(:membership, person: person, event: @future)
-      authenticate_user(person, 'member')
+      member_user = create(:user, person: person)
+      create(:membership, person: person, event: @future,
+        attendance: 'Confirmed')
 
+      logout(@user)
+      login_as member_user, scope: :user
       visit my_events_path
-      puts "#{person.name}'s events: #{person.events.map(&:code)}"
 
       expect(page.body).to have_text(@future.code)
       expect(page.body).not_to have_text(@past.code)
+      expect(page.body).not_to have_text(@current.code)
+
+      logout(member_user)
+      authenticate_user
     end
   end
 
@@ -112,7 +141,6 @@ describe 'Event List', type: :feature do
   end
 
   describe 'Event Years' do
-    it 'shows a link for each year of events'
     it 'lists events for selected year'
     it 'allows toggle by location'
   end
