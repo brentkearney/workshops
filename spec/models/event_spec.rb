@@ -88,11 +88,6 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(build(:event, event_type: 'Keg Party')).not_to be_valid
   end
 
-  it 'has a country based on its location' do
-    e = build(:event)
-    expect(e.country).not_to be_nil
-  end
-
   it "can find based on code (instead of just id)" do
     e = create(:event)
     found = Event.find(e.code)
@@ -121,58 +116,71 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(e.name).to eq('Testing save function too')
   end
 
-  it ":past scope returns events in the past" do
-    e1 = create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
-    e2 = create(:event, code: '11w5001', start_date: '2011-05-15', end_date: '2011-05-20')
-    e3 = create(:event, code: '20w5001', start_date: '2020-05-15', end_date: '2020-05-20')
-    e4 = create(:event, code: '21w5001', start_date: '2021-05-15', end_date: '2021-05-20')
-    events = Event.past
-    expect(events).to include(e1, e2)
-    expect(events).not_to include(e3, e4)
+  describe '.years' do
+    it 'returns an array of years in which events take place' do
+      Event.destroy_all
+      @past = create(:event, past: true)
+      @current = create(:event, current: true)
+      @future = create(:event, future: true)
+
+      expect(Event.years).to eq([@past.year, @current.year, @future.year])
+    end
   end
 
-  it ":future scope returns events in the future" do
-    e1 = create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
-    e2 = create(:event, code: '11w5001', start_date: '2011-05-15', end_date: '2011-05-20')
-    e3 = create(:event, code: '20w5001', start_date: '2020-05-15', end_date: '2020-05-20')
-    e4 = create(:event, code: '21w5001', start_date: '2021-05-15', end_date: '2021-05-20')
-    events = Event.future
-    expect(events).to include(e3, e4)
-    expect(events).not_to include(e1, e2)
-  end
+  describe 'Event Scopes' do
+    before do
+      @past = create(:event, past: true)
+      @current = create(:event, current: true)
+      @future = create(:event, future: true)
+    end
 
-  it ":year scope returns events in a given year" do
-    e1 = create(:event, code: '10w5001', start_date: '2010-05-15', end_date: '2010-05-20')
-    e2 = create(:event, code: '10w5002', start_date: '2010-05-25', end_date: '2010-05-30')
-    e3 = create(:event, code: '10w5003', start_date: '2010-06-01', end_date: '2010-06-05')
-    e4 = create(:event, code: '21w5004', start_date: '2021-06-15', end_date: '2021-06-20')
-    events = Event.year(2010)
-    expect(events).to include(e1, e2, e3)
-    expect(events).not_to include(e4)
+    it ":past scope returns events in the past" do
+      events = Event.past
+      expect(events).to include(@past)
+      expect(events).not_to include(@current, @future)
+    end
 
-    # Bonus - also works when year is a string:
-    events = Event.year('2010')
-    expect(events).to include(e1, e2, e3)
-    expect(events).not_to include(e4)
-  end
+    it ":future scope returns current & future events" do
+      events = Event.future
+      expect(events).to include(@current, @future)
+      expect(events).not_to include(@past)
+    end
 
-  it ":kind scope returns events of a given kind" do
-    e1 = create(:event, code: '10w5001', event_type: '5 Day Workshop')
-    e2 = create(:event, code: '10w5002', event_type: '5 Day Workshop')
-    e3 = create(:event, code: '10w2001', event_type: '2 Day Workshop')
-    e4 = create(:event, code: '10w2002', event_type: '2 Day Workshop')
-    events = Event.kind('5 Day Workshop')
-    expect(events).to include(e1, e2)
-    expect(events).not_to include(e3, e4)
+    it ":year scope returns events in a given year" do
+      events = Event.year(Date.today.strftime('%Y'))
+      expect(events).to include(@current)
+      expect(events).not_to include(@past, @future)
+    end
 
-    events = Event.kind('2 Day Workshop')
-    expect(events).to include(e3, e4)
-    expect(events).not_to include(e1, e2)
+    it ":kind scope returns events of a given kind" do
+      @past.event_type = '5 Day Workshop'
+      @past.save
+      @current.event_type = '5 Day Workshop'
+      @current.save
+      @future.event_type = '2 Day Workshop'
+      @future.save
+      
+      events = Event.kind('5 Day Workshop')
+      expect(events).to include(@past, @current)
+      expect(events).not_to include(@future)
+
+      events = Event.kind('2 Day Workshop')
+      expect(events).to include(@future)
+      expect(events).not_to include(@past, @current)
+    end
   end
 
   ###
-  ################# instance methods from app/models/concerns/event_decorators.rb #################
+  #####instance methods from app/models/concerns/event_decorators.rb #########
   ###
+  it '.country from Setting.Locations' do
+    country = Setting.Locations.first.second[:Country]
+
+    event = build(:event, location: Setting.Locations.keys[0])
+
+    expect(event.country).to eq(country)
+  end
+
   it '.days returns a collection of Time objects for each day of the event' do
     e = create(:event, start_date: '2015-05-04', end_date: '2015-05-07')
     edays = e.days

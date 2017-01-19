@@ -72,6 +72,10 @@ class Event < ActiveRecord::Base
     end
   end
 
+  def self.years
+    all.map {|e| e.start_date.year.to_s}.uniq
+  end
+
   private
 
   def clean_data
