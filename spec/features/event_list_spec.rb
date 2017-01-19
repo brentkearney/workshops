@@ -20,27 +20,27 @@ describe 'Event List', type: :feature do
   end
 
   describe 'Navigation Links' do
-    it '#My Events' do
+    it '#My Events has a link' do
       visit root_path
       expect(page.body).to have_link('My Events')
     end
 
-    it '#All Events' do
+    it '#All Events has a link' do
       visit root_path
       expect(page.body).to have_link('All Events')
     end
 
-    it '#Future Events' do
+    it '#Future Events has a link' do
       visit root_path
       expect(page.body).to have_link('Future Events')
     end
 
-    it '#Past Events' do
+    it '#Past Events has a link' do
       visit root_path
       expect(page.body).to have_link('Past Events')
     end
 
-    describe '#Event Years' do
+    describe '#Event Years has a link' do
       it 'has a link' do
         visit root_path
         expect(page.body).to have_link('Event Years')
@@ -71,6 +71,19 @@ describe 'Event List', type: :feature do
         expect(locations).to include(@current.location)
         expect(locations).to include(@future.location)
       end
+    end
+
+    it 'Event list navigation disappears when an event is opened' do
+      visit root_path
+      click_link 'All Events'
+      click_link @current.name
+
+      expect(page.body).not_to have_link 'All Events'
+      expect(page.body).not_to have_link 'My Events'
+      expect(page.body).not_to have_link 'Future Events'
+      expect(page.body).not_to have_link 'Past Events'
+      expect(page.body).not_to have_link 'Event Locations'
+      expect(page.body).not_to have_link 'Events Years'
     end
   end
 
