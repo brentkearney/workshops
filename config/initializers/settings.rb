@@ -1,6 +1,6 @@
 # Sets up some defaults to populate the Settings section
 
-if Setting.find_by(var: 'Site').nil?
+if Setting.Site.blank?
   Setting.Site = {
     'title': 'Workshop Manager',
     'logo': 'logo.png',
@@ -17,9 +17,9 @@ if Setting.find_by(var: 'Site').nil?
   }
 end
 
-if Setting.find_by(var: 'Emails').nil?
+if Setting.Emails.blank?
   Setting.Emails = {
-    'EO': {
+    :EO => {
       'program_coordinator': 'organization@example.com',
       'secretary': 'organization-secretary@example.com',
       'administrator': 'organization-administrator@example.com',
@@ -32,9 +32,9 @@ if Setting.find_by(var: 'Emails').nil?
   }
 end
 
-if Setting.find_by(var: 'Locations').nil?
+if Setting.Locations.blank?
   Setting.Locations = {
-    'EO': {
+    :EO => {
       'Name': 'Example Organization',
       'Address': '123 Example Street',
       'City': 'Exampletown',
@@ -47,9 +47,9 @@ if Setting.find_by(var: 'Locations').nil?
   }
 end
 
-if Setting.find_by(var: 'Rooms').nil?
+if Setting.Rooms.blank?
   Setting.Rooms = {
-    'EO': {
+    :EO => {
       '5 Day Workshop': 'TCPL 201',
       '2 Day Workshop': 'TCPL 201',
       'Summer School':  'TCPL 202',

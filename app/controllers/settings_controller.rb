@@ -28,9 +28,8 @@ class SettingsController < ApplicationController
   # PATCH /settings
   def update
     authorize @setting
-
     @setting.value = update_params
-    # redirect_to edit_setting_path(params[:id])
+
     if @setting.save
       redirect_to edit_setting_path(params[:id]),
         notice: 'Setting has been updated.'
@@ -88,11 +87,8 @@ class SettingsController < ApplicationController
     params.require(:setting).permit(:id)
   end
 
-
   def get_setting
-    @setting = Setting.find_by_var(params[:id]) || Setting.new(var: params[:id])
-    # rails-settings-cached sometimes adds empty values
-    # @setting.value = @setting.value.except!(:"") unless @setting.value.nil?
+    @setting = Setting.find_by_var(params[:id]) || Setting.new(var: params[:id], value: {})
   end
 
   def get_settings

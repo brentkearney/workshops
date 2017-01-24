@@ -3,6 +3,7 @@
 <%= render partial: 'locations_nav', locals: {tabs: @setting.value.keys.uniq} %>
 
 <div class="tab tab-content">
+<pre>@setting value: <%= @setting.value %></pre>
 <% @setting.value.each do |key, values| %>
   <div role="tabpanel" class="tab-pane<%= ' active' if key == @setting.value.keys.first %>" id="<%= key %>">
     <h3><%= @setting.name(key) %></h3>
@@ -17,7 +18,7 @@
                   class: 'form-control input-sm' %></p>
           </div>
         </div>
-        <% unless values.empty? %>
+        <% if values.is_a?(Hash) && !values.empty? %>
           <% values.each do |field_name, field_value| %>
             <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
             <p><%= var_field.text_field field_name, value: field_value,

@@ -138,7 +138,17 @@ describe 'Settings page', type: :feature do
         expect(Setting.find_by_var('Locations').value.keys).to include('TEST2')
       end
 
-      it 'updates the locations of the other Setting sections as well'
+      it 'updates the location keys of the other Setting sections as well' do
+        visit edit_setting_path('Locations')
+
+        click_link '+/- Location'
+        fill_in 'setting[Locations][new_location]', with: 'TEST3'
+        click_button 'Create New Location'
+
+        (Setting.get_all.keys - ['Site', 'Locations']).each do |section|
+          expect(Setting.send(section).keys).to include(:TEST3)
+        end
+      end
     end
 
     context 'Rooms tab' do
