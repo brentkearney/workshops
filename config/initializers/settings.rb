@@ -1,7 +1,7 @@
 # Sets up some defaults to populate the Settings section
 
-if Setting.Site.blank?
-  Setting.Site = {
+if Setting.find_by_var('Site').nil?
+  s = Setting.new(var: 'Site', value: {
     'title': 'Workshop Manager',
     'logo': 'logo.png',
     'footer': 'Copyright © 2016 Example Organization',
@@ -12,13 +12,14 @@ if Setting.Site.blank?
     'webmaster_email': 'webmaster@example.com',
     'sysadmin_email': 'sysadmin@example.com',
     'event_types': ['5 Day Workshop', '2 Day Workshop', 'Research in Teams',
-      'Focussed Research Group', 'Summer School', 'Public Lecture'],
+    'Focussed Research Group', 'Summer School', 'Public Lecture'],
     'code_pattern': '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z'
-  }
+  })
+  s.save!
 end
 
-if Setting.Emails.blank?
-  Setting.Emails = {
+if Setting.find_by_var('Emails').nil?
+  s = Setting.new(var: 'Emails', value: {
     :EO => {
       'program_coordinator': 'organization@example.com',
       'secretary': 'organization-secretary@example.com',
@@ -29,26 +30,23 @@ if Setting.Emails.blank?
       'event_updates': 'webmaster@example.com, communications@example.com',
       'name_tags': 'organization-secretary@example.com'
     }
-  }
+  })
+  s.save!
 end
 
-if Setting.Locations.blank?
-  Setting.Locations = {
+if Setting.find_by_var('Locations').nil?
+  s = Setting.new(var: 'Locations', value: {
     :EO => {
       'Name': 'Example Organization',
-      'Address': '123 Example Street',
-      'City': 'Exampletown',
-      'Region': 'EX',
-      'Postal Code': '1E2 3X4',
       'Country': 'Canada',
-      'Timezone': 'Mountain Time (US & Canada)',
-      'Description': 'Please edit this example organization in Settings.'
+      'Timezone': 'Mountain Time (US & Canada)'
     }
-  }
+  })
+  s.save!
 end
 
-if Setting.Rooms.blank?
-  Setting.Rooms = {
+if Setting.find_by_var('Rooms').nil?
+  s = Setting.new(var: 'Rooms', value: {
     :EO => {
       '5 Day Workshop': 'TCPL 201',
       '2 Day Workshop': 'TCPL 201',
@@ -61,5 +59,6 @@ if Setting.Rooms.blank?
       'CH1': ['5112', '5114', '5120', '5122'],
       'CH2': ['5116', '5124']
     }
-  }
+  })
+  s.save!
 end

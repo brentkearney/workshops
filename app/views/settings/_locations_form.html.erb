@@ -3,7 +3,6 @@
 <%= render partial: 'locations_nav', locals: {tabs: @setting.value.keys.uniq} %>
 
 <div class="tab tab-content">
-<pre>@setting value: <%= @setting.value %></pre>
 <% @setting.value.each do |key, values| %>
   <div role="tabpanel" class="tab-pane<%= ' active' if key == @setting.value.keys.first %>" id="<%= key %>">
     <h3><%= @setting.name(key) %></h3>
@@ -21,27 +20,18 @@
         <% if values.is_a?(Hash) && !values.empty? %>
           <% values.each do |field_name, field_value| %>
             <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
-            <p><%= var_field.text_field field_name, value: field_value,
-                class: 'form-control' %></p>
+            <p>
+            <% if field_name == :Timezone %>
+              <%= var_field.time_zone_select 'Timezone', ActiveSupport::TimeZone.us_zones, 
+                { default: field_value }, { class: 'form-control' } %>
+            <% else %>
+              <%= var_field.text_field field_name, value: field_value,
+                class: 'form-control' %>
+            <% end %>
+            </p>
           <% end %><!-- values -->
         <% end %>
       <% end %><!-- var_form -->
-      <%= var_form.fields_for key do |new_field_form| %>
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <h4>Add New Field to "<%= key %>":</h4>
-            <div class="form-group">
-              <label for="new_field">Field name:</label>
-              <%= new_field_form.text_field :new_field, class: 'form-control' %>
-            </div>
-            <div class="form-group">
-              <label for="new_field">Field value:</label>
-              <%= new_field_form.text_field :new_value, class: 'form-control' %>
-              <span class="help-block">For arrays, use: [One, Two, 3, four]</span>
-            </div>
-          </div>
-        </div>
-      <% end %>
 
       <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>
     <% end %><!-- setting_form -->

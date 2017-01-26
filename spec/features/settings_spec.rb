@@ -58,7 +58,7 @@ describe 'Settings page', type: :feature do
         visit edit_setting_path('Site')
 
         Setting.Site.keys.each do |field|
-          expect(page).to have_field("setting[Site][#{field}]")
+          expect(page).to have_field("setting[Site][#{field}]") unless field.empty?
         end
       end
 
@@ -86,13 +86,12 @@ describe 'Settings page', type: :feature do
       it 'accepts array values' do
         visit edit_setting_path('Site')
 
-        fill_in 'setting[Site][new_field]', with: 'Breakfast'
-        fill_in 'setting[Site][new_value]', with: '[Lunch, Dinner, Desert]'
+        fill_in 'setting[Site][event_types]', with: '[Lunch, Dinner, Desert]'
         click_button 'Update Settings'
 
         expect(page).to have_text('Setting has been updated')
         setting = Setting.find_by_var('Site')
-        expect(setting.value['Breakfast'].class).to eq(Array)
+        expect(setting.value['event_types'].class).to eq(Array)
       end
 
       it 'has a way to delete fields'
@@ -134,8 +133,8 @@ describe 'Settings page', type: :feature do
         click_button 'Create New Location'
 
         expect(page).to have_text('Setting has been updated')
-        expect(page).to have_link('TEST2')
-        expect(Setting.find_by_var('Locations').value.keys).to include('TEST2')
+        expect(page).to have_css('div.tab-pane#TEST2')
+        expect(Setting.find_by_var('Locations').value.keys).to include(:TEST2)
       end
 
       it 'updates the location keys of the other Setting sections as well' do

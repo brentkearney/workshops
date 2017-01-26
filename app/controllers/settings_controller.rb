@@ -63,17 +63,20 @@ class SettingsController < ApplicationController
   private
 
   def update_params
-    setting_fields = [:new_field, :new_value, :new_location, :remove_location]
+    setting_fields = initial_settings
     @setting.value.each do |field_name, value|
       if value.is_a?(Hash)
-        setting_fields << { "#{field_name}": value.keys <<
-          [:new_field, :new_value, :new_key] }
+        setting_fields << { "#{field_name}": value.keys << :new_key }
       else
         setting_fields << field_name
       end
     end
     data = params.require(:setting).permit("#{@setting.var}": setting_fields)
     data["#{@setting.var}"]
+  end
+
+  def initial_settings
+    params['setting']['Locations'] ? [:new_location, :remove_location] : Array.new
   end
 
   def setting_params

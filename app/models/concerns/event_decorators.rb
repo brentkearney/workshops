@@ -95,7 +95,7 @@ module EventDecorators
   end
 
   def country
-    if Setting.Locations[self.location.to_sym]
+    if Setting.Locations && Setting.Locations[self.location.to_sym]
       Setting.Locations[self.location.to_sym][:Country]
     else
       'Unknown'
