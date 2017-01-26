@@ -1,5 +1,5 @@
 <%= render "settings_nav" %>
-<div class="tab">
+<div class="tab" id="settings-tab">
   <%= form_for(@setting, url: setting_path(@setting.var), method: 'patch') do
       |setting_form| %>
     <% if lookup_context.exists?("#{@setting.var.downcase}_form",
@@ -11,4 +11,4 @@
       <%= render partial: 'edit_form',locals: { setting_form: setting_form } %>
     <% end %>
   <% end %>
-</div><!-- Settings: div class="tab" -->
+</div><!-- Settings: div.tab#settings-tab -->
