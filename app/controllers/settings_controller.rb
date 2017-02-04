@@ -28,16 +28,16 @@ class SettingsController < ApplicationController
 
   # PATCH /settings
   def update
-    @setting = @setting_params.setting
-    authorize @setting
+    setting = @setting_params.setting
+    authorize setting
     @setting_params.organize_params
 
-    if @setting.save
+    if setting.save
       redirect_to edit_setting_path(params[:id]),
         notice: 'Setting has been updated.'
     else
       redirect_to settings_path,
-        error: 'There was a problem saving the setting.'
+        error: %(Error saving setting: #{setting.errors})
     end
   end
 
