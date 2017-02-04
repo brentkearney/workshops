@@ -27,8 +27,7 @@ class SettingsController < ApplicationController
 
   # PATCH /settings
   def update
-    authorize @setting
-    @setting.value = update_params
+    authorize_and_organize
 
     if @setting.save
       redirect_to edit_setting_path(params[:id]),
@@ -62,7 +61,17 @@ class SettingsController < ApplicationController
 
   private
 
-  def update_params
+  def authorize_and_organize
+    authorize @setting
+    @setting.value = update_params
+  end
+
+  def update_params    
+    data = params.require(:setting).permit("#{@setting.var}": valid_fields)
+    data["#{@setting.var}"]
+  end
+
+  def valid_fields
     setting_fields = initial_settings
     @setting.value.each do |field_name, value|
       if value.is_a?(Hash)
@@ -71,8 +80,7 @@ class SettingsController < ApplicationController
         setting_fields << field_name
       end
     end
-    data = params.require(:setting).permit("#{@setting.var}": setting_fields)
-    data["#{@setting.var}"]
+    setting_fields
   end
 
   def initial_settings
