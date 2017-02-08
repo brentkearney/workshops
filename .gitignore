@@ -23,14 +23,15 @@ config/newrelic.yml
 lib/tasks/birs.rake
 
 # Docker files
-Dockerfile
-docker-compose.yml
+.dockerignore
 .env.db
 .env.web
-.dockerignore
+passenger.*
+Dockerfile
+docker-compose.yml
 entrypoint.sh
 Passengerfile.json
-passenger.*
+nginx.conf.erb
 
 .idea
 app/views/memberships/old-new.html.erb
@@ -41,5 +42,3 @@ sources.list
 public/assets/
 app/assets/images/*_logo.png
 public/icons/*
-
-nginx.conf.erb

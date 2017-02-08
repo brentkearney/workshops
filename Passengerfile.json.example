@@ -1,0 +1,9 @@
+{
+  "environment": "development",
+  "address": "0.0.0.0",
+  "port": 80,
+  "daemonize": false,
+  "user": "app",
+  "ssl": false,
+  "nginx_config_template": "/home/app/workshops/nginx.conf.erb",
+}

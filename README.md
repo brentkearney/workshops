@@ -1,9 +1,11 @@
 # Workshops
 
-"Workshops" is a web-based conference/workshop management application, built with [Ruby on Rails](http://rubyonrails.org). 
+"Workshops" is a web-based conference/workshop management application, built with [Ruby on Rails](http://rubyonrails.org).
 A _workshop_ is like a conference, only with less people, typically experts in a subject
 domain who are invited to an event to share their research with peers. This software is intended for institutions/organizations
 who host workshops.
+
+Installation instructions below.
 
 ### Current Features
 * Workshop data is imported via calls to an external API.
@@ -21,9 +23,11 @@ who host workshops.
 * Default times for new schedule items are estimated based on previous schedule entries, to reduce data entry time.
 * Authenticated JSON API for [an external video recording system](http://www.birs.ca/facilities/automated-video) to update lecture records.
 * Public access to workshop event information and schedules via JSON.
+* Application settings stored in the database, allowing admins to easily change settings with web interface.
+
 
 ### Future Features:
-* Application settings to be stored in the database, with UI for staff/admin to change them.
+* Staff can manage buildings and rooms, and assign participants to (i.e. hotel) rooms.
 * Staff and admin can create new events.
 * Staff and Organizers can add and invite members to their workshop.
 * Invitations will include a one-click RSVP link, allowing members to setup profiles, etc..
@@ -35,6 +39,21 @@ who host workshops.
 * Interface for admin users to manage application settings and permissions.
 * Addition of a forum/mail list software for each workshop. Considering embedding [Discourse](http://www.discourse.org), with an updated editor to support mathematics.
 * Crowd-sourcing feature for workshop participants to post open problems to the public, soliciting solutions.
+
+
+### Installation Instructions:
+The application is setup to work in [Docker](http://www.docker.com) containers, in development mode.
+1. Checkout the repository: git checkout https://github.com/brentkearney/workshops.git
+2. Copy the example config files, and customize them to suit your needs. These include:
+  * .env.web.example -> .env.web
+  * .env.db.example -> .env.db
+  * *.example (Docker and Passenger related files)
+  * config/settings/*.yml.example -> *.yml
+  * you may want to modify docker-compose.yml and/or entrypoint.sh
+3. Read the instructions at the top of docker-compose.yml (create data-containers)
+4. Run `docker-compose up`
+
+
 
 ### License:
 Workshops is free software: you can redistribute it and/or modify it under

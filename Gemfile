@@ -49,8 +49,6 @@ end
 # end
 
 group :development do
-  gem 'sqlite3'
-  gem 'seed_dump'
   gem 'web-console'
   gem 'pronto'
   gem 'pronto-rubocop'

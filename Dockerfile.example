@@ -1,0 +1,44 @@
+# See: https://github.com/phusion/passenger-docker
+# Latest image versions: https://github.com/phusion/passenger-docker/blob/master/Changelog.md
+FROM phusion/passenger-ruby22:0.9.19
+
+# Use baseimage-docker's init process.
+CMD ["/sbin/my_init"]
+
+RUN apt-get update -qq && apt-get install --yes wget apt-utils && \
+  apt-get upgrade --fix-missing -y -o Dpkg::Options::="--force-confold"
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN apt-get install --yes pkg-config cmake
+RUN apt-get install -y build-essential udev locales curl git gnupg ca-certificates \
+	zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev libxslt-dev \
+	libxslt1-dev libqtwebkit4 libqt4-dev xvfb gnupg libpq-dev nodejs \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Use en_CA.utf8 as our locale
+RUN locale-gen en_CA.utf8
+ENV LANG en_CA.utf8
+ENV LANGUAGE en_CA:en
+ENV LC_ALL en_CA.utf8
+
+RUN ln -sf /usr/share/zoneinfo/America/Edmonton /etc/localtime
+RUN echo 'export PATH=$PATH:/usr/local/rvm/bin:./bin:/usr/local/rvm/rubies/ruby-2.2.5/bin:/usr/local/rvm/gems/ruby-2.2.5/bin' > ~/.bashrc
+
+# Update RVM
+RUN /usr/bin/gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+RUN /usr/bin/curl -sSL https://rvm.io/mpapis.asc | gpg --import -
+RUN /usr/bin/curl https://keybase.io/mpapis/pgp_keys.asc | gpg --import
+
+# Local machine uses 999 for docker user
+ENV APP_HOME /home/app/workshops
+ADD . $APP_HOME
+RUN /usr/sbin/usermod -u 999 app
+RUN chown app -R $APP_HOME
+WORKDIR $APP_HOME
+
+EXPOSE 80 443
+ADD entrypoint.sh /sbin/
+RUN chmod 755 /sbin/entrypoint.sh
+RUN mkdir -p /etc/my_init.d
+RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
+ENTRYPOINT ["/sbin/entrypoint.sh"]

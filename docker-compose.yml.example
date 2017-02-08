@@ -1,0 +1,32 @@
+# Note: data containers are used here mainly for developing with
+# MacOS. Docker performance is too slow to run rails when the gems
+# and/or database is stored on host-mounted volumes.
+#
+# Create data volumes like this:
+# docker run -v /var/lib/postgresql --name pgdata postgres:9.5.3 echo 'Postgres data'
+# docker run -v /usr/local/rvm/gems -v /home/app/workshops/vendor/cache \
+#    --name rubygems "phusion/passenger-ruby22:0.9.19" echo 'Ruby gems'
+
+db:
+  image: postgres:9.5.3
+  container_name: wsdb
+  volumes:
+    - ./db/pg-init:/docker-entrypoint-initdb.d
+  volumes_from:
+    - pgdata
+  env_file:
+    - '.env.db'
+web:
+  build: .
+  container_name: ws
+  command: /sbin/entrypoint.sh
+  ports:
+    - '80:80'
+  volumes:
+    - ./:/home/app/workshops
+  volumes_from:
+    - rubygems
+  links:
+    - db
+  env_file:
+    - '.env.web'
