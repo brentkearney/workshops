@@ -43,6 +43,7 @@ Installation instructions below.
 
 ### Installation Instructions:
 The application is setup to work in [Docker](http://www.docker.com) containers, in development mode.
+
 1. Checkout the repository: `git checkout https://github.com/brentkearney/workshops.git`
 2. Copy the example config files, and customize them to suit your needs. These include:
   * .env.web.example -> .env.web, and edit it to fill in empty fields
