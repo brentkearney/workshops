@@ -23,14 +23,11 @@ echo "Updating RVM..."
 echo
 echo "Bundle install..."
 cd /home/app/workshops; RAILS_ENV=development ./bin/bundle install
+# cd /home/app/workshops; RAILS_ENV=development ./bin/bundle update
 
 echo
 echo "chowning gems..."
 chown -R app /home/app/workshops/vendor/cache
-
-echo
-echo "Waiting 30 seconds, for database"
-sleep 30
 
 echo
 echo "Running migrations..."
