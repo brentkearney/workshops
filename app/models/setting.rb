@@ -56,7 +56,7 @@ class Setting < RailsSettings::Base
       setting.value = setting_value
       setting.save!
     end
-  end 
+  end
 
   def remove_location
     settings = self.value
@@ -86,7 +86,7 @@ class Setting < RailsSettings::Base
     (Setting.get_all.keys - ['Site']).each do |section|
       setting = Setting.find_by(var: section)
       section_settings = setting.value
-     
+
       new_location = {:"#{new_key}" => create_empty_setting(section_settings)}
       new_value = section_settings.merge(new_location)
       if section == 'Locations'

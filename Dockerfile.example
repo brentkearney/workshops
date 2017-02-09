@@ -5,6 +5,7 @@ FROM phusion/passenger-ruby22:0.9.19
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
 
+ADD ./sources.list /etc/apt/
 RUN apt-get update -qq && apt-get install --yes wget apt-utils && \
   apt-get upgrade --fix-missing -y -o Dpkg::Options::="--force-confold"
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
@@ -24,7 +25,7 @@ ENV LC_ALL en_CA.utf8
 RUN ln -sf /usr/share/zoneinfo/America/Edmonton /etc/localtime
 RUN echo 'export PATH=$PATH:/usr/local/rvm/bin:./bin:/usr/local/rvm/rubies/ruby-2.2.5/bin:/usr/local/rvm/gems/ruby-2.2.5/bin' > ~/.bashrc
 
-# Update RVM
+# To support RVM update in entrypoint.sh
 RUN /usr/bin/gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 RUN /usr/bin/curl -sSL https://rvm.io/mpapis.asc | gpg --import -
 RUN /usr/bin/curl https://keybase.io/mpapis/pgp_keys.asc | gpg --import

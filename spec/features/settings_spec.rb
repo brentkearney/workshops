@@ -12,7 +12,7 @@ describe 'Settings page', type: :feature do
     expect(Setting.get_all).not_to be_empty
   end
 
-  def find_sub_tabs(section) 
+  def find_sub_tabs(section)
     Setting.find_by_var(section).value.keys.each do |tab|
       tab_pane = 'div.tab-pane#' + tab.to_s
       expect(page.body).to have_css(tab_pane)
@@ -40,7 +40,7 @@ describe 'Settings page', type: :feature do
       @person.destroy
     end
 
-    
+
     it 'does not show a link to Settings in the drop-down user menu' do
       visit root_path
       expect(page).not_to have_css('ul.dropdown-user li a', text: 'Settings')
@@ -160,7 +160,7 @@ describe 'Settings page', type: :feature do
         find_sub_tabs('Locations')
       end
 
-      it 'has a form field for each field of the location' do 
+      it 'has a form field for each field of the location' do
         Setting.Locations.each do |location, properties|
           properties.each do |field, value|
             expect(page).to have_field("setting[Locations][#{location}][#{field}]")
@@ -180,8 +180,6 @@ describe 'Settings page', type: :feature do
       end
 
       it '"Location code" field updates the key representing that location' do
-        visit edit_setting_path('Locations')
-
         fill_in "setting[Locations][EO][new_key]", with: 'TEST'
         click_button 'Update EO Settings'
 
@@ -190,8 +188,6 @@ describe 'Settings page', type: :feature do
       end
 
       it 'has a "+/- Location" tab to add new locations' do
-        visit edit_setting_path('Locations')
-
         click_link '+/- Location'
         fill_in 'setting[Locations][new_location]', with: 'TEST2'
         click_button 'Create New Location'
@@ -202,8 +198,6 @@ describe 'Settings page', type: :feature do
       end
 
       it 'updates the location keys of the other Setting sections as well' do
-        visit edit_setting_path('Locations')
-
         click_link '+/- Location'
         fill_in 'setting[Locations][new_location]', with: 'TEST3'
         click_button 'Create New Location'
@@ -211,6 +205,15 @@ describe 'Settings page', type: :feature do
         (Setting.get_all.keys - ['Site', 'Locations']).each do |section|
           expect(Setting.send(section).keys).to include(:TEST3)
         end
+      end
+
+      it 'Setting.Locations returns same value as Setting.find_by_var...' do
+        puts page.body
+        fill_in "setting[Locations][EO][new_key]", with: 'TEST'
+        click_button 'Update EO Settings'
+
+        new_setting = Setting.find_by_var('Locations')
+        expect(Setting.Locations[:TEST]).to eq(new_setting[:TEST])
       end
     end
 

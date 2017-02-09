@@ -44,17 +44,18 @@ Installation instructions below.
 ### Installation Instructions:
 The application is setup to work in [Docker](http://www.docker.com) containers, in development mode.
 
-1. Checkout the repository: `git clone https://github.com/brentkearney/workshops.git`
+1. Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
 2. Copy the example config files, and customize them to suit your needs. These include:
   * .env.web.example -> .env.web, and edit it to fill in empty fields
   * .env.db.example -> .env.db, and edit it to fill in empty fields
   * copy ./*.example files to remove the ".example" (Docker and Passenger related files)
-  * config/settings/*.yml.example -> *.yml, and edit them
+  * config/settings/*.yml.example -> *.yml, and edit them (note: these will be depreciated soon!)
   * you may want to modify docker-compose.yml and/or entrypoint.sh
 3. Read the instructions at the top of docker-compose.yml (create data-containers)
 4. Edit the lib/tasks/ws.rake file to change default user account information, noting passwords.
 5. Run `docker-compose up`
-6. Edit the entrypoint.sh script. After the initial run, you will pobably want to comment out most of it, such as running migrations, updating RVM, etc.. After editing, copy it into your container with: `docker cp entrypoint.sh ws:/sbin/entrypoint.sh`
+
+After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out most of it, such as running migrations, updating RVM, etc.. After editing, copy it into your container with: `docker cp entrypoint.sh ws:/sbin/entrypoint.sh`
 
 
 
