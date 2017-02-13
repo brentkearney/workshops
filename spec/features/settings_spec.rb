@@ -100,9 +100,11 @@ describe 'Settings page', type: :feature do
     end
 
     context 'Site tab' do
-      it 'shows the fields of the Site settings' do
+      before :each do
         visit edit_setting_path('Site')
+      end
 
+      it 'shows the fields of the Site settings' do
         Setting.Site.keys.each do |field|
           expect(page).to have_field("setting[Site][#{field}]") unless field.empty?
         end
@@ -112,15 +114,12 @@ describe 'Settings page', type: :feature do
         required_fields = %w(title footer events_url legacy_person legacy_api
             application_email webmaster_email sysadmin_email)
 
-        visit edit_setting_path('Site')
-
         required_fields.each do |field|
           expect(page).to have_field("setting[Site][#{field}]")
         end
       end
 
       it 'updates data' do
-        visit edit_setting_path('Site')
         fill_in 'setting[Site][title]', with: 'Test Title'
         click_button 'Update Settings'
 
@@ -130,14 +129,20 @@ describe 'Settings page', type: :feature do
       end
 
       it 'accepts array values' do
-        visit edit_setting_path('Site')
-
         fill_in 'setting[Site][event_types]', with: '[Lunch, Dinner, Desert]'
         click_button 'Update Settings'
 
         expect(page).to have_text('Setting has been updated')
         setting = Setting.find_by_var('Site')
         expect(setting.value['event_types'].class).to eq(Array)
+      end
+
+      it 'Setting.Site returns same value as Setting.find_by_var(Site)' do
+        fill_in "setting[Site][title]", with: 'Foo'
+        click_button 'Update Settings'
+
+        new_setting = Setting.find_by_var('Site').value
+        expect(Setting.Site[:title]).to eq(new_setting[:title])
       end
     end
 
@@ -148,6 +153,14 @@ describe 'Settings page', type: :feature do
 
       it 'has a sub-tab for each location' do
         find_sub_tabs('Emails')
+      end
+
+      it 'Setting.Emails returns same value as Setting.find_by_var(Emails)' do
+        fill_in "setting[Emails][EO][program_coordinator]", with: 'test@test.ca'
+        click_button 'Update EO Settings'
+
+        new_setting = Setting.find_by_var('Emails').value
+        expect(Setting.Locations[:program_coordinator]).to eq(new_setting[:program_coordinator])
       end
     end
 
@@ -207,12 +220,11 @@ describe 'Settings page', type: :feature do
         end
       end
 
-      it 'Setting.Locations returns same value as Setting.find_by_var...' do
-        puts page.body
+      it 'Setting.Locations returns same value as Setting.find_by_var(Locations)' do
         fill_in "setting[Locations][EO][new_key]", with: 'TEST'
         click_button 'Update EO Settings'
 
-        new_setting = Setting.find_by_var('Locations')
+        new_setting = Setting.find_by_var('Locations').value
         expect(Setting.Locations[:TEST]).to eq(new_setting[:TEST])
       end
     end

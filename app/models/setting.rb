@@ -110,10 +110,12 @@ class Setting < RailsSettings::Base
 
   # Save arrays as arrays (not strings)
   def convert_type
-    self.value.each do |param_name, param_value|
-      if param_value =~ /^\[(.+)\]$/
-        param_value = param_value.gsub(/^\[|"|'|\]$/, '').split(',').map(&:strip)
-        self.value = self.value.merge("#{param_name}": param_value)
+    if self.value.is_a?(Hash)
+      self.value.each do |param_name, param_value|
+        if param_value =~ /^\[(.+)\]$/
+          param_value = param_value.gsub(/^\[|"|'|\]$/, '').split(',').map(&:strip)
+          self.value = self.value.merge("#{param_name}": param_value)
+        end
       end
     end
   end

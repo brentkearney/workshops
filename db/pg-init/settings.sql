@@ -28,7 +28,7 @@ SET default_with_oids = false;
 
 CREATE TABLE settings (
     id integer NOT NULL,
-    var character varying NOT NULL,
+    var character varying NOT NULL UNIQUE,
     value text,
     thing_id integer,
     thing_type character varying(30),
