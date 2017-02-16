@@ -40,12 +40,20 @@ a {
 }
 
 #application-heading {
+  margin-top: 5px;
+  height: 45px;
+  /* border: 1px solid red; */
+  text-align: bottom;
   #logo-heading {
-    vertical-align: text-bottom;
     padding: 5px;
     img {
       max-height: 45px;
+      vertical-align:middle;
     }
+  }
+  #application-title {
+    font-size: 1.5em;
+    padding-bottom: 10px;
   }
 }
 

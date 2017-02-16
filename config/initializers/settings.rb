@@ -1,6 +1,5 @@
 # Sets up some defaults to populate the Settings section
-
-Rails.cache.clear
+Rails.cache.delete('settings')
 
 if Setting.find_by_var('Site').nil?
   s = Setting.new(var: 'Site', value: {

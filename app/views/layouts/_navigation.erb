@@ -8,7 +8,8 @@
       <span class="icon-bar"></span>
     </button>
     <div id="application-heading">
-      <%= link_to image_tag(Setting.Site[:logo]), '/', {id: 'logo-heading'} %>
+      <%= link_to image_tag(Setting.Site['logo']), '/', {id: 'logo-heading'} %>
+      <span id="application-title"><%= Setting.Site['title'] %></span>
     </div>
   </div>
   <!-- /.navbar-header -->

@@ -8,6 +8,7 @@ require 'rails_helper'
 
 describe 'Settings page', type: :feature do
   before do
+    Setting.destroy_all
     load "#{Rails.root}/config/initializers/settings.rb"
     expect(Setting.get_all).not_to be_empty
   end
@@ -124,8 +125,8 @@ describe 'Settings page', type: :feature do
         click_button 'Update Settings'
 
         expect(page).to have_text('Setting has been updated')
-        setting = Setting.find_by_var('Site')
-        expect(setting.value['title']).to eq('Test Title')
+        title = Setting.Site['title']
+        expect(title).to eq('Test Title')
       end
 
       it 'accepts array values' do
@@ -135,14 +136,6 @@ describe 'Settings page', type: :feature do
         expect(page).to have_text('Setting has been updated')
         setting = Setting.find_by_var('Site')
         expect(setting.value['event_types'].class).to eq(Array)
-      end
-
-      it 'Setting.Site returns same value as Setting.find_by_var(Site)' do
-        fill_in "setting[Site][title]", with: 'Foo'
-        click_button 'Update Settings'
-
-        new_setting = Setting.find_by_var('Site').value
-        expect(Setting.Site[:title]).to eq(new_setting[:title])
       end
     end
 
@@ -184,12 +177,10 @@ describe 'Settings page', type: :feature do
       it 'updates the data in the given field' do
         first_key = Setting.Locations.keys.first
         first_field = Setting.Locations[first_key].first.first
-
-        expect(Setting.Locations[first_key][first_field]).not_to eq('A new name')
         fill_in "setting[Locations][#{first_key}][#{first_field}]", with: 'A new name'
         click_button "Update #{first_key} Settings"
 
-        expect(Setting.find_by_var('Locations').value[first_key][first_field]).to eq('A new name')
+        expect(Setting.Locations[first_key].first.first).to eq('A new name')
       end
 
       it '"Location code" field updates the key representing that location' do
@@ -197,7 +188,8 @@ describe 'Settings page', type: :feature do
         click_button 'Update EO Settings'
 
         expect(page).to have_text('Setting has been updated')
-        expect(Setting.find_by_var('Locations').value.keys.first).to eq('TEST')
+        expect(Setting.Locations.keys).not_to include(:EO)
+        expect(Setting.Locations.keys).to include(:TEST)
       end
 
       it 'has a "+/- Location" tab to add new locations' do
@@ -212,11 +204,37 @@ describe 'Settings page', type: :feature do
 
       it 'updates the location keys of the other Setting sections as well' do
         click_link '+/- Location'
-        fill_in 'setting[Locations][new_location]', with: 'TEST3'
+        fill_in 'setting[Locations][new_location]', with: 'TEST5'
         click_button 'Create New Location'
 
         (Setting.get_all.keys - ['Site', 'Locations']).each do |section|
-          expect(Setting.send(section).keys).to include(:TEST3)
+          expect(Setting.send(section).keys).to include(:TEST5)
+        end
+      end
+
+      it 'has a "+/- Location" tab to remove locations' do
+        key = Setting.Locations.keys.first
+        Setting.Locations = Setting.Locations.merge(:NEWLOCATION => Setting.Locations[key])
+
+        click_link '+/- Location'
+        select 'NEWLOCATION', from: 'setting[Locations][remove_location]'
+        click_button 'Delete Location'
+
+        expect(page).to have_text('Setting has been updated')
+        expect(page).not_to have_css("div.tab-pane#NEWLOCATION")
+        expect(Setting.find_by_var('Locations').value.keys).not_to include(:NEWLOCATION)
+      end
+
+      it 'removes the location keys from the other Setting sections as well' do
+        key = Setting.Locations.keys.first
+        Setting.Locations = Setting.Locations.merge(:NEWLOCATION => Setting.Locations[key])
+
+        click_link '+/- Location'
+        select 'NEWLOCATION', from: 'setting[Locations][remove_location]'
+        click_button 'Delete Location'
+
+        (Setting.get_all.keys - ['Site', 'Locations']).each do |section|
+          expect(Setting.send(section).keys).not_to include(:NEWLOCATION)
         end
       end
 

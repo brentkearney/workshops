@@ -32,13 +32,9 @@ class SettingsController < ApplicationController
     authorize setting
     @setting_params.organize_params
 
-    if setting.save
-      redirect_to edit_setting_path(params[:id]),
-        notice: 'Setting has been updated.'
-    else
-      redirect_to settings_path,
-        error: %(Error saving setting: #{setting.errors})
-    end
+    SettingUpdater.new(setting).save
+    redirect_to edit_setting_path(params[:id]),
+      notice: 'Setting has been updated.'
   end
 
   # POST /settings
