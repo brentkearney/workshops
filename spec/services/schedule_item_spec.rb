@@ -61,7 +61,7 @@ describe "ScheduleItem" do
 
   describe '.new(params).schedule' do
     it '.set_default_location sets the room according to the event type & location' do
-      new_event_type = Setting.Site[:event_types].third
+      new_event_type = Setting.Site['event_types'].third
       @event.event_type = new_event_type
       @event.save
 

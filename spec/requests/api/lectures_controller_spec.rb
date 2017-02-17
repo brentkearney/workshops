@@ -12,9 +12,9 @@ describe Api::V1::LecturesController do
 
   context '#update' do
     before do
-      @event = FactoryGirl.create(:event)
-      @lecture = FactoryGirl.create(:lecture, event: @event)
-      FactoryGirl.create(:schedule, lecture: @lecture, event: @event)
+      @event = create(:event)
+      @lecture = create(:lecture, event: @event)
+      create(:schedule, lecture: @lecture, event: @event)
       key = ENV['LECTURES_API_KEY']
       @payload = {
           api_key: key,

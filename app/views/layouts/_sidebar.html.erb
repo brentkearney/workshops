@@ -21,11 +21,11 @@
         <%= link_to '<i class="fa fa-backward fa-fw"></i> Past Events'.html_safe, events_past_path %>
         <div class="bottom-border"></div>
       </li>
-      <% unless Global.location.all.empty? %>
+      <% unless Setting.Locations.keys.blank? %>
       <li id="event-locations">
         <a href="#" id="event-locations-link"><i class="fa fa-globe fa-fw"></i> Event Locations <span id="locations-arrow" class="fa arrow"></span></a>
         <ul class="nav nav-second-level" id="event-locations-list">
-          <% Global.location.all.each do |location| %>
+          <% Setting.Locations.keys.each do |location| %>
           <li id="<%= location %>">
             <div class="top-border"></div>
             <%= link_to %Q(<i class="fa fa-location-arrow fa-fw"></i> #{location}).html_safe, events_location_path(location) %>

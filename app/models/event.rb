@@ -73,7 +73,7 @@ class Event < ActiveRecord::Base
   end
 
   def self.years
-    all.map {|e| e.start_date.year.to_s}.uniq
+    all.map {|e| e.start_date.year.to_s}.uniq.sort
   end
 
   private
