@@ -9,5 +9,9 @@
       </p>
     <% end %>
   <% end %>
+  <% if policy(@setting).new? %>
+    <%= render partial: 'new_field', locals:
+      { setting_form: setting_form, fields_for: @setting.var } %>
+  <% end %>
   <%= setting_form.submit 'Update Settings', class: 'btn btn-default' %>
 <% end %>

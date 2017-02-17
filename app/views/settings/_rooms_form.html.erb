@@ -14,6 +14,12 @@
             <p><%= var_field.text_field field_name, value: field_value,
                 class: 'form-control' %></p>
           <% end %><!-- values -->
+
+          <% if policy(@setting).new? %>
+            <%= render partial: 'new_field', locals:
+              { setting_form: var_form, fields_for: key } %>
+          <% end %>
+
         <% end %>
       <% end %><!-- var_form -->
       <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>

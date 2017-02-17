@@ -12,7 +12,7 @@ class SettingParametizer
   end
 
   def organize_params
-    @setting.value = update_params.to_h
+    @setting.value = update_params
   end
 
   def update_params
@@ -24,12 +24,19 @@ class SettingParametizer
     setting_fields = initial_settings
     @setting.value.each do |field_name, value|
       if value.is_a?(Hash)
-        setting_fields << { field_name => (value.keys << :new_key) }
+        setting_fields << { field_name => field_values(value) }
       else
         setting_fields << field_name
       end
     end
     setting_fields
+  end
+
+  def field_values(value)
+    permitted_fields = value.keys
+    permitted_fields += [:new_field, :new_value]
+    permitted_fields << :new_key if @setting.var == 'Locations'
+    permitted_fields
   end
 
   def initial_settings

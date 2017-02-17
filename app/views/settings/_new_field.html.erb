@@ -1,7 +1,7 @@
-<%= setting_form.fields_for @setting.var do |field_form| %>
+<%= setting_form.fields_for fields_for do |field_form| %>
   <div class="panel panel-default">
     <div class="panel-body">
-      <h4>Add New Field to "<%= @setting.var %>":</h4>
+      <h4>Add New Field:</h4>
       <div class="form-group">
         <label for="new_field">Field name:</label>
         <%= field_form.text_field :new_field, class: 'form-control' %>

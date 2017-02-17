@@ -22,7 +22,7 @@
             <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
             <p>
             <% if field_name == :Timezone %>
-              <%= var_field.time_zone_select 'Timezone', ActiveSupport::TimeZone.us_zones, 
+              <%= var_field.time_zone_select 'Timezone', ActiveSupport::TimeZone.us_zones,
                 { default: field_value }, { class: 'form-control' } %>
             <% else %>
               <%= var_field.text_field field_name, value: field_value,
@@ -30,6 +30,12 @@
             <% end %>
             </p>
           <% end %><!-- values -->
+
+          <% if policy(@setting).new? %>
+            <%= render partial: 'new_field', locals:
+              { setting_form: var_form, fields_for: key } %>
+          <% end %>
+
         <% end %>
       <% end %><!-- var_form -->
 
@@ -40,7 +46,7 @@
 
 <% end %><!-- @setting -->
 
-  <% if policy(Setting).new? %>
+  <% if policy(@setting).new? %>
     <%= render partial: 'new_location_form',
           locals: {setting_form: setting_form } %>
   <% end %>

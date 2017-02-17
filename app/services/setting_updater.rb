@@ -5,6 +5,7 @@ class SettingUpdater
 
   def save
     keep_arrays
+    add_new_field
 
     case @setting.var
     when 'Site'
@@ -16,6 +17,12 @@ class SettingUpdater
     when 'Locations'
       Setting.Locations = update_locations
     end
+    rewrite_cache
+  end
+
+  def rewrite_cache
+    Rails.cache.write("settings:#{@setting.var}", @setting.value,
+      expires_in: 10.minutes)
   end
 
   def keep_arrays
@@ -40,7 +47,7 @@ class SettingUpdater
   def remove_location
     settings = @setting.value
     location_key = settings.delete('remove_location')
-    @setting.value = settings
+    @setting.value = settings.except(location_key)
     unless location_key.blank?
       remove_locations(location_key: location_key.to_sym)
     end
@@ -67,7 +74,6 @@ class SettingUpdater
     (Setting.get_all.keys - ['Site']).each do |section|
       setting = Setting.find_by(var: section)
       section_settings = setting.value
-
       new_location = {new_key => create_empty_setting(section_settings)}
       new_value = section_settings.merge(new_location)
 
@@ -84,7 +90,6 @@ class SettingUpdater
     settings = @setting.value
     @setting.value.each do |key, values|
       new_key = values.delete('new_key')
-      new_key = values.delete(:new_key) if new_key.blank?
       settings[key] = values
       if !new_key.blank? && new_key != key
         settings[:"#{new_key}"] = settings.delete(:"#{key}")
@@ -112,5 +117,26 @@ class SettingUpdater
       end
     end
     empty_fields
+  end
+
+  def merge_new_field(settings)
+    new_field = settings.delete('new_field')
+    new_value = settings.delete('new_value')
+    settings.merge!("#{new_field}": "#{new_value}") unless new_field.blank?
+    settings
+  end
+
+  def add_new_field
+    if @setting.var == 'Site'
+      @setting.value = merge_new_field(@setting.value)
+    else
+      settings = @setting.value
+      @setting.value.each do |param_key, param_value|
+        if param_value.is_a?(Hash)
+          settings[:"#{param_key}"] = merge_new_field(param_value)
+        end
+      end
+      @setting.value = settings
+    end
   end
 end
