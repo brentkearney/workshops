@@ -1,4 +1,5 @@
 # spec/factories/events.rb
+require 'factory_girl_rails'
 require 'faker'
 
 FactoryGirl.define do
@@ -14,10 +15,10 @@ FactoryGirl.define do
     f.door_code 1234
     f.start_date
     f.end_date
-    f.event_type Global.event.types.first
+    f.event_type '5 Day Workshop'
     f.max_participants 42
-    f.location Global.location.first
-    f.time_zone Global.location.timezone.send(Global.location.first)
+    f.location 'EO'
+    f.time_zone 'Mountain Time (US & Canada)'
     f.description { Faker::Lorem.sentence(6) }
     f.updated_by 'FactoryGirl'
     f.template false

@@ -9,7 +9,8 @@ include ActiveJob::TestHelper
 
 RSpec.describe StaffMailer, type: :mailer do
   before do
-    @sysadmin_email = Setting.Site[:sysadmin_email]
+    @sysadmin_email = Setting.Site['sysadmin_email']
+    expect(@sysadmin_email).not_to be_nil
   end
 
   before :each do
@@ -32,7 +33,7 @@ RSpec.describe StaffMailer, type: :mailer do
       StaffMailer.event_sync(event, @sync_errors).deliver_now
 
       expect(ActionMailer::Base.deliveries.count).to eq(1)
-      pc = Setting.Emails[event.location.to_sym][:program_coordinator]
+      pc = Setting.Emails[event.location.to_sym]['program_coordinator']
       expect(ActionMailer::Base.deliveries.first.to).to include(pc)
       expect(ActionMailer::Base.deliveries.first.cc).to include(@sysadmin_email)
     end
@@ -71,7 +72,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: schedule_staff' do
-      schedule_staff = Setting.Emails[event.location.to_sym][:schedule_staff]
+      schedule_staff = Setting.Emails[event.location.to_sym]['schedule_staff']
       mailto = ActionMailer::Base.deliveries.first.to
       expect(mailto).to eq(schedule_staff.split(', '))
     end
@@ -91,7 +92,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: nametag_updates' do
-      name_tags = Setting.Emails[event.location.to_sym][:name_tags]
+      name_tags = Setting.Emails[event.location.to_sym]['name_tags']
       expect(ActionMailer::Base.deliveries.first.to).to match_array(name_tags)
     end
   end
@@ -110,7 +111,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: event_updates' do
-      event_updates = Setting.Emails[event.location.to_sym][:event_updates]
+      event_updates = Setting.Emails[event.location.to_sym]['event_updates']
       mailto = ActionMailer::Base.deliveries.first.to
       expect(mailto).to eq(event_updates.split(', '))
     end

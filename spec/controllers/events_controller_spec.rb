@@ -387,7 +387,7 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe '#location' do
-    Global.location.all.each do |loc|
+    Setting.Locations.keys.each do |loc|
       context ":#{loc}" do
         let(:location) { loc }
 
@@ -421,7 +421,7 @@ RSpec.describe EventsController, type: :controller do
     end
 
     it 'given an invalid location, it uses the first configured location' do
-      legit_location = Global.location.first
+      legit_location = Setting.Locations.keys.first
       event1 = create(:event, location: "#{legit_location}")
 
       %w(random-place 7th-level-of-hell at-the-pub).each do |place|
@@ -436,7 +436,7 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe '#kind' do
-    Global.event.types.each do |type|
+    Setting.Site['event_types'].each do |type|
       context ":#{type}" do
         let(:kind) { type.parameterize }
 
@@ -462,7 +462,7 @@ RSpec.describe EventsController, type: :controller do
           event1 = create(:event, event_type: "#{type}")
           another_type = type
           until another_type != type
-            another_type = Global.event.types.sample
+            another_type = Setting.Site['event_types'].sample
           end
           event2 = create(:event, event_type: "#{another_type}")
 
@@ -474,7 +474,7 @@ RSpec.describe EventsController, type: :controller do
     end
 
     it 'given an invalid event type, it assumes the first configured type' do
-      legit_type = Global.event.types.first
+      legit_type = Setting.Site['event_types'].first
       event1 = create(:event, location: "#{legit_type}")
 
       %w(lynch-mob circus funeral).each do |invalid_type|

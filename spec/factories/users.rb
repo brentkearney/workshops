@@ -1,3 +1,5 @@
+require 'factory_girl_rails'
+
 FactoryGirl.define do
   require 'faker'
 
@@ -9,7 +11,7 @@ FactoryGirl.define do
     f.password password
     f.password_confirmation password
     f.confirmed_at Time.now
-    f.location Setting.get_all['Locations'].keys.first
+    f.location 'EO'
 
     trait :staff do
       role 'staff'

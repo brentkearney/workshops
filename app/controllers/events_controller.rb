@@ -56,7 +56,9 @@ class EventsController < ApplicationController
   # GET /events/location/:location.json
   def location
     location = params[:location]
-    location = Global.location.first unless Global.location.all.include?(location)
+    unless Setting.Locations.keys.include?(location)
+      location = Setting.Locations.keys.first
+    end
 
     @heading = "Events at #{location}"
     @events = Event.location(location).order(:start_date)
@@ -70,7 +72,9 @@ class EventsController < ApplicationController
     if kind == 'Research In Teams'
       kind = 'Research in Teams'
     else
-      kind = Global.event.types.first unless Global.event.types.include?(kind.singularize)
+      unless Setting.Site['event_types'].include?(kind.singularize)
+        kind = Setting.Site['event_types'].first
+      end
     end
 
     @heading = kind.pluralize

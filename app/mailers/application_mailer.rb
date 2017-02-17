@@ -5,6 +5,6 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class ApplicationMailer < ActionMailer::Base
-  default from: Global.email.application
+  default from: Setting.Site['application_email']
   layout 'mailer'
 end

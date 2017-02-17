@@ -16,8 +16,8 @@ class Event < ActiveRecord::Base
   validates :short_name, presence: true, :if => :has_long_name
 
   validates :code, uniqueness: true, format: {
-    with: /#{Global.event.code_pattern}/,
-    message: "- invalid code format. Must match: #{Global.event.code_pattern}"
+    with: /#{Setting.Site['code_pattern']}/,
+    message: "- invalid code format. Must match: #{Setting.Site['code_pattern']}"
   }
   validates :event_type, presence: true, :if => :check_event_type
   validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.zones_map.keys
@@ -53,10 +53,10 @@ class Event < ActiveRecord::Base
   end
 
   def check_event_type
-    if Setting.Site[:event_types].include?(event_type)
+    if Setting.Site['event_types'].include?(event_type)
       return true
     else
-      types = Setting.Site[:event_types].join(', ')
+      types = Setting.Site['event_types'].join(', ')
       errors.add(:event_type, "- event type must be one of: #{types}")
       return false
     end

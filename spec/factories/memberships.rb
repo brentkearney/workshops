@@ -1,3 +1,5 @@
+require 'factory_girl_rails'
+
 FactoryGirl.define do
   require 'faker'
 

@@ -1,4 +1,5 @@
 # spec/factories/people.rb
+require 'factory_girl_rails'
 require 'faker'
 
 FactoryGirl.define do
@@ -7,7 +8,7 @@ FactoryGirl.define do
 
   factory :person do |f|
     lastname = Faker::Name.last_name
-    f.salutation Global.person.salutations.sample
+    f.salutation 'Prof.'
     f.firstname
     f.lastname { lastname }
     f.gender ['M', 'F'].sample
@@ -16,7 +17,7 @@ FactoryGirl.define do
     f.phone { Faker::PhoneNumber.phone_number }
     f.affiliation { Faker::Company.name }
     f.department { Faker::Commerce.department }
-    f.academic_status Global.person.academic_status.sample
+    f.academic_status 'Professor'
     f.legacy_id Random.rand(1000..9999)
     f.updated_by 'FactoryGirl'
   end
