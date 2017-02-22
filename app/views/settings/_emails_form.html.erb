@@ -8,19 +8,17 @@
     <h3><%= @setting.name(key) %></h3>
     <%= setting_form.fields_for @setting.var do |var_form| %>
       <%= var_form.fields_for key do |var_field| %>
-        <% unless values.blank? %>
-          <% values.each do |field_name, field_value| %>
-            <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
-            <p><%= var_field.text_field field_name, value: field_value,
-                class: 'form-control' %></p>
-          <% end %><!-- values -->
+        <% values.each do |field_name, field_value| %>
+          <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
+          <p><%= var_field.text_field field_name, value: field_value,
+              class: 'form-control' %></p>
+        <% end %><!-- values -->
 
-          <% if policy(@setting).new? %>
-            <%= render partial: 'new_field', locals:
-                { setting_form: var_form, fields_for: key } %>
-          <% end %>
-
+        <% if policy(@setting).new? %>
+          <%= render partial: 'new_field', locals:
+              { setting_form: var_form, fields_for: key } %>
         <% end %>
+
       <% end %><!-- var_form -->
       <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>
     <% end %><!-- setting_form -->

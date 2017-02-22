@@ -12,7 +12,11 @@ class SettingParametizer
   end
 
   def create_new
-    Setting.new(var: @params['setting']['var'].strip, value: {})
+    locations = {:new_setting => true}
+    Setting.find_by_var('Locations').value.keys.each do |key|
+      locations[key.to_sym] = {}
+    end
+    Setting.new(var: @params['setting']['var'].strip, value: locations)
   end
 
   def organize_params

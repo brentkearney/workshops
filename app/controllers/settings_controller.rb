@@ -43,7 +43,8 @@ class SettingsController < ApplicationController
     authorize @setting
 
     if @setting.save
-      redirect_to settings_path, notice: %(Added "#{@setting.var}" setting!)
+      redirect_to edit_setting_path(@setting.var),
+        notice: %(Added "#{@setting.var}" setting!)
     else
       flash[:error] = %(Error saving setting: #{@setting.flash_error})
       render :new

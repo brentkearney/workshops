@@ -17,7 +17,7 @@
                   class: 'form-control input-sm' %></p>
           </div>
         </div>
-        <% if values.is_a?(Hash) && !values.empty? %>
+        <% if values.is_a?(Hash) && !values.blank? %>
           <% values.each do |field_name, field_value| %>
             <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
             <p>

@@ -16,6 +16,8 @@ class SettingUpdater
       Setting.Rooms = @setting.value
     when 'Locations'
       Setting.Locations = update_locations
+    else
+      @setting.save
     end
     rewrite_cache
   end

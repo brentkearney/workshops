@@ -22,8 +22,9 @@ class Setting < RailsSettings::Base
       errors.add(:var, '- Setting Name must not be blank')
     end
 
-    # for new setting sections
-    if self.value.blank?
+    new_setting = self.value.delete(:new_setting)
+    self.value = self.value.except(:new_setting)
+    if new_setting
       unless Setting.find_by_var(self.var).nil?
         self.flash_error = 'Setting Name must be unique'
         errors.add(:var, '- Setting Name must be unique')

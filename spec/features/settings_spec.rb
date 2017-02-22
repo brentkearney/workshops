@@ -14,7 +14,8 @@ describe 'Settings page', type: :feature do
   end
 
   def find_sub_tabs(section)
-    Setting.find_by_var(section).value.keys.each do |tab|
+    Setting.find_by_var('Locations').value.keys.each do |tab|
+      visit edit_setting_path(section)
       tab_pane = 'div.tab-pane#' + tab.to_s
       expect(page.body).to have_css(tab_pane)
     end
@@ -273,6 +274,36 @@ describe 'Settings page', type: :feature do
         expect(page.body).to have_text 'Added "NewSection" setting!'
         expect(page.body).to have_css('li#NewSection')
         expect(Setting.find_by_var('NewSection')).not_to be_nil
+      end
+
+      it 'new sections have sub-tabs for each location' do
+        fill_in 'setting[var]', with: 'NewSection2'
+        click_button 'Add Setting'
+
+        find_sub_tabs('NewSection2')
+      end
+
+      it 'new sections have a form for adding new fields' do
+        fill_in 'setting[var]', with: 'NewSection3'
+        click_button 'Add Setting'
+
+        visit edit_setting_path('NewSection3')
+
+        Setting.find_by_var('Locations').value.keys.each do |tab|
+          expect(page.body).to have_field("setting[NewSection3][#{tab}][new_field]")
+        end
+      end
+
+      it 'new fields can be added to new sections' do
+        key = Setting.Locations.keys.first
+        fill_in 'setting[var]', with: 'NewSection4'
+        click_button 'Add Setting'
+
+        visit edit_setting_path('NewSection4')
+        fill_in "setting[NewSection4][#{key}][new_field]", with: 'Test'
+        click_button "Update #{key} Settings"
+
+        expect(page.body).to have_field("setting[NewSection4][#{key}][Test]")
       end
 
       it 'disallows duplicate Setting names' do
