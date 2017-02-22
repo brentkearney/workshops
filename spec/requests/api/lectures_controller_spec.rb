@@ -7,9 +7,7 @@
 require 'rails_helper'
 require 'factory_girl_rails'
 
-
 describe Api::V1::LecturesController do
-
   context '#update' do
     before do
       @event = create(:event)

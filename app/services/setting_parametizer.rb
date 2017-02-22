@@ -11,6 +11,10 @@ class SettingParametizer
       Setting.new(var: @params[:id].to_s.strip, value: {})
   end
 
+  def create_new
+    Setting.new(var: @params['setting']['var'].strip, value: {})
+  end
+
   def organize_params
     @setting.value = update_params
   end

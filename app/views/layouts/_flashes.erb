@@ -1,4 +1,4 @@
 <% flash.each do |key, value| %>
-  <%= content_tag(:div, value.html_safe, :class => "alert alert-#{key} flash") %>
+  <%= content_tag(:div, value.html_safe, class: "alert alert-#{key} flash") %>
 <% end %>
 

@@ -39,12 +39,13 @@ class SettingsController < ApplicationController
 
   # POST /settings
   def create
-    @setting = @setting_params.setting
+    @setting = @setting_params.create_new
     authorize @setting
+
     if @setting.save
       redirect_to settings_path, notice: %(Added "#{@setting.var}" setting!)
     else
-      flash[:error] = %(Error saving setting: #{@setting.errors})
+      flash[:error] = %(Error saving setting: #{@setting.flash_error})
       render :new
     end
   end
@@ -56,7 +57,7 @@ class SettingsController < ApplicationController
     if setting.destroy
       redirect_to settings_path, notice: %(Deleted "#{setting.var_was}" setting!)
     else
-      flash[:error] = %(Error deleting setting: #{setting.errors})
+      flash[:error] = %(Error deleting setting: #{setting.errors.full_messages})
     end
   end
 

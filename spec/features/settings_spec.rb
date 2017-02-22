@@ -89,7 +89,7 @@ describe 'Settings page', type: :feature do
 
     after do
       logout(@user)
-      @person.destroy
+      @person.destroy if @person
     end
 
     it 'has tabs for each Setting section' do
@@ -263,18 +263,45 @@ describe 'Settings page', type: :feature do
 
     context '+/- Setting tab' do
       before :each do
-        visit edit_setting_path('new')
+        visit new_setting_path
       end
 
-      it 'has a form for adding new setting sections' do
-        expect(page).to have_css('form#new_setting')
-        expect(page).to have_field('setting[new][new_location]')
+      it 'adds a new setting section' do
+        fill_in 'setting[var]', with: 'NewSection'
+        click_button 'Add Setting'
+
+        expect(page.body).to have_text 'Added "NewSection" setting!'
+        expect(page.body).to have_css('li#NewSection')
+        expect(Setting.find_by_var('NewSection')).not_to be_nil
       end
 
-      it 'has a form for deleting existing setting sections' do
-        expect(page).to have_field('setting[new][remove_location]')
+      it 'disallows duplicate Setting names' do
+        fill_in 'setting[var]', with: 'Site'
+        click_button 'Add Setting'
+
+        expect(page.body).to have_css('div.alert-error',
+          text: 'Error saving setting: Setting Name must be unique')
+      end
+
+      it 'disallows blank name field' do
+        click_button 'Add Setting'
+
+        expect(page.body).to have_css('div.alert-error',
+          text: 'Error saving setting: Setting Name must not be blank')
+      end
+
+      it 'deletes a setting section' do
+        fill_in 'setting[var]', with: 'DeleteMe'
+        click_button 'Add Setting'
+
+        visit new_setting_path
+        select 'DeleteMe', from: 'setting[id]'
+        click_button 'Delete Setting'
+
+        expect(page.body).to have_css('div.alert-notice',
+          text: 'Deleted "DeleteMe" setting!')
+        expect(Setting.find_by_var('DeleteMe')).to be_nil
       end
     end
   end
-
 end
