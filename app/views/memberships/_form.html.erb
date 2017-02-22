@@ -10,19 +10,20 @@
 			<%= f.hidden_field :person_id %>
 		<% end %>
 	</div>
-</div>	
-	
+</div>
+
 <%= f.fields_for @membership.person do |person| %>
 <div class="form-group">
 	<div class="col-sm-3 control-label">
 		<%= person.label :salutation, "Salutation: " %>
 	</div>
 	<div class="col-sm-2">
-		<%= person.select :salutation, {"Prof." => "Prof.", "Dr." => "Dr.", "Mr." => "Mr.", "Mrs." => "Mrs.", "Ms." => "Ms."}, {}, { required: 'true', autofocus: 'true', class: 'form-control' } %>			
+		<%= person.select :salutation, Setting.Site['salutations'], {},
+			{ required: 'true', autofocus: 'true', class: 'form-control' } %>
 	</div>
 	<div class="col-sm-7"></div>
 </div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :firstname, "Firstname: " %>
@@ -31,7 +32,7 @@
 			<%= person.text_field :firstname, class: 'form-control' %>
 		</div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :lastname, "Lastname: " %>
@@ -40,7 +41,7 @@
 			<%= person.text_field :lastname, class: 'form-control' %>
 		</div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :email, "E-mail: " %>
@@ -67,7 +68,7 @@
 			<%= person.text_field :phone, class: 'form-control' %>
 		</div>
 	</div>
-		
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :url, "Website: " %>
@@ -76,17 +77,17 @@
 			<%= person.text_field :url, class: 'form-control' %>
 		</div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :gender, "Gender: " %>
 		</div>
 		<div class="col-sm-3">
-			<%= person.select :gender, {"Male" => "M", "Female" => "F"}, {}, { required: 'true', autofocus: 'true', class: 'form-control' } %>			
+			<%= person.select :gender, {"Male" => "M", "Female" => "F"}, {}, { required: 'true', autofocus: 'true', class: 'form-control' } %>
 		</div>
 		<div class="col-sm-6"></div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :affiliation, "Affiliation: " %>
@@ -95,7 +96,7 @@
 			<%= person.text_field :affiliation, class: 'form-control' %>
 		</div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :department, "Department: " %>
@@ -104,7 +105,7 @@
 			<%= person.text_field :department, class: 'form-control' %>
 		</div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :title, "Title: " %>
@@ -113,17 +114,17 @@
 			<%= person.text_field :title, class: 'form-control' %>
 		</div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :academic_status, "Academic Status: " %>
 		</div>
 		<div class="col-sm-3">
-			<%= person.select :academic_status, Global.person.academic_status, {}, { required: 'true', autofocus: 'true', class: 'form-control' } %>
+			<%= person.select :academic_status, Setting.Site['academic_status'], {}, { required: 'true', autofocus: 'true', class: 'form-control' } %>
 		</div>
 		<div class="col-sm-6"></div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :research_areas, "Research Areas: " %>
@@ -132,7 +133,7 @@
 			<%= person.text_field :research_areas, class: 'form-control' %>
 		</div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :biograhy, "Biography: " %>
@@ -141,7 +142,7 @@
 			<%= person.text_area :biography, class: 'form-control' %>
 		</div>
 	</div>
-	
+
 <% end %>
 
 <div class="form-group">
@@ -164,7 +165,7 @@
 			<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 		</div>
 	</div>
-	
+
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= f.label :departure_date, "Departure Date: " %>
@@ -175,7 +176,7 @@
 		</div>
 	</div>
 <% end %>
-	
+
 <div class="form-group">
 	<div class="col-sm-3 control-label">
 		<%= f.label :attendance, "Attendance: " %>
@@ -189,13 +190,13 @@
 <div class="form-group">
 	<div class="col-sm-3"></div>
 	<div class="col-sm-9" id="member-buttons">
-	<%= f.submit @button_text, class: 'btn btn-sm btn-default' %> 
+	<%= f.submit @button_text, class: 'btn btn-sm btn-default' %>
 	<% if request.fullpath.match(/.+\/edit$/) && user_is_organizer? %>
 		| <%= link_to 'Delete Membership', event_membership_path(@event, @membership), method: :delete, class: 'btn btn-sm btn-default', data: { confirm: "Are you sure you want to remove #{@membership.person.name} from #{@event.code}?" } %>
 		| <%= link_to "Back to Profile", event_membership_path(@event, @membership), class: 'btn btn-sm btn-default' %>
 	<% else %>
 	<%= f.submit "Back", :name => "back_button", class: 'btn btn-sm btn-default' unless @membership.first_step? %>
-	
+
 	<% end %>
 	</div>
 </div>

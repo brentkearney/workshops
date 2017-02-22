@@ -1,8 +1,0 @@
-DEVISE_PEPPER: 'a-really-long-string'
-SECRET_KEY_BASE: 'a-really-long-string'
-LECTURES_API_KEY: 'long-random-string'
-APPLICATION_HOST: 'your.app.com'
-APPLICATION_PROTOCOL: 'http'
-EMAIL_SERVER: 'your.mailserver.com'
-EMAIL_PORT: '25'
-EMAIL_STARTTLS: 'true'

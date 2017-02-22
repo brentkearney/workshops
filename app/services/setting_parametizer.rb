@@ -48,6 +48,6 @@ class SettingParametizer
   end
 
   def initial_settings
-    @params['setting']['Locations'] ? [:new_location, :remove_location] : Array.new
+    @params['setting']['Locations'] ? [:new_location, :remove_location] : [:new_field, :new_value]
   end
 end

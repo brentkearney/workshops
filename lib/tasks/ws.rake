@@ -18,15 +18,15 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace :ws do
-  
+
   task :default => 'ws:print_options'
-  
+
   # safe default
   task :print_options do
     puts "Options are: create_admins, nuke_data, import_year, import_month, add_lectures, update_members"
   end
-  
-  desc "Create staff and admin accounts"  
+
+  desc "Create staff and admin accounts"
   task :create_admins => :environment do
     ##
     ## Create Admin People
@@ -81,7 +81,7 @@ namespace :ws do
             password_confirmation: '1234567Secret',
             person: p,
             role: :staff,
-            location: Global.location.first
+            location: Setting.Locations.keys.first
         )
         user.skip_confirmation!
         user.save
@@ -92,7 +92,7 @@ namespace :ws do
       end
     end # create staff users
   end # task :create_admins
-  
+
   ##
   ## Nuke existing records
   ##
@@ -162,33 +162,33 @@ namespace :ws do
     end
     membership_errors
   end
-  
+
   ##
   ## Populate Event data from legacy db
   ##
   desc "Import event and membership data for a given year"
   task :import_year, [:year] => :environment do |t, args|
-    year = args[:year] 
+    year = args[:year]
     if year.blank?
       abort("\nUse import_year[year]. For example `rake ws:import_year[2015]`\n")
     end
-    
+
     events = Array.new
     event_errors = Array.new
 
     lc = LegacyConnector.new
-    
+
     lc.get_event_data_for_year(year).each do |event|
       puts "Adding event: " + event["code"]
       e = Event.new(event)
-      
-      if e.save        
+
+      if e.save
         events << event["code"]
       else
         event_errors << "#{e.code}: #{e.errors.full_messages.to_s}"
       end
     end
-    
+
     ##
     ## Populate Membership & People data from legacy db
     ##
@@ -197,7 +197,7 @@ namespace :ws do
       membership_errors << import_members(lc, code)
     end
 
-    puts 
+    puts
     puts "Errors encountered:"
     puts "~~~~~~~~~~~~~~~~~~~"
     puts "Events: "
@@ -206,7 +206,7 @@ namespace :ws do
     puts "Memberships: "
     puts membership_errors.to_yaml
     puts
-    
+
   end
 
   desc "Import event and membership data for a given month"
@@ -254,7 +254,7 @@ namespace :ws do
     if event_id.blank?
       abort("\nUse add_lectures[event_code]. For example `rake ws:add_lectures[\"15w5012\"]`\n\n")
     end
-    
+
     event = Event.find(event_id)
 
       LC = LegacyConnector.new

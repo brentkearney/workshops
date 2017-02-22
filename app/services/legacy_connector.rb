@@ -20,11 +20,11 @@
 # Connects to internal API for legacy database
 class LegacyConnector
   require 'rest_client'
-    
+
   def initialize
-    @rest_url = Global.config.legacy_api
+    @rest_url = Setting.Site['legacy_api']
   end
-  
+
   # get a list of events within a given date range
   def list_events(from_date, to_date)
      JSON.parse(RestClient.get "#{@rest_url}/event_list", {params: {year1: from_date, year2: to_date}})
@@ -34,32 +34,32 @@ class LegacyConnector
   def get_event_data(event_id)
     JSON.parse(RestClient.get "#{@rest_url}/event_data/#{event_id}")
   end
-  
+
   # get event data for given year
   def get_event_data_for_year(year)
     JSON.parse(RestClient.get "#{@rest_url}/event_data_for_year/#{year}")
   end
-  
+
   # get membership data for an event
   def get_members(event)
     JSON.parse(RestClient.get "#{@rest_url}/members/#{event.code}")
   end
-  
+
   # get a person record data
   def get_person(legacy_id)
     JSON.parse(RestClient.get "#{@rest_url}/get_person/#{legacy_id}")
   end
-  
+
   # search legacy db for person by email
   def search_person(email)
     JSON.parse(RestClient.get "#{@rest_url}/search_person/#{email}")
   end
-  
+
   # add new person record
   def add_person(person)
     JSON.parse(RestClient.post "#{@rest_url}/add_person", person.to_json, content_type: :json, accept: :json)
   end
-  
+
   # add new member to event
   def add_member(membership:, event_code:, person:, updated_by:)
     remote_membership = membership.attributes.merge('workshop_id' => "#{event_code}", 'person' => person.as_json, 'updated_by' => "#{updated_by}")

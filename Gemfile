@@ -25,9 +25,7 @@ gem 'devise_invitable'
 gem 'pundit'
 gem 'sucker_punch'
 gem 'passenger'
-gem 'global'
 gem 'rails-settings-cached'
-
 
 group :development, :test do
   gem 'byebug'

@@ -1,6 +1,6 @@
 <%= render "shared/errors", object: @event %>
 
-<%= form_for @event, :html => { :role => "form", :class => "form" } do |f| %>
+<%= form_for @event, :html => { role: "form", class: "form" } do |f| %>
     <fieldset>
       <div class="row">
         <div class='col-md-2'>
@@ -60,7 +60,7 @@
       <div class="form-group">
         <%= f.label :location %>
         <div style="width: 6em;">
-          <%= f.select(:location, Global.location.all, {}, { class: 'form-control' }) %>
+          <%= f.select(:location, Setting.Locations.keys, {}, { class: 'form-control' }) %>
         </div>
       </div>
       <div class="form-group">
@@ -73,7 +73,7 @@
       <div class="form-group">
         <%= f.label :event_type %>
         <div style="width: 17em;">
-          <%= f.select(:event_type, Global.event.types, {}, { class: 'form-control' }) %>
+          <%= f.select(:event_type, Setting.Site['event_types'], {}, { class: 'form-control' }) %>
         </div>
       </div>
       <div class="form-group">

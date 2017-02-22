@@ -45,7 +45,7 @@ class ErrorReport
           errors['Person'].each do |person_error|
             person = person_error.object
             message = person_error.message.to_s
-            legacy_url = Global.config.legacy_person
+            legacy_url = Setting.Site['legacy_person']
 
             if person.legacy_id.nil?
               person_error.message << "\n\nDuring #{event.code} data synchronization, we found a local person record with no legacy_id!\n\n"
@@ -69,7 +69,7 @@ class ErrorReport
               if membership.person.nil?
                 error_messages << "* #{@event.code} membership has no associated person record!\n\n#{membership.inspect}\n"
               else
-                legacy_url = Global.config.legacy_person + "#{membership.person.legacy_id}" + '&ps=events'
+                legacy_url = Setting.Site['legacy_person'] + "#{membership.person.legacy_id}" + '&ps=events'
                 error_messages << "* Membership of #{membership.person.name}: #{message}\n"
                 error_messages << "   -> #{legacy_url}\n\n"
               end

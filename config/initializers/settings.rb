@@ -14,7 +14,11 @@ if Setting.find_by(var: 'Site').nil?
     'sysadmin_email' => 'sysadmin@example.com',
     'event_types' => ['5 Day Workshop', '2 Day Workshop', 'Research in Teams',
     'Focussed Research Group', 'Summer School', 'Public Lecture'],
-    'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z'
+    'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
+    'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor',
+      'Ph.D. Student', 'Masters Student', 'Undergraduate Student',
+      'K-12 Teacher', 'K-12 Student', 'Other'],
+    'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.']
   }
 end
 

@@ -138,6 +138,13 @@ describe 'Settings page', type: :feature do
         setting = Setting.find_by_var('Site')
         expect(setting.value['event_types'].class).to eq(Array)
       end
+
+      it 'can add new fields' do
+        fill_in "setting[Site][new_field]", with: 'Test'
+        click_button "Update Settings"
+
+        expect(page.body).to have_field("setting[Site][Test]")
+      end
     end
 
     context 'Emails tab' do

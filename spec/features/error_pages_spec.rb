@@ -16,7 +16,7 @@ describe 'Custom error pages', type: :feature do
   it 'displays a 500 error message, and help email' do
     visit '/500'
     expect(page.body).to have_text('Error 500: Internal Server Error')
-    expect(page.body).to include(Global.email.webmaster)
+    expect(page.body).to include(Setting.Site['webmaster_email'])
   end
 
 end
