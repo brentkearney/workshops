@@ -1,4 +1,0 @@
-# Rename to person.yml and customize
-default:
-  salutations: ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.']
-  academic_status: ['Professor', 'Post Doctoral Fellow', 'Medical Doctor', 'Ph.D. Student', 'Masters Student', 'Undergraduate Student', 'K-12 Teacher', 'K-12 Student', 'Other']

@@ -1,4 +1,0 @@
-# Rename to event.yml and customize
-default:
-  types: ['5 Day Workshop', '2 Day Workshop', 'Focussed Research Group']
-  code_pattern: '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z'
