@@ -12,18 +12,12 @@ class Api::V1::LecturesController < Api::V1::BaseController
   def update
     @json['lecture']['updated_by'] = @updated_by
     @lecture.assign_attributes(@json['lecture'])
-    # Keep the original schedule intact
-    #schedule = update_schedule(@lecture)
+
     respond_to do |format|
       if @lecture.save
         format.json { render nothing: true, status: :created }
       else
         format.json { render json: @lecture.errors, status: :unprocessable_entity }
-        # if schedule.errors
-        #   format.json { render json: schedule.errors, status: :unprocessable_entity }
-        # elsif @lecture.errors
-        #   format.json { render json: @lecture.errors, status: :unprocessable_entity }
-        # end
       end
     end
   end
@@ -52,14 +46,6 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
   private
 
-  def update_schedule(lecture)
-    schedule = Schedule.find_by_lecture_id(lecture.id)
-    schedule.name = "#{lecture.person.name}: #{lecture.title}"
-    schedule.start_time = lecture.start_time
-    schedule.end_time = lecture.end_time
-    schedule
-  end
-
   # safety check due to legacy_db SNAFU
   def confirm_legacy_db_consistency(event, lecture)
     event && lecture && lecture.event_id == event.id || go_away
@@ -77,5 +63,4 @@ class Api::V1::LecturesController < Api::V1::BaseController
     @json['event_id'] && @json['lecture_id'] && @json.has_key?('lecture') &&
         @json['lecture'].is_a?(Hash) && !@json['lecture'].empty?
   end
-
 end

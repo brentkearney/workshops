@@ -22,16 +22,21 @@ describe Api::V1::LecturesController do
       }
     end
 
+    it 'authenticates with the correct api key' do
+      put "/api/v1/lectures.json", @payload.to_json
+      expect(response).not_to be_unauthorized
+    end
+
+    it 'does not authenticate with an invalid api key' do
+      @payload['api_key'] = '123'
+      put "/api/v1/lectures.json", @payload.to_json
+      expect(response).to be_unauthorized
+    end
+
     it 'given appropriate keys and lecture data, it updates lectures' do
       put "/api/v1/lectures.json", @payload.to_json
       expect(response).to be_created
       expect(Lecture.find(@lecture.id).title).to eq('A new title')
-    end
-
-    it 'given invalid api key, it fails' do
-      @payload['api_key'] = '123'
-      put "/api/v1/lectures.json", @payload.to_json
-      expect(response).to be_unauthorized
     end
 
     it 'given invalid or missing lecture_id, it fails' do
