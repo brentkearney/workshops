@@ -26,10 +26,6 @@ cd /home/app/workshops; RAILS_ENV=development ./bin/bundle install
 # cd /home/app/workshops; RAILS_ENV=development ./bin/bundle update
 
 echo
-echo "chowning gems..."
-chown -R app /home/app/workshops/vendor/cache
-
-echo
 echo "Running migrations..."
 rake db:migrate RAILS_ENV=development
 
@@ -37,15 +33,8 @@ echo
 echo "Creating admins..."
 if [ -e lib/tasks/birs.rake ]; then
   rake birs:create_admins RAILS_ENV=development
-
-  echo
-  echo "Importing data..."
-  rake birs:import_data[2016] RAILS_ENV=development
-  rake birs:import_data[2017] RAILS_ENV=development
 else
   rake ws:create_admins RAILS_ENV=development
-  echo
-  echo "lib/tasks/birs.rake not found, not importing BIRS data."
 fi
 
 
