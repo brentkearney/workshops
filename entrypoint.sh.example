@@ -38,9 +38,10 @@ else
 fi
 
 
-# echo
-# echo "Compiling Assets..."
-# chown -R app /home/app/workshops/tmp
+echo
+echo "chown -R app /home/app/workshops..."
+mkdir /home/app/workshops/tmp
+chown -R app:app /home/app/workshops
 # su - app -c "cd /home/app/workshops; RAILS_ENV=production bundle exec rake assets:precompile --trace"
 
 echo

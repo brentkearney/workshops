@@ -182,6 +182,25 @@ describe 'Settings page', type: :feature do
         end
       end
 
+      it 'the timezone field is a drop-down of available time zones' do
+        location = Setting.Locations.keys.first
+        tz_select = "setting[Locations][#{location}][Timezone]"
+        zones = []
+        ActiveSupport::TimeZone.us_zones.each do |tz|
+          zones << tz.to_s
+        end
+
+        expect(page.body).to have_select(tz_select, with_options: zones)
+      end
+
+      it 'the correct timezone is selected in the Timezone drop-down' do
+        location = Setting.Locations.keys.first
+        tz_select = "select#setting_Locations_#{location}_Timezone"
+        timezone = Setting.Locations[location]['Timezone']
+
+        expect(find(:css, tz_select).value).to eq(timezone)
+      end
+
       it 'updates the data in the given field' do
         first_key = Setting.Locations.keys.first
         first_field = Setting.Locations[first_key].first.first
