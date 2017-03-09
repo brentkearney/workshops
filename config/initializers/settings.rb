@@ -1,7 +1,7 @@
 # Sets up some defaults to populate the Settings section
 Rails.cache.delete('settings')
 
-if Setting.find_by(var: 'Site').nil?
+if Setting.find_by(var: 'Site').nil? || Setting.Site.blank?
   Setting.Site = {
     'title' => 'Workshop Manager',
     'logo' => 'logo.png',
@@ -22,7 +22,7 @@ if Setting.find_by(var: 'Site').nil?
   }
 end
 
-if Setting.find_by(var: 'Emails').nil?
+if Setting.find_by(var: 'Emails').nil? || Setting.Emails.blank?
   Setting.Emails = {
     :EO => {
       'program_coordinator' => 'organization@example.com',
@@ -37,7 +37,7 @@ if Setting.find_by(var: 'Emails').nil?
   }
 end
 
-if Setting.find_by(var: 'Locations').nil?
+if Setting.find_by(var: 'Locations').nil? || Setting.Locations.blank?
   Setting.Locations = {
     :EO => {
       'Name' => 'Example Organization',
@@ -47,7 +47,7 @@ if Setting.find_by(var: 'Locations').nil?
   }
 end
 
-if Setting.find_by(var: 'Rooms').nil?
+if Setting.find_by(var: 'Rooms').nil? || Setting.Rooms.blank?
   Setting.Rooms = {
     :EO => {
       '5 Day Workshop' => 'TCPL 201',
