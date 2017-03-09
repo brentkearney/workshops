@@ -5,8 +5,10 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class ApplicationMailer < ActionMailer::Base
-  app_email = Setting.Site['application_email']
-  app_email = 'workshops@example.com' if app_email.nil?
+  app_email = 'workshops@example.com'
+  unless Setting.Site.blank? && Setting.Site['application_email'].nil?
+    app_email = Setting.Site['application_email']
+  end
   default from: app_email
   layout 'mailer'
 end

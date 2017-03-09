@@ -17,7 +17,7 @@ class ErrorReport
 
   def add(the_object, error_message = nil)
     objects = "#{the_object.class}"
-    objects = 'LegacyConnector' if objects == 'FakeLegacyConnector' # for rspec tests
+    objects = 'LegacyConnector' if objects == 'FakeLegacyConnector' # for rspec
     error = errorify(the_object, error_message)
 
     unless error.blank?
