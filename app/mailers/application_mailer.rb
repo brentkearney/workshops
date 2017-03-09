@@ -5,6 +5,8 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class ApplicationMailer < ActionMailer::Base
-  default from: Setting.Site['application_email']
+  app_email = Setting.Site['application_email']
+  app_email = 'workshops@example.com' if app_email.nil?
+  default from: app_email
   layout 'mailer'
 end

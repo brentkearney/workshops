@@ -5,11 +5,15 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class StaffMailer < ApplicationMailer
-  default from: Setting.Site['application_email']
+  app_email = Setting.Site['application_email']
+  app_email = 'workshops@example.com' if app_email.nil?
+  default from: app_email
 
   def schedule_change(schedule, type:, user:, updated_schedule: false, changed_similar: false)
     @event = schedule.event
-    to_email = Setting.Emails[@event.location.to_sym]['schedule_staff']
+    schedule_emails = Setting.Emails[@event.location.to_sym]['schedule_staff']
+    schedule_emails = 'schedule@example.com' if schedule_emails.nil?
+    to_email = schedule_emails
     subject = "[#{@event.code}] Schedule change notice!"
     if schedule.lecture.nil?
       publish = 'N/A'
