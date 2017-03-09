@@ -6,7 +6,7 @@
 
 class ApplicationMailer < ActionMailer::Base
   app_email = 'workshops@example.com'
-  unless Setting.Site.blank? && Setting.Site['application_email'].nil?
+  unless Setting.Site.blank? || Setting.Site['application_email'].nil?
     app_email = Setting.Site['application_email']
   end
   default from: app_email

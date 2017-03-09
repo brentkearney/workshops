@@ -6,7 +6,7 @@
 
 class StaffMailer < ApplicationMailer
   app_email = 'workshops@example.com'
-  unless Setting.Site.blank? && Setting.Site['application_email'].nil?
+  unless Setting.Site.blank? || Setting.Site['application_email'].nil?
     app_email = Setting.Site['application_email']
   end
 
@@ -15,7 +15,7 @@ class StaffMailer < ApplicationMailer
   def schedule_change(schedule, type:, user:, updated_schedule: false, changed_similar: false)
     @event = schedule.event
     schedule_emails = 'schedule@example.com'
-    unless Setting.Emails.blank? &&
+    unless Setting.Emails.blank? ||
       Setting.Emails[@event.location.to_sym]['schedule_staff'].nil?
       schedule_emails = Setting.Emails[@event.location.to_sym]['schedule_staff']
     end
