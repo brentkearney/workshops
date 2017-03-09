@@ -14,13 +14,14 @@ class Event < ActiveRecord::Base
 
   validates :name, :start_date, :end_date, :location, :max_participants, :time_zone, presence: true
   validates :short_name, presence: true, :if => :has_long_name
-
-  validates :code, uniqueness: true, format: {
-    with: /#{Setting.Site['code_pattern']}/,
-    message: "- invalid code format. Must match: #{Setting.Site['code_pattern']}"
-  }
   validates :event_type, presence: true, :if => :check_event_type
   validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.zones_map.keys
+  unless Setting.Site.blank?
+    validates :code, uniqueness: true, format: {
+      with: /#{Setting.Site['code_pattern']}/,
+      message: "- invalid code format. Must match: #{Setting.Site['code_pattern']}"
+    }
+  end
 
   # app/models/concerns/event_decorators.rb
   include EventDecorators

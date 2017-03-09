@@ -4,7 +4,7 @@ def rewrite_cache(var, value)
     expires_in: 10.minutes)
 end
 
-if Setting.find_by(var: 'Site').nil? || Setting.Site.blank?
+if Setting.find_by(var: 'Site').nil?
   Setting.Site = {
     'title' => 'Workshop Manager',
     'logo' => 'logo.png',
@@ -26,7 +26,7 @@ if Setting.find_by(var: 'Site').nil? || Setting.Site.blank?
   rewrite_cache('Site', Setting.Site)
 end
 
-if Setting.find_by(var: 'Emails').nil? || Setting.Emails.blank?
+if Setting.find_by(var: 'Emails').nil?
   Setting.Emails = {
     :EO => {
       'program_coordinator' => 'organization@example.com',
@@ -42,7 +42,7 @@ if Setting.find_by(var: 'Emails').nil? || Setting.Emails.blank?
   rewrite_cache('Emails', Setting.Emails)
 end
 
-if Setting.find_by(var: 'Locations').nil? || Setting.Locations.blank?
+if Setting.find_by(var: 'Locations').nil?
   Setting.Locations = {
     :EO => {
       'Name' => 'Example Organization',
@@ -53,7 +53,7 @@ if Setting.find_by(var: 'Locations').nil? || Setting.Locations.blank?
   rewrite_cache('Locations', Setting.Locations)
 end
 
-if Setting.find_by(var: 'Rooms').nil? || Setting.Rooms.blank?
+if Setting.find_by(var: 'Rooms').nil?
   Setting.Rooms = {
     :EO => {
       '5 Day Workshop' => 'TCPL 201',
