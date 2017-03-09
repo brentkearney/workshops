@@ -1,5 +1,8 @@
 # Sets up some defaults to populate the Settings section
-Rails.cache.delete('settings')
+def rewrite_cache(var, value)
+  Rails.cache.write("settings:#{var}", value,
+    expires_in: 10.minutes)
+end
 
 if Setting.find_by(var: 'Site').nil? || Setting.Site.blank?
   Setting.Site = {
@@ -16,10 +19,11 @@ if Setting.find_by(var: 'Site').nil? || Setting.Site.blank?
     'Focussed Research Group', 'Summer School', 'Public Lecture'],
     'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
     'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor',
-      'Ph.D. Student', 'Masters Student', 'Undergraduate Student',
-      'K-12 Teacher', 'K-12 Student', 'Other'],
+    'Ph.D. Student', 'Masters Student', 'Undergraduate Student',
+    'K-12 Teacher', 'K-12 Student', 'Other'],
     'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.']
   }
+  rewrite_cache('Site', Setting.Site)
 end
 
 if Setting.find_by(var: 'Emails').nil? || Setting.Emails.blank?
@@ -35,6 +39,7 @@ if Setting.find_by(var: 'Emails').nil? || Setting.Emails.blank?
       'name_tags' => 'organization-secretary@example.com'
     }
   }
+  rewrite_cache('Emails', Setting.Emails)
 end
 
 if Setting.find_by(var: 'Locations').nil? || Setting.Locations.blank?
@@ -45,6 +50,7 @@ if Setting.find_by(var: 'Locations').nil? || Setting.Locations.blank?
       'Timezone' => 'Mountain Time (US & Canada)'
     }
   }
+  rewrite_cache('Locations', Setting.Locations)
 end
 
 if Setting.find_by(var: 'Rooms').nil? || Setting.Rooms.blank?
@@ -62,4 +68,5 @@ if Setting.find_by(var: 'Rooms').nil? || Setting.Rooms.blank?
       'CH2' => ['5116', '5124']
     }
   }
+  rewrite_cache('Rooms', Setting.Rooms)
 end
