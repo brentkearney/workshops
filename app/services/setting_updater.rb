@@ -75,7 +75,7 @@ class SettingUpdater
   def add_locations(new_key:)
     (Setting.get_all.keys - ['Site']).each do |section|
       setting = Setting.find_by(var: section)
-      section_settings = setting.value
+      section_settings = Setting.send(section)
       new_location = {new_key => create_empty_setting(section_settings)}
       new_value = section_settings.merge(new_location)
 
