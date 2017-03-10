@@ -13,10 +13,10 @@ class User < ActiveRecord::Base
   validates :person, presence: true
   validates :location, presence: true, if: :staff?
 
-  belongs_to :person, :inverse_of => :user
+  belongs_to :person, inverse_of: :user
 
   enum role: [:member, :staff, :admin, :super_admin]
-  after_initialize :set_default_role, :if => :new_record?
+  after_initialize :set_default_role, if: :new_record?
 
   def set_default_role
     role ||= :member
