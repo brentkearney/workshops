@@ -1,4 +1,7 @@
-$(document).on "page:change", ->
+$(document).on 'turbolinks:load', ->
+  $('#print-button').click (event) ->
+    print()
+
   if /firefox|msie/i.test(navigator.userAgent)
     $('select').removeClass('form-control')
 
@@ -30,8 +33,6 @@ $(document).on "page:change", ->
         toggle_icon.removeClass('fa-toggle-up')
         toggle_icon.addClass('fa-toggle-down')
 
-    $('#print-button').click (event) ->
-      print()
 
   if $("body.schedule.new").length > 0 || $("body.schedule.edit").length > 0
     date = $('#day').val()
