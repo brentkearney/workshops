@@ -25,7 +25,7 @@ class SettingParametizer
 
   def update_params
     data = @params.require(:setting).permit(@setting.var => valid_fields)
-    data["#{@setting.var}"].to_h
+    data["#{@setting.var}"]
   end
 
   def valid_fields
