@@ -29,7 +29,6 @@ Rails.application.routes.draw do
     get 'schedule/new/:day/item' => 'schedule#new_item', as: :schedule_item
     get 'schedule/:id' => 'schedule#edit', as: :schedule_edit
     post 'schedule/create' => 'schedule#create'
-    get 'schedule/send/videos' => 'schedule#send_video_filenames'
     post 'schedule/publish_schedule' => 'schedule#publish_schedule'
     resources :schedule
     resources :memberships
