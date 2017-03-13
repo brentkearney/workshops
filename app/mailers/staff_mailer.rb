@@ -5,9 +5,9 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class StaffMailer < ApplicationMailer
-  app_email = 'workshops@example.com'
-  unless Setting.Site.blank? || Setting.Site['application_email'].nil?
-    app_email = Setting.Site['application_email']
+  app_email = Setting.Site['application_email'] unless Setting.Site.blank?
+  if Setting.Site.blank? || app_email.nil?
+    app_email = ENV['DEVISE_EMAIL']
   end
 
   default from: app_email
@@ -76,7 +76,7 @@ class StaffMailer < ApplicationMailer
   def event_sync(event, error_messages)
     @event = event
     @error_messages = error_messages
-    to_email = Setting.Emails[event.location.to_sym]['program_coordinator']
+    to_email = Setting.Emails[event.location]['program_coordinator']
     cc_email = Setting.Site['sysadmin_email']
     subject = "!! #{event.code} (#{event.location}) Data errors !!"
 
@@ -103,7 +103,7 @@ class StaffMailer < ApplicationMailer
     @event_url = Setting.Site[:event_url]
     @workshops_url = event_url(event)
 
-    to_email = Setting.Emails[event.location.to_sym]['event_updates']
+    to_email = Setting.Emails[event.location]['event_updates']
     subject = "[#{event.code}] Event updated!"
 
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
@@ -116,7 +116,7 @@ class StaffMailer < ApplicationMailer
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
     @workshops_url = event_url(event)
 
-    to_email = Setting.Emails[event.location.to_sym]['name_tags']
+    to_email = Setting.Emails[event.location]['name_tags']
     subject = "[#{event.code}] Name tag change notice!"
 
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
