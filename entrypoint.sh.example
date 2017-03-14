@@ -13,7 +13,7 @@ echo "Installing latest bundler..."
 
 echo
 echo "Bundle install..."
-cd /home/app/workshops; RAILS_ENV=development ./bin/bundle install
+cd /home/app/workshops; RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.4.0 bundle install
 
 echo
 echo "Running migrations..."
