@@ -27,6 +27,7 @@ describe 'Event Show Page', type: :feature do
     expect(page.body).to have_text(@event.arrival_date)
     expect(page.body).to have_text(@event.departure_date)
     expect(page.body).to have_text(@event.event_type)
+    expect(page.body).to have_link(@event.url)
     expect(page.body).to have_text(@event.description)
   end
 
@@ -35,9 +36,9 @@ describe 'Event Show Page', type: :feature do
     expect(page.body).to have_text(@event.short_name)
     expect(page.body).to have_text(@event.door_code)
     expect(page.body).to have_text(@event.max_participants)
-    #expect(page.body).to have_text(@event.booking_code)
+    expect(page.body).to have_text(@event.booking_code)
   end
-  
+
   def hides_some_details
     expect(page.body).not_to have_text(@event.door_code)
     expect(page.body).not_to have_text(@event.booking_code)
@@ -69,7 +70,7 @@ describe 'Event Show Page', type: :feature do
     it 'shows partial event details' do
       shows_partial_details
     end
-    
+
     it 'hides some details' do
       hides_some_details
     end

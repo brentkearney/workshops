@@ -16,8 +16,8 @@ class StaffMailer < ApplicationMailer
     @event = schedule.event
     schedule_emails = 'schedule@example.com'
     unless Setting.Emails.blank? ||
-      Setting.Emails[@event.location.to_sym]['schedule_staff'].nil?
-      schedule_emails = Setting.Emails[@event.location.to_sym]['schedule_staff']
+      Setting.Emails[@event.location.to_s]['schedule_staff'].nil?
+      schedule_emails = Setting.Emails[@event.location.to_s]['schedule_staff']
     end
     to_email = schedule_emails
     subject = "[#{@event.code}] Schedule change notice!"
@@ -76,7 +76,7 @@ class StaffMailer < ApplicationMailer
   def event_sync(event, error_messages)
     @event = event
     @error_messages = error_messages
-    to_email = Setting.Emails[event.location]['program_coordinator']
+    to_email = Setting.Emails[event.location.to_s]['program_coordinator']
     cc_email = Setting.Site['sysadmin_email']
     subject = "!! #{event.code} (#{event.location}) Data errors !!"
 
@@ -100,10 +100,10 @@ class StaffMailer < ApplicationMailer
     event = original_event
     @updated_by = args[:updated_by]
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
-    @event_url = Setting.Site[:event_url]
+    @event_url = event.url
     @workshops_url = event_url(event)
 
-    to_email = Setting.Emails[event.location]['event_updates']
+    to_email = Setting.Emails[event.location.to_s]['event_updates']
     subject = "[#{event.code}] Event updated!"
 
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
@@ -116,7 +116,7 @@ class StaffMailer < ApplicationMailer
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
     @workshops_url = event_url(event)
 
-    to_email = Setting.Emails[event.location]['name_tags']
+    to_email = Setting.Emails[event.location.to_s]['name_tags']
     subject = "[#{event.code}] Name tag change notice!"
 
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)

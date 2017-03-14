@@ -51,7 +51,7 @@ class SettingUpdater
     location_key = settings.delete('remove_location')
     @setting.value = settings.except(location_key)
     unless location_key.blank?
-      remove_locations(location_key: location_key.to_sym)
+      remove_locations(location_key: location_key)
     end
   end
 
@@ -68,8 +68,7 @@ class SettingUpdater
     settings = @setting.value
     new_key = settings.delete('new_location')
     @setting.value = settings
-
-    add_locations(new_key: new_key.to_sym) unless new_key.blank?
+    add_locations(new_key: new_key) unless new_key.blank?
   end
 
   def add_locations(new_key:)
@@ -94,7 +93,7 @@ class SettingUpdater
       new_key = values.delete('new_key')
       settings[key] = values
       if !new_key.blank? && new_key != key
-        settings[:"#{new_key}"] = settings.delete(:"#{key}")
+        settings[new_key] = settings.delete(key)
         rename_location_keys(old_key: key, new_key: new_key)
       end
     end
@@ -102,13 +101,16 @@ class SettingUpdater
   end
 
   def rename_location_keys(old_key:, new_key:)
+    temp_setting = @setting
     (Setting.get_all.keys - ['Site', 'Locations']).each do |section|
       setting = Setting.find_by(var: section)
       setting_value = setting.value
-      setting_value[new_key.to_sym] = setting_value.delete(old_key.to_sym)
+      setting_value[new_key] = setting_value.delete(old_key)
       setting.value = setting_value
-      setting.save!
+      @setting = setting
+      self.save
     end
+    @setting = temp_setting
   end
 
   def create_empty_setting(section_settings)

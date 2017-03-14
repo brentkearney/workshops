@@ -28,7 +28,7 @@ end
 
 if Setting.find_by(var: 'Emails').nil?
   Setting.Emails = {
-    :EO => {
+    'EO' => {
       'program_coordinator' => 'organization@example.com',
       'secretary' => 'organization-secretary@example.com',
       'administrator' => 'organization-administrator@example.com',
@@ -44,7 +44,7 @@ end
 
 if Setting.find_by(var: 'Locations').nil?
   Setting.Locations = {
-    :EO => {
+    'EO' => {
       'Name' => 'Example Organization',
       'Country' => 'Canada',
       'Timezone' => 'Mountain Time (US & Canada)'
@@ -55,7 +55,7 @@ end
 
 if Setting.find_by(var: 'Rooms').nil?
   Setting.Rooms = {
-    :EO => {
+    'EO' => {
       '5 Day Workshop' => 'TCPL 201',
       '2 Day Workshop' => 'TCPL 201',
       'Summer School' =>  'TCPL 202',

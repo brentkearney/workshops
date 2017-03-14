@@ -95,8 +95,8 @@ module EventDecorators
   end
 
   def country
-    if Setting.Locations && Setting.Locations[self.location.to_sym]
-      Setting.Locations[self.location.to_sym][:Country]
+    if Setting.Locations && Setting.Locations[self.location]
+      Setting.Locations[self.location]['Country']
     else
       'Unknown'
     end
@@ -120,6 +120,10 @@ module EventDecorators
 
   def is_upcoming?
     (start_date.to_time.to_i - Time.now.to_i) <= 7.days.to_i
+  end
+
+  def url
+    Setting.Site['events_url'] + self.code
   end
 
 end
