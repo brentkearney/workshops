@@ -29,6 +29,13 @@ RUN echo 'export PATH=$PATH:/usr/local/rvm/bin:./bin:/usr/local/rvm/rubies/ruby-
 RUN /usr/bin/gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 RUN /usr/bin/curl -sSL https://rvm.io/mpapis.asc | gpg --import -
 RUN /usr/bin/curl https://keybase.io/mpapis/pgp_keys.asc | gpg --import
+RUN /usr/local/rvm/bin/rvm get stable --auto-dotfiles
+RUN /usr/local/rvm/bin/rvm install 2.4.0
+RUN /usr/local/rvm/bin/rvm remove 2.2.5
+RUN bash -lc 'rvm --default use ruby-2.4.0'
+RUN /usr/local/rvm/bin/rvm all do gem regenerate_binstubs
+RUN /usr/local/rvm/bin/rvm reload && /usr/local/rvm/bin/rvm repair all
+RUN /usr/local/rvm/bin/rvm wrapper ruby --no-prefix --all
 
 # Local machine uses 999 for docker user
 ENV APP_HOME /home/app/workshops
