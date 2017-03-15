@@ -55,7 +55,7 @@ class SettingUpdater
     end
   end
 
-  def remove_locations(location_key:)
+  def remove_locations(location_key: '')
     (Setting.get_all.keys - ['Site', 'Locations']).each do |section|
       setting = Setting.find_by(var: section)
       new_value = setting.value.except(location_key)
@@ -71,7 +71,7 @@ class SettingUpdater
     add_locations(new_key: new_key) unless new_key.blank?
   end
 
-  def add_locations(new_key:)
+  def add_locations(new_key: '')
     (Setting.get_all.keys - ['Site']).each do |section|
       setting = Setting.find_by(var: section)
       section_settings = Setting.send(section)
@@ -100,7 +100,7 @@ class SettingUpdater
     @setting.value = settings
   end
 
-  def rename_location_keys(old_key:, new_key:)
+  def rename_location_keys(old_key: '', new_key: '')
     temp_setting = @setting
     (Setting.get_all.keys - ['Site', 'Locations']).each do |section|
       setting = Setting.find_by(var: section)
@@ -108,7 +108,7 @@ class SettingUpdater
       setting_value[new_key] = setting_value.delete(old_key)
       setting.value = setting_value
       @setting = setting
-      self.save
+      save
     end
     @setting = temp_setting
   end
@@ -126,7 +126,7 @@ class SettingUpdater
   def merge_new_field(settings)
     new_field = settings.delete('new_field')
     new_value = settings.delete('new_value')
-    settings.merge!("#{new_field}": "#{new_value}") unless new_field.blank?
+    settings[new_field] = new_value unless new_field.blank?
     settings
   end
 
