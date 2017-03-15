@@ -8,13 +8,13 @@ class SettingParametizer
 
   def get_setting
     @setting = Setting.find_by_var(@params[:id]) ||
-      Setting.new(var: @params[:id].to_s.strip, value: {})
+               Setting.new(var: @params[:id].to_s.strip, value: {})
   end
 
   def create_new
-    locations = {:new_setting => true}
+    locations = { :new_setting => true }
     Setting.find_by_var('Locations').value.keys.each do |key|
-      locations[key.to_sym] = {}
+      locations[key] = {}
     end
     Setting.new(var: @params['setting']['var'].strip, value: locations)
   end
@@ -25,7 +25,7 @@ class SettingParametizer
 
   def update_params
     data = @params.require(:setting).permit(@setting.var => valid_fields)
-    data["#{@setting.var}"]
+    data[@setting.var.to_s]
   end
 
   def valid_fields
@@ -48,6 +48,10 @@ class SettingParametizer
   end
 
   def initial_settings
-    @params['setting']['Locations'] ? [:new_location, :remove_location] : [:new_field, :new_value]
+    if @params['setting']['Locations']
+      [:new_location, :remove_location]
+    else
+      [:new_field, :new_value]
+    end
   end
 end

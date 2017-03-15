@@ -43,6 +43,10 @@ Rails.application.routes.draw do
   match "/404", :to => "errors#not_found", via: :all
   match "/500", :to => "errors#internal_server_error", via: :all
 
+  # RSVP
+  get '/rsvp' => 'rsvp#index'
+  get '/rsvp/:event_id/:otp' => 'rsvp#index', as: :rsvp_otp
+
   # API
   namespace :api do
     namespace :v1 do

@@ -12,14 +12,16 @@ class Event < ActiveRecord::Base
 
   before_save :clean_data
 
-  validates :name, :start_date, :end_date, :location, :max_participants, :time_zone, presence: true
-  validates :short_name, presence: true, :if => :has_long_name
-  validates :event_type, presence: true, :if => :check_event_type
+  validates :name, :start_date, :end_date, :location, :max_participants,
+            :time_zone, presence: true
+  validates :short_name, presence: true, if: :has_long_name
+  validates :event_type, presence: true, if: :check_event_type
   validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.zones_map.keys
   unless Setting.Site.blank?
     validates :code, uniqueness: true, format: {
       with: /#{Setting.Site['code_pattern']}/,
-      message: "- invalid code format. Must match: #{Setting.Site['code_pattern']}"
+      message: "- invalid code format. Must match:
+              #{Setting.Site['code_pattern']}"
     }
   end
 
