@@ -10,7 +10,7 @@ class Setting < RailsSettings::Base
   namespace Rails.env
 
   def name(key)
-    loc = Setting.find_by_var('Locations').value[key.to_sym]
+    loc = Setting.find_by_var('Locations').value[key]
     loc.nil? ? key : loc['Name']
   end
 

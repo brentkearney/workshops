@@ -1,21 +1,22 @@
 # Copyright (c) 2016 Banff International Research Station
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this
-# software and associated documentation files (the "Software"), to deal in the Software
-# without restriction, including without limitation the rights to use, copy, modify,
-# merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to the following
-# conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all copies
-# or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-# CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
-# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 # Connects to internal API for legacy database
 class LegacyConnector
@@ -27,7 +28,8 @@ class LegacyConnector
 
   # get a list of events within a given date range
   def list_events(from_date, to_date)
-     JSON.parse(RestClient.get "#{@rest_url}/event_list", {params: {year1: from_date, year2: to_date}})
+     JSON.parse(RestClient.get "#{@rest_url}/event_list",
+                {params: {year1: from_date, year2: to_date}})
   end
 
   # get data for specific events
@@ -57,29 +59,36 @@ class LegacyConnector
 
   # add new person record
   def add_person(person)
-    JSON.parse(RestClient.post "#{@rest_url}/add_person", person.to_json, content_type: :json, accept: :json)
+    JSON.parse(RestClient.post "#{@rest_url}/add_person", person.to_json,
+                                content_type: :json, accept: :json)
   end
 
   # add new member to event
-  def add_member(membership:, event_code:, person:, updated_by:)
-    remote_membership = membership.attributes.merge('workshop_id' => "#{event_code}", 'person' => person.as_json, 'updated_by' => "#{updated_by}")
-    JSON.parse(RestClient.post "#{@rest_url}/add_member/#{event_code}", remote_membership.to_json, content_type: :json, accept: :json)
+  def add_member(membership: '', event_code: '', person: '', updated_by: '')
+    remote_membership = membership.attributes.merge(
+      'workshop_id' => "#{event_code}", 'person' => person.as_json,
+      'updated_by' => "#{updated_by}")
+    JSON.parse(RestClient.post "#{@rest_url}/add_member/#{event_code}",
+                remote_membership.to_json, content_type: :json, accept: :json)
   end
 
   # add new members to event
-  def add_members(event_code:, members:, updated_by:)
+  def add_members(event_code: '', members: '', updated_by: '')
     responses = Array.new
     members.each do |member|
-      responses[] = add_member(membership: member, event_code: event_code, legacy_id: member.legacy_id, updated_by: updated_by)
+      responses[] = add_member(membership: member, event_code: event_code,
+                            legacy_id: member.legacy_id, updated_by: updated_by)
     end
   end
 
   # update membership & person record
   def update_member(membership, person, event_id, legacy_id, updated_by)
-    add_member(membership, event_id, legacy_id, updated_by) # add_member updates existing memberships
+    # add_member updates existing memberships
+    add_member(membership, event_id, legacy_id, updated_by)
     remote_person = person.attributes.merge('updated_by' => "#{updated_by}")
     remote_person.delete("legacy_id")
-    JSON.parse(RestClient.post "#{@rest_url}/update_person/#{legacy_id}", remote_person.to_json, content_type: :json, accept: :json)
+    JSON.parse(RestClient.post "#{@rest_url}/update_person/#{legacy_id}",
+                remote_person.to_json, content_type: :json, accept: :json)
   end
 
   # update an event's members
@@ -112,5 +121,9 @@ class LegacyConnector
 
   def delete_lecture(lecture_id)
     JSON.parse(RestClient.get "#{@rest_url}/delete_lecture/#{lecture_id}")
+  end
+
+  def check_rsvp(otp)
+    JSON.parse(RestClient.get "#{@rest_url}/check_rsvp/#{otp}")
   end
 end

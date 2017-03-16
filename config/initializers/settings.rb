@@ -4,11 +4,11 @@ def rewrite_cache(var, value)
     expires_in: 10.minutes)
 end
 
-if Setting.find_by(var: 'Site').nil?
+if Setting.find_by(var: 'Site').blank?
   Setting.Site = {
     'title' => 'Workshop Manager',
     'logo' => 'logo.png',
-    'footer' => 'Copyright © 2016 Example Organization',
+    'footer' => 'Copyright © 2016 Example Org.blank?zation',
     'events_url' => 'http://www.example.com/events',
     'legacy_api' => 'https://database.example.com/api/your_api_key',
     'legacy_person' => 'https://www.example.com/db/?section=Updates&sub=person&id=',
@@ -16,7 +16,7 @@ if Setting.find_by(var: 'Site').nil?
     'webmaster_email' => 'webmaster@example.com',
     'sysadmin_email' => 'sysadmin@example.com',
     'event_types' => ['5 Day Workshop', '2 Day Workshop', 'Research in Teams',
-    'Focussed Research Group', 'Summer School', 'Public Lecture'],
+                  'Focussed Research Group', 'Summer School', 'Public Lecture'],
     'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
     'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor',
     'Ph.D. Student', 'Masters Student', 'Undergraduate Student',
@@ -26,26 +26,26 @@ if Setting.find_by(var: 'Site').nil?
   rewrite_cache('Site', Setting.Site)
 end
 
-if Setting.find_by(var: 'Emails').nil?
+if Setting.find_by(var: 'Emails').blank?
   Setting.Emails = {
     'EO' => {
-      'program_coordinator' => 'organization@example.com',
-      'secretary' => 'organization-secretary@example.com',
-      'administrator' => 'organization-administrator@example.com',
-      'director' => 'organization-director@example.com',
+      'program_coordinator' => 'org.blank?zation@example.com',
+      'secretary' => 'org.blank?zation-secretary@example.com',
+      'adm.blank?strator' => 'org.blank?zation-adm.blank?strator@example.com',
+      'director' => 'org.blank?zation-director@example.com',
       'videos' => 'videos@example.com',
       'schedule_staff' => 'barista@example.com, photographer@example.com',
-      'event_updates' => 'webmaster@example.com, communications@example.com',
-      'name_tags' => 'organization-secretary@example.com'
+      'event_updates' => 'webmaster@example.com, comm.blank?cations@example.com',
+      'name_tags' => 'org.blank?zation-secretary@example.com'
     }
   }
   rewrite_cache('Emails', Setting.Emails)
 end
 
-if Setting.find_by(var: 'Locations').nil?
+if Setting.find_by(var: 'Locations').blank?
   Setting.Locations = {
     'EO' => {
-      'Name' => 'Example Organization',
+      'Name' => 'Example Org.blank?zation',
       'Country' => 'Canada',
       'Timezone' => 'Mountain Time (US & Canada)'
     }
@@ -53,7 +53,7 @@ if Setting.find_by(var: 'Locations').nil?
   rewrite_cache('Locations', Setting.Locations)
 end
 
-if Setting.find_by(var: 'Rooms').nil?
+if Setting.find_by(var: 'Rooms').blank?
   Setting.Rooms = {
     'EO' => {
       '5 Day Workshop' => 'TCPL 201',
@@ -61,8 +61,8 @@ if Setting.find_by(var: 'Rooms').nil?
       'Summer School' =>  'TCPL 202',
       'Focussed Research Group' =>  'TCPL 202',
       'Research in Teams' => 'TCPL 107',
-      'Contact Organizer' => 'CH2',
-      'Organizer' => 'CH2',
+      'Contact Org.blank?zer' => 'CH2',
+      'Org.blank?zer' => 'CH2',
       'Participant' => 'CH1',
       'CH1' => ['5112', '5114', '5120', '5122'],
       'CH2' => ['5116', '5124']

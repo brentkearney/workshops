@@ -1,21 +1,23 @@
 # Copyright (c) 2016 Banff International Research Station
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this
-# software and associated documentation files (the "Software"), to deal in the Software
-# without restriction, including without limitation the rights to use, copy, modify,
-# merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to the following
-# conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all copies
-# or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-# CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
-# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 
 # Updates local database with records from legacy database
 class SyncMembers
@@ -60,13 +62,16 @@ class SyncMembers
     if remote['Person']['updated_at'].blank?
       remote['Person']['updated_at'] = Time.now
     else
-      remote['Person']['updated_at'] = Time.at(remote['Person']['updated_at']).in_time_zone(@event.time_zone)
+      remote['Person']['updated_at'] =
+        Time.at(remote['Person']['updated_at']).in_time_zone(@event.time_zone)
     end
 
     if remote['Membership']['updated_at'].blank?
       remote['Membership']['updated_at'] = Time.now
     else
-      remote['Membership']['updated_at'] = Time.at(remote['Membership']['updated_at']).in_time_zone(@event.time_zone)
+      remote['Membership']['updated_at'] =
+        Time.at(remote['Membership']['updated_at']).
+          in_time_zone(@event.time_zone)
     end
 
     if remote['Membership']['role'] == 'Backup Participant'
@@ -75,7 +80,7 @@ class SyncMembers
 
     remote
   end
-  
+
   def update_person(remote)
     local_person = get_local_person(remote)
 
@@ -92,7 +97,7 @@ class SyncMembers
         save_person(local_person)
       end
     end
-    
+
     local_person
   end
 
@@ -104,9 +109,10 @@ class SyncMembers
       sync_errors.add(person)
     end
   end
-  
+
   def get_local_person(remote)
-    Person.find_by(legacy_id: remote['Person']['legacy_id']) || Person.find_by(email: remote['Person']['email'])
+    Person.find_by(legacy_id: remote['Person']['legacy_id']) ||
+      Person.find_by(email: remote['Person']['email'])
   end
 
   def update_membership(remote, person)

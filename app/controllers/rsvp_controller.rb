@@ -5,15 +5,26 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RsvpController < ApplicationController
-  before_action :set_event
-
   def index
-    redirect_to event_path(@event) unless valid_otp
+    # legacy OTP urls = "https://www.domain.com/rsvp/?otp=$otp";
+
+    if params[:otp].blank?
+      redirect_to rsvp_new_path
+    else
+      @message = validate_otp
+      Rails.logger.debug "\n\n" + '*' * 50 + "\n\n"
+      Rails.logger.debug "OTP response: #{@message.inspect}"
+      Rails.logger.debug "\n\n" + '*' * 50 + "\n\n"
+    end
+  end
+
+  def new
+    @events = Event.future
   end
 
   private
 
-  def valid_otp
-    false
+  def validate_otp
+    LegacyConnector.new.check_rsvp(params[:otp])
   end
 end
