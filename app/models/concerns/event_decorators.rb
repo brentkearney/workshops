@@ -94,6 +94,10 @@ module EventDecorators
     end_date.strftime("%A, %B %-d, %Y")
   end
 
+  def date
+    start_date.strftime("%Y-%m-%d")
+  end
+
   def country
     if Setting.Locations && Setting.Locations[self.location]
       Setting.Locations[self.location]['Country']

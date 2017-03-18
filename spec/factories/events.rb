@@ -3,9 +3,19 @@ require 'factory_girl_rails'
 require 'faker'
 
 FactoryGirl.define do
-  sequence(:code) { |n| DateTime.now.strftime("%y") + 'w5' + n.to_s.rjust(3, '0') }
-  sequence(:start_date, 1) { |n| Date.new(2016,1,10).advance(weeks: n).beginning_of_week(:sunday) }
-  sequence(:end_date, 1) { |n| Date.new(2016,1,10).advance(weeks: n, days: 5).beginning_of_week(:friday) }
+  sequence(:code) do |n|
+    DateTime.now.strftime("%y") + 'w5' + n.to_s.rjust(3, '0')
+  end
+  sequence(:start_date, 1) do |n|
+    n = 1 if n > 48 # avoid going years into the future
+    date = Date.today.beginning_of_year.advance(weeks: 1)
+    date.advance(weeks: n).beginning_of_week(:sunday)
+  end
+  sequence(:end_date, 1) do |n|
+    n = 1 if n > 48
+    date = Date.today.beginning_of_year.advance(weeks: 1)
+    date.advance(weeks: n, days: 5).beginning_of_week(:friday)
+  end
 
   factory :event do |f|
     f.code
@@ -34,16 +44,23 @@ FactoryGirl.define do
       if evaluator.past
         date = date.prev_year
         event.start_date = date.prev_week(:sunday)
-        event.end_date = date.prev_week(:sunday) + 5.days
+        event.end_date = date.prev_week(:friday)
       elsif evaluator.future
         date = date.next_year
         event.start_date = date.next_week(:sunday)
-        event.end_date = date.next_week(:sunday) + 5.days
+        event.end_date = date.next_week(:friday)
       elsif evaluator.current
-        event.start_date = date.beginning_of_week(:sunday)
-        event.end_date = date.beginning_of_week(:sunday) + 7.days
+        if date.strftime("%A") =~ /[Friday|Saturday|Sunday]/
+          event.start_date = date
+          event.end_date = date.end_of_week(:sunday)
+        else
+          event.start_date = date.beginning_of_week(:sunday)
+          event.end_date = date.beginning_of_week(:friday)
+        end
       end
-      event.code.gsub!(/^\d{2}/, date.strftime('%y'))
+      if event.start_date
+        event.code.gsub!(/^\d{2}/, event.start_date.strftime('%y'))
+      end
     end
 
     factory :event_with_roles do

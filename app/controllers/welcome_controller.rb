@@ -11,14 +11,15 @@ class WelcomeController < ApplicationController
   # GET / or /welcome
   def index
     @memberships = policy_scope(Membership)
-    @memberships.delete_if { |m| m.event.start_date < 2.weeks.ago }
+    @memberships.delete_if {|m| m.event.start_date < 2.weeks.ago }
 
     if @memberships.empty?
       redirect_to my_events_path
     else
       @heading = 'Your Current & Upcoming Events'
-      @memberships.each { |m| SyncEventMembersJob.perform_later(m.event) if policy(m.event).sync? }
-      # welcome#index
+      @memberships.each do |m|
+        SyncEventMembersJob.perform_later(m.event) if policy(m.event).sync?
+      end
     end
   end
 

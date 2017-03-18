@@ -226,12 +226,18 @@ class FakeLegacyConnector
   end
 
   # successfull OTP validation
-  def validated_otp
+  def valid_otp
     message = {
       'otp_id' => 1,
       'legacy_id' => 2,
       'event_code' => '17w5001',
       'attendance' => 'Confirmed'
+    }
+  end
+
+  def invalid_otp
+    message = {
+      'denied' => 'Invalid invitation code.'
     }
   end
 end

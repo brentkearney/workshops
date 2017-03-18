@@ -6,12 +6,14 @@
 
 require 'rails_helper'
 
-describe 'Post-login Welcome Page', :type => :feature do
+describe 'Post-login Welcome Page', type: :feature do
 
   before do
     Person.destroy_all
     Event.destroy_all
-    @user = create(:user, password: 'secret123456', password_confirmation: 'secret123456')
+    Membership.destroy_all
+    @user = create(:user, password: 'secret123456',
+                   password_confirmation: 'secret123456')
   end
 
   after(:each) do
@@ -27,8 +29,8 @@ describe 'Post-login Welcome Page', :type => :feature do
 
   def expect_current_and_upcoming
     @user.person.memberships.each do |m|
-      expect(page.body).to include("#{m.event.code}")
-      expect(page.body).to include("#{m.event.name}")
+      expect(page.body).to have_text("#{m.event.code}")
+      expect(page.body).to have_text("#{m.event.name}")
     end
   end
 
@@ -121,9 +123,11 @@ describe 'Post-login Welcome Page', :type => :feature do
 
   context 'As an event organizer' do
     before do
-      Event.destroy_all
       @user.member!
-      3.times { create(:membership, person: @user.person, role: 'Organizer') }
+      3.times do
+        e = create(:event, future: true)
+        create(:membership, event: e, person: @user.person, role: 'Organizer')
+      end
     end
 
     after(:each) do
@@ -133,8 +137,8 @@ describe 'Post-login Welcome Page', :type => :feature do
     it "shows the user's current and upcoming workshops" do
       sign_in_as @user
 
-      expect(current_path).to eq(welcome_path)
       expect_current_and_upcoming
+      expect(current_path).to eq(welcome_path)
     end
 
     it 'shows the workshops for which the user is Not Yet Invited' do
@@ -145,7 +149,7 @@ describe 'Post-login Welcome Page', :type => :feature do
       sign_in_as @user
 
       expect(current_path).to eq(welcome_path)
-      expect(page.body).to include("#{membership.event.name}")
+      expect(page.body).to have_text("#{membership.event.name}")
 
       membership.destroy!
     end

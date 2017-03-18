@@ -19,7 +19,7 @@ RSpec.describe RsvpController, type: :controller do
       it 'validates the one-time-password (OTP) via legacy db' do
         lc = FakeLegacyConnector.new
         expect(LegacyConnector).to receive(:new).and_return(lc)
-        allow(lc).to receive(:check_rsvp).with('123').and_return(lc.validated_otp)
+        allow(lc).to receive(:check_rsvp).with('123').and_return(lc.valid_otp)
 
         get :index, { otp: '123' }
 
@@ -28,6 +28,16 @@ RSpec.describe RsvpController, type: :controller do
     end
 
     context 'with invalid one-time-password (OTP) in the url' do
+      it 'returns denied message' do
+        lc = FakeLegacyConnector.new
+        expect(LegacyConnector).to receive(:new).and_return(lc)
+        allow(lc).to receive(:check_rsvp).with('123').and_return(lc.invalid_otp)
+
+        get :index, { otp: '123' }
+
+        expect(assigns(:message)).to include('denied' =>
+                                             'Invalid invitation code.')
+      end
     end
   end
 
