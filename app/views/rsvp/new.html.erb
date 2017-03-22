@@ -6,7 +6,7 @@
     <div class="form-group">
       <p><label>Select the event you were invited to:</label></p>
       <%= select_tag(:event, options_for_select(future_events_options),
-                     class: 'form-control') %>
+                     include_blank: true, class: 'form-control') %>
     </div>
   </div>
 </div>
@@ -14,6 +14,14 @@
   <div class='col-md-6'>
     <div class="form-group">
       <p>Enter the email address to which the invitation was sent:</p>
+      <%= email_field(:person, :email) %>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class='col-md-6'>
+    <div class="form-group">
+      <%= submit_tag('Request Another Invitation') %>
     </div>
   </div>
 </div>

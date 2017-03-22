@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161117004538) do
+ActiveRecord::Schema.define(version: 20170321222619) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,20 @@ ActiveRecord::Schema.define(version: 20161117004538) do
   end
 
   add_index "events", ["code"], name: "index_events_on_code", unique: true, using: :btree
+
+  create_table "invitations", force: :cascade do |t|
+    t.integer  "membership_id"
+    t.integer  "invited_by"
+    t.string   "code",          null: false
+    t.datetime "expires"
+    t.datetime "invited_on"
+    t.datetime "used_on"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "invitations", ["invited_by"], name: "index_invitations_on_invited_by", using: :btree
+  add_index "invitations", ["membership_id"], name: "index_invitations_on_membership_id", using: :btree
 
   create_table "lectures", force: :cascade do |t|
     t.integer  "event_id",            null: false
@@ -157,6 +171,7 @@ ActiveRecord::Schema.define(version: 20161117004538) do
     t.datetime "updated_at"
   end
 
+  add_index "settings", ["id"], name: "settings_id_key", unique: true, using: :btree
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true, using: :btree
   add_index "settings", ["var"], name: "settings_var_key", unique: true, using: :btree
 
@@ -202,6 +217,8 @@ ActiveRecord::Schema.define(version: 20161117004538) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
+  add_foreign_key "invitations", "memberships"
+  add_foreign_key "invitations", "people", column: "invited_by"
   add_foreign_key "lectures", "events"
   add_foreign_key "lectures", "people"
   add_foreign_key "memberships", "events"

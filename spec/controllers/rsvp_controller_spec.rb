@@ -65,4 +65,16 @@ RSpec.describe RsvpController, type: :controller do
       expect(assigns(:events)).not_to include(@past)
     end
   end
+
+  describe 'POST #new' do
+    before do
+      @event = create(:event, future: true)
+    end
+
+    it 'validates email' do
+      post :new, { event: @event.code, email: 'foo' }
+      expect(response).to render_template('new')
+      expect(assigns(:flash)).to include(:error)
+    end
+  end
 end

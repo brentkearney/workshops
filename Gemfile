@@ -41,10 +41,10 @@ group :test do
   gem 'database_cleaner'
 end
 
-# group :production do
-#   gem 'newrelic_rpm'
-#   gem 'rollbar'
-# end
+group :production do
+  gem 'newrelic_rpm'
+  gem 'rollbar'
+end
 
 group :development do
   gem 'web-console'

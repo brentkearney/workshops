@@ -159,6 +159,7 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.0.0)
     netrc (0.11.0)
+    newrelic_rpm (4.0.0.332)
     nokogiri (1.7.0.1)
       mini_portile2 (~> 2.1.0)
     octokit (4.6.2)
@@ -246,6 +247,8 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
+    rollbar (2.14.1)
+      multi_json
     rspec-core (3.5.4)
       rspec-support (~> 3.5.0)
     rspec-expectations (3.5.0)
@@ -357,6 +360,7 @@ DEPENDENCIES
   jquery-rails
   jquery-turbolinks
   momentjs-rails (>= 2.9.0)
+  newrelic_rpm
   paper_trail
   passenger
   pg
@@ -370,6 +374,7 @@ DEPENDENCIES
   rails (= 4.2.8)
   rails-settings-cached
   rest-client
+  rollbar
   rspec-rails
   sass-rails
   sdoc

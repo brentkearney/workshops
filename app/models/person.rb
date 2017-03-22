@@ -5,13 +5,14 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Person < ActiveRecord::Base
-  has_many :memberships, :dependent => :destroy
+  has_many :memberships, dependent: :destroy
   has_many :events, -> { where ("attendance != 'Not Yet Invited' AND attendance != 'Declined'") }, through: :memberships, source: :event
-  has_one :user, :dependent => :destroy
+  has_one :user, dependent: :destroy
+  has_many :invitations, foreign_key: 'invited_by'
 
   before_validation :downcase_email
   before_save :clean_data
-  
+
   validates :email, presence: true,
                     case_sensitive: false,
                     uniqueness: true,
@@ -22,7 +23,7 @@ class Person < ActiveRecord::Base
 
   # app/models/concerns/person_decorators.rb
   include PersonDecorators
-    
+
   private
 
   def clean_data

@@ -51,7 +51,7 @@ FactoryGirl.define do
         event.end_date = date.next_week(:friday)
       elsif evaluator.current
         if date.strftime("%A") =~ /[Friday|Saturday|Sunday]/
-          event.start_date = date
+          event.start_date = date.beginning_of_week(:friday)
           event.end_date = date.end_of_week(:sunday)
         else
           event.start_date = date.beginning_of_week(:sunday)

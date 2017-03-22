@@ -1,19 +1,41 @@
 #!/bin/bash
 set -e
 
+export PATH=$PATH:/usr/local/rvm/bin:/usr/local/rvm/rubies/ruby-2.4.0/bin:/usr/local/rvm/gems/ruby-2.4.0/bin:./bin
+echo
+echo "PATH is: "
+echo $PATH
+
 echo
 echo "Setting system timezone..."
 dpkg-reconfigure -f noninteractive tzdata
+
+echo
+echo "Create gemset..."
+/bin/bash -lc 'rvm --default use ruby-2.4.0 --create'
 
 echo
 echo "Installing latest bundler..."
 /usr/local/rvm/bin/rvm-exec 2.4.0 gem install bundler
 /usr/local/rvm/bin/rvm-exec 2.4.0 gem install rubygems-bundler
 
-
 echo
 echo "Bundle install..."
-cd /home/app/workshops; RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.4.0 bundle install
+/usr/local/rvm/bin/rvm-exec 2.4.0 bundle install
+
+
+echo
+echo "Chowning..."
+chown -R app:app /usr/local/rvm/gems
+if [ ! -e /home/app/workshops/tmp ]; then
+  mkdir /home/app/workshops/tmp
+  mkdir -p /home/app/workshops/vendor/cache
+fi
+chown -R app:app /home/app/workshops
+
+echo
+echo "Creating databases..."
+rake db:setup
 
 echo
 echo "Running migrations..."
@@ -27,23 +49,12 @@ else
   rake ws:create_admins RAILS_ENV=development
 fi
 
-
-echo
-echo "Chowning..."
-chown -R app:app /usr/local/rvm/gems
-if [ ! -e /home/app/workshops/tmp ]; then
-  mkdir /home/app/workshops/tmp
-  mkdir -p /home/app/workshops/vendor/cache
-fi
-chown -R app:app /home/app/workshops
-
 # echo
 # echo "Compiling Assets..."
+# chown -R app /home/app/workshops/tmp
 # su - app -c "cd /home/app/workshops; RAILS_ENV=production bundle exec rake assets:precompile --trace"
 
 echo
 echo "Starting web server..."
-bundle exec passenger start
-
-# /usr/bin/passenger start
+/usr/bin/passenger start
 # /home/app/workshops/bin/rails server -e development -b 0.0.0.0 -p 80
