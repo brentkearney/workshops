@@ -45,8 +45,9 @@ Rails.application.routes.draw do
 
   # RSVP
   get '/rsvp' => 'rsvp#index'
-  get '/rsvp/new' => 'rsvp#new'
   get '/rsvp/:otp' => 'rsvp#index', as: :rsvp_otp
+  get '/invitations/new' => 'invitations#new'
+  post '/invitations/create' => 'invitations#create'
 
   # API
   namespace :api do

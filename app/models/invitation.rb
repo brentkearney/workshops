@@ -10,9 +10,7 @@ class Invitation < ActiveRecord::Base
   before_save :set_expiry
 
   def generate_code
-    if self.code.blank?
-      self.code = SecureRandom.urlsafe_base64(37)
-    end
+    self.code = SecureRandom.urlsafe_base64(37) if self.code.blank?
   end
 
   def set_expiry

@@ -9,7 +9,7 @@ class RsvpController < ApplicationController
     # legacy OTP urls = "https://www.domain.com/rsvp/?otp=$otp";
 
     if params[:otp].blank?
-      redirect_to rsvp_new_path
+      redirect_to invitations_new_path
     else
       @message = validate_otp
       Rails.logger.debug "\n\n" + '*' * 50 + "\n\n"
@@ -18,9 +18,6 @@ class RsvpController < ApplicationController
     end
   end
 
-  def new
-    @events = Event.future
-  end
 
   private
 

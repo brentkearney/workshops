@@ -6,14 +6,14 @@
 
 require 'rails_helper'
 
-describe 'RSVP#new', type: :feature do
+describe 'Invitation#new', type: :feature do
   before do
     create(:event, past: true)
     3.times { create(:event, future: true) }
   end
 
   before :each do
-    visit rsvp_new_path
+    visit invitations_new_path
   end
 
   it 'has a SELECT menu of future events' do

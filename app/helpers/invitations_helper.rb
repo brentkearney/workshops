@@ -4,7 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-module RsvpHelper
+module InvitationsHelper
 
   # options for select menu
   def future_events_options
