@@ -1,36 +1,49 @@
-<h1>Event Invitations</h1>
-<%= form_for @invitation, url: { action: 'create' },
-                         html: {  class: 'form',
-                                   role: 'form' } do |f| %>
-<fieldset>
-<div class="row">
-  <div class='col-md-6'>
-    <div class="form-group">
-      <p>
-      <%= f.label 'Select the event you were invited to:' %><br />
-      <%= select_tag('membership[event]', options_for_select(future_events_options),
-                     include_blank: true, class: 'form-control') %>
-     </p>
-    </div>
-  </div>
-</div>
+<div class="row invitation-box">
+  <div class="col-md-6 col-md-offset-3">
+    <%= render 'validation_errors' %>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h1 class="panel-title">Event Invitations</h1>
+      </div>
+      <div class="panel-body">
 
-<div class="row">
-  <div class='col-md-6'>
-    <div class="form-group">
-      <p>
-      <%= f.label 'Enter your email address:' %><br />
-      <%= email_field 'membership[person]', :email, class: 'form-control' %>
-    </div>
-  </div>
-</div>
+        <%= form_for @invitation, as: :invitation, url: invitations_create_path,
+                              method: 'post',
+                                html: { class: 'form', role: 'form' } do |f| %>
+        <fieldset>
+        <div class="row">
+          <div class='col-md-12'>
+            <div class="form-group">
+              <p>
+              <%= f.label :event, 'Select the event you were invited to:' %><br />
+              <%= f.collection_select(:event, @events, :code, :options_list,
+                                { include_blank: true }, { class: 'form-control' }) %>
+             </p>
+            </div>
+          </div>
+        </div>
 
-<div class="row">
-  <div class='col-md-6'>
-    <div class="form-group">
-      <%= f.submit 'Request Another Invitation' %>
+        <div class="row">
+          <div class='col-md-12'>
+            <div class="form-group">
+              <p>
+              <%= f.label :email, 'Enter your email address:' %><br />
+              <%= f.email_field :email, class: 'form-control' %>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class='col-md-4'>
+            <div class="form-group">
+              <%= f.submit 'Request Invitation', class: 'btn btn-default' %>
+            </div>
+          </div>
+        </div>
+        </fieldset>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>
-</fieldset>
-<% end %>

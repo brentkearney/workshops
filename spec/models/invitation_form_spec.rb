@@ -4,16 +4,8 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-module InvitationsHelper
+require 'rails_helper'
 
-  # options for select menu
-  def future_events_options
-    options = []
-    @events.each do |e|
-      name = e.name.truncate(60, omission: '...')
-      options << ["#{e.date}: [#{e.code}] #{name}", e.code]
-    end
-    options
-  end
+RSpec.describe 'Model validations: InvitationForm', type: :model do
 
 end

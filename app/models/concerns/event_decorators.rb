@@ -130,4 +130,7 @@ module EventDecorators
     Setting.Site['events_url'] + self.code
   end
 
+  def options_list
+    "#{self.date}: [#{self.code}] #{self.name}"
+  end
 end

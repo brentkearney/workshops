@@ -5,31 +5,39 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class InvitationsController < ApplicationController
+
+  def index
+    redirect_to invitations_new_path
+  end
+
   def new
     @events = Event.future
     @invitation = InvitationForm.new
   end
 
   def create
-    Rails.logger.debug "\n\nInvitations Controller Received: #{params.inspect}\n"
-    Rails.logger.debug "Strong params returns: #{invitation_params}\n"
-    membership = find_membership
-    Rails.logger.debug "Found membership: #{membership.inspect}\n\n"
+    @invitation = InvitationForm.new(invitation_params)
+    if @invitation.valid?
+      Rails.logger.debug "invitation is valid!\n"
+      send_invitation(@invitation.membership)
 
-    redirect_to invitations_new_path
+      redirect_to invitations_new_path,
+        success: 'A new invitation has been emailed to you!'
+    else
+      @events = Event.future
+      render :new
+    end
   end
 
   private
 
-  def find_membership
-    param = invitation_params
-    e = Event.find(param['event'])
-    p = Person.find_by_email(param['person']['email'])
-    Membership.where("event_id = #{e.id} AND person_id = #{p.id}")
+  def send_invitation(member)
+    Invitation.new(membership: member,
+                   invited_by: member.person.id).send_invite
   end
 
   def invitation_params
-    params.require(:membership).permit(:event, :person => [ :email ])
+    params.require(:invitation).permit(:event, :email)
   end
 end
 

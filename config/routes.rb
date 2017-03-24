@@ -43,9 +43,10 @@ Rails.application.routes.draw do
   match "/404", :to => "errors#not_found", via: :all
   match "/500", :to => "errors#internal_server_error", via: :all
 
-  # RSVP
+  # Invitations & RSVP
   get '/rsvp' => 'rsvp#index'
   get '/rsvp/:otp' => 'rsvp#index', as: :rsvp_otp
+  get '/invitations' => 'invitations#index'
   get '/invitations/new' => 'invitations#new'
   post '/invitations/create' => 'invitations#create'
 

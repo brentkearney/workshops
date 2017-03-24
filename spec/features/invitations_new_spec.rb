@@ -20,24 +20,40 @@ describe 'Invitation#new', type: :feature do
     future_events = Event.future.map(&:code)
     past_events = Event.past.map(&:code)
 
-    expect(page.body).to have_select('event', with_options: future_events)
-    expect(page.body).not_to have_select('event', with_options: past_events)
+    expect(page.body).to have_select('invitation[event]', with_options: future_events)
+    expect(page.body).not_to have_select('invitation[event]', with_options: past_events)
   end
 
   it 'has an email field' do
-    expect(page.body).to have_field('person_email')
+    expect(page.body).to have_field('invitation[email]')
   end
 
-  it 'validates email' do
-    option = first('#event option').text
-    puts "Selecting option: #{option}"
-    select option, from: 'event'
+  context 'validates email' do
+    it 'no email'
+    it 'invalid email' do
+      find('#invitation_event').find(:xpath, 'option[2]').select_option
+      page.fill_in 'invitation[email]', with: 'foo@bar'
+      click_button 'Request Invitation'
 
-    page.fill_in 'person_email', with: 'foo@bar'
-    click_button 'Request Another Invitation'
+      expect(page.body).to have_css('div.alert',
+          text: 'You must enter a valid e-mail address')
+    end
+    it 'valid email'
+  end
 
-    expect(current_path).to eq(rsvp_new_path)
-    expect(page.body).to have_css('div.alert-error',
-        text: 'Invalid email address')
+  context 'validates event' do
+    it 'no event'
+    it 'invalid event'
+    it 'valid event'
+  end
+
+  context 'validates membership' do
+    it 'no membership'
+    it 'not invited'
+    it 'already confirmed'
+    it 'already declined'
+    it 'not yet invited'
+    it 'invited'
+    it 'undecided'
   end
 end
