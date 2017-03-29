@@ -8,7 +8,7 @@ if Setting.find_by(var: 'Site').blank?
   Setting.Site = {
     'title' => 'Workshop Manager',
     'logo' => 'logo.png',
-    'footer' => 'Copyright © 2016 Example Org.blank?zation',
+    'footer' => 'Copyright © 2016 Example Organzation',
     'events_url' => 'http://www.example.com/events',
     'legacy_api' => 'https://database.example.com/api/your_api_key',
     'legacy_person' => 'https://www.example.com/db/?section=Updates&sub=person&id=',
@@ -29,14 +29,15 @@ end
 if Setting.find_by(var: 'Emails').blank?
   Setting.Emails = {
     'EO' => {
-      'program_coordinator' => 'org.blank?zation@example.com',
-      'secretary' => 'org.blank?zation-secretary@example.com',
-      'adm.blank?strator' => 'org.blank?zation-adm.blank?strator@example.com',
-      'director' => 'org.blank?zation-director@example.com',
+      'program_coordinator' => 'organization@example.com',
+      'secretary' => 'organization-secretary@example.com',
+      'administrator' => 'organization-administrator@example.com',
+      'director' => 'organization-director@example.com',
       'videos' => 'videos@example.com',
       'schedule_staff' => 'barista@example.com, photographer@example.com',
-      'event_updates' => 'webmaster@example.com, comm.blank?cations@example.com',
-      'name_tags' => 'org.blank?zation-secretary@example.com'
+      'event_updates' => 'webmaster@example.com, communications@example.com',
+      'name_tags' => 'organization-secretary@example.com',
+      'confirmation_notices' => 'organization@example.com'
     }
   }
   rewrite_cache('Emails', Setting.Emails)
@@ -45,7 +46,7 @@ end
 if Setting.find_by(var: 'Locations').blank?
   Setting.Locations = {
     'EO' => {
-      'Name' => 'Example Org.blank?zation',
+      'Name' => 'Example Organization',
       'Country' => 'Canada',
       'Timezone' => 'Mountain Time (US & Canada)'
     }
@@ -61,8 +62,8 @@ if Setting.find_by(var: 'Rooms').blank?
       'Summer School' =>  'TCPL 202',
       'Focussed Research Group' =>  'TCPL 202',
       'Research in Teams' => 'TCPL 107',
-      'Contact Org.blank?zer' => 'CH2',
-      'Org.blank?zer' => 'CH2',
+      'Contact Organization' => 'CH2',
+      'Organization' => 'CH2',
       'Participant' => 'CH1',
       'CH1' => ['5112', '5114', '5120', '5122'],
       'CH2' => ['5116', '5124']

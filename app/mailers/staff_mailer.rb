@@ -121,4 +121,16 @@ class StaffMailer < ApplicationMailer
 
     mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
   end
+
+  def confirmation_notice(membership, msg)
+    email = Setting.Emails["#{membership.event.location}"]['confirmation_notices']
+    unless email.blank?
+      @person = membership.person
+      @event = membership.event
+      @message = msg
+
+      subject = "[#{@event.code}] membership change!"
+      mail(to: email, subject: subject, Importance: 'High', 'X-Priority': 1)
+    end
+  end
 end

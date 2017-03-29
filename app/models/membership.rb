@@ -10,6 +10,7 @@ class Membership < ActiveRecord::Base
   accepts_nested_attributes_for :person
   has_one :invitation
 
+  after_update :confirmation_notification
   after_save :update_counter_cache
   after_destroy :update_counter_cache
 
@@ -40,7 +41,7 @@ class Membership < ActiveRecord::Base
   end
 
   def set_role
-    unless Membership::ROLES.include?(role)
+    unless ROLES.include?(role)
       self.role = 'Participant'
     end
   end
@@ -91,6 +92,15 @@ class Membership < ActiveRecord::Base
           errors.add(:attendance, "- the maximum number of invited participants for #{event.code} has been reached.")
         end
       end
+    end
+  end
+
+  def confirmation_notification
+    if self.changed.include?('attendance')
+      msg = nil
+      msg = 'is no longer confirmed' if self.attendance_was == 'Confirmed'
+      msg = 'is now confirmed' if self.attendance == 'Confirmed'
+      StaffMailer.confirmation_notice(self, msg).deliver_now unless msg.nil?
     end
   end
 
