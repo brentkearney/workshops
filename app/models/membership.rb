@@ -9,14 +9,15 @@ class Membership < ActiveRecord::Base
   belongs_to :person
   accepts_nested_attributes_for :person
 
+  after_update :confirmation_notification
   after_save :update_counter_cache
   after_destroy :update_counter_cache
-  
+
   validates :event, presence: true
   validates :person, presence: true, :uniqueness => { :scope => :event,
       :message => "is already a participant of this event" }
   validates :updated_by, presence: true
-      
+
   validate :set_role
   validate :default_attendance
   validate :check_max_participants
@@ -39,17 +40,17 @@ class Membership < ActiveRecord::Base
   end
 
   def set_role
-    unless Membership::ROLES.include?(role)
+    unless ROLES.include?(role)
       self.role = 'Participant'
     end
   end
-  
+
   def default_attendance
     unless Membership::ATTENDANCE.include?(attendance)
       self.attendance = 'Not Yet Invited'
     end
   end
-  
+
   def arrival_and_departure_dates
     if self.event.blank?
       errors.add(:event, "can't be blank")
@@ -57,7 +58,7 @@ class Membership < ActiveRecord::Base
     else
       w = Event.find(self.event.id)
     end
-    
+
     unless arrival_date.blank?
       if arrival_date.to_date > w.end_date.to_date
         errors.add(:arrival_date, "- arrival date must be before the end of the event.")
@@ -66,20 +67,20 @@ class Membership < ActiveRecord::Base
         errors.add(:arrival_date, "- arrival date must be within 30 days of the event.")
       end
     end
-    
+
     unless departure_date.blank?
       if departure_date.to_date < w.start_date.to_date
         errors.add(:departure_date, "- departure date must be after the beginning of the event.")
       end
     end
-    
-    if errors.empty? 
+
+    if errors.empty?
       return false
-    else 
-      return true    
+    else
+      return true
     end
   end
-  
+
   # max_participants - (invited + confirmed participants)
   def check_max_participants
     if attendance == 'Declined' || attendance == 'Not Yet Invited'
@@ -90,6 +91,15 @@ class Membership < ActiveRecord::Base
           errors.add(:attendance, "- the maximum number of invited participants for #{event.code} has been reached.")
         end
       end
+    end
+  end
+
+  def confirmation_notification
+    if self.changed.include?('attendance')
+      msg = nil
+      msg = 'is no longer confirmed' if self.attendance_was == 'Confirmed'
+      msg = 'is now confirmed' if self.attendance == 'Confirmed'
+      StaffMailer.confirmation_notice(self, msg).deliver_now unless msg.nil?
     end
   end
 

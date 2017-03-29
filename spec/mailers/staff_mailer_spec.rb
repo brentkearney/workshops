@@ -13,6 +13,10 @@ RSpec.describe StaffMailer, type: :mailer do
     expect(@sysadmin_email).not_to be_nil
   end
 
+  def expect_email_was_sent
+    expect(ActionMailer::Base.deliveries.count).to eq(1)
+  end
+
   before :each do
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
@@ -32,7 +36,7 @@ RSpec.describe StaffMailer, type: :mailer do
         'Memberships' => Array.new }
       StaffMailer.event_sync(event, @sync_errors).deliver_now
 
-      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect_email_was_sent
       pc = Setting.Emails[event.location.to_s]['program_coordinator']
       expect(ActionMailer::Base.deliveries.first.to).to include(pc)
       expect(ActionMailer::Base.deliveries.first.cc).to include(@sysadmin_email)
@@ -50,7 +54,7 @@ RSpec.describe StaffMailer, type: :mailer do
 
       StaffMailer.notify_sysadmin(@event, @error).deliver_now
 
-      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect_email_was_sent
       expect(ActionMailer::Base.deliveries.first.to).to include(@sysadmin_email)
     end
   end
@@ -68,7 +72,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'sends email' do
-      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect_email_was_sent
     end
 
     it 'To: schedule_staff' do
@@ -88,7 +92,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'sends email' do
-      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect_email_was_sent
     end
 
     it 'To: nametag_updates' do
@@ -107,7 +111,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'sends email' do
-      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect_email_was_sent
     end
 
     it 'To: event_updates' do
@@ -115,6 +119,25 @@ RSpec.describe StaffMailer, type: :mailer do
       mailto = ActionMailer::Base.deliveries.first.to
       expect(mailto).to eq(event_updates.split(', '))
     end
+  end
 
+  describe '.confirmation_notice' do
+    before do
+      @member = create(:membership)
+      @event = @member.event
+    end
+
+    before :each do
+      StaffMailer.confirmation_notice(@member, 'Hi!').deliver_now
+    end
+
+    it 'sends email' do
+      expect_email_was_sent
+    end
+
+    it 'To: confirmation_notices' do
+      recipient = Setting.Emails[@event.location.to_s]['confirmation_notices']
+      expect(ActionMailer::Base.deliveries.first.to).to match_array(recipient)
+    end
   end
 end

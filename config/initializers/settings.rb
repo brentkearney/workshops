@@ -36,7 +36,8 @@ if Setting.find_by(var: 'Emails').nil?
       'videos' => 'videos@example.com',
       'schedule_staff' => 'barista@example.com, photographer@example.com',
       'event_updates' => 'webmaster@example.com, communications@example.com',
-      'name_tags' => 'organization-secretary@example.com'
+      'name_tags' => 'organization-secretary@example.com',
+      'confirmation_notices' => 'organization@example.com'
     }
   }
   rewrite_cache('Emails', Setting.Emails)
