@@ -1,4 +1,5 @@
 class InvitationForm
+  # validations for views/invitations/new.html.erb
   extend ActiveModel::Naming
   include ActiveModel::Validations
 
@@ -77,11 +78,18 @@ class InvitationForm
     end
   end
 
-  def organizer(evnt)
-    mail_link = '<a href="mailto:'
-    om = evnt.memberships.select { |m| m.role == 'Contact Organizer' }.first
-    mail_link += "'#{om.person.name}' <#{om.person.email}>"
-    mail_link += "?Subject=[#{evnt.code}] \">#{om.person.name}</a>".html_safe
+  def organizer(event)
+    om = event.memberships.select { |m| m.role == 'Contact Organizer' }.first
+    link = ''
+    if om.nil?
+      event_url = Setting.Site['events_url'] + event.code
+      link = '<a href="' + event_url + '">' + event_url + '</a>'
+    else
+      link = '<a href="mailto:'
+      link += "'#{om.person.name}' <#{om.person.email}>"
+      link += "?Subject=[#{evnt.code}] \">#{om.person.name}</a>".html_safe
+    end
+    link
   end
 
   # Required ActiveModel methods

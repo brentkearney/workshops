@@ -22,7 +22,7 @@ class InvitationsController < ApplicationController
       send_invitation(@invitation.membership)
 
       redirect_to invitations_new_path,
-        success: 'A new invitation has been emailed to you!'
+        success: 'A new invitation has been e-mailed to you!'
     else
       @events = Event.future
       render :new

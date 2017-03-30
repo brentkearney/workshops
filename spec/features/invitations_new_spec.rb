@@ -29,31 +29,127 @@ describe 'Invitation#new', type: :feature do
   end
 
   context 'validates email' do
-    it 'no email'
-    it 'invalid email' do
+    before :each do
       find('#invitation_event').find(:xpath, 'option[2]').select_option
+    end
+
+    it 'no email' do
+      click_button 'Request Invitation'
+      expect(page.body).to have_css('div.alert',
+          text: 'Your e-mail address is required')
+    end
+
+    it 'invalid email' do
       page.fill_in 'invitation[email]', with: 'foo@bar'
       click_button 'Request Invitation'
 
       expect(page.body).to have_css('div.alert',
           text: 'You must enter a valid e-mail address')
     end
-    it 'valid email'
+
+    it 'valid email' do
+      event = Event.last
+      member = create(:membership, event: event, attendance: 'Invited')
+
+      select "#{event.name}", from: 'invitation_event'
+      page.fill_in 'invitation[email]', with: member.person.email
+      click_button 'Request Invitation'
+
+      expect(page.body).to have_css('div.alert',
+          text: 'A new invitation has been e-mailed to you')
+    end
   end
 
   context 'validates event' do
-    it 'no event'
-    it 'invalid event'
-    it 'valid event'
+    it 'no event selected' do
+      page.fill_in 'invitation[email]', with: 'foo@bar'
+      click_button 'Request Invitation'
+
+      expect(page.body).to have_css('div.alert',
+          text: 'You must select the event to which you were invited')
+    end
   end
 
   context 'validates membership' do
-    it 'no membership'
-    it 'not invited'
-    it 'already confirmed'
-    it 'already declined'
-    it 'not yet invited'
-    it 'invited'
-    it 'undecided'
+    before do
+      @event = Event.last
+      @member = create(:membership, event: @event)
+    end
+
+    def submit_member_request(member)
+      select "#{@event.name}", from: 'invitation_event'
+      page.fill_in 'invitation[email]', with: member.person.email
+      click_button 'Request Invitation'
+    end
+
+    it 'no membership' do
+      find('#invitation_event').find(:xpath, 'option[2]').select_option
+      page.fill_in 'invitation[email]', with: 'foo@bar.com'
+      click_button 'Request Invitation'
+
+      expect(page.body).to have_css('div.alert',
+          text: 'We have no record of that email address')
+    end
+
+    it 'not invited' do
+      @member.attendance = 'Not Yet Invited'
+      @member.save
+
+      submit_member_request(@member)
+
+      expect(page.body).to have_css('div.alert',
+          text: 'We could not find an event invitation')
+    end
+
+    it 'already confirmed' do
+      @member.attendance = 'Confirmed'
+      @member.save
+
+      submit_member_request(@member)
+
+      expect(page.body).to have_css('div.alert',
+          text: 'You are already confirmed')
+    end
+
+    it 'already declined' do
+      @member.attendance = 'Declined'
+      @member.save!
+
+      submit_member_request(@member)
+
+      expect(page.body).to have_css('div.alert',
+          text: 'You have already declined an invitation')
+    end
+
+    it 'not yet invited' do
+      @member.attendance = 'Not Yet Invited'
+      @member.save
+
+      submit_member_request(@member)
+
+      expect(page.body).to have_css('div.alert',
+          text: 'We could not find an event invitation')
+    end
+
+    it 'invited' do
+      @member.attendance = 'Invited'
+      @member.save
+
+      submit_member_request(@member)
+
+      expect(page.body).to have_css('div.alert',
+          text: 'A new invitation has been e-mailed to you')
+    end
+
+    it 'undecided' do
+      @member.attendance = 'Undecided'
+      @member.save
+
+      submit_member_request(@member)
+
+      expect(page.body).to have_css('div.alert',
+          text: 'A new invitation has been e-mailed to you')
+    end
+
   end
 end
