@@ -15,8 +15,7 @@ class Invitation < ActiveRecord::Base
 
   def send_invite
     self.save
-    Rails.logger.debug "\nSending invite to #{self.person.email}!\n"
-    Rails.logger.debug "object: #{self.inspect}\n\n"
+    InvitationMailer.invite(self).deliver_now
   end
 
   def update_times

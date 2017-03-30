@@ -10,6 +10,7 @@ if Setting.find_by(var: 'Site').blank?
     'logo' => 'logo.png',
     'footer' => 'Copyright © 2016 Example Organzation',
     'events_url' => 'http://www.example.com/events/',
+    'app_url' => 'http://workshops.example.com',
     'legacy_api' => 'https://database.example.com/api/your_api_key',
     'legacy_person' => 'https://www.example.com/db/?section=Updates&sub=person&id=',
     'application_email' => 'workshops@example.com',

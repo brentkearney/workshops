@@ -1,0 +1,14 @@
+Dear <%= @person.dear_name %>,
+
+You are invited to attend the following event:
+<%= @event.name %>
+On: <%= @event.dates('long') %>
+At: <%= @org_name %>
+URL: <%= @event_url %>
+
+Please follow the link below to let us know whether or not you will attend.
+
+<%= @rsvp_link %>
+
+Thank you very much.
+<%= @org_name %>

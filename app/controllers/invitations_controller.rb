@@ -18,7 +18,6 @@ class InvitationsController < ApplicationController
   def create
     @invitation = InvitationForm.new(invitation_params)
     if @invitation.valid?
-      Rails.logger.debug "invitation is valid!\n"
       send_invitation(@invitation.membership)
 
       redirect_to invitations_new_path,

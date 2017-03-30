@@ -12,7 +12,8 @@ class StaffMailer < ApplicationMailer
 
   default from: app_email
 
-  def schedule_change(schedule, type:, user:, updated_schedule: false, changed_similar: false)
+  def schedule_change(schedule, type: '', user: '',
+                      updated_schedule: false, changed_similar: false)
     @event = schedule.event
     schedule_emails = 'schedule@example.com'
     unless Setting.Emails.blank? ||
