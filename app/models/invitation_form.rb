@@ -77,7 +77,7 @@ class InvitationForm < ComplexForms
     else
       link = '<a href="mailto:'
       link += "'#{om.person.name}' <#{om.person.email}>"
-      link += "?Subject=[#{evnt.code}] \">#{om.person.name}</a>".html_safe
+      link += "?Subject=[#{event.code}] \">#{om.person.name}</a>".html_safe
     end
     link
   end
