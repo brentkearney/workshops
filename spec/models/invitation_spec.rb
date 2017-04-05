@@ -7,12 +7,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Model validations: Invitation', type: :model do
-  before do
-    @person = create(:person)
-  end
-
   it 'has valid factory' do
-    expect(create(:invitation, invited_by: @person.id)).to be_valid
+    expect(create(:invitation)).to be_valid
   end
 
   it 'requires a membership' do
@@ -21,7 +17,8 @@ RSpec.describe 'Model validations: Invitation', type: :model do
   end
 
   it 'requires invited_by' do
-    i = build(:invitation, invited_by: nil)
+    i = build(:invitation)
+    i.invited_by = nil
     expect(i.valid?).to be_falsey
   end
 
@@ -31,7 +28,7 @@ RSpec.describe 'Model validations: Invitation', type: :model do
   end
 
   it 'sets expires on save' do
-    i = build(:invitation, invited_by: @person.id)
+    i = build(:invitation)
     expect(i.expires).to be_nil
     i.save
     expect(i.expires).not_to be_nil

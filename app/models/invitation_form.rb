@@ -1,8 +1,5 @@
-class InvitationForm
+class InvitationForm < ComplexForms
   # validations for views/invitations/new.html.erb
-  extend ActiveModel::Naming
-  include ActiveModel::Validations
-
   attr_accessor :event, :email, :membership
   attr_reader :errors
 
@@ -11,7 +8,6 @@ class InvitationForm
   validate :is_member
 
   def initialize(attributes = {})
-    @attributes = attributes
     @event = attributes['event']
     @email = attributes['email']
     @membership = nil
@@ -44,19 +40,16 @@ class InvitationForm
       if person.nil?
         @errors.add(:email, ": We have no record of that email address.
           Is it possible that we were given a different email address for you?")
+        return false
       else
         e = Event.find(event)
-        @membership = Membership.where("event_id = #{e.id}
-                                      AND person_id = #{person.id}").first
+        @membership = Membership.where(person: person, event: e).first
+
         if @membership.nil?
           @errors.add(:email, ": that e-mail address is not associated to the
             event you selected. Do you have a different e-mail address that we
             might have in our records?")
-
-        elsif @membership.attendance == 'Confirmed'
-          @errors.add(:Membership, ": You are already confirmed to attend this
-            event! If you wish to cancel, please contact the event organizer:
-            <u>#{organizer(e)}</u>.")
+          return false
 
         elsif @membership.attendance == 'Declined'
           @errors.add(:Membership, ": You have already declined an invitation
@@ -64,15 +57,12 @@ class InvitationForm
             is still possible to attend.<br />
             The contact organizer is: <u>#{organizer(e)}</u>.")
 
-        elsif @membership.attendance == 'Invited' ||
-              @membership.attendance == 'Undecided'
-          return true
-
+          elsif @membership.attendance == 'Not Yet Invited'
+            @errors.add(:Membership, ": The event's organizers have not yet
+              invited you.<br />
+              The contact organizer is: <u>#{organizer(e)}</u>.")
         else
-          @errors.add(:Membership, ": We could not find an event invitation
-            for you. Please contact the event organizer:
-            <u>#{organizer(e)}</u>.")
-
+          return true
         end
       end
     end
@@ -90,30 +80,5 @@ class InvitationForm
       link += "?Subject=[#{evnt.code}] \">#{om.person.name}</a>".html_safe
     end
     link
-  end
-
-  # Required ActiveModel methods
-  def to_key
-  end
-
-  def to_model
-    self
-  end
-
-  def persisted?
-    false
-  end
-
-  def read_attribute_for_validation(key)
-    @attributes[key]
-    send(key)
-  end
-
-  def self.human_attribute_name(attr, options = {})
-    attr
-  end
-
-  def self.lookup_ancestors
-    [self]
   end
 end

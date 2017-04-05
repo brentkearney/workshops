@@ -32,7 +32,7 @@ class InvitationsController < ApplicationController
 
   def send_invitation(member)
     Invitation.new(membership: member,
-                   invited_by: member.person.id).send_invite
+                   invited_by: member.person.name).send_invite
   end
 
   def invitation_params

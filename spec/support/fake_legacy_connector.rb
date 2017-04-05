@@ -225,7 +225,7 @@ class FakeLegacyConnector
 
   end
 
-  # successfull OTP validation
+  # successful OTP validation
   def valid_otp
     message = {
       'otp_id' => 1,

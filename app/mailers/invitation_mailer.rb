@@ -13,7 +13,7 @@ class InvitationMailer < ApplicationMailer
   default from: app_email
 
   def invite(invitation)
-    @person = invitation.person
+    @person = invitation.membership.person
     @event = invitation.membership.event
     @rsvp_link = Setting.Site['app_url'] + '/rsvp/' + invitation.code
     @org_name = Setting.Locations["#{@event.location}"]['Name']

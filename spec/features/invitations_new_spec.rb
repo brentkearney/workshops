@@ -91,16 +91,6 @@ describe 'Invitation#new', type: :feature do
           text: 'We have no record of that email address')
     end
 
-    it 'not invited' do
-      @member.attendance = 'Not Yet Invited'
-      @member.save
-
-      submit_member_request(@member)
-
-      expect(page.body).to have_css('div.alert',
-          text: 'We could not find an event invitation')
-    end
-
     it 'already confirmed' do
       @member.attendance = 'Confirmed'
       @member.save
@@ -108,7 +98,7 @@ describe 'Invitation#new', type: :feature do
       submit_member_request(@member)
 
       expect(page.body).to have_css('div.alert',
-          text: 'You are already confirmed')
+        text: 'A new invitation has been e-mailed to you')
     end
 
     it 'already declined' do
@@ -128,7 +118,7 @@ describe 'Invitation#new', type: :feature do
       submit_member_request(@member)
 
       expect(page.body).to have_css('div.alert',
-          text: 'We could not find an event invitation')
+        text: "The event's organizers have not yet\n              invited you")
     end
 
     it 'invited' do

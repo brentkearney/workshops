@@ -5,23 +5,41 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RsvpController < ApplicationController
+  before_filter :get_invitation
+
   def index
     # legacy OTP urls = "https://www.domain.com/rsvp/?otp=$otp";
+    Rails.logger.debug "\n\n" + '*' * 50 + "\n\n"
+    Rails.logger.debug "Checking #{otp_params}..."
+    Rails.logger.debug "\n\n" + '*' * 50 + "\n\n"
+  end
 
-    if params[:otp].blank?
-      redirect_to invitations_new_path
-    else
-      @message = validate_otp
-      Rails.logger.debug "\n\n" + '*' * 50 + "\n\n"
-      Rails.logger.debug "OTP response: #{@message.inspect}"
-      Rails.logger.debug "\n\n" + '*' * 50 + "\n\n"
-    end
+  def yes
+    @rsvp = RsvpForm.new(@invitation)
+  end
+
+  def no
+  end
+
+  def maybe
   end
 
 
   private
 
-  def validate_otp
-    LegacyConnector.new.check_rsvp(params[:otp])
+  def get_invitation
+    if params[:otp].blank?
+      redirect_to invitations_new_path
+    else
+      @invitation = InvitationChecker.new(otp_params).invitation
+      if @invitation.nil?
+        redirect_to invitations_new_path,
+          warning: 'That invitation code was not found! Please request a new one.'
+      end
+    end
+  end
+
+  def otp_params
+    params[:otp].tr('^A-Za-z0-9_-','')
   end
 end

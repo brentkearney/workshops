@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 export PATH=$PATH:/usr/local/rvm/bin:/usr/local/rvm/rubies/ruby-2.4.0/bin:/usr/local/rvm/gems/ruby-2.4.0/bin:./bin

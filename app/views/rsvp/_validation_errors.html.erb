@@ -1,8 +1,8 @@
-<% if @invitation.errors.any? %>
+<% if @rsvp && @rsvp.errors.any? %>
 <section id="errors">
 <div class="alert alert-danger">
   <header>
-  <% if @invitation.errors.has_key?(:Membership) %>
+  <% if @rsvp.errors.has_key?(:Membership) %>
     <h3>
       Your request could not be made:
     </h3>
@@ -16,7 +16,7 @@
   <% end %>
   </header>
   <ul>
-    <% @invitation.errors.full_messages.each do |message| %>
+    <% @rsvp.errors.full_messages.each do |message| %>
       <li><%= message.html_safe %></li>
     <% end %>
   </ul>

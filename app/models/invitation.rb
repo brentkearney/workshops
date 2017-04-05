@@ -1,6 +1,5 @@
 class Invitation < ActiveRecord::Base
   belongs_to :membership
-  belongs_to :person, foreign_key: 'invited_by'
 
   validates :membership, presence: true
   validates :invited_by, presence: true

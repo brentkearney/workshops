@@ -1,10 +1,10 @@
 FactoryGirl.define do
   factory :invitation do
     association :membership, factory: :membership
-    invited_by 1
+    invited_by 'FactoryGirl'
     code SecureRandom.urlsafe_base64(37)
     expires nil
-    invited_on nil
+    invited_on Date.today
     used_on nil
   end
 end
