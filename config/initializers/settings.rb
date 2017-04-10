@@ -24,7 +24,7 @@ if Setting.find_by(var: 'Site').blank?
     'K-12 Teacher', 'K-12 Student', 'Other'],
     'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.']
   }
-  rewrite_cache('Site', Setting.Site)
+  # rewrite_cache('Site', Setting.Site)
 end
 
 if Setting.find_by(var: 'Emails').blank?
@@ -41,7 +41,7 @@ if Setting.find_by(var: 'Emails').blank?
       'confirmation_notices' => 'organization@example.com'
     }
   }
-  rewrite_cache('Emails', Setting.Emails)
+  # rewrite_cache('Emails', Setting.Emails)
 end
 
 if Setting.find_by(var: 'Locations').blank?
@@ -52,7 +52,7 @@ if Setting.find_by(var: 'Locations').blank?
       'Timezone' => 'Mountain Time (US & Canada)'
     }
   }
-  rewrite_cache('Locations', Setting.Locations)
+  # rewrite_cache('Locations', Setting.Locations)
 end
 
 if Setting.find_by(var: 'Rooms').blank?
@@ -70,5 +70,5 @@ if Setting.find_by(var: 'Rooms').blank?
       'CH2' => ['5116', '5124']
     }
   }
-  rewrite_cache('Rooms', Setting.Rooms)
+  # rewrite_cache('Rooms', Setting.Rooms)
 end

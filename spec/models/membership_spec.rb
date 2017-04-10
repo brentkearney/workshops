@@ -12,6 +12,8 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @event = create(:event, code: '16w5666')
     @person = create(:person)
     @membership = create(:membership, person: @person, event: @event)
+    om = create(:membership, event: @event, role: 'Contact Organizer')
+    @organizer = om.person
   end
 
   it 'has valid factory' do
@@ -127,5 +129,17 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.save
 
     expect(ActionMailer::Base.deliveries.count).not_to be_zero
+  end
+
+  it 'notifies event organizer if attendance changes' do
+    @membership.attendance = 'Invited'
+    @membership.save
+    ActionMailer::Base.deliveries = []
+
+    @membership.attendance = 'Declined'
+    @membership.save
+
+    expect(ActionMailer::Base.deliveries.count).not_to be_zero
+    expect(ActionMailer::Base.deliveries.first.to).to include(@organizer.email)
   end
 end

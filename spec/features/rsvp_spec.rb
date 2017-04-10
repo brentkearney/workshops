@@ -11,6 +11,7 @@ describe 'RSVP', type: :feature do
     @invitation = create(:invitation)
     @membership = @invitation.membership
     @membership.attendance ='Invited'
+    @membership.save
     @event = @membership.event
     @person = @membership.person
   end
@@ -44,11 +45,37 @@ describe 'RSVP', type: :feature do
     it 'participant already confirmed'
   end
 
-  context 'Users says No' do
-    it 'says thanks'
-    it 'declines membership'
-    it 'destroys invitation'
-    it 'notifies organizer'
+  context 'User says No' do
+    before :each do
+      click_link 'No'
+    end
+
+    it 'says thanks' do
+      expect(page).to have_text('Thank you')
+    end
+
+    it 'declines membership' do
+      expect(Membership.find(@membership.id).attendance).to eq('Declined')
+    end
+
+    it 'destroys invitation' do
+      expect(Invitation.where(id: @invitation.id)).to be_empty
+    end
+
+    it 'notifies the event organizer' do
+      ActionMailer::Base.deliveries = []
+      membership = create(:membership, attendance: 'Invited')
+      organizer = create(:membership, role: 'Contact Organizer',
+                                     event: membership.event).person
+      invite = create(:invitation, membership: membership)
+
+      expect(membership.attendance).to eq('Invited')
+      visit rsvp_otp_path(invite.code)
+      click_link 'No'
+
+      expect(ActionMailer::Base.deliveries.count).not_to be_zero
+      expect(ActionMailer::Base.deliveries.first.to).to include(organizer.email)
+    end
   end
 
   context 'User says Maybe' do

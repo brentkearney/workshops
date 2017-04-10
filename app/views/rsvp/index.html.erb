@@ -3,7 +3,7 @@
     <%= render 'validation_errors' %>
     <div class="panel panel-primary">
       <div class="panel-heading">
-        <h1 class="panel-title">Invitation RSVP</h1>
+        <span class="panel-title"><h4>Invitation RSVP</h4></span>
       </div>
       <div class="panel-body">
 
@@ -14,7 +14,8 @@
         </div>
         <div class="row">
           <div class='col-md-12'>
-              <p class='lead'>You have been invited to:
+              <p class='lead text-center'>You have been invited to the
+              <%= @invitation.membership.event.event_type %>,
               "<%= @invitation.membership.event.name %>", on
               <%= @invitation.membership.event.dates('long') %>.
               Will you be attending?</p>
@@ -25,9 +26,11 @@
             <div class='col-md-4'>
               <a href="<%= rsvp_yes_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-success">Yes</a>
             </div>
+            <div class="hidden-lg hidden-md">&nbsp;</div>
             <div class='col-md-4'>
               <a href="<%= rsvp_maybe_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-warning">Maybe</a>
             </div>
+            <div class="hidden-lg hidden-md">&nbsp;</div>
             <div class='col-md-4'>
               <a href="<%= rsvp_no_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-danger">No</a>
             </div>

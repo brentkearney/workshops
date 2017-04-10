@@ -10,7 +10,7 @@ class Membership < ActiveRecord::Base
   accepts_nested_attributes_for :person
   has_one :invitation
 
-  after_update :confirmation_notification
+  after_update :attendance_notification
   after_save :update_counter_cache
   after_destroy :update_counter_cache
 
@@ -95,11 +95,16 @@ class Membership < ActiveRecord::Base
     end
   end
 
-  def confirmation_notification
+  def attendance_notification
     if self.changed.include?('attendance')
+      old_attendance = self.attendance_was
+      new_attendance = self.attendance
+
       msg = nil
-      msg = 'is no longer confirmed' if self.attendance_was == 'Confirmed'
-      msg = 'is now confirmed' if self.attendance == 'Confirmed'
+      msg = 'is no longer confirmed' if old_attendance == 'Confirmed'
+      msg = 'is now confirmed' if new_attendance == 'Confirmed'
+
+      OrganizerMailer.attendance_change(self, old_attendance, new_attendance).deliver_now
       StaffMailer.confirmation_notice(self, msg).deliver_now unless msg.nil?
     end
   end

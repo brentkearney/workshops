@@ -1,6 +1,5 @@
 class ComplexForms
-  extend ActiveModel::Naming
-  include ActiveModel::Validations
+  include ActiveModel::Model
 
   def to_key
   end

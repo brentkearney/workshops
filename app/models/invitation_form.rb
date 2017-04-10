@@ -59,7 +59,7 @@ class InvitationForm < ComplexForms
 
           elsif @membership.attendance == 'Not Yet Invited'
             @errors.add(:Membership, ": The event's organizers have not yet
-              invited you.<br />
+              invited you. Please contact them if you wish to be invited.<br />
               The contact organizer is: <u>#{organizer(e)}</u>.")
         else
           return true

@@ -106,6 +106,16 @@ module EventDecorators
     end
   end
 
+  def organizer
+    membership = self.memberships.where(role: 'Contact Organizer').first
+    if membership.blank?
+      organizer = Person.new(email: '')
+    else
+      organizer = membership.person
+    end
+    organizer
+  end
+
   def schedule_on(day)
     schedules.select {|s| s.start_time.to_date == day.to_date }.sort_by(&:start_time)
   end

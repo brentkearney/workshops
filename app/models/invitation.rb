@@ -21,4 +21,9 @@ class Invitation < ActiveRecord::Base
     self.expires = Time.now + 240.days if self.expires.blank?
     self.invited_on = Time.now
   end
+
+  def decline!
+    membership.attendance = 'Declined'
+    membership.save
+  end
 end

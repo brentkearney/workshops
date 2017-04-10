@@ -34,12 +34,9 @@ fi
 chown -R app:app /home/app/workshops
 
 echo
-echo "Creating databases..."
-rake db:setup
-
-echo
 echo "Running migrations..."
 rake db:migrate RAILS_ENV=development
+rake db:migrate RAILS_ENV=test
 
 echo
 echo "Creating admins..."

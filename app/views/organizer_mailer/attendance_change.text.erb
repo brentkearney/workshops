@@ -1,0 +1,11 @@
+Dear <%= @organizer.dear_name %>,
+
+There has been a change in membership for the event:
+<%= @event.code %>: <%= @event.name %>
+<%= @event.dates %>
+
+The change is:
+<%= @member.name %> was "<%= @old_attendance %>", and is now "<%= @new_attendance %>".
+
+Best regards,
+<%= @organization %>

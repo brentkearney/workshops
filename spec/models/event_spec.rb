@@ -116,15 +116,13 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(e.name).to eq('Testing save function too')
   end
 
-  describe '.years' do
-    it 'returns an array of years in which events take place' do
-      Event.destroy_all
-      @past = create(:event, past: true)
-      @current = create(:event, current: true)
-      @future = create(:event, future: true)
+  it '.years returns an array of years in which events take place' do
+    Event.destroy_all
+    @past = create(:event, past: true)
+    @current = create(:event, current: true)
+    @future = create(:event, future: true)
 
-      expect(Event.years).to eq([@past.year, @current.year, @future.year])
-    end
+    expect(Event.years).to eq([@past.year, @current.year, @future.year])
   end
 
   describe 'Event Scopes' do
@@ -173,12 +171,23 @@ RSpec.describe "Model validations: Event ", type: :model do
   ###
   #####instance methods from app/models/concerns/event_decorators.rb #########
   ###
+  it '.year returns the year as a string' do
+    event = build(:event)
+    expect(event.year).to eq(event.start_date.strftime('%Y'))
+  end
+
   it '.country from Setting.Locations' do
     country = Setting.Locations.first.second['Country']
 
     event = build(:event, location: Setting.Locations.keys[0])
 
     expect(event.country).to eq(country)
+  end
+
+  it '.organizer returns Person whose role is Contact Organizer' do
+    event = create(:event_with_roles)
+    organizer = event.memberships.where(role: 'Contact Organizer').first
+    expect(event.organizer).to eq(organizer.person)
   end
 
   it '.days returns a collection of Time objects for each day of the event' do

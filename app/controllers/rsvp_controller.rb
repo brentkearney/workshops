@@ -19,6 +19,8 @@ class RsvpController < ApplicationController
   end
 
   def no
+    @invitation.decline!
+    @invitation.destroy
   end
 
   def maybe
