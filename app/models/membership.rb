@@ -14,7 +14,6 @@ class Membership < ActiveRecord::Base
   after_update :attendance_notification, :sync_with_legacy
   after_save :update_counter_cache
   after_destroy :update_counter_cache
-  after_commit
 
   validates :event, presence: true
   validates :person, presence: true, :uniqueness => { :scope => :event,
@@ -112,7 +111,7 @@ class Membership < ActiveRecord::Base
   end
 
   def sync_with_legacy
-    LegacyConnector.new.update_member(self) if self.sync_remote
+    LegacyConnector.new.update_member(self) if sync_remote
   end
 
 end

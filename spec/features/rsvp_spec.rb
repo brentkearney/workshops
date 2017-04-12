@@ -8,6 +8,9 @@ require 'rails_helper'
 
 describe 'RSVP', type: :feature do
   before do
+    @lc = FakeLegacyConnector.new
+    allow(LegacyConnector).to receive(:new).and_return(@lc)
+
     @invitation = create(:invitation)
     @membership = @invitation.membership
     @membership.attendance ='Invited'
@@ -47,9 +50,6 @@ describe 'RSVP', type: :feature do
 
   context 'User says No' do
     before :each do
-      @lc = FakeLegacyConnector.new
-      allow(LegacyConnector).to receive(:new).and_return(@lc)
-
       click_link 'No'
     end
 
