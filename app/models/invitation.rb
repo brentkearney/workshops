@@ -24,6 +24,7 @@ class Invitation < ActiveRecord::Base
 
   def decline!
     membership.attendance = 'Declined'
+    membership.sync_remote = true
     membership.save
   end
 end

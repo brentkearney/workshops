@@ -64,7 +64,7 @@ class LegacyConnector
   end
 
   # add new member to event
-  def add_member(membership: '', event_code: '', person: '', updated_by: '')
+  def add_member(membership:, event_code:, person:, updated_by:)
     remote_membership = membership.attributes.merge(
       'workshop_id' => "#{event_code}", 'person' => person.as_json,
       'updated_by' => "#{updated_by}")
@@ -73,7 +73,7 @@ class LegacyConnector
   end
 
   # add new members to event
-  def add_members(event_code: '', members: '', updated_by: '')
+  def add_members(event_code:, members:, updated_by:)
     responses = Array.new
     members.each do |member|
       responses[] = add_member(membership: member, event_code: event_code,
@@ -82,13 +82,12 @@ class LegacyConnector
   end
 
   # update membership & person record
-  def update_member(membership, person, event_id, legacy_id, updated_by)
-    # add_member updates existing memberships
-    add_member(membership, event_id, legacy_id, updated_by)
-    remote_person = person.attributes.merge('updated_by' => "#{updated_by}")
-    remote_person.delete("legacy_id")
-    JSON.parse(RestClient.post "#{@rest_url}/update_person/#{legacy_id}",
-                remote_person.to_json, content_type: :json, accept: :json)
+  def update_member(membership)
+    person = membership.person.attributes.
+      merge('updated_by' => "#{membership.updated_by}")
+    # add_member() adds or updates memberships
+    add_member(membership: membership, event_code: membership.event.code,
+      person: person, updated_by: membership.updated_by)
   end
 
   # update an event's members

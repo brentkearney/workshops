@@ -10,9 +10,11 @@ class Membership < ActiveRecord::Base
   accepts_nested_attributes_for :person
   has_one :invitation
 
-  after_update :attendance_notification
+  attr_accessor :sync_remote
+  after_update :attendance_notification, :sync_with_legacy
   after_save :update_counter_cache
   after_destroy :update_counter_cache
+  after_commit
 
   validates :event, presence: true
   validates :person, presence: true, :uniqueness => { :scope => :event,
@@ -107,6 +109,10 @@ class Membership < ActiveRecord::Base
       OrganizerMailer.attendance_change(self, old_attendance, new_attendance).deliver_now
       StaffMailer.confirmation_notice(self, msg).deliver_now unless msg.nil?
     end
+  end
+
+  def sync_with_legacy
+    LegacyConnector.new.update_member(self) if self.sync_remote
   end
 
 end

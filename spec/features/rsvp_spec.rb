@@ -47,6 +47,9 @@ describe 'RSVP', type: :feature do
 
   context 'User says No' do
     before :each do
+      @lc = FakeLegacyConnector.new
+      allow(LegacyConnector).to receive(:new).and_return(@lc)
+
       click_link 'No'
     end
 
@@ -75,6 +78,17 @@ describe 'RSVP', type: :feature do
 
       expect(ActionMailer::Base.deliveries.count).not_to be_zero
       expect(ActionMailer::Base.deliveries.first.to).to include(organizer.email)
+    end
+
+    it 'updates legacy database' do
+      lc = spy('lc')
+      allow(LegacyConnector).to receive(:new).and_return(lc)
+
+      invite = create(:invitation, membership: @membership)
+      visit rsvp_otp_path(invite.code)
+      click_link 'No'
+
+      expect(lc).to have_received(:update_member).with(@membership)
     end
   end
 

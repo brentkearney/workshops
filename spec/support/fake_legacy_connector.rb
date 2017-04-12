@@ -180,15 +180,15 @@ class FakeLegacyConnector
 
   end
 
-  def add_member(membership, event_id, legacy_id, updated_by)
+  def add_member(membership:, event_code:, person:, updated_by:)
 
   end
 
-  def add_members(event_id, members)
+  def add_members(event_code:, members:, updated_by:)
 
   end
 
-  def update_member(membership, person, event_id, legacy_id, updated_by)
+  def update_member(membership)
 
   end
 
