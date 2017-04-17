@@ -8,10 +8,7 @@ class RsvpController < ApplicationController
   before_filter :get_invitation
 
   def index
-    # legacy OTP urls = "https://www.domain.com/rsvp/?otp=$otp";
-    Rails.logger.debug "\n\n" + '*' * 50 + "\n\n"
-    Rails.logger.debug "Checking #{otp_params}..."
-    Rails.logger.debug "\n\n" + '*' * 50 + "\n\n"
+
   end
 
   def yes
@@ -20,10 +17,12 @@ class RsvpController < ApplicationController
 
   def no
     @invitation.decline!
-    @invitation.destroy
   end
 
   def maybe
+  end
+
+  def errors
   end
 
 
@@ -34,10 +33,6 @@ class RsvpController < ApplicationController
       redirect_to invitations_new_path
     else
       @invitation = InvitationChecker.new(otp_params).invitation
-      if @invitation.nil?
-        redirect_to invitations_new_path,
-          warning: 'That invitation code was not found! Please request a new one.'
-      end
     end
   end
 

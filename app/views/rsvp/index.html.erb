@@ -1,42 +1,14 @@
 <div class="row invitation-box container">
   <div class="col-md-8 col-md-offset-2">
-    <%= render 'validation_errors' %>
     <div class="panel panel-primary">
       <div class="panel-heading">
         <span class="panel-title"><h4>Invitation RSVP</h4></span>
       </div>
-      <div class="panel-body">
-
-        <div class="row">
-          <div class='col-md-12 text-center'>
-              <h1>Dear <%= @invitation.membership.person.dear_name %>:</h1>
-          </div>
-        </div>
-        <div class="row">
-          <div class='col-md-12'>
-              <p class='lead text-center'>You have been invited to the
-              <%= @invitation.membership.event.event_type %>,
-              "<%= @invitation.membership.event.name %>", on
-              <%= @invitation.membership.event.dates('long') %>.
-              Will you be attending?</p>
-          </div>
-        </div>
-        <div class="jumbotron">
-          <div class="row">
-            <div class='col-md-4'>
-              <a href="<%= rsvp_yes_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-success">Yes</a>
-            </div>
-            <div class="hidden-lg hidden-md">&nbsp;</div>
-            <div class='col-md-4'>
-              <a href="<%= rsvp_maybe_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-warning">Maybe</a>
-            </div>
-            <div class="hidden-lg hidden-md">&nbsp;</div>
-            <div class='col-md-4'>
-              <a href="<%= rsvp_no_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-danger">No</a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <% if @invitation.errors.any? %>
+        <%= render 'invitation_errors' %>
+      <% else %>
+        <%= render 'questions' %>
+      <% end %>
     </div>
   </div>
 </div>

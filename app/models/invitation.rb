@@ -26,5 +26,6 @@ class Invitation < ActiveRecord::Base
     membership.attendance = 'Declined'
     membership.sync_remote = true
     membership.save
+    self.destroy
   end
 end

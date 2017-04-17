@@ -1,0 +1,14 @@
+<div class="panel-body">
+  <div class="jumbotron" id="invitation-error">
+    <div class="row">
+      <h3>There is a problem with that invitation code:</h3>
+      <ul>
+        <% @invitation.errors.each do |key, message| %>
+          <li><strong><%= key %></strong>: <%= message.html_safe %></li>
+        <% end %>
+      </ul>
+      <h4>If applicable, new invitations can be requested
+        <%= link_to 'here', invitations_new_path %>.</h4>
+    </div>
+  </div>
+</div>

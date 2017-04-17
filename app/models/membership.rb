@@ -29,7 +29,8 @@ class Membership < ActiveRecord::Base
   ATTENDANCE = ['Confirmed', 'Invited', 'Undecided', 'Not Yet Invited', 'Declined']
 
   def update_counter_cache
-    self.event.confirmed_count = Membership.where("attendance='Confirmed' AND event_id=?", self.event.id).count
+    self.event.confirmed_count = Membership.where("attendance='Confirmed'
+      AND event_id=?", self.event.id).count
     self.event.save
   end
 
@@ -105,7 +106,8 @@ class Membership < ActiveRecord::Base
       msg = 'is no longer confirmed' if old_attendance == 'Confirmed'
       msg = 'is now confirmed' if new_attendance == 'Confirmed'
 
-      OrganizerMailer.attendance_change(self, old_attendance, new_attendance).deliver_now
+      OrganizerMailer.
+        attendance_change(self, old_attendance, new_attendance).deliver_now
       StaffMailer.confirmation_notice(self, msg).deliver_now unless msg.nil?
     end
   end

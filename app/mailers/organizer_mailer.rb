@@ -18,7 +18,9 @@ class OrganizerMailer < ApplicationMailer
     @member = membership.person
     @event = membership.event
     @organizer = @event.organizer
-    @organization = Setting.Emails["#{membership.event.location}"]['Name']
+    unless Setting.Emails["#{membership.event.location}"].nil?
+      @organization = Setting.Emails["#{membership.event.location}"]['Name']
+    end
     email = '"' + @organizer.name + '" <' + @organizer.email + '>'
     subject = '[' + membership.event.code + '] Membership change notice'
     mail(to: email, subject: subject, 'Importance': 'High', 'X-Priority': 1)

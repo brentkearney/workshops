@@ -8,6 +8,10 @@ require 'rails_helper'
 
 RSpec.describe RsvpController, type: :controller do
   describe 'GET #index' do
+    before do
+      @invitation = create(:invitation)
+    end
+
     context 'without one-time-password (OTP) in the url' do
       it 'redirects to new invitations page' do
         get :index
@@ -15,19 +19,7 @@ RSpec.describe RsvpController, type: :controller do
       end
     end
 
-    context 'with valid OTP in the url' do
-      before do
-        @invitation = create(:invitation)
-      end
-
-      it 'validates the OTP via legacy db' do
-        allow_any_instance_of(InvitationChecker).to receive(:check_legacy_database).and_return(@invitation)
-
-        get :index, { otp: '123' }
-
-        expect(assigns(:invitation)).to be_a(Invitation)
-      end
-
+    context 'with a valid OTP in the url' do
       it 'validates the OTP via local db and renders index' do
         get :index, { otp: @invitation.code }
 
@@ -35,22 +27,48 @@ RSpec.describe RsvpController, type: :controller do
         expect(response).to render_template(:index)
       end
 
-      it '#yes'
-      it '#no'
-      it '#maybe'
+      it 'validates the OTP via legacy db' do
+        allow_any_instance_of(InvitationChecker).to receive(:check_legacy_database).and_return(@invitation)
+
+        get :index, { otp: '123' }
+
+        expect(assigns(:invitation)).to eq(@invitation)
+        expect(response).to render_template(:index)
+      end
     end
 
-    context 'with invalid OTP in the url' do
-      it 'redirects to new invitations page' do
+    context 'with an invalid OTP in the url' do
+      it 'sets error message' do
         lc = FakeLegacyConnector.new
         expect(LegacyConnector).to receive(:new).and_return(lc)
         allow(lc).to receive(:check_rsvp).with('123').and_return(lc.invalid_otp)
 
         get :index, { otp: '123' }
 
-        expect(response).to redirect_to(invitations_new_path)
-        expect(flash[:warning]).to include('That invitation code was not found')
+        expect(assigns(:invitation)).to be_a(InvitationChecker)
+        expect(response).to render_template("rsvp/_invitation_errors")
       end
+    end
+  end
+
+  describe 'GET #no' do
+    before :each do
+      allow_any_instance_of(LegacyConnector).to receive(:update_member)
+      @invitation = create(:invitation)
+    end
+
+    it 'changes membership attendance to Declined' do
+      membership = @invitation.membership
+      expect(membership.attendance).to eq('Confirmed')
+
+      get :no, { otp: @invitation.code }
+
+      expect(Membership.find(membership.id).attendance).to eq('Declined')
+    end
+
+    it 'renders no template' do
+      get :no, { otp: @invitation.code }
+      expect(response).to render_template(:no)
     end
   end
 end

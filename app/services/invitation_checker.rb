@@ -1,50 +1,93 @@
-# Copyright (c) 2016 Banff International Research Station.
-# This file is part of Workshops. Workshops is licensed under
-# the GNU Affero General Public License as published by the
-# Free Software Foundation, version 3 of the License.
-# See the COPYRIGHT file for details and exceptions.
+# Copyright (c) 2016 Banff International Research Station
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 class InvitationChecker
   attr_reader :otp, :invitation, :errors
 
   def initialize(otp)
     @otp = otp
-    @invitation = nil
     @errors = ActiveModel::Errors.new(self)
+    @invitation = find_invitation
   end
 
-  def invitation
-    local_otp = @otp
-    local_otp = otp.ljust(50, '-') if otp.length < 50
-    @invitation = Invitation.find_by_code(local_otp) || check_legacy_database
+  def find_invitation
+    invitation = Invitation.find_by_code(local_otp) || check_legacy_database
+    validate(invitation) if invitation
+    invitation || self
+  end
+
+  def local_otp
+    @otp.length < 50 ? @otp.ljust(50, '-') : @otp
   end
 
   def check_legacy_database
     invitation = nil
     response = LegacyConnector.new.check_rsvp(@otp)
     Rails.logger.debug "\nLegacy response: #{response.inspect}\n"
-    unless response['event_code'].nil? || response['legacy_id'].nil?
+
+    @errors.add(:Invitation, response['denied']) if response['denied']
+
+    if response['event_code'] && response['legacy_id']
       event = Event.find(response['event_code'])
+
       # temporary, until members are added using Workshops
       SyncEventMembersJob.perform_now(event) unless event.nil?
       sleep 2
+
       person = Person.where(legacy_id: response['legacy_id']).first
       membership = Membership.where(person: person, event: event).first
-
-      unless invalid_membership?(membership)
-        invitation = create_local_invitation(membership)
-      end
+      invitation = create_local_invitation(membership)
     end
     invitation
   end
 
-  def invalid_membership?(membership)
-    membership.nil? || membership.attendance == 'Declined'
+  def validate(invitation)
+    if DateTime.now > invitation.expires
+      @errors.add(:Invitation, 'This invitation code is expired.')
+    end
+
+    if Date.today > invitation.membership.event.end_date
+      @errors.add(:Event, "You cannot RSVP for past events.")
+    end
+
+    case invitation.membership.attendance
+    when 'Declined'
+      @errors.add(:Membership, "You have already declined an invitation
+            to this event. Please contact the event's organizers to ask if it
+            is still possible to attend.")
+
+    when 'Not Yet Invited'
+      @errors.add(:Membership, ": The event's organizers have not yet
+        invited you. Please contact them if you wish to be invited.")
+    end
+
+    unless @errors.empty?
+      @errors.each do |k,v|
+        invitation.errors.add(k.to_sym, "#{v}")
+      end
+    end
   end
 
   def create_local_invitation(membership)
     invitation = Invitation.new(membership: membership, invited_by: 'Staff',
-      code: @otp.ljust(50, '-'), expires: Date.tomorrow)
+      code: local_otp, expires: Date.tomorrow)
     invitation.save
     invitation
   end

@@ -20,8 +20,11 @@ class InvitationForm < ComplexForms
     elsif event !~ /#{Setting.Site['code_pattern']}/
       @errors.add(:event, ": Invalid event code.")
     else
-      if Event.find(event).nil?
+      ev = Event.find(event)
+      if ev.nil?
         @errors.add(:event, ": No record of that event.")
+      elsif ev.start_date < Date.today
+        @errors.add(:event, ": Event is in the past.")
       end
     end
   end

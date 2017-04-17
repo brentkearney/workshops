@@ -11,11 +11,11 @@ describe 'RSVP', type: :feature do
     @lc = FakeLegacyConnector.new
     allow(LegacyConnector).to receive(:new).and_return(@lc)
 
-    @invitation = create(:invitation)
-    @membership = @invitation.membership
+    @event = create(:event, future: true)
+    @membership = create(:membership, event: @event)
     @membership.attendance ='Invited'
     @membership.save
-    @event = @membership.event
+    @invitation = create(:invitation, membership: @membership)
     @person = @membership.person
   end
 
@@ -40,12 +40,56 @@ describe 'RSVP', type: :feature do
   end
 
   context 'Error conditions' do
-    it 'past events'
-    it 'expired invitations'
-    it 'non-existent invitations'
-    it 'participant not invited'
-    it 'participant already declined'
-    it 'participant already confirmed'
+    it 'past events' do
+      @event.start_date = Date.today.last_year
+      @event.end_date = Date.today.last_year + 5.days
+      @event.save!
+
+      visit rsvp_otp_path(@invitation.code)
+
+      expect(page).to have_text('You cannot RSVP for past events')
+    end
+
+    it 'expired invitations' do
+      @invitation.expires = Date.today.last_year
+      @invitation.save
+
+      visit rsvp_otp_path(@invitation.code)
+
+      expect(page).to have_text('This invitation code is expired')
+      @invitation.expires = Date.today.next_year
+      @invitation.save
+    end
+
+    it 'non-existent invitations' do
+      response = {'denied' => 'Invalid code'}
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive('new').and_return(lc)
+      allow(lc).to receive('check_rsvp').and_return(response)
+
+      visit rsvp_otp_path(123)
+
+      expect(page).to have_text('Invalid code')
+    end
+
+    it 'participant not invited' do
+      @membership.attendance = 'Not Yet Invited'
+      @membership.save
+
+      visit rsvp_otp_path(@invitation.code)
+
+      expect(page).to have_text("The event's organizers have not yet
+        invited you")
+    end
+
+    it 'participant already declined' do
+      @membership.attendance = 'Declined'
+      @membership.save
+
+      visit rsvp_otp_path(@invitation.code)
+
+      expect(page).to have_text("You have already declined an invitation")
+    end
   end
 
   context 'User says No' do
@@ -67,7 +111,8 @@ describe 'RSVP', type: :feature do
 
     it 'notifies the event organizer' do
       ActionMailer::Base.deliveries = []
-      membership = create(:membership, attendance: 'Invited')
+      event = create(:event, future: true)
+      membership = create(:membership, attendance: 'Invited', event: event)
       organizer = create(:membership, role: 'Contact Organizer',
                                      event: membership.event).person
       invite = create(:invitation, membership: membership)
@@ -84,11 +129,13 @@ describe 'RSVP', type: :feature do
       lc = spy('lc')
       allow(LegacyConnector).to receive(:new).and_return(lc)
 
-      invite = create(:invitation, membership: @membership)
+      event = create(:event, future: true)
+      membership = create(:membership, attendance: 'Invited', event: event)
+      invite = create(:invitation, membership: membership)
       visit rsvp_otp_path(invite.code)
       click_link 'No'
 
-      expect(lc).to have_received(:update_member).with(@membership)
+      expect(lc).to have_received(:update_member).with(membership)
     end
   end
 
@@ -97,6 +144,7 @@ describe 'RSVP', type: :feature do
     it 'displays invitation expiry date'
     it 'changes membership attendance to maybe'
     it 'notifies organizer'
+    it 'updates legacy database'
   end
 
   context 'User says Yes' do
@@ -109,5 +157,6 @@ describe 'RSVP', type: :feature do
     it 'changes membership attendance to confirmed'
     it 'destroys invitation'
     it 'notifies organizer'
+    it 'updates legacy database'
   end
 end
