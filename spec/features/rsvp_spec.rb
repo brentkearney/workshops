@@ -12,9 +12,7 @@ describe 'RSVP', type: :feature do
     allow(LegacyConnector).to receive(:new).and_return(@lc)
 
     @event = create(:event, future: true)
-    @membership = create(:membership, event: @event)
-    @membership.attendance ='Invited'
-    @membership.save
+    @membership = create(:membership, event: @event, attendance: 'Invited')
     @invitation = create(:invitation, membership: @membership)
     @person = @membership.person
   end
@@ -117,7 +115,6 @@ describe 'RSVP', type: :feature do
                                      event: membership.event).person
       invite = create(:invitation, membership: membership)
 
-      expect(membership.attendance).to eq('Invited')
       visit rsvp_otp_path(invite.code)
       click_link 'No'
 
@@ -140,10 +137,37 @@ describe 'RSVP', type: :feature do
   end
 
   context 'User says Maybe' do
-    it 'says thanks'
-    it 'displays invitation expiry date'
-    it 'changes membership attendance to maybe'
-    it 'notifies organizer'
+    before :each do
+      click_link 'Maybe'
+    end
+
+    it 'says thanks' do
+      expect(page).to have_text('Thank you')
+    end
+
+    it 'displays invitation expiry date' do
+      expect(page).to have_text(@invitation.expire_date)
+    end
+
+    it 'changes membership attendance to Undecided' do
+      expect(Membership.find(@membership.id).attendance).to eq('Undecided')
+    end
+
+    it 'notifies organizer' do
+      ActionMailer::Base.deliveries = []
+      event = create(:event, future: true)
+      membership = create(:membership, attendance: 'Invited', event: event)
+      organizer = create(:membership, role: 'Contact Organizer',
+                                     event: membership.event).person
+      invite = create(:invitation, membership: membership)
+
+      visit rsvp_otp_path(invite.code)
+      click_link 'Maybe'
+
+      expect(ActionMailer::Base.deliveries.count).not_to be_zero
+      expect(ActionMailer::Base.deliveries.first.to).to include(organizer.email)
+    end
+
     it 'updates legacy database'
   end
 

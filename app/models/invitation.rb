@@ -22,10 +22,20 @@ class Invitation < ActiveRecord::Base
     self.invited_on = Time.now
   end
 
+  def expire_date
+    self.expires.strftime("%B %-d, %Y")
+  end
+
   def decline!
     membership.attendance = 'Declined'
     membership.sync_remote = true
     membership.save
     self.destroy
+  end
+
+  def maybe!
+    membership.attendance = 'Undecided'
+    membership.sync_remote = true
+    membership.save
   end
 end

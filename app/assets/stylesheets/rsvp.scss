@@ -1,5 +1,4 @@
 #invitation-error {
-
   h3 {
     margin-top: 0;
     margin-bottom: 1.5em;
@@ -15,5 +14,19 @@
     a {
       text-decoration: underline;
     }
+  }
+}
+
+#maybe-form {
+  p {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  #message {
+    margin-top: 0;
+  }
+  .btn {
+    margin-top: 10px;
   }
 }

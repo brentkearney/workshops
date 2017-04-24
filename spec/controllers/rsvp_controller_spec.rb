@@ -55,20 +55,41 @@ RSpec.describe RsvpController, type: :controller do
     before :each do
       allow_any_instance_of(LegacyConnector).to receive(:update_member)
       @invitation = create(:invitation)
+      @membership = @invitation.membership
+      @membership.attendance = 'Invited'
+      @membership.save
     end
 
     it 'changes membership attendance to Declined' do
-      membership = @invitation.membership
-      expect(membership.attendance).to eq('Confirmed')
-
       get :no, { otp: @invitation.code }
 
-      expect(Membership.find(membership.id).attendance).to eq('Declined')
+      expect(Membership.find(@membership.id).attendance).to eq('Declined')
     end
 
     it 'renders no template' do
       get :no, { otp: @invitation.code }
       expect(response).to render_template(:no)
+    end
+  end
+
+  describe 'GET #maybe' do
+    before :each do
+      allow_any_instance_of(LegacyConnector).to receive(:update_member)
+      @invitation = create(:invitation)
+      @membership = @invitation.membership
+      @membership.attendance = 'Invited'
+      @membership.save
+    end
+
+    it 'changes membership attendance to Undecided' do
+      get :maybe, { otp: @invitation.code }
+
+      expect(Membership.find(@membership.id).attendance).to eq('Undecided')
+    end
+
+    it 'renders maybe template' do
+      get :maybe, { otp: @invitation.code }
+      expect(response).to render_template(:maybe)
     end
   end
 end

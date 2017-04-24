@@ -1,1 +1,34 @@
-<h1>Maybe</h1>
+<div class="row invitation-box container">
+  <div class="col-md-8 col-md-offset-2">
+    <%= render 'validation_errors' %>
+    <div class="panel panel-primary" id="maybe-form">
+      <div class="panel-heading">
+        <span class="panel-title"><h4>Invitation RSVP</h4></span>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class='col-md-12 text-center'>
+              <h1>OK! One more step:</h1>
+              <p>The event organizer (<%= @organizer %>) will be notified that
+              you might be attending, as soon as you click the Submit button.
+              Would you like to add something to the message?</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class='col-md-12 text-center'>
+            <%= form_tag({controller: 'rsvp', action: 'maybe',method: 'post'},
+                         { class: 'form', role: 'form'}) do %>
+            <%= text_area_tag(:message, "", size: "100x4",
+            class: 'form-control', placeholder: "Enter your message here.",) %>
+           </div>
+         </div>
+        <div class="row">
+           <div class='col-md-12'>
+            <%= submit_tag('Submit', class: 'btn btn-warning pull-right') %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

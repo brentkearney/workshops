@@ -20,6 +20,7 @@ class RsvpController < ApplicationController
   end
 
   def maybe
+    @organizer = @invitation.membership.event.organizer.name
   end
 
   def errors
