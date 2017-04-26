@@ -99,14 +99,9 @@ class Membership < ActiveRecord::Base
 
   def attendance_notification
     if self.changed.include?('attendance')
-      old_attendance = self.attendance_was
-      new_attendance = self.attendance
-      OrganizerMailer.
-        attendance_change(self, old_attendance, new_attendance).deliver_now
-
       msg = nil
-      msg = 'is no longer confirmed' if old_attendance == 'Confirmed'
-      msg = 'is now confirmed' if new_attendance == 'Confirmed'
+      msg = 'is no longer confirmed' if self.attendance_was == 'Confirmed'
+      msg = 'is now confirmed' if self.attendance == 'Confirmed'
       StaffMailer.confirmation_notice(self, msg).deliver_now unless msg.nil?
     end
   end

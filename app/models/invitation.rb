@@ -1,5 +1,6 @@
 class Invitation < ActiveRecord::Base
   belongs_to :membership
+  attr_accessor :organizer_message
 
   validates :membership, presence: true
   validates :invited_by, presence: true
@@ -9,7 +10,7 @@ class Invitation < ActiveRecord::Base
   before_save :update_times
 
   def generate_code
-    self.code = SecureRandom.urlsafe_base64(37) if self.code.blank?
+    code = SecureRandom.urlsafe_base64(37) if code.blank?
   end
 
   def send_invite
@@ -18,16 +19,17 @@ class Invitation < ActiveRecord::Base
   end
 
   def update_times
-    self.expires = Time.now + 240.days if self.expires.blank?
     self.invited_on = Time.now
+    self.expires = self.membership.event.start_date - 1.month if self.expires.blank?
   end
 
   def expire_date
-    self.expires.strftime("%B %-d, %Y")
+    expires.strftime("%B %-d, %Y")
   end
 
   def decline!
     membership.attendance = 'Declined'
+    OrganizerMailer.rsvp_notice(self.membership, organizer_message).deliver_now
     membership.sync_remote = true
     membership.save
     self.destroy
@@ -35,6 +37,7 @@ class Invitation < ActiveRecord::Base
 
   def maybe!
     membership.attendance = 'Undecided'
+    OrganizerMailer.rsvp_notice(self.membership, organizer_message).deliver_now
     membership.sync_remote = true
     membership.save
   end

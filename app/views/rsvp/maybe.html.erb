@@ -1,33 +1,41 @@
 <div class="row invitation-box container">
-  <div class="col-md-8 col-md-offset-2">
+  <div class="col-md-8 col-md-offset-1">
     <%= render 'validation_errors' %>
     <div class="panel panel-primary" id="maybe-form">
       <div class="panel-heading">
         <span class="panel-title"><h4>Invitation RSVP</h4></span>
       </div>
       <div class="panel-body">
+        <%= form_tag({controller: 'rsvp', action: 'maybe', method: 'post'},
+                     { class: 'form', role: 'form'}) do %>
         <div class="row">
-          <div class='col-md-12 text-center'>
-              <h1>OK! One more step:</h1>
+          <div class="col-md-12">
+              <h1>One more step:</h1>
+              <p class="lead text-center">Thanks! Please let us know by
+              <%= @invitation.expire_date %>.</p>
               <p>The event organizer (<%= @organizer %>) will be notified that
-              you might be attending, as soon as you click the Submit button.
-              Would you like to add something to the message?</p>
+              you <strong>might</strong> be attending, as soon as you click the
+              Submit button. Would you like to add something to the
+              message?</p>
           </div>
         </div>
         <div class="row">
           <div class='col-md-12 text-center'>
-            <%= form_tag({controller: 'rsvp', action: 'maybe',method: 'post'},
-                         { class: 'form', role: 'form'}) do %>
-            <%= text_area_tag(:message, "", size: "100x4",
-            class: 'form-control', placeholder: "Enter your message here.",) %>
+              <%= text_area_tag('organizer_message', "", size: "100x4",
+                  class: 'form-control',
+                  placeholder:
+                        "Optional: enter a message to the organizer here.",) %>
            </div>
          </div>
         <div class="row">
            <div class='col-md-12'>
+
             <%= submit_tag('Submit', class: 'btn btn-warning pull-right') %>
-            <% end %>
+            <span id="click-submit" class="pull-right">Click the Submit button
+            to complete the process ➜</span>
           </div>
         </div>
+        <% end %>
       </div>
     </div>
   </div>

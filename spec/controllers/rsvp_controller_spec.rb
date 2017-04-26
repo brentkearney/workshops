@@ -7,6 +7,10 @@
 require 'rails_helper'
 
 RSpec.describe RsvpController, type: :controller do
+  before do
+    allow_any_instance_of(LegacyConnector).to receive(:update_member)
+  end
+
   describe 'GET #index' do
     before do
       @invitation = create(:invitation)
@@ -53,7 +57,6 @@ RSpec.describe RsvpController, type: :controller do
 
   describe 'GET #no' do
     before :each do
-      allow_any_instance_of(LegacyConnector).to receive(:update_member)
       @invitation = create(:invitation)
       @membership = @invitation.membership
       @membership.attendance = 'Invited'
@@ -74,22 +77,28 @@ RSpec.describe RsvpController, type: :controller do
 
   describe 'GET #maybe' do
     before :each do
-      allow_any_instance_of(LegacyConnector).to receive(:update_member)
       @invitation = create(:invitation)
       @membership = @invitation.membership
       @membership.attendance = 'Invited'
       @membership.save
     end
 
-    it 'changes membership attendance to Undecided' do
-      get :maybe, { otp: @invitation.code }
-
-      expect(Membership.find(@membership.id).attendance).to eq('Undecided')
-    end
-
     it 'renders maybe template' do
       get :maybe, { otp: @invitation.code }
       expect(response).to render_template(:maybe)
+    end
+  end
+
+  describe 'POST #maybe' do
+    it 'changes membership attendance to Undecided' do
+      @invitation = create(:invitation)
+      @membership = @invitation.membership
+      @membership.attendance = 'Invited'
+      @membership.save
+
+      post :maybe, { otp: @invitation.code, organizer_message: 'Hi' }
+
+      expect(Membership.find(@membership.id).attendance).to eq('Undecided')
     end
   end
 end

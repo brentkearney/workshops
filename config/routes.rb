@@ -48,7 +48,8 @@ Rails.application.routes.draw do
   get '/rsvp/:otp' => 'rsvp#index', as: :rsvp_otp
   get '/rsvp/yes/:otp' => 'rsvp#yes', as: :rsvp_yes
   get '/rsvp/no/:otp' => 'rsvp#no', as: :rsvp_no
-  get '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe
+  match '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe, via: [:get, :post]
+  get '/rsvp/thank_you' => 'rsvp#thank_you', as: :rsvp_thank_you
   get '/invitations' => 'invitations#index'
   get '/invitations/new' => 'invitations#new'
   post '/invitations/create' => 'invitations#create'

@@ -12,12 +12,13 @@ class OrganizerMailer < ApplicationMailer
 
   default from: app_email
 
-  def attendance_change(membership, old_attendance, new_attendance)
-    @old_attendance = old_attendance
-    @new_attendance = new_attendance
+  def rsvp_notice(membership, organizer_message = nil)
+    @old_attendance = membership.attendance_was
+    @new_attendance = membership.attendance
     @member = membership.person
     @event = membership.event
     @organizer = @event.organizer
+    @message_to_organizer = organizer_message
 
     @organization = 'Staff'
     unless Setting.Locations["#{membership.event.location}"].nil?
@@ -25,7 +26,7 @@ class OrganizerMailer < ApplicationMailer
     end
 
     email = '"' + @organizer.name + '" <' + @organizer.email + '>'
-    subject = '[' + membership.event.code + '] Membership change notice'
+    subject = '[' + membership.event.code + '] Membership invitation reply'
     mail(to: email, subject: subject, 'Importance': 'High', 'X-Priority': 1)
   end
 end

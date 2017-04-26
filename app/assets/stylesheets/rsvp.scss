@@ -1,3 +1,10 @@
+@import "colours";
+
+h1 {
+  color: $secondary-text-color;
+  font-weight: bold;
+}
+
 #invitation-error {
   h3 {
     margin-top: 0;
@@ -29,4 +36,12 @@
   .btn {
     margin-top: 10px;
   }
+}
+
+#click-submit {
+  padding: 1em;
+  margin-top: 5px;
+  text-align: right;
+  font-size: 1.3em;
+  color: $errors-text-color;
 }
