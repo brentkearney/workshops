@@ -5,6 +5,8 @@
         <a href="/"><i class="fa fa-dashboard fa-fw"></i> Home</a>
         <div class="bottom-border"></div>
       </li>
+
+      <% unless @event && @event.id %>
       <li id="all-events">
         <%= link_to '<i class="fa fa-university fa-fw"></i> All Events'.html_safe, events_path %>
         <div class="bottom-border"></div>
@@ -13,14 +15,18 @@
         <%= link_to '<i class="fa fa-suitcase fa-fw"></i> My Events'.html_safe, my_events_path %>
         <div class="bottom-border"></div>
       </li>
+
+      <!-- /.locations -->
       <li id="future-events">
         <%= link_to '<i class="fa fa-forward fa-fw"></i> Future Events'.html_safe, events_future_path %>
         <div class="bottom-border"></div>
       </li>
+
       <li id="past-events">
         <%= link_to '<i class="fa fa-backward fa-fw"></i> Past Events'.html_safe, events_past_path %>
         <div class="bottom-border"></div>
       </li>
+
       <% unless Setting.Locations.keys.blank? %>
       <li id="event-locations">
         <a href="#" id="event-locations-link"><i class="fa fa-globe fa-fw"></i> Event Locations <span id="locations-arrow" class="fa arrow"></span></a>
@@ -37,6 +43,23 @@
       </li>
       <% end %>
       <!-- /.locations -->
+
+      <li id="event-years">
+        <a href="#" id="event-years-link"><i class="fa fa-calendar fa-fw"></i> Event Years <span id="years-arrow" class="fa arrow"></span></a>
+        <ul class="nav nav-second-level" id="event-years-list">
+          <% Event.years.each do |year| %>
+          <li id="<%= year %>">
+            <div class="top-border"></div>
+            <%= link_to %Q(<i class="fa fa-calendar-check-o fa-fw"></i> #{year}).html_safe, events_year_path(year) %>
+            <div class="bottom-border"></div>
+          </li>
+          <% end %>
+        </ul>
+        <!-- /.nav-second-level -->
+      </li>
+
+      <% end %>
+      
 
       <% if @event && @event.id %>
       <li id="event-links">

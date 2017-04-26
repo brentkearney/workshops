@@ -59,7 +59,6 @@ class EventsController < ApplicationController
     unless Setting.Locations.keys.include?(location)
       location = Setting.Locations.keys.first
     end
-
     @heading = "Events at #{location}"
     @events = Event.location(location).order(:start_date)
     render :index
@@ -68,7 +67,6 @@ class EventsController < ApplicationController
   # GET /events/kind/:kind
   def kind
     kind = params[:kind].titleize
-
     if kind == 'Research In Teams'
       kind = 'Research in Teams'
     else
