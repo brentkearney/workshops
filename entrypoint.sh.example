@@ -1,29 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/bash
+set -e
 
 echo
 echo "Setting system timezone..."
 dpkg-reconfigure -f noninteractive tzdata
 
 echo
-echo "Gem environment is:"
-gem environment
-
-echo
 echo "Installing latest bundler..."
-gem install bundler
-gem install rubygems-bundler
+/usr/local/rvm/bin/rvm-exec 2.4.0 gem install bundler
+/usr/local/rvm/bin/rvm-exec 2.4.0 gem install rubygems-bundler
 
-echo
-echo "Updating RVM..."
-/usr/local/rvm/bin/rvm get stable --auto-dotfiles
-/usr/local/rvm/bin/rvm gem regenerate_binstubs
-/usr/local/rvm/bin/rvm reload && /usr/local/rvm/bin/rvm repair all
-# /usr/local/rvm/bin/rvm wrapper ruby --no-prefix --all
 
 echo
 echo "Bundle install..."
-cd /home/app/workshops; RAILS_ENV=development ./bin/bundle install
-# cd /home/app/workshops; RAILS_ENV=development ./bin/bundle update
+cd /home/app/workshops; RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.4.0 bundle install
 
 echo
 echo "Running migrations..."
@@ -38,12 +28,22 @@ else
 fi
 
 
+echo
+echo "Chowning..."
+chown -R app:app /usr/local/rvm/gems
+if [ ! -e /home/app/workshops/tmp ]; then
+  mkdir /home/app/workshops/tmp
+  mkdir -p /home/app/workshops/vendor/cache
+fi
+chown -R app:app /home/app/workshops
+
 # echo
 # echo "Compiling Assets..."
-# chown -R app /home/app/workshops/tmp
 # su - app -c "cd /home/app/workshops; RAILS_ENV=production bundle exec rake assets:precompile --trace"
 
 echo
 echo "Starting web server..."
-/usr/bin/passenger start
+bundle exec passenger start
+
+# /usr/bin/passenger start
 # /home/app/workshops/bin/rails server -e development -b 0.0.0.0 -p 80

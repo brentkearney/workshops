@@ -1,5 +1,8 @@
 # Sets up some defaults to populate the Settings section
-Rails.cache.delete('settings')
+def rewrite_cache(var, value)
+  Rails.cache.write("settings:#{var}", value,
+    expires_in: 10.minutes)
+end
 
 if Setting.find_by(var: 'Site').nil?
   Setting.Site = {
@@ -16,15 +19,16 @@ if Setting.find_by(var: 'Site').nil?
     'Focussed Research Group', 'Summer School', 'Public Lecture'],
     'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
     'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor',
-      'Ph.D. Student', 'Masters Student', 'Undergraduate Student',
-      'K-12 Teacher', 'K-12 Student', 'Other'],
+    'Ph.D. Student', 'Masters Student', 'Undergraduate Student',
+    'K-12 Teacher', 'K-12 Student', 'Other'],
     'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.']
   }
+  rewrite_cache('Site', Setting.Site)
 end
 
 if Setting.find_by(var: 'Emails').nil?
   Setting.Emails = {
-    :EO => {
+    'EO' => {
       'program_coordinator' => 'organization@example.com',
       'secretary' => 'organization-secretary@example.com',
       'administrator' => 'organization-administrator@example.com',
@@ -32,24 +36,27 @@ if Setting.find_by(var: 'Emails').nil?
       'videos' => 'videos@example.com',
       'schedule_staff' => 'barista@example.com, photographer@example.com',
       'event_updates' => 'webmaster@example.com, communications@example.com',
-      'name_tags' => 'organization-secretary@example.com'
+      'name_tags' => 'organization-secretary@example.com',
+      'confirmation_notices' => 'organization@example.com'
     }
   }
+  rewrite_cache('Emails', Setting.Emails)
 end
 
 if Setting.find_by(var: 'Locations').nil?
   Setting.Locations = {
-    :EO => {
+    'EO' => {
       'Name' => 'Example Organization',
       'Country' => 'Canada',
       'Timezone' => 'Mountain Time (US & Canada)'
     }
   }
+  rewrite_cache('Locations', Setting.Locations)
 end
 
 if Setting.find_by(var: 'Rooms').nil?
   Setting.Rooms = {
-    :EO => {
+    'EO' => {
       '5 Day Workshop' => 'TCPL 201',
       '2 Day Workshop' => 'TCPL 201',
       'Summer School' =>  'TCPL 202',
@@ -62,4 +69,5 @@ if Setting.find_by(var: 'Rooms').nil?
       'CH2' => ['5116', '5124']
     }
   }
+  rewrite_cache('Rooms', Setting.Rooms)
 end

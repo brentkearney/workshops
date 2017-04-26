@@ -182,6 +182,25 @@ describe 'Settings page', type: :feature do
         end
       end
 
+      it 'the timezone field is a drop-down of available time zones' do
+        location = Setting.Locations.keys.first
+        tz_select = "setting[Locations][#{location}][Timezone]"
+        zones = []
+        ActiveSupport::TimeZone.us_zones.each do |tz|
+          zones << tz.to_s
+        end
+
+        expect(page.body).to have_select(tz_select, with_options: zones)
+      end
+
+      it 'the correct timezone is selected in the Timezone drop-down' do
+        location = Setting.Locations.keys.first
+        tz_select = "select#setting_Locations_#{location}_Timezone"
+        timezone = Setting.Locations[location]['Timezone']
+
+        expect(find(:css, tz_select).value).to eq(timezone)
+      end
+
       it 'updates the data in the given field' do
         first_key = Setting.Locations.keys.first
         first_field = Setting.Locations[first_key].first.first
@@ -201,15 +220,17 @@ describe 'Settings page', type: :feature do
       end
 
       it 'updating the location code updates it for all sections' do
-        fill_in "setting[Locations][EO][new_key]", with: 'TEST'
-        click_button 'Update EO Settings'
+        key = Setting.Locations.keys.last
+        fill_in "setting[Locations][#{key}][new_key]", with: 'FOO'
+        click_button "Update #{key} Settings"
 
-        click_link 'Emails'
-        expect(page.body).not_to have_css('div.tab-pane#EO')
-        expect(page.body).to have_css('div.tab-pane#TEST')
-        click_link 'Rooms'
-        expect(page.body).not_to have_css('div.tab-pane#EO')
-        expect(page.body).to have_css('div.tab-pane#TEST')
+        visit edit_setting_path('Emails')
+        expect(page.body).not_to have_css("div.tab-pane##{key}")
+        expect(page.body).to have_css('div.tab-pane#FOO')
+
+        visit edit_setting_path('Rooms')
+        expect(page.body).not_to have_css("div.tab-pane##{key}")
+        expect(page.body).to have_css('div.tab-pane#FOO')
       end
 
       it 'has a "+/- Location" tab to add new locations' do
@@ -219,7 +240,7 @@ describe 'Settings page', type: :feature do
 
         expect(page).to have_text('Setting has been updated')
         expect(page).to have_css('div.tab-pane#TEST2')
-        expect(Setting.find_by_var('Locations').value.keys).to include(:TEST2)
+        expect(Setting.find_by_var('Locations').value.keys).to include('TEST2')
       end
 
       it 'adds the new location to the other Setting sections as well' do

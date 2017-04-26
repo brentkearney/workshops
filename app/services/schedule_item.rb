@@ -249,6 +249,11 @@ class ScheduleItem
   end
 
   def set_default_location
-    location = Setting.Rooms[@event.location.to_sym][@event.event_type.to_sym]
+    rooms = Setting.get_all['Rooms']
+    location = ''
+    unless rooms.nil? || rooms[@event.location].nil?
+      location = rooms[@event.location][@event.event_type]
+    end
+    location
   end
 end

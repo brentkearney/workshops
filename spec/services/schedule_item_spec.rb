@@ -64,11 +64,12 @@ describe "ScheduleItem" do
       new_event_type = Setting.Site['event_types'].third
       @event.event_type = new_event_type
       @event.save
+      Setting.Rooms =
+        {"#{@event.location}" => {"#{new_event_type}" => 'New Room'}}
 
       item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
 
-      new_room = Setting.Rooms[@event.location.to_sym][new_event_type.to_sym]
-      expect(item.location).to eq(new_room)
+      expect(item.location).to eq('New Room')
     end
 
     it 'creates a valid schedule item without associated lecture item' do

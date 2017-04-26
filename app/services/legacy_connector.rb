@@ -113,10 +113,4 @@ class LegacyConnector
   def delete_lecture(lecture_id)
     JSON.parse(RestClient.get "#{@rest_url}/delete_lecture/#{lecture_id}")
   end
-
-  # send a report of lectures and video filenames for given event
-  def send_lectures_report(event_id)
-    RestClient.post "#{@rest_url}/send_lectures_report/#{event_id}", 1, content_type: :json, accept: :json
-  end
-
 end

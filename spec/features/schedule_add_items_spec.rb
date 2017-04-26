@@ -6,23 +6,20 @@
 
 require 'rails_helper'
 
-describe "Adding a Schedule Item", :type => :feature do
+describe "Adding a Schedule Item", type: :feature do
 
   before do
     authenticate_user
-
-    @event = FactoryGirl.create(:event)
+    @event = create(:event)
     @day = @event.start_date + 3.days
     @weekday = @day.strftime("%A")
-    FactoryGirl.create(:schedule, event: @event)
-
+    create(:schedule, event: @event)
     visit event_schedule_index_path(@event)
   end
 
   after(:each) do
     Warden.test_reset!
   end
-
 
   it 'opens an edit/add form when the "Add an Item" button is clicked' do
     click_link "Add an item on #{@weekday}"
@@ -40,8 +37,8 @@ describe "Adding a Schedule Item", :type => :feature do
   end
 
   it 'sets new schedule item times in the associated event\'s time zone' do
-    event = FactoryGirl.create(:event, name: 'TZ Test Event', time_zone: 'Brisbane')
-    FactoryGirl.create(:schedule, event: event)
+    event = create(:event, name: 'TZ Test Event', time_zone: 'Brisbane')
+    create(:schedule, event: event)
     day = event.start_date + 2.days
     weekday = day.strftime("%A")
     visit event_schedule_index_path(event)
@@ -104,7 +101,7 @@ describe "Adding a Schedule Item", :type => :feature do
 
   context 'Is authorized only for admin users (above), and staff and organizers of the event' do
     before do
-      @membership = FactoryGirl.create(:membership, event: @event, person: @person)
+      @membership = create(:membership, event: @event, person: @person)
     end
 
     it 'hides "Add an Item" button from users who are not event members' do
@@ -190,34 +187,5 @@ describe "Adding a Schedule Item", :type => :feature do
       expect(current_path).to eq(event_schedule_day_path(@event, @day))
     end
   end
+
 end
-
-## This test crashes rspec with:
-# Failure/Error: Unable to find matching line from backtrace
-# ActiveRecord::StatementInvalid:
-#  SQLite3::BusyException: database is locked: UPDATE "users" SET "last_sign_in_at" = ?, "current_sign_in_at" = ?, "last_sign_in_ip" = ?, "current_sign_in_ip" = ?, "sign_in_count" = ?, "updated_at" = ? WHERE "users"."id" = ?
-## Failure occurs at the line 'visit event_schedule_edit_path(@event, @item)'
-## Possible solution: http://devblog.avdi.org/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/
-
-# feature 'Deleting a Schedule Item', :devise, :js do
-#   before do
-#     Warden.test_reset!
-#     @user = FactoryGirl.create(:user)
-#     login_as(@user, scope: :user)
-#     @user.confirmed_at = Time.now
-#     @user.save
-#   end
-#
-#   it 'Clicking the Delete button on the edit form deletes the item' do
-#     @item = FactoryGirl.create(:schedule)
-#     @event = @item.event
-#     item_id = @item.id
-#
-#     Capybara.current_driver = :selenium
-#
-#     visit event_schedule_edit_path(@event, @item)
-#     click_link 'Delete Schedule Item'
-#     page.driver.browser.switch_to.alert.accept
-#     expect(Schedules.where(id: item_id)).to be_empty
-#   end
-# end

@@ -21,15 +21,6 @@ class ScheduleController < ApplicationController
     end
   end
 
-  # GET /events/:event_id/schedule/send_video_filenames
-  def send_video_filenames
-    if Rails.env.production?
-      lc = LegacyConnector.new
-      lc.send_lectures_report(@event.code)
-    end
-    redirect_to event_schedule_index_path(@event), notice: "Video filenames were sent to #{@event.location} for #{@event.code}"
-  end
-
   # POST /events/:event_id/schedule/schedule_publish
   def publish_schedule
     if @event.update(publish_schedule: params[:publish_schedule])

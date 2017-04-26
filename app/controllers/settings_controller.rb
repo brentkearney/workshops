@@ -28,11 +28,10 @@ class SettingsController < ApplicationController
 
   # PATCH /settings
   def update
-    setting = @setting_params.setting
-    authorize setting
+    authorize Setting
     @setting_params.organize_params
 
-    SettingUpdater.new(setting).save
+    SettingUpdater.new(@setting_params.setting).save
     redirect_to edit_setting_path(params[:id]),
       notice: 'Setting has been updated.'
   end

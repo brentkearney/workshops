@@ -29,7 +29,6 @@ Rails.application.routes.draw do
     get 'schedule/new/:day/item' => 'schedule#new_item', as: :schedule_item
     get 'schedule/:id' => 'schedule#edit', as: :schedule_edit
     post 'schedule/create' => 'schedule#create'
-    get 'schedule/send/videos' => 'schedule#send_video_filenames'
     post 'schedule/publish_schedule' => 'schedule#publish_schedule'
     resources :schedule
     resources :memberships
@@ -43,6 +42,10 @@ Rails.application.routes.draw do
   # Errors
   match "/404", :to => "errors#not_found", via: :all
   match "/500", :to => "errors#internal_server_error", via: :all
+
+  # RSVP
+  get '/rsvp' => 'rsvp#index'
+  get '/rsvp/:event_id/:otp' => 'rsvp#index', as: :rsvp_otp
 
   # API
   namespace :api do

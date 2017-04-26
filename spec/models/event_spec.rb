@@ -159,7 +159,7 @@ RSpec.describe "Model validations: Event ", type: :model do
       @current.save
       @future.event_type = '2 Day Workshop'
       @future.save
-      
+
       events = Event.kind('5 Day Workshop')
       expect(events).to include(@past, @current)
       expect(events).not_to include(@future)
@@ -174,7 +174,7 @@ RSpec.describe "Model validations: Event ", type: :model do
   #####instance methods from app/models/concerns/event_decorators.rb #########
   ###
   it '.country from Setting.Locations' do
-    country = Setting.Locations.first.second[:Country]
+    country = Setting.Locations.first.second['Country']
 
     event = build(:event, location: Setting.Locations.keys[0])
 

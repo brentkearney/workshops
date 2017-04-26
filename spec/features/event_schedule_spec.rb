@@ -6,7 +6,7 @@
 
 require 'rails_helper'
 
-describe 'Event Schedule Page', :type => :feature do
+describe 'Event Schedule Page', type: :feature do
   before do
     authenticate_user
     @event = create(:event_with_schedule)
@@ -28,12 +28,4 @@ describe 'Event Schedule Page', :type => :feature do
       expect(page.body).to have_link(item.name, href: event_schedule_edit_path(@event, item))
     end
   end
-
-  it 'if the event.location is not BIRS, includes a button to Send Video Filenames' do
-    @event.location = 'CMO'
-    @event.save
-    visit event_schedule_index_path(@event)
-    expect(page.body).to have_link("Send Video Filenames to #{@event.location}")
-  end
-
 end

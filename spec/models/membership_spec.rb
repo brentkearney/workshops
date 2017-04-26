@@ -9,71 +9,60 @@ require 'rails_helper'
 RSpec.describe 'Model validations: Membership', type: :model do
 
   before do
-    @event = FactoryGirl.create(:event, code: '16w5666')
-    @person = FactoryGirl.create(:person)
-    @membership = FactoryGirl.create(:membership, person: @person, event: @event)
+    @event = create(:event, code: '16w5666')
+    @person = create(:person)
+    @membership = create(:membership, person: @person, event: @event)
   end
 
   it 'has valid factory' do
-    expect(FactoryGirl.create(:membership)).to be_valid
     expect(@membership).to be_valid
   end
 
   it 'is invalid without an event association' do
-    expect(@membership.event).to be(@event)
-
     @membership.event = nil
     expect(@membership.valid?).to be_falsey
-    expect(@membership.errors[:event].any?).to be_truthy
+    expect(@membership.errors.has_key?(:event)).to be_truthy
   end
 
   it 'is invalid without a person association' do
-    expect(@membership.person).to be(@person)
-
     @membership.person_id = nil
     expect(@membership.valid?).to be_falsey
-    expect(@membership.errors[:person].any?).to be_truthy
+    expect(@membership.errors.has_key?(:person)).to be_truthy
   end
 
   it 'is invalid without unique people per event' do
-    expect(@membership.valid?).to be_truthy
-    new_membership = FactoryGirl.build(:membership, person: @person, event: @event)
+    new_membership = build(:membership, person: @person, event: @event)
 
     expect(new_membership.valid?).to be_falsey
-    expect(new_membership.errors[:person].any?).to be_truthy
+    expect(new_membership.errors.has_key?(:person)).to be_truthy
   end
 
   it 'is invalid if arrival dates are after the event ends' do
     @membership.arrival_date = @event.end_date + 2.days
     @membership.valid?
-    expect(@membership.errors[:arrival_date].any?).to be_truthy
+    expect(@membership.errors.has_key?(:arrival_date)).to be_truthy
   end
 
   it 'is invalid if departure dates are before the event begins' do
     @membership.departure_date = @event.start_date - 2.days
     @membership.valid?
-    expect(@membership.errors[:departure_date].any?).to be_truthy
+    expect(@membership.errors.has_key?(:departure_date)).to be_truthy
   end
 
   it 'is invalid if arrival dates are a month before the event begins' do
     @membership.arrival_date = @event.start_date - 31.days
     @membership.valid?
-    expect(@membership.errors[:arrival_date].any?).to be_truthy
+    expect(@membership.errors.has_key?(:arrival_date)).to be_truthy
   end
 
   it 'is valid if arrival dates are within the period of the event' do
-    fresh_event = FactoryGirl.create(:event)
-    fresh_membership = FactoryGirl.create(:membership, event: fresh_event)
-    fresh_membership.arrival_date = fresh_event.start_date + 1.days
-    expect(fresh_membership.valid?).to be_truthy
+    @membership.arrival_date = @event.start_date + 1.days
+    expect(@membership.valid?).to be_truthy
   end
 
   it 'is valid if departure dates are within the period of the event' do
-    fresh_event = FactoryGirl.create(:event)
-    fresh_membership = FactoryGirl.create(:membership, event: fresh_event)
-    fresh_membership.departure_date = fresh_event.end_date - 1.days
-    fresh_membership.valid?
-    expect(fresh_membership.valid?).to be_truthy
+    @membership.departure_date = @event.end_date - 1.days
+    expect(@membership.valid?).to be_truthy
   end
 
   it 'is valid with nil arrival and departure dates' do
@@ -88,10 +77,10 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @event.max_participants = @event.num_participants + 1
     @event.save
 
-    second_membership = FactoryGirl.create(:membership, event: @event, attendance: 'Invited')
+    second_membership = create(:membership, event: @event, attendance: 'Invited')
     expect(second_membership).to be_valid
 
-    third_membership = FactoryGirl.create(:membership, event: @event, attendance: 'Invited')
+    third_membership = create(:membership, event: @event, attendance: 'Invited')
     expect(third_membership).not_to be_valid
   end
 
@@ -99,7 +88,8 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @event.max_participants = @event.num_participants
     @event.save
 
-    observer_membership = FactoryGirl.create(:membership, event: @event, attendance: 'Invited', role: 'Observer')
+    observer_membership = create(:membership, event: @event,
+                                  attendance: 'Invited', role: 'Observer')
     expect(observer_membership).to be_valid
   end
 
@@ -117,8 +107,7 @@ RSpec.describe 'Model validations: Membership', type: :model do
 
   it "increases associated event's confirmed_cache when Confirmed member is added" do
     counter_cache = @event.confirmed_count
-
-    member = create(:membership, event: @event, role: 'Confirmed')
+    create(:membership, event: @event, role: 'Confirmed')
 
     expect(@event.confirmed_count).to eq(counter_cache + 1)
   end
@@ -130,5 +119,13 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @event.memberships.last.destroy
 
     expect(@event.confirmed_count).to eq(counter_cache - 1)
+  end
+
+  it "notifies staff if attendance changes to or from confirmed" do
+    expect(@membership.attendance).to eq('Confirmed')
+    @membership.attendance = 'Not Yet Invited'
+    @membership.save
+
+    expect(ActionMailer::Base.deliveries.count).not_to be_zero
   end
 end

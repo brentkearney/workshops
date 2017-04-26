@@ -49,14 +49,17 @@
 
        <td align="right">Last updated:</td>
        <td>
-         <% if @event.updated_by.blank? %>
-             <em>Unknown</em>
-         <% else %>
-             by <%= @event.updated_by %> on <%= @event.updated_at %>
+         <% unless @event.updated_by.blank? %>
+           by <%= @event.updated_by %> on
          <% end %>
+         <%= @event.updated_at.strftime('%Y-%m-%d @ %H:%M') %>
        </td>
       </tr>
     <% end %>
+    <tr>
+      <td align="right">Event Webpage:</td>
+      <td colspan="3"><%= link_to @event.url, @event.url %></td>
+    </tr>
      </tbody>
    </table>
  </div>
@@ -64,7 +67,7 @@
 
 <div class="row" id="event-description">
   <div class="col-lg-6">
-      <h5>Event Description:</h5>
+      <h4 class="event-details">Event Description:</h4>
   </div>
   <div class="col-lg-6 event-edit-icon">
     <%= link_to ' Edit', edit_event_path(@event), class: 'fa fa-pencil-square-o' %>
@@ -76,7 +79,7 @@
 
 <div class="row" id="event-press-release">
   <div class="col-lg-6">
-    <h5>Event Press Release:</h5>
+    <h4 class="event-details">Event Press Release:</h4>
   </div>
   <div class="col-lg-6 event-edit-icon">
     <%= link_to ' Edit', edit_event_path(@event), class: 'fa fa-pencil-square-o' %>

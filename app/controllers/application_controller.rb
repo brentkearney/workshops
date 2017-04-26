@@ -19,13 +19,9 @@ class ApplicationController < ActionController::Base
   add_flash_types :warning, :success, :info, :error
 
   def set_event
-    if params[:event_id]
-      @event = Event.find(params[:event_id])
-    elsif params[:id]
-      @event = Event.find(params[:id])
-    end
-
-    redirect_to events_path, error: 'Event not found.' if @event.nil?
+    event_id = validate_event
+    @event = Event.find(event_id) if event_id
+    redirect_to events_path, error: 'Event not found.' if @event.blank?
   end
 
   def set_time_zone
@@ -33,10 +29,15 @@ class ApplicationController < ActionController::Base
   end
 
   def set_attendance
-    @attendance = Membership::ATTENDANCE unless @event.nil?
+    @attendance = Membership::ATTENDANCE unless @event.blank?
   end
 
   private
+
+  def validate_event
+    event = params[:event_id] || params[:id]
+    event if event =~ /\A\d+\Z/ || event =~ /#{Setting.Site['code_pattern']}/
+  end
 
   def invalid_auth_token
     redirect_to sign_in_path, error: 'Login expired'
@@ -46,22 +47,23 @@ class ApplicationController < ActionController::Base
     policy_name = exception.policy.class.to_s.underscore
 
     respond_to do |format|
-      format.html {
-        flash[:error] = t "#{policy_name}.#{exception.query}", scope: "pundit", default: :default
+      format.html do
+        flash[:error] = t "#{policy_name}.#{exception.query}",
+                          scope: 'pundit', default: :default
+
         redirect_to (request.referrer || my_events_path)
-      }
+      end
       format.json { head 403 }
     end
   end
 
   # After successful login, redirect to welcome page
-  def after_sign_in_path_for(resource)
+  def after_sign_in_path_for(_resource)
     flash[:success] = 'Signed in successfully!' unless flash[:notice]
     welcome_path
   end
 
-  def after_sign_out_path_for(resource)
+  def after_sign_out_path_for(_resource)
     sign_in_path
   end
-
 end

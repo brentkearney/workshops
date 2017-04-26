@@ -2,9 +2,9 @@ class CreateSettings < ActiveRecord::Migration
   def self.up
     unless ActiveRecord::Base.connection.table_exists? 'settings'
       create_table :settings do |t|
-        t.string  :var,        null: false
+        t.string  :var,        null: false, unique: true
         t.text    :value,      null: true
-        t.integer :thing_id,   null: true
+        t.integer :thing_id,   null: true, unique: true
         t.string  :thing_type, null: true, limit: 30
         t.timestamps
       end
