@@ -7,21 +7,23 @@
 class RegistrationsController < Devise::RegistrationsController
 
   def create
-    if EmailValidator.valid?(sign_up_params[:email])
-      person = Person.find_by_email(sign_up_params[:email].downcase)
+    if valid_email?
+      person = Person.find_by_email(user_email)
       if person.nil?
-        redirect_to register_path, :error => 'We have no record of that email address. Please check the invitation we sent you, to see what email address is in the To: field.'
+        redirect_to register_path, error: 'We have no record of that email address. Please check our correspondence with you, to see what email address is in the To: field.'
       else
-        membership = (person.memberships.select {|m| m.attendance != 'Not Yet Invited' && m.attendance != 'Declined'}).first
+        membership = person.memberships.where("(role LIKE '%Org%') OR
+                                          (attendance != 'Not Yet Invited' AND
+                                           attendance != 'Declined')").first
         if membership.nil?
-          redirect_to register_path, :error => 'We have no records of pending event invitations for you. Please contact the event organizer.'
+          redirect_to register_path, error: 'We have no records of pending event invitations for you. Please contact the event organizer.'
         else
           params[:user][:person_id] = person.id
           super
         end
       end
     else
-      redirect_to register_path, :error => 'You must enter a valid e-mail address.'
+      redirect_to register_path, error: 'You must enter a valid e-mail address.'
     end
   end
 
@@ -41,4 +43,11 @@ class RegistrationsController < Devise::RegistrationsController
     params.require(:user).permit(:person_id, :password, :password_confirmation, :current_password)
   end
 
+  def valid_email?
+    EmailValidator.valid?(sign_up_params[:email])
+  end
+
+  def user_email
+    sign_up_params[:email].downcase
+  end
 end
