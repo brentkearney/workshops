@@ -5,7 +5,6 @@
 # See the COPYRIGHT file for details and exceptions.
 
 module ApplicationHelper
-
   def profile_pic(person)
     image_tag "profile.png", alt: "#{person.name}", id: "profile-pic-#{person.id}", class: "img-responsive img-rounded"
   end
@@ -17,5 +16,4 @@ module ApplicationHelper
   def user_is_member?
     current_user && current_user.is_member?(@event)
   end
-
 end
