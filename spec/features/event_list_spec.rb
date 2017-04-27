@@ -157,24 +157,18 @@ describe 'Event List', type: :feature do
     end
 
     it 'can toggle by location' do
-      @current.location = @future.location
+      @current.location = 'OTHER'
       @current.save
-      other_event = create(:event,
-                           start_date: @future.start_date.advance(weeks: 1),
-                           end_date: @future.end_date.advance(weeks: 1),
-                           location: 'NEW')
 
       visit events_future_path
       expect(page.body).to have_text(@current.name)
       expect(page.body).to have_text(@future.name)
-      expect(page.body).to have_text(other_event.name)
 
-      click_link 'Event Locations'
-      click_link @current.location
+      click_link @future.location
 
-      expect(page.body).to have_text(@current.name)
-      expect(page.body).not_to have_text(@future.name)
-      expect(page.body).not_to have_text(other_event.name)
+      expect(current_path).to eq("/events/future/location/#{@future.location}")
+      expect(page.body).to have_text(@future.name)
+      expect(page.body).not_to have_text(@current.name)
     end
   end
 
@@ -205,6 +199,7 @@ describe 'Event List', type: :feature do
       click_link 'Event Locations'
       click_link @past.location
 
+      expect(current_path).to eq("/events/past/location/#{@future.location}")
       expect(page.body).to have_text(@past.name)
       expect(page.body).not_to have_text(other_event.name)
       expect(page.body).not_to have_text(@future.name)
@@ -240,6 +235,8 @@ describe 'Event List', type: :feature do
       click_link 'Event Years'
       click_link @current.location
 
+      expected_path = "/events/year/#{@current.year}/#{@current.location}"
+      expect(current_path).to eq(expected_path)
       expect(page.body).to have_text(@current.name)
       expect(page.body).not_to have_text(other_event.name)
       expect(page.body).not_to have_text(@future.name)

@@ -9,6 +9,8 @@ class EventsController < ApplicationController
   before_filter :authenticate_user!, only: [:my_events, :new, :edit, :create, :update, :destroy]
   after_action :verify_policy_scoped, only: [:index, :past, :future, :kind]
 
+  include EventsHelper
+
   # GET /events
   # GET /events.json
   def index
@@ -31,11 +33,12 @@ class EventsController < ApplicationController
     render :index
   end
 
-  # GET /events/future
-  # GET /events/future.json
+  # GET /events/future(/location/:location)
+  # GET /events/future(/location/:location).json
   def future
     @heading = 'Future Events'
     @events = policy_scope(Event).future
+    remove_locations
     render :index
   end
 
@@ -162,17 +165,27 @@ class EventsController < ApplicationController
 
   private
 
-    def notify_staff(event: original_event, params: update_params)
-      if params[:short_name] != event.short_name
-        StaffMailer.nametag_update(original_event: event, args: params).deliver_now if event.is_upcoming?
-      end
-
-      if params[:description] != event.description || params[:press_release] != event.press_release
-        StaffMailer.event_update(original_event: event, args: params).deliver_now
-      end
+  def notify_staff(event: original_event, params: update_params)
+    if params[:short_name] != event.short_name
+      StaffMailer.nametag_update(original_event: event, args: params).deliver_now if event.is_upcoming?
     end
 
-    def event_params
-      params.require(:event).permit(:code, :name, :short_name, :start_date, :end_date, :time_zone, :event_type, :location, :description, :press_release, :max_participants, :door_code, :booking_code, :updated_by)
+    if params[:description] != event.description || params[:press_release] != event.press_release
+      StaffMailer.event_update(original_event: event, args: params).deliver_now
     end
+  end
+
+  def event_params
+    params.require(:event).permit(:code, :name, :short_name, :start_date, :end_date, :time_zone, :event_type, :location, :description, :press_release, :max_participants, :door_code, :booking_code, :updated_by)
+  end
+
+  def location_params
+    params.permit(:location)
+  end
+
+  def remove_locations
+    unless location_params.blank?
+      @events = @events.select {|e| e.location = location_params['location']}
+    end
+  end
 end

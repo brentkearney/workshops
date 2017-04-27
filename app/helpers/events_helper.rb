@@ -20,4 +20,11 @@ module EventsHelper
     field
   end
 
+  def location_url(location)
+    if request.path =~ /past|future|year/
+      '/events/' + action_name + "/location/#{location}"
+    else
+      events_location_path(location)
+    end
+  end
 end

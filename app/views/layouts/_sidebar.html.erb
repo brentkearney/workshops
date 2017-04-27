@@ -34,7 +34,7 @@
           <% Setting.Locations.keys.each do |location| %>
           <li id="<%= location %>">
             <div class="top-border"></div>
-            <%= link_to %Q(<i class="fa fa-location-arrow fa-fw"></i> #{location}).html_safe, events_location_path(location) %>
+            <%= link_to %Q(<i class="fa fa-location-arrow fa-fw"></i> #{location}).html_safe, location_url(location) %>
             <div class="bottom-border"></div>
           </li>
           <% end %>
@@ -59,7 +59,7 @@
       </li>
 
       <% end %>
-      
+
 
       <% if @event && @event.id %>
       <li id="event-links">

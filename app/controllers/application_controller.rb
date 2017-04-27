@@ -14,6 +14,8 @@ class ApplicationController < ActionController::Base
   # Enforces access right checks for collections
   #after_filter :verify_policy_scoped, :except => :index
 
+  include ApplicationHelper
+
   before_action :set_paper_trail_whodunnit
 
   add_flash_types :warning, :success, :info, :error
