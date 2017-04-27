@@ -235,7 +235,7 @@ describe 'Event List', type: :feature do
       click_link 'Event Years'
       click_link @current.location
 
-      expected_path = "/events/year/#{@current.year}/#{@current.location}"
+      expected_path = "/events/year/#{@current.year}/location/#{@current.location}"
       expect(current_path).to eq(expected_path)
       expect(page.body).to have_text(@current.name)
       expect(page.body).not_to have_text(other_event.name)
@@ -247,7 +247,7 @@ describe 'Event List', type: :feature do
     it 'lists events for selected location' do
       location = @current.location
 
-      visit root_path
+      visit my_events_path
       click_link 'Event Locations'
       click_link "#{location}"
 

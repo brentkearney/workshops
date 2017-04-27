@@ -50,7 +50,7 @@
           <% Event.years.each do |year| %>
           <li id="<%= year %>">
             <div class="top-border"></div>
-            <%= link_to %Q(<i class="fa fa-calendar-check-o fa-fw"></i> #{year}).html_safe, events_year_path(year) %>
+            <%= link_to %Q(<i class="fa fa-calendar-check-o fa-fw"></i> #{year}).html_safe, year_url(year) %>
             <div class="bottom-border"></div>
           </li>
           <% end %>

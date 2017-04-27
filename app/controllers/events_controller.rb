@@ -30,6 +30,7 @@ class EventsController < ApplicationController
   def past
     @heading = 'Past Events'
     @events = policy_scope(Event).past.reverse_order
+    remove_locations
     render :index
   end
 
@@ -49,6 +50,7 @@ class EventsController < ApplicationController
     if year =~ /^\d{4}$/
       @heading = "#{year} Events"
       @events = policy_scope(Event).year(year)
+      remove_locations
       render :index
     else
       redirect_to events_path
@@ -184,8 +186,7 @@ class EventsController < ApplicationController
   end
 
   def remove_locations
-    unless location_params.blank?
-      @events = @events.select {|e| e.location = location_params['location']}
-    end
+    location = location_params['location']
+    @events = @events.select {|e| e.location == location} unless location.blank?
   end
 end
