@@ -133,4 +133,14 @@ class StaffMailer < ApplicationMailer
       mail(to: staff_email, subject: subject, 'Importance': 'High', 'X-Priority': 1)
     end
   end
+
+  def site_feedback(section:, membership:, message:)
+    feedback_email = Setting.Site['webmaster_email']
+    unless feedback_email.blank?
+      @membership = membership
+      @message = message
+      subject = "[#{@membership.event.code}] #{section} feedback"
+      mail(to: feedback_email, subject: subject)
+    end
+  end
 end

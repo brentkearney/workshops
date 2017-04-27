@@ -10,7 +10,7 @@ class Invitation < ActiveRecord::Base
   before_save :update_times
 
   def generate_code
-    code = SecureRandom.urlsafe_base64(37) if code.blank?
+    self.code = SecureRandom.urlsafe_base64(37) if self.code.blank?
   end
 
   def send_invite

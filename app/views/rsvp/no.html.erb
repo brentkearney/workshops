@@ -1,18 +1,39 @@
 <div class="row invitation-box container">
-  <div class="col-md-8 col-md-offset-2">
+  <div class="col-md-8 col-md-offset-1">
     <%= render 'validation_errors' %>
-    <div class="panel panel-primary">
+    <div class="panel panel-primary" id="no-form">
       <div class="panel-heading">
         <span class="panel-title"><h4>Invitation RSVP</h4></span>
       </div>
       <div class="panel-body">
-
+        <%= form_tag({controller: 'rsvp', action: 'maybe', method: 'post'},
+                     { class: 'form', role: 'form'}) do %>
         <div class="row">
-          <div class='col-md-12 text-center'>
-              <h1>Thank you for letting us know</h1>
-              <h4>The event organizer will be notified.</h4>
+          <div class="col-md-12">
+              <h1>One more step:</h1>
+              <p class="lead text-center">The event organizer
+              (<%= @organizer %>) will be notified that you will not be
+              attending, as soon as you click the Submit button below. Would
+              you like to add something to the message?</p>
           </div>
         </div>
+        <div class="row">
+          <div class='col-md-12 text-center'>
+              <%= text_area_tag('organizer_message', "", size: "100x4",
+                  class: 'form-control',
+                  placeholder:
+                        "Optional: enter a message to the organizer here.") %>
+           </div>
+         </div>
+        <div class="row">
+           <div class='col-md-12'>
+
+            <%= submit_tag('Submit', class: 'btn btn-danger pull-right') %>
+            <span id="click-submit" class="pull-right">Click the Submit button
+            to complete the process ➜</span>
+          </div>
+        </div>
+        <% end %>
       </div>
     </div>
   </div>

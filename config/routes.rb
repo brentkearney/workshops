@@ -32,7 +32,8 @@ Rails.application.routes.draw do
     post 'schedule/publish_schedule' => 'schedule#publish_schedule'
     resources :schedule
     resources :memberships
-    put 'memberships/invite/:id' => 'memberships#invite', as: :memberships_invite
+    put 'memberships/invite/:id' => 'memberships#invite',
+      as: :memberships_invite
     get 'lectures' => 'lectures#index'
   end
 
@@ -44,15 +45,17 @@ Rails.application.routes.draw do
   match "/500", :to => "errors#internal_server_error", via: :all
 
   # Invitations & RSVP
-  get '/rsvp' => 'rsvp#index'
-  get '/rsvp/:otp' => 'rsvp#index', as: :rsvp_otp
-  get '/rsvp/yes/:otp' => 'rsvp#yes', as: :rsvp_yes
-  get '/rsvp/no/:otp' => 'rsvp#no', as: :rsvp_no
-  match '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe, via: [:get, :post]
-  get '/rsvp/thank_you' => 'rsvp#thank_you', as: :rsvp_thank_you
   get '/invitations' => 'invitations#index'
   get '/invitations/new' => 'invitations#new'
   post '/invitations/create' => 'invitations#create'
+
+  get '/rsvp' => 'rsvp#index'
+  get '/rsvp/:otp' => 'rsvp#index', as: :rsvp_otp
+  get '/rsvp/yes/:otp' => 'rsvp#yes', as: :rsvp_yes
+  match '/rsvp/no/:otp' => 'rsvp#no', as: :rsvp_no, via: [:get, :post]
+  match '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe, via: [:get, :post]
+  match '/rsvp/feedback/:membership_id' => 'rsvp#feedback',
+    as: :rsvp_feedback, via: [:get, :post]
 
   # API
   namespace :api do
