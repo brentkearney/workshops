@@ -36,8 +36,8 @@ module EventsHelper
     when /past|future/
       '/events/' + action_name + "/location/#{location}"
     when /year/
-      match = request.path.match(/year\/(\w+)/)
-      "/events/year/#{match[1]}/location/#{location}"
+      year = request.path.match(/year\/(\w+)/)
+      "/events/year/#{year[1]}/location/#{location}"
     else
       events_location_path(location)
     end
