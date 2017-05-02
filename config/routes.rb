@@ -51,7 +51,7 @@ Rails.application.routes.draw do
 
   get '/rsvp' => 'rsvp#index'
   get '/rsvp/:otp' => 'rsvp#index', as: :rsvp_otp
-  get '/rsvp/yes/:otp' => 'rsvp#yes', as: :rsvp_yes
+  match '/rsvp/yes/:otp' => 'rsvp#yes', as: :rsvp_yes, via: [:get, :post]
   match '/rsvp/no/:otp' => 'rsvp#no', as: :rsvp_no, via: [:get, :post]
   match '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe, via: [:get, :post]
   match '/rsvp/feedback/:membership_id' => 'rsvp#feedback',

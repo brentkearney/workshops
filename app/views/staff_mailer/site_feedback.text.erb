@@ -1,0 +1,13 @@
+Feedback from:
+"<%= @membership.person.name %>" <<%= @membership.person.email %>>
+(<%= @membership.person.affiliation %>)
+<%= @membership.person.url %>
+
+Related to event:
+<%= @membership.event.code %>: <%= @membership.event.name %>
+<%= @membership.event.dates(format = 'long') %>
+
+Question: <%= @question %>
+Reply from <%= @membership.person.dear_name %>:
+"<%= @message %>"
+

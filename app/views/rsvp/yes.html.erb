@@ -1,4 +1,39 @@
-<h1>Please Review and Click Submit</h1>
-<p>Person: <%= @rsvp.person.name %> </p>
-<p>Event: <%= @rsvp.event.name %></p>
-<p>Attendance: <%= @rsvp.membership.attendance %></p>
+<div class="row invitation-box container">
+  <div class="col-md-8 col-md-offset-1">
+    <%= render 'validation_errors' %>
+    <div class="panel panel-primary" id="yes-form">
+      <div class="panel-heading">
+        <span class="panel-title"><h4>Invitation RSVP</h4></span>
+      </div>
+      <div class="panel-body">
+        <%= form_for @rsvp, as: :rsvp,
+           url: rsvp_yes_path(@rsvp.invitation.code), method: :post,
+          html: { role: 'form', class: 'form' } do |rsvp| %>
+        <fieldset>
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="rsvp-section">Your Profile</h2>
+            <%= rsvp.fields_for :person, @rsvp.person do |p| %>
+              <div class="form-group">
+                <%= p.label :firstname %>
+                <%= p.text_field :firstname, class: 'form-control' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :lastname %>
+                <%= p.text_field :lastname, class: 'form-control' %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="row">
+           <div class='col-md-12'>
+            SUBMIT
+          </div>
+        </div>
+        </fieldset>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

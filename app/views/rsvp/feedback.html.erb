@@ -1,0 +1,32 @@
+<div class="row invitation-box container">
+  <div class="col-md-8 col-md-offset-1">
+    <div class="panel panel-primary" id="feedback-form">
+      <div class="panel-heading">
+        <span class="panel-title"><h4>RSVP Feedback</h4></span>
+      </div>
+      <div class="panel-body">
+        <%= form_tag({controller: 'rsvp', action: 'feedback', method: 'post'},
+                     { class: 'form', role: 'form'}) do %>
+        <div class="row">
+          <div class="col-md-12">
+              <h1>Thank you!</h1>
+              <h3>How was your RSVP experience?</h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class='col-md-12 text-center'>
+            <%= text_area_tag('feedback_message', "", size: "100x4",
+                class: 'form-control', placeholder:
+                 "Optional: suggest how we could improve this service.") %>
+           </div>
+         </div>
+        <div class="row">
+           <div class='col-md-12'>
+            <%= submit_tag('Send Feedback', class: 'btn btn-success pull-right') %>
+          </div>
+        </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

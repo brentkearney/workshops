@@ -6,12 +6,12 @@
         <span class="panel-title"><h4>Invitation RSVP</h4></span>
       </div>
       <div class="panel-body">
-        <%= form_tag({controller: 'rsvp', action: 'maybe', method: 'post'},
+        <%= form_tag({controller: 'rsvp', action: 'no', method: 'post'},
                      { class: 'form', role: 'form'}) do %>
         <div class="row">
           <div class="col-md-12">
               <h1>One more step:</h1>
-              <p class="lead text-center">The event organizer
+              <p class="lead">The event organizer
               (<%= @organizer %>) will be notified that you will not be
               attending, as soon as you click the Submit button below. Would
               you like to add something to the message?</p>
@@ -30,7 +30,7 @@
 
             <%= submit_tag('Submit', class: 'btn btn-danger pull-right') %>
             <span id="click-submit" class="pull-right">Click the Submit button
-            to complete the process ➜</span>
+            to complete your RSVP ➜</span>
           </div>
         </div>
         <% end %>

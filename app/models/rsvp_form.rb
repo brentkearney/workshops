@@ -1,6 +1,6 @@
 class RsvpForm < ComplexForms
   # validations for views/rsvp/index.html.erb
-  attr_accessor :membership, :person, :event
+  attr_accessor :membership, :person, :event, :invitation
   attr_reader :errors
 
   def initialize(invitation)

@@ -15,6 +15,7 @@ class RsvpController < ApplicationController
   end
 
   # GET /rsvp/yes/:otp
+  # POST /rsvp/yes/:otp
   def yes
     @rsvp = RsvpForm.new(@invitation)
   end
