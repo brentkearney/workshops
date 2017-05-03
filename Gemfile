@@ -15,7 +15,7 @@ gem 'sdoc', group: :doc
 gem 'bcrypt'
 gem 'activerecord-session_store'
 gem 'momentjs-rails', '>= 2.9.0'
-gem 'bootstrap3-datetimepicker-rails', '~> 4.14.30'
+gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
 gem 'paper_trail'
 gem 'rest-client'
 gem 'email_validator'

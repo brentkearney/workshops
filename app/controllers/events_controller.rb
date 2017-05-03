@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class EventsController < ApplicationController
-  before_action :set_event, :set_attendance, only: [:show, :edit, :update, :destroy]
+  before_action :set_event, :set_time_zone, :set_attendance, only: [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!, only: [:my_events, :new, :edit, :create, :update, :destroy]
   after_action :verify_policy_scoped, only: [:index, :past, :future, :kind]
 
@@ -176,5 +176,9 @@ class EventsController < ApplicationController
 
     def event_params
       params.require(:event).permit(:code, :name, :short_name, :start_date, :end_date, :time_zone, :event_type, :location, :description, :press_release, :max_participants, :door_code, :booking_code, :updated_by)
+    end
+
+    def set_time_zone
+      Time.zone = @event.time_zone
     end
 end

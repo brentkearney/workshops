@@ -11,6 +11,7 @@
  * file per style scope.
  *
  *= require font-awesome
+ *= require bootstrap-datetimepicker.min
  *= stub print
  *= require_tree .
  *= require_self

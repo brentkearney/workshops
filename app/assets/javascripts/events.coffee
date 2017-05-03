@@ -5,7 +5,7 @@ $(document).on 'turbolinks:load', ->
     })
 
     $('#end_date').datetimepicker({
-      useCurrent: false
+      useCurrent: false,
       format: 'YYYY-MM-DD'
     })
 

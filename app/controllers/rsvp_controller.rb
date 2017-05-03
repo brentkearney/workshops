@@ -18,6 +18,7 @@ class RsvpController < ApplicationController
   # POST /rsvp/yes/:otp
   def yes
     @rsvp = RsvpForm.new(@invitation)
+    @years = 1930..Date.current.year
   end
 
   # GET /rsvp/no/:otp

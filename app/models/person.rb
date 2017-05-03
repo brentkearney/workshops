@@ -18,7 +18,7 @@ class Person < ActiveRecord::Base
                     uniqueness: true,
                     email: true
   validates :firstname, :lastname, :affiliation, :gender, :updated_by, presence: true
-  validates :gender, format: { with: /(M|F)/, message: " must be either 'M' or 'F'" }, :allow_blank => true
+  validates :gender, format: { with: /(M|F|O)/, message: " must be 'M','F', or 'O'" }, allow_blank: true
   validates :phd_year, numericality: { allow_blank: true, only_integer: true }
 
   # app/models/concerns/person_decorators.rb

@@ -6,31 +6,146 @@
         <span class="panel-title"><h4>Invitation RSVP</h4></span>
       </div>
       <div class="panel-body">
+        <h1>We're happy that you can make it! 🎉<br />
+        <small>Please update our records, to help us book your attendance:</small></h1>
         <%= form_for @rsvp, as: :rsvp,
            url: rsvp_yes_path(@rsvp.invitation.code), method: :post,
           html: { role: 'form', class: 'form' } do |rsvp| %>
         <fieldset>
         <div class="row">
           <div class="col-md-12">
-            <h2 class="rsvp-section">Your Profile</h2>
+            <h2 class="rsvp-section">Personal Information</h2>
             <%= rsvp.fields_for :person, @rsvp.person do |p| %>
               <div class="form-group">
+                <%= p.label :salutation %>
+                <%= p.select :salutation, Setting.Site['salutations'], { include_blank: 'Please select' }, { class: 'form-control' } %>
+              </div>
+              <div class="form-group">
                 <%= p.label :firstname %>
-                <%= p.text_field :firstname, class: 'form-control' %>
+                <%= p.text_field :firstname, class: 'form-control', placeholder: 'Your given name' %>
               </div>
               <div class="form-group">
                 <%= p.label :lastname %>
-                <%= p.text_field :lastname, class: 'form-control' %>
+                <%= p.text_field :lastname, class: 'form-control', placeholder: 'Your family name' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :gender %> (Male, Female, Other) - some rooms have shared bathrooms
+                <%= p.select :gender, ['M','F','O'], { include_blank: 'Please select' }, { class: 'form-control' } %>
+              </div>
+              <div class="form-group">
+                <%= p.label :affiliation %>
+                <%= p.text_field :affiliation, class: 'form-control', placeholder: 'For whom do you work?' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :department %>
+                <%= p.text_field :department, class: 'form-control' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :title, 'Job Title' %>
+                <%= p.text_field :title, class: 'form-control' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :academic_status %>
+                <%= p.select :academic_status, Setting.Site['academic_status'], {}, { class: 'form-control' } %>
+              </div>
+              <div class="form-group">
+                <%= p.label :phd_year, 'Year of first Ph.D.' %>
+                <%= p.select :phd_year, @years, { include_blank: 'Please select if applicable' }, class: 'form-control' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :email, 'E-mail' %>
+                <%= p.text_field :email, class: 'form-control' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :url, 'Website (URL)' %>
+                <%= p.text_field :url, class: 'form-control' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :phone %>
+                <%= p.text_field :phone, class: 'form-control' %>
+              </div>
+              <div class="form-group" id="address-fields">
+                <label>Address</label> (required for hotel room booking)
+                <div class="row">
+                  <div class='col-md-12'>
+                    <%= p.text_field :address1, class: 'form-control', placeholder: 'Address line 1' %>
+                    <%= p.text_field :address2, class: 'form-control', placeholder: 'Address line 2' %>
+                    <%= p.text_field :address3, class: 'form-control', placeholder: 'Address line 3' %>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class='col-md-4'>
+                    <%= p.text_field :city, class: 'form-control', placeholder: 'City' %>
+                  </div>
+                  <div class='col-md-4'>
+                    <%= p.text_field :region, class: 'form-control', placeholder: 'Province/State/Region' %>
+                  </div>
+                  <div class='col-md-4'>
+                    <%= p.text_field :postal_code, class: 'form-control', placeholder: 'Postal Code' %>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class='col-md-4'>
+                  <%= p.text_field :country, class: 'form-control', placeholder: 'Country' %>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <%= p.label :emergency_contact, 'Emergency Contact Name' %>
+                <%= p.text_field :emergency_contact, class: 'form-control' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :emergency_phone, 'Emergency Contact Phone' %>
+                <%= p.text_field :emergency_phone, class: 'form-control' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :biography %>
+                <%= p.text_area :biography, size: "100x4", class: 'form-control', placeholder: 'An optional, brief biographical summary.' %>
+              </div>
+              <div class="form-group">
+                <%= p.label :research_areas %>
+                <%= p.text_field :research_areas, class: 'form-control', placeholder: 'An optional comma-separated list of your areas of research (tags)' %>
               </div>
             <% end %>
           </div>
         </div>
 
         <div class="row">
-           <div class='col-md-12'>
-            SUBMIT
+          <div class="col-md-12">
+            <h2 class="rsvp-section midpage">Arrival & Departure Dates
+            <small>Event dates: <%= @rsvp.event.dates('long') %></small></h2>
+            <p>We provide free meals and acommodation during the event only. If you wish to stay longer, you will have to find your own accommodation and pay for your own meals during your extra days.</p>
+            <%= rsvp.fields_for :memberhsip, @rsvp.membership do |m| %>
+              <%= m.hidden_field :min_date, id: 'min_date', value: @rsvp.event.start_date %>
+              <%= m.hidden_field :max_date, id: 'max_date', value: @rsvp.event.end_date %>
+            <div class="form-group date-picker text-center">
+              <div class="col-md-6">
+                <%= m.label :arrival_date %>
+                <%= m.hidden_field :arrival_date, id: 'arrival_date' %>
+                <div id="arrival"></div>
+              </div>
+              <div class="col-md-6">
+                <%= m.label :departure_date %>
+                <%= m.hidden_field :departure_date, id: 'departure_date' %>
+                <div id="departure"></div>
+              </div>
+            </div>
+            <% end %>
           </div>
         </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="rsvp-section midpage">Guests</h2>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="rsvp-section midpage">Notes</h2>
+          </div>
+        </div>
+
         </fieldset>
         <% end %>
       </div>

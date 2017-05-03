@@ -1,8 +1,24 @@
 @import "colours";
 
 h1 {
-  color: $secondary-text-color;
+  color: $grey-heading;
   font-weight: bold;
+}
+
+h2.rsvp-section {
+  margin: 1em 0;
+  font-size: 1.8em;
+  color: $grey-heading;
+  padding-bottom: 5px;
+  border-bottom: 1px solid lightgrey;
+}
+
+h2.midpage {
+  margin-top: 3em;
+}
+
+label {
+  margin-top: 5px;
 }
 
 #invitation-error {
@@ -32,6 +48,19 @@ h1 {
   }
   #message {
     margin-top: 0;
+  }
+}
+
+#yes-form {
+  .date-picker {
+    overflow: hidden;
+
+    label {
+      font-size: 1.2em;
+    }
+  }
+  p {
+    color: $secondary-text-color;
   }
 }
 
