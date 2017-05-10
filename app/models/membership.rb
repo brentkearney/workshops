@@ -24,6 +24,7 @@ class Membership < ActiveRecord::Base
   validate :default_attendance
   validate :check_max_participants
   validate :arrival_and_departure_dates
+  validate :guest_disclamer_acknowledgement
 
   ROLES = ['Contact Organizer', 'Organizer', 'Participant', 'Observer', 'Backup Participant']
   ATTENDANCE = ['Confirmed', 'Invited', 'Undecided', 'Not Yet Invited', 'Declined']
@@ -77,10 +78,10 @@ class Membership < ActiveRecord::Base
       end
     end
 
-    if errors.empty?
-      return false
-    else
-      return true
+    unless arrival_date.blank? || departure_date.blank?
+      if arrival_date.to_date > departure_date.to_date
+        errors.add(:arrival_date, "- one must arrive before departing!")
+      end
     end
   end
 
@@ -110,4 +111,9 @@ class Membership < ActiveRecord::Base
     LegacyConnector.new.update_member(self) if sync_remote
   end
 
+  def guest_disclamer_acknowledgement
+    if has_guest && !guest_disclaimer
+      errors.add(:guest_disclaimer, "must be acknowledged if bringing a guest.")
+    end
+  end
 end

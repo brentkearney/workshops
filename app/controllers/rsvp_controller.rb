@@ -19,6 +19,15 @@ class RsvpController < ApplicationController
   def yes
     @rsvp = RsvpForm.new(@invitation)
     @years = 1930..Date.current.year
+
+    if request.post?
+      if @rsvp.validate_form(yes_params)
+        @invitation.organizer_message = message_params['organizer_message']
+        @invitation.accept!
+        membership = @invitation.membership
+        redirect_to rsvp_feedback_path(membership.id), success: @update_message
+      end
+    end
   end
 
   # GET /rsvp/no/:otp
@@ -84,5 +93,18 @@ class RsvpController < ApplicationController
 
   def feedback_params
     params.permit(:membership_id, :feedback_message)
+  end
+
+  def yes_params
+    params.require(:rsvp).permit(:organizer_message,
+      membership: [:arrival_date, :departure_date,
+        :own_accommodation, :has_guest, :guest_disclaimer, :special_info,
+        :share_email],
+      person: [:salutation, :firstname, :lastname, :gender,
+        :affiliation, :department, :title, :academic_status, :phd_year, :email,
+        :url, :phone, :address1, :address2, :address3, :city, :region,
+        :postal_code, :country, :emergency_contact, :emergency_phone,
+        :biography, :research_areas]
+    )
   end
 end

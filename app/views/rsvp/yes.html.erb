@@ -6,16 +6,94 @@
         <span class="panel-title"><h4>Invitation RSVP</h4></span>
       </div>
       <div class="panel-body">
-        <h1>We're happy that you can make it! 🎉<br />
-        <small>Please update our records, to help us book your attendance:</small></h1>
+        <h1>We're happy that you can attend! 🎉<br />
+        <small>Please share your plans, and click the button at the bottom:</small></h1>
         <%= form_for @rsvp, as: :rsvp,
            url: rsvp_yes_path(@rsvp.invitation.code), method: :post,
           html: { role: 'form', class: 'form' } do |rsvp| %>
         <fieldset>
+
+        <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
+        <%= m.hidden_field :min_date, id: 'min_date', value: @rsvp.event.start_date %>
+        <%= m.hidden_field :max_date, id: 'max_date', value: @rsvp.event.end_date %>
         <div class="row">
           <div class="col-md-12">
-            <h2 class="rsvp-section">Personal Information</h2>
-            <%= rsvp.fields_for :person, @rsvp.person do |p| %>
+            <h2 class="rsvp-section">Arrival & Departure Dates
+            <small>Event dates: <%= @rsvp.event.dates('long') %></small></h2>
+            <p><%= @rsvp.arrival_departure_intro %></p>
+            <div class="form-group date-picker text-center">
+              <div class="col-md-6">
+                <%= m.label :arrival_date %>
+                <%= m.hidden_field :arrival_date, id: 'arrival_date' %>
+                <div id="arrival"></div>
+              </div>
+              <div class="col-md-6">
+                <%= m.label :departure_date %>
+                <%= m.hidden_field :departure_date, id: 'departure_date' %>
+                <div id="departure"></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12 form-inline text-center">
+                <div class="form-group">
+                  <%= m.check_box :own_accommodation, { class: "form-control checkbox" }, true %>
+                  <%= m.label :own_accommodation, 'I will book my own accommodation elsewhere' %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="rsvp-section midpage">Guests</h2>
+            <p><%= @rsvp.guests_intro %></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 form-inline">
+            <div class="form-group guest-options">
+              <table border="0" cellpadding="20" cellspacing="20" width="100%">
+              <tr><td width="5">
+              <%= m.check_box :has_guest, { class: "form-control checkbox" }, true %>
+              </td><td>
+              <%= m.label :has_guest, @rsvp.has_guest %>
+              </td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 form-inline">
+            <div class="form-group guest-options">
+              <table border="0" cellpadding="20" cellspacing="20" width="100%">
+              <tr><td width="5">
+              <%= m.check_box :guest_disclaimer, { class: "form-control checkbox" }, true %>
+              </td><td>
+              <%= m.label :guest_disclaimer, @rsvp.guest_disclaimer %>
+              </td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="rsvp-section midpage">Special Considerations</h2>
+            <p><%= @rsvp.special_intro %></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 form-group">
+          <%= m.text_area :special_info, size: "100x4", class: 'form-control', placeholder: 'Notes to staff' %>
+          </div>
+        </div>
+        <% end %>
+
+        <%= rsvp.fields_for :person, @rsvp.person do |p| %>
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="rsvp-section midpage">Personal Information</h2>
               <div class="form-group">
                 <%= p.label :salutation %>
                 <%= p.select :salutation, Setting.Site['salutations'], { include_blank: 'Please select' }, { class: 'form-control' } %>
@@ -55,6 +133,12 @@
               <div class="form-group">
                 <%= p.label :email, 'E-mail' %>
                 <%= p.text_field :email, class: 'form-control' %>
+                <div class="form-inline inline-checkbox">
+                  <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
+                    <%= m.check_box :share_email, { class: "form-control checkbox" }, true %>
+                    <p>Allow other members of this event to see your e-mail address</p>
+                  <% end %>
+                </div>
               </div>
               <div class="form-group">
                 <%= p.label :url, 'Website (URL)' %>
@@ -106,48 +190,27 @@
                 <%= p.label :research_areas %>
                 <%= p.text_field :research_areas, class: 'form-control', placeholder: 'An optional comma-separated list of your areas of research (tags)' %>
               </div>
-            <% end %>
           </div>
         </div>
+        <% end %>
 
         <div class="row">
           <div class="col-md-12">
-            <h2 class="rsvp-section midpage">Arrival & Departure Dates
-            <small>Event dates: <%= @rsvp.event.dates('long') %></small></h2>
-            <p>We provide free meals and acommodation during the event only. If you wish to stay longer, you will have to find your own accommodation and pay for your own meals during your extra days.</p>
-            <%= rsvp.fields_for :memberhsip, @rsvp.membership do |m| %>
-              <%= m.hidden_field :min_date, id: 'min_date', value: @rsvp.event.start_date %>
-              <%= m.hidden_field :max_date, id: 'max_date', value: @rsvp.event.end_date %>
-            <div class="form-group date-picker text-center">
-              <div class="col-md-6">
-                <%= m.label :arrival_date %>
-                <%= m.hidden_field :arrival_date, id: 'arrival_date' %>
-                <div id="arrival"></div>
-              </div>
-              <div class="col-md-6">
-                <%= m.label :departure_date %>
-                <%= m.hidden_field :departure_date, id: 'departure_date' %>
-                <div id="departure"></div>
-              </div>
-            </div>
-            <% end %>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-12">
-            <h2 class="rsvp-section midpage">Guests</h2>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-12">
-            <h2 class="rsvp-section midpage">Notes</h2>
+            <%= submit_tag('Send Reply', class: 'btn btn-success pull-right') %>
+            <span id="click-submit" class="pull-right">Click the button
+            to complete your RSVP ➜</span>
           </div>
         </div>
 
         </fieldset>
         <% end %>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="well">
+            <p><%= @rsvp.privacy_notice %></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

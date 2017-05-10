@@ -27,16 +27,27 @@ class Invitation < ActiveRecord::Base
     expires.strftime("%B %-d, %Y")
   end
 
+  def accept!
+    update_membership('Confirmed')
+    self.destroy
+  end
+
   def decline!
-    membership.attendance = 'Declined'
-    OrganizerMailer.rsvp_notice(self.membership, organizer_message).deliver_now
-    membership.sync_remote = true
-    membership.save
+    update_membership('Declined')
     self.destroy
   end
 
   def maybe!
-    membership.attendance = 'Undecided'
+    update_membership('Undecided')
+  end
+
+  private
+
+  def update_membership(status)
+    membership.attendance = status
+    membership.updated_by = membership.person.name
+    membership.replied_at = Time.now
+
     OrganizerMailer.rsvp_notice(self.membership, organizer_message).deliver_now
     membership.sync_remote = true
     membership.save

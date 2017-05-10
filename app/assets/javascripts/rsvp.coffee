@@ -21,3 +21,9 @@ $(document).on 'turbolinks:load', ->
     maxDate: $('#max_date').val(),
     defaultDate: departure_date
   })
+
+  $('#arrival').on 'dp.change', (e) =>
+    $('#arrival_date').val(e.date.format('YYYY-MM-DD'));
+
+  $('#departure').on 'dp.change', (e) =>
+    $('#departure_date').val(e.date.format('YYYY-MM-DD'));

@@ -52,15 +52,47 @@ label {
 }
 
 #yes-form {
+  label {
+    font-size: 1.2em;
+    display: inline;
+    color: $secondary-text-color;
+    max-width: 80%;
+  }
+
   .date-picker {
     overflow: hidden;
-
     label {
       font-size: 1.2em;
+      text-decoration: underline;
     }
   }
   p {
     color: $secondary-text-color;
+  }
+  .checkbox {
+    margin: 10px;
+  }
+  .inline-checkbox {
+    margin-left: 10px;
+    p {
+      font-size: 1.2em;
+      display: inline;
+      color: $secondary-text-color;
+      margin-top: 10px;
+    }
+    .checkbox {
+      margin-bottom: 12px;
+      display: inline;
+    }
+  }
+  .guest-options {
+    .field_with_errors {
+      background-color: #e9d5d5;
+    }
+    display: inline;
+    td {
+      padding-left: 8px;
+    }
   }
 }
 
@@ -72,6 +104,10 @@ label {
 
 .btn {
   margin-top: 10px;
+}
+
+.well {
+  margin: 70px 20px 20px 20px;
 }
 
 #click-submit {

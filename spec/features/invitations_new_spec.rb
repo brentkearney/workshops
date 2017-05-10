@@ -28,6 +28,10 @@ describe 'Invitation#new', type: :feature do
     expect(page.body).to have_field('invitation[email]')
   end
 
+  it "won't send invitations within a month of the event" do
+
+  end
+
   context 'validates email' do
     before :each do
       find('#invitation_event').find(:xpath, 'option[2]').select_option
@@ -140,6 +144,5 @@ describe 'Invitation#new', type: :feature do
       expect(page.body).to have_css('div.alert',
           text: 'A new invitation has been e-mailed to you')
     end
-
   end
 end

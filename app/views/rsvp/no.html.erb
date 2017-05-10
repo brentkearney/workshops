@@ -12,9 +12,10 @@
           <div class="col-md-12">
               <h1>One more step:</h1>
               <p class="lead">The event organizer
-              (<%= @organizer %>) will be notified that you will not be
-              attending, as soon as you click the Submit button below. Would
-              you like to add something to the message?</p>
+              (<%= @organizer %>) will be notified that you will
+              <strong>not</strong> be attending, as soon as you click the
+              "Send Reply" button below. Would you like to add something to
+              the message?</p>
           </div>
         </div>
         <div class="row">
@@ -22,14 +23,14 @@
               <%= text_area_tag('organizer_message', "", size: "100x4",
                   class: 'form-control',
                   placeholder:
-                        "Optional: enter a message to the organizer here.") %>
+                        "Optional: enter a message for the organizer here.") %>
            </div>
          </div>
         <div class="row">
            <div class='col-md-12'>
 
-            <%= submit_tag('Submit', class: 'btn btn-danger pull-right') %>
-            <span id="click-submit" class="pull-right">Click the Submit button
+            <%= submit_tag('Send Reply', class: 'btn btn-danger pull-right') %>
+            <span id="click-submit" class="pull-right">Click the button
             to complete your RSVP ➜</span>
           </div>
         </div>
