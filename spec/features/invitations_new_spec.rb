@@ -28,9 +28,7 @@ describe 'Invitation#new', type: :feature do
     expect(page.body).to have_field('invitation[email]')
   end
 
-  it "won't send invitations within a month of the event" do
-
-  end
+  it "doesn't list events for whose new invitations would be expired"
 
   context 'validates email' do
     before :each do

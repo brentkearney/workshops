@@ -11,8 +11,8 @@
         <div class="row">
           <div class="col-md-12">
               <h1>One more step:</h1>
-              <p class="lead">The event organizer
-              (<%= @organizer %>) will be notified that you will
+              <p class="lead">The Contact Organizer for the event,
+              <%= @organizer %>, will notified that you will
               <strong>not</strong> be attending, as soon as you click the
               "Send Reply" button below. Would you like to add something to
               the message?</p>
@@ -29,7 +29,7 @@
         <div class="row">
            <div class='col-md-12'>
 
-            <%= submit_tag('Send Reply', class: 'btn btn-danger pull-right') %>
+            <%= submit_tag('Decline Attendance', class: 'btn btn-danger pull-right') %>
             <span id="click-submit" class="pull-right">Click the button
             to complete your RSVP ➜</span>
           </div>

@@ -13,20 +13,20 @@
               <p class="lead text-center">Thanks! Please let us know by
               <%= @invitation.expire_date %>.</p>
               <h1>One more step:</h1>
-              <p>The event organizer (<%= @organizer %>) will be notified that
-              you <strong>might</strong> be attending, as soon as you click the
-              "Send Reply" button. Would you like to add something to the
-              message?</p>
+              <p>The Contact Organizer for the event, <%= @organizer %>, will
+              be notified that you <strong>might</strong> be attending, as soon
+              as you click the "Send Reply" button. Would you like to add
+              something to the message?</p>
           </div>
         </div>
         <div class="row">
           <div class='col-md-12 text-center'>
-              <%= text_area_tag('organizer_message', "", size: "100x4",
-                  class: 'form-control',
-                  placeholder:
-                        "Optional: enter a message for the organizer here.") %>
-           </div>
-         </div>
+            <%= text_area_tag('organizer_message', "", size: "100x4",
+                class: 'form-control',
+                placeholder:
+                      "Optional: enter a message for the organizer here.") %>
+          </div>
+        </div>
         <div class="row">
            <div class='col-md-12'>
             <%= submit_tag('Send Reply', class: 'btn btn-warning pull-right') %>
@@ -35,7 +35,7 @@
           </div>
         </div>
         <% end %>
-      </div>
-    </div>
-  </div>
-</div>
+      </div><!-- panel-body -->
+    </div><!-- panel maybe-form -->
+  </div><!-- col-md-8 -->
+</div><!-- container -->

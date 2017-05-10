@@ -1,6 +1,6 @@
 class RsvpForm < ComplexForms
   # For views/rsvp/index.html.erb
-  attr_accessor :membership, :person, :event, :invitation
+  attr_accessor :membership, :person, :event, :invitation, :organizer_message
 
   def initialize(invitation)
     @invitation = invitation
@@ -53,12 +53,5 @@ class RsvpForm < ComplexForms
   def privacy_notice
     default = "We promise not to share your information with anyone."
     (Setting.RSVP["#{@event.location}"]['privacy_notice'] || default).html_safe
-  end
-
-
-  private
-
-  def must_acknowledge_guest_disclaimer
-
   end
 end

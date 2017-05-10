@@ -97,7 +97,7 @@ describe 'Settings page', type: :feature do
       visit settings_path
 
       Setting.get_all.keys.each do |tab|
-        expect(page).to have_link(tab)
+        expect(page).to have_link(tab.titleize)
       end
     end
 

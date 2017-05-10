@@ -27,17 +27,17 @@ class Invitation < ActiveRecord::Base
     expires.strftime("%B %-d, %Y")
   end
 
-  def accept!
+  def accept
     update_membership('Confirmed')
     self.destroy
   end
 
-  def decline!
+  def decline
     update_membership('Declined')
     self.destroy
   end
 
-  def maybe!
+  def maybe
     update_membership('Undecided')
   end
 

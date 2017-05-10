@@ -196,7 +196,25 @@
 
         <div class="row">
           <div class="col-md-12">
-            <%= submit_tag('Send Reply', class: 'btn btn-success pull-right') %>
+            <h2 class="rsvp-section midpage">Note to the Contact Organizer</h2>
+            <p>The Contact Organizer for the event, <%= @organizer %>, will be
+              notified that you plan to attend, as soon as you click the
+              "Confirm Attendance" button. Would you like to add something to
+              the message?</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 form-group">
+          <%= text_area_tag('organizer_message', "", size: "100x4",
+                class: 'form-control',
+                placeholder:
+                "Optional: enter a message for the organizer here.") %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <%= submit_tag('Confirm Attendance', class: 'btn btn-success pull-right') %>
             <span id="click-submit" class="pull-right">Click the button
             to complete your RSVP ➜</span>
           </div>

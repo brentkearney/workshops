@@ -130,16 +130,4 @@ RSpec.describe 'Model validations: Membership', type: :model do
 
     expect(ActionMailer::Base.deliveries.count).not_to be_zero
   end
-
-  it 'notifies event organizer if attendance changes' do
-    @membership.attendance = 'Invited'
-    @membership.save
-    ActionMailer::Base.deliveries = []
-
-    @membership.attendance = 'Declined'
-    @membership.save
-
-    expect(ActionMailer::Base.deliveries.count).not_to be_zero
-    expect(ActionMailer::Base.deliveries.first.to).to include(@organizer.email)
-  end
 end

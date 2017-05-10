@@ -6,6 +6,7 @@
 
 class RsvpController < ApplicationController
   before_filter :get_invitation, except: [:feedback]
+  before_filter :set_organizer_name, only: [:yes, :no, :maybe]
 
   @update_message = 'Your attendance status was successfully updated.
     Thanks for your reply!'
@@ -20,41 +21,21 @@ class RsvpController < ApplicationController
     @rsvp = RsvpForm.new(@invitation)
     @years = 1930..Date.current.year
 
-    if request.post?
-      if @rsvp.validate_form(yes_params)
-        @invitation.organizer_message = message_params['organizer_message']
-        @invitation.accept!
-        membership = @invitation.membership
-        redirect_to rsvp_feedback_path(membership.id), success: @update_message
-      end
+    if request.post? && @rsvp.validate_form(yes_params)
+      update_and_redirect(rsvp: :accept)
     end
   end
 
   # GET /rsvp/no/:otp
   # POST /rsvp/no/:otp
   def no
-    if request.post?
-      @invitation.organizer_message = message_params['organizer_message']
-      membership = @invitation.membership
-      @invitation.decline!
-      redirect_to rsvp_feedback_path(membership.id), success: @update_message
-    else
-      @organizer = @invitation.membership.event.organizer.name
-    end
+    update_and_redirect(rsvp: :decline) if request.post?
   end
 
   # GET /rsvp/maybe/:otp
   # POST /rsvp/maybe/:otp
   def maybe
-    if request.post?
-      @invitation.organizer_message = message_params['organizer_message']
-      membership = @invitation.membership
-      @invitation.maybe!
-
-      redirect_to rsvp_feedback_path(membership.id), success: @update_message
-    else
-      @organizer = @invitation.membership.event.organizer.name
-    end
+    update_and_redirect(rsvp: :maybe) if request.post?
   end
 
   # GET /rsvp/feedback
@@ -75,12 +56,23 @@ class RsvpController < ApplicationController
 
   private
 
+  def update_and_redirect(rsvp:)
+    @invitation.organizer_message = message_params['organizer_message']
+    membership = @invitation.membership
+    @invitation.send(rsvp)
+    redirect_to rsvp_feedback_path(membership.id), success: @update_message
+  end
+
   def get_invitation
     if params[:otp].blank?
       redirect_to invitations_new_path
     else
       @invitation = InvitationChecker.new(otp_params).invitation
     end
+  end
+
+  def set_organizer_name
+    @organizer = @invitation.membership.event.organizer.name
   end
 
   def otp_params
@@ -96,7 +88,7 @@ class RsvpController < ApplicationController
   end
 
   def yes_params
-    params.require(:rsvp).permit(:organizer_message,
+    params.require(:rsvp).permit(
       membership: [:arrival_date, :departure_date,
         :own_accommodation, :has_guest, :guest_disclaimer, :special_info,
         :share_email],

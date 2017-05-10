@@ -72,3 +72,17 @@ if Setting.find_by(var: 'Rooms').blank?
   }
   # rewrite_cache('Rooms', Setting.Rooms)
 end
+
+if Setting.find_by(var: 'RSVP').blank?
+  Setting.RSVP = {
+    'EO' => {
+      'arrival_departure_intro' => "If you plan to arrive after the event starts, or to leave before it ends, please indicate when by clicking the days on the calendars below. If you plan to book your own accommodation instead, please check the box below the calendars.",
+      'guests_intro' => "If you wish to bring a guest, please select the checkbox below.",
+      'has_guest' => "I plan to bring a guest with me.",
+      'guest_disclaimer' => "I am aware that I may have to pay extra for my guest's accommodation.",
+      'special_intro' => "Please let us know if you have any special dietary or other needs.",
+      'privacy_notice' => "We promise not to share your information with anyone."
+    }
+  }
+  # rewrite_cache('Locations', Setting.Locations)
+end
