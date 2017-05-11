@@ -32,6 +32,7 @@ group :development, :test do
   gem 'spring'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
+  gem 'capistrano-rails', '~> 1.1'
 end
 
 group :test do

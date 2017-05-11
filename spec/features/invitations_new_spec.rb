@@ -9,6 +9,7 @@ require 'rails_helper'
 describe 'Invitation#new', type: :feature do
   before do
     create(:event, past: true)
+    @current_event = create(:event, current: true)
     3.times { create(:event, future: true) }
   end
 
@@ -17,18 +18,20 @@ describe 'Invitation#new', type: :feature do
   end
 
   it 'has a SELECT menu of future events' do
-    future_events = Event.future.map(&:code)
+    future_events = Event.future.map(&:code) - [@current_event.code]
     past_events = Event.past.map(&:code)
 
     expect(page.body).to have_select('invitation[event]', with_options: future_events)
     expect(page.body).not_to have_select('invitation[event]', with_options: past_events)
   end
 
+  it 'excludes events for whose expiry dates will already have passed' do
+    expect(page.body).not_to have_select('invitation[event]', with_options: [@current_event.code])
+  end
+
   it 'has an email field' do
     expect(page.body).to have_field('invitation[email]')
   end
-
-  it "doesn't list events for whose new invitations would be expired"
 
   context 'validates email' do
     before :each do

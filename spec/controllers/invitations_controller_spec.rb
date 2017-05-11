@@ -34,7 +34,8 @@ RSpec.describe InvitationsController, type: :controller do
     end
 
     it 'assigns future events to @events' do
-      expect(assigns(:events)).to include(@current, @future)
+      expect(assigns(:events)).to include(@future)
+      expect(assigns(:events)).not_to include(@current)
       expect(assigns(:events)).not_to include(@past)
     end
 
@@ -46,17 +47,75 @@ RSpec.describe InvitationsController, type: :controller do
   describe 'POST #create' do
     before do
       @event = create(:event, future: true)
+      @membership = create(:membership, event: @event, attendance: 'Invited')
+      @form_params = {'invitation': {
+          'event': @event.code,
+          'email': @membership.person.email
+      }}
     end
 
-    it 'assigns @invitation using params'
-    it 'validates params'
+    it 'assigns @invitation using params' do
+      post :create, @form_params
+      expect(assigns(:invitation)).to be_a(InvitationForm)
+    end
+
     context 'valid params' do
-      it 'sends invitation'
+      before do
+        post :create, @form_params
+      end
+
+      it 'redirects to invitations_new_path' do
+        expect(response).to redirect_to(invitations_new_path)
+      end
+
+      it 'assigns success message' do
+        expect(flash[:success]).to be_present
+      end
+
+      it 'does not assign @events' do
+        expect(assigns(:events)).to be_falsey
+      end
+
+      it 'does not add errors to @invitation' do
+        expect(assigns(:invitation).errors).to be_empty
+      end
+
+      it 'sends invitation' do
+        invitation = spy('invitation')
+        allow(Invitation).to receive(:new).and_return(invitation)
+
+        post :create, @form_params
+
+        expect(invitation).to have_received(:send_invite)
+      end
     end
 
     context 'invalid params' do
-      it 'assigns @events'
-      it 'renders :new'
+      before do
+        @form_params = {'invitation': {'event': 'foo', 'email': 'bar'}}
+        post :create, @form_params
+      end
+
+      it 'assigns @events' do
+        expect(assigns(:events)).not_to be_empty
+      end
+
+      it 'renders :new template' do
+        expect(response).to render_template(:new)
+      end
+
+      it 'adds errors to @invitation' do
+        expect(assigns(:invitation).errors).not_to be_empty
+      end
+
+      it 'does not send invitation' do
+        invitation = spy('invitation')
+        allow(Invitation).to receive(:new).and_return(invitation)
+
+        post :create, @form_params
+
+        expect(invitation).not_to have_received(:send_invite)
+      end
     end
   end
 end

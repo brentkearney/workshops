@@ -11,7 +11,7 @@ class InvitationsController < ApplicationController
   end
 
   def new
-    @events = Event.future
+    @events = future_events
     @invitation = InvitationForm.new
   end
 
@@ -23,7 +23,7 @@ class InvitationsController < ApplicationController
       redirect_to invitations_new_path,
         success: 'A new invitation has been e-mailed to you!'
     else
-      @events = Event.future
+      @events = future_events
       render :new
     end
   end
@@ -33,6 +33,14 @@ class InvitationsController < ApplicationController
   def send_invitation(member)
     Invitation.new(membership: member,
                    invited_by: member.person.name).send_invite
+  end
+
+  def future_events
+    Event.where("start_date >= ?", expires_before)
+  end
+
+  def expires_before
+    Date.today + Invitation::EXPIRES_BEFORE
   end
 
   def invitation_params

@@ -314,8 +314,9 @@ describe 'RSVP', type: :feature do
         expect(current_path).to eq(rsvp_feedback_path(@membership.id))
       end
 
-      it 'links to brochure'
-      it 'emails participant'
+      it 'links to information brochure?'
+
+      it 'sends confirmation email to participant'
 
       it 'updates legacy database' do
         lc = spy('lc')
