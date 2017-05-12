@@ -98,6 +98,7 @@
   <% else %>
       <div class="row buttons">
         <div class="form-group">
+          <%= link_to 'Event Members', event_memberships_path(@event), class: 'btn btn-sm btn-default' %>
           <%= link_to 'Event Schedule', event_schedule_index_path(@event), class: 'btn btn-sm btn-default' %>
         </div>
       </div>

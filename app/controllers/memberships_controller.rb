@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class MembershipsController < ApplicationController
-  before_filter :authenticate_user!
+  before_filter :authenticate_user!, except: [:index, :show]
   before_action :set_event
   before_action :set_membership, only: [:show, :edit, :update, :destroy, :invite]
 
@@ -13,6 +13,7 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships.json
   def index
     @memberships = SortedMembers.new(@event).memberships
+    authorize(Membership.new)
     @current_user = current_user
 
     # For the "Email Organizers/Participants" buttons
@@ -31,6 +32,7 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships/1
   # GET /events/:event_id/memberships/1.json
   def show
+    authorize @membership
   end
 
   # GET /events/:event_id/memberships/new

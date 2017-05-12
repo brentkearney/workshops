@@ -15,6 +15,9 @@ class MembershipPolicy
 
   # Membership modification is not yet implemented
   def method_missing(name, *args)
+    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
+    Rails.logger.debug "MembershipPolicy method_missing called for: #{name}, with args: #{args}\n"
+    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
     false
   end
 
@@ -31,15 +34,27 @@ class MembershipPolicy
     end
   end
 
+  def index?
+    true
+  end
+
+  def show?
+    true
+  end
+
   def use_email_address?
-    @current_user.is_organizer?(@event) || @current_user.is_admin? ||
+    if @current_user
+      @current_user.is_organizer?(@event) || @current_user.is_admin? ||
         (@current_user.staff? && @current_user.location == @event.location) ||
         (@current_user.is_member?(@event) && @membership.share_email)
+    end
   end
 
   def view_details?
-    @current_user.is_organizer?(@event) || @current_user.is_admin? ||
+    if @current_user
+      @current_user.is_organizer?(@event) || @current_user.is_admin? ||
         (@current_user.staff? && @current_user.location == @event.location)
+    end
   end
 
   def invite?

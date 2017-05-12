@@ -32,7 +32,6 @@ group :development, :test do
   gem 'spring'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
-  gem 'capistrano-rails', '~> 1.1'
 end
 
 group :test do
@@ -55,4 +54,5 @@ group :development do
   gem 'pronto-reek'
   gem 'pronto-brakeman'
   gem 'pronto-poper'
+  gem 'capistrano-rails', '~> 1.1'
 end

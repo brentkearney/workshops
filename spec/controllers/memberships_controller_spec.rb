@@ -9,19 +9,30 @@ require 'rails_helper'
 RSpec.describe MembershipsController, type: :controller do
 
   context 'As an unauthenticated user' do
-    describe '#index' do
-      it 'responds with redirect to sign_in page' do
-        get :index, { event_id: 1 }
+    before do
+      @event = create(:event)
+      @membership = create(:membership, event: @event, role: 'Confirmed')
+    end
 
-        expect(response).to redirect_to(new_user_session_path)
+    describe '#index' do
+      it 'responds with success code' do
+        get :index, { event_id: @event.id }
+
+        expect(response).to be_success
+      end
+
+      it 'assigns @memberships to event members' do
+        get :index, { event_id: @event.id }
+
+        expect(assigns(:memberships)).to eq({"Confirmed" => [@membership]})
       end
     end
 
     describe '#show' do
-      it 'responds with redirect to sign_in page' do
-        get :show, { event_id: 1, id: 1 }
+      it 'assigns @membership' do
+        get :show, { event_id: @event.id, id: @membership.id }
 
-        expect(response).to redirect_to(new_user_session_path)
+        expect(assigns(:membership)).to eq(@membership)
       end
     end
 
@@ -66,9 +77,7 @@ RSpec.describe MembershipsController, type: :controller do
         expect(response).to redirect_to(new_user_session_path)
       end
     end
-
   end
-
 
   context 'As an authenticated user' do
     before do
@@ -139,9 +148,7 @@ RSpec.describe MembershipsController, type: :controller do
       end
     end
 
-
     context 'with a valid event id' do
-
       before do
         @event = create(:event)
       end
@@ -149,7 +156,6 @@ RSpec.describe MembershipsController, type: :controller do
       after :each do
         @event.memberships.destroy_all
       end
-
 
       describe '#index' do
         it 'responds with success code' do

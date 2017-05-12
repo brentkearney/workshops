@@ -60,7 +60,7 @@ class EventPolicy
         []
     end
   end
-  
+
   def show?
     if event.template
       allow_staff_and_admins
@@ -89,7 +89,9 @@ class EventPolicy
 
   # Allow the use of emails when they are not shared by the member
   def use_email_addresses?
-    current_user.is_organizer?(event) || allow_staff_and_admins
+    if current_user
+      current_user.is_organizer?(event) || allow_staff_and_admins
+    end
   end
 
   def show_invite_buttons?
@@ -111,7 +113,7 @@ class EventPolicy
   end
 
   private
-  
+
   def staff_at_location
     current_user.staff? && current_user.location == event.location
   end

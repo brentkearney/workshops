@@ -85,7 +85,9 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'does not show member email addresses' do
-      does_not_list_members
+      @event.memberships.each do |member|
+        expect(page.body).not_to include(member.person.email)
+      end
     end
 
     it 'hides email buttons' do
