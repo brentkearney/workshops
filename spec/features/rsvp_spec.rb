@@ -239,10 +239,15 @@ describe 'RSVP', type: :feature do
     it 'has arrival and departure date section' do
       expect(page).to have_text(@event.dates('long'))
       expect(page).to have_text(@rsvp.arrival_departure_intro)
+    end
 
+    it 'arrival & departure default to event start & end' do
       Capybara.ignore_hidden_elements = false
-      expect(page).to have_css('input#arrival_date')
-      expect(page).to have_css('input#departure_date')
+      arrival = page.find(:xpath, "//input[@id='arrival_date']").value
+      departure = page.find(:xpath, "//input[@id='departure_date']").value
+
+      expect(arrival).to eq(@event.start_date.strftime("%Y-%m-%d"))
+      expect(departure).to eq(@event.end_date.strftime("%Y-%m-%d"))
     end
 
     it 'has guests form' do
@@ -314,10 +319,6 @@ describe 'RSVP', type: :feature do
         expect(current_path).to eq(rsvp_feedback_path(@membership.id))
       end
 
-      it 'links to information brochure?'
-
-      it 'sends confirmation email to participant'
-
       it 'updates legacy database' do
         lc = spy('lc')
         allow(LegacyConnector).to receive(:new).and_return(lc)
@@ -328,6 +329,14 @@ describe 'RSVP', type: :feature do
 
         expect(lc).to have_received(:update_member).with(@membership)
       end
+
+      it 'links to information brochure?'
+      it 'sends confirmation email to participant'
     end
+  end
+
+  context 'Feedback Form' do
+    it 'sends feedback email if user enters feedback text'
+    it 'does not send email if no text is entered'
   end
 end

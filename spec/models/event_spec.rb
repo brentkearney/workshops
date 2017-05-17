@@ -26,7 +26,16 @@ RSpec.describe "Model validations: Event ", type: :model do
   end
 
   it "is invalid without an end date" do
-    expect(build(:event, end_date: nil)).not_to be_valid
+    event = build(:event)
+    event.end_date = nil
+    expect(event).not_to be_valid
+  end
+
+  it "is invalid if the start date is before the end date" do
+    event = build(:event)
+    event.start_date = event.end_date
+    event.end_date = event.end_date - 2.days
+    expect(event).not_to be_valid
   end
 
   it "is invalid without a location" do

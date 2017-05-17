@@ -56,12 +56,7 @@ class Membership < ActiveRecord::Base
   end
 
   def arrival_and_departure_dates
-    if self.event.blank?
-      errors.add(:event, "can't be blank")
-      return false
-    else
-      w = Event.find(self.event.id)
-    end
+    w = self.event
 
     unless arrival_date.blank?
       if arrival_date.to_date > w.end_date.to_date

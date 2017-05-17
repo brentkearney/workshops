@@ -16,12 +16,9 @@ if Setting.find_by(var: 'Site').blank?
     'application_email' => 'workshops@example.com',
     'webmaster_email' => 'webmaster@example.com',
     'sysadmin_email' => 'sysadmin@example.com',
-    'event_types' => ['5 Day Workshop', '2 Day Workshop', 'Research in Teams',
-                  'Focussed Research Group', 'Summer School', 'Public Lecture'],
+    'event_types' => ['5 Day Workshop', '2 Day Workshop', 'Research in Teams', 'Focussed Research Group', 'Summer School', 'Public Lecture'],
     'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
-    'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor',
-    'Ph.D. Student', 'Masters Student', 'Undergraduate Student',
-    'K-12 Teacher', 'K-12 Student', 'Other'],
+    'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor', 'Ph.D. Student', 'Masters Student', 'Undergraduate Student', 'K-12 Teacher', 'K-12 Student', 'Other'],
     'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.']
   }
   # rewrite_cache('Site', Setting.Site)
@@ -81,6 +78,7 @@ if Setting.find_by(var: 'RSVP').blank?
       'has_guest' => "I plan to bring a guest with me.",
       'guest_disclaimer' => "I am aware that I may have to pay extra for my guest's accommodation.",
       'special_intro' => "Please let us know if you have any special dietary or other needs.",
+      'personal_info_intro' => "",
       'privacy_notice' => "We promise not to share your information with anyone."
     }
   }

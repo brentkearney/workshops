@@ -36,7 +36,7 @@ class InvitationsController < ApplicationController
   end
 
   def future_events
-    Event.where("start_date >= ?", expires_before)
+    Event.where("start_date >= ?", expires_before).order(:start_date)
   end
 
   def expires_before

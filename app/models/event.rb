@@ -16,6 +16,7 @@ class Event < ActiveRecord::Base
             :time_zone, presence: true
   validates :short_name, presence: true, if: :has_long_name
   validates :event_type, presence: true, if: :check_event_type
+  validate :starts_before_ends
   validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.zones_map.keys
   unless Setting.Site.blank?
     validates :code, uniqueness: true, format: {
@@ -77,6 +78,12 @@ class Event < ActiveRecord::Base
 
   def self.years
     all.map {|e| e.start_date.year.to_s}.uniq.sort
+  end
+
+  def starts_before_ends
+    if (start_date && end_date) && (start_date > end_date)
+      errors.add(:start_date, "- event must begin before it ends")
+    end
   end
 
   private

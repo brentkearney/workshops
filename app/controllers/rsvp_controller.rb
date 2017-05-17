@@ -19,7 +19,8 @@ class RsvpController < ApplicationController
   # POST /rsvp/yes/:otp
   def yes
     @rsvp = RsvpForm.new(@invitation)
-    @years = 1930..Date.current.year
+    @years = (1930..Date.current.year).to_a #.reverse
+    set_default_dates
 
     if request.post? && @rsvp.validate_form(yes_params)
       update_and_redirect(rsvp: :accept)
@@ -45,7 +46,7 @@ class RsvpController < ApplicationController
       membership = Membership.find(feedback_params[:membership_id])
       message = feedback_params[:feedback_message]
       StaffMailer.site_feedback(section: 'RSVP', membership: membership,
-          message: message).deliver_now
+          message: message).deliver_now unless message.blank?
       redirect_to event_memberships_path(membership.event),
         success: 'Thanks for the feedback!'
     else
@@ -55,6 +56,12 @@ class RsvpController < ApplicationController
 
 
   private
+
+  def set_default_dates
+    m = @invitation.membership
+    m.arrival_date = m.event.start_date if m.arrival_date.blank?
+    m.departure_date = m.event.end_date if m.departure_date.blank?
+  end
 
   def update_and_redirect(rsvp:)
     @invitation.organizer_message = message_params['organizer_message']

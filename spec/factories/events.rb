@@ -14,7 +14,7 @@ FactoryGirl.define do
   sequence(:end_date, 1) do |n|
     n = 1 if n > 48
     date = Date.today.beginning_of_year.advance(weeks: 1)
-    date.advance(weeks: n, days: 5).beginning_of_week(:friday)
+    date.advance(weeks: n, days: 5) #.beginning_of_week(:friday)
   end
 
   factory :event do |f|
@@ -44,20 +44,18 @@ FactoryGirl.define do
       if evaluator.past
         date = date.prev_year
         event.start_date = date.prev_week(:sunday)
-        event.end_date = date.prev_week(:friday)
       elsif evaluator.future
         date = date.next_year
         event.start_date = date.next_week(:sunday)
-        event.end_date = date.next_week(:friday)
       elsif evaluator.current
         if date.strftime("%A") =~ /[Friday|Saturday|Sunday]/
           event.start_date = date.beginning_of_week(:friday)
-          event.end_date = date.end_of_week(:sunday)
         else
           event.start_date = date.beginning_of_week(:sunday)
-          event.end_date = date.beginning_of_week(:friday)
         end
       end
+      event.end_date = event.start_date + 5.days unless event.start_date.nil?
+
       if event.start_date
         event.code.gsub!(/^\d{2}/, event.start_date.strftime('%y'))
       end
