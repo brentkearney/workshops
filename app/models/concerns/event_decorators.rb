@@ -59,26 +59,26 @@ module EventDecorators
     person_profile
   end
 
-  def dates(format = 'short')
-    start = Date.parse(start_date.to_s)
-    finish = Date.parse(end_date.to_s)
+  def dates(format = :short)
+    start = Date.parse(start_date)
+    finish = Date.parse(end_date)
 
-    if format == 'long'
+    if format == :long
       ld = start.strftime("%B %-d")
     else
       ld = start.strftime("%b %-d")
     end
 
-    ld += " - "
+    ld += " to "
 
     if start.mon == finish.mon
-      if format == 'long'
+      if format == :long
         ld += finish.strftime("%-d, %Y")
       else
         ld += finish.strftime("%-d")
       end
     else
-      if format == 'long'
+      if format == :long
         ld += finish.strftime("%B %-d, %Y")
       else
         ld += finish.strftime("%b %-d")
@@ -96,6 +96,14 @@ module EventDecorators
 
   def date
     start_date.strftime("%Y-%m-%d")
+  end
+
+  def address
+    if Setting.Locations && Setting.Locations[self.location]
+      Setting.Locations[self.location]['Address']
+    else
+      ''
+    end
   end
 
   def country

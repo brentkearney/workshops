@@ -43,6 +43,8 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.1)
       public_suffix (~> 2.0, >= 2.0.2)
+    airbrussh (1.2.0)
+      sshkit (>= 1.6.1, != 1.7.0)
     arel (6.0.4)
     ast (2.3.0)
     autoprefixer-rails (6.7.7.2)
@@ -61,6 +63,17 @@ GEM
     brakeman (3.6.1)
     builder (3.2.3)
     byebug (9.0.6)
+    capistrano (3.8.1)
+      airbrussh (>= 1.0.0)
+      i18n
+      rake (>= 10.0.0)
+      sshkit (>= 1.9.0)
+    capistrano-bundler (1.2.0)
+      capistrano (~> 3.1)
+      sshkit (~> 1.2)
+    capistrano-rails (1.2.3)
+      capistrano (~> 3.1)
+      capistrano-bundler (~> 1.1)
     capybara (2.14.0)
       addressable
       mime-types (>= 1.16)
@@ -158,6 +171,9 @@ GEM
     multi_json (1.12.1)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
+    net-scp (1.2.1)
+      net-ssh (>= 2.6.5)
+    net-ssh (4.1.0)
     netrc (0.11.0)
     newrelic_rpm (4.1.0.333)
     nokogiri (1.7.1)
@@ -236,6 +252,10 @@ GEM
     rainbow (2.2.2)
       rake
     rake (12.0.0)
+    rbnacl (4.0.2)
+      ffi
+    rbnacl-libsodium (1.0.11)
+      rbnacl (>= 3.0.1)
     rdoc (4.3.0)
     reek (4.6.2)
       codeclimate-engine-rb (~> 0.4.0)
@@ -306,6 +326,9 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
+    sshkit (1.13.1)
+      net-scp (>= 1.1.2)
+      net-ssh (>= 2.8.0)
     sucker_punch (2.0.2)
       concurrent-ruby (~> 1.0.0)
     terminal-table (1.7.1)
@@ -349,6 +372,7 @@ DEPENDENCIES
   bootstrap-sass
   bootstrap3-datetimepicker-rails (~> 4.17.47)
   byebug
+  capistrano-rails (~> 1.1)
   capybara
   coffee-rails
   database_cleaner
@@ -376,6 +400,8 @@ DEPENDENCIES
   pundit
   rails (= 4.2.8)
   rails-settings-cached
+  rbnacl (< 5.0)
+  rbnacl-libsodium
   rest-client
   rollbar
   rspec-rails

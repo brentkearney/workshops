@@ -9,7 +9,7 @@
         <p class='lead text-center'>You have been invited to the
         <%= @invitation.membership.event.event_type %>,
         "<%= @invitation.membership.event.name %>", on
-        <%= @invitation.membership.event.dates('long') %>.
+        <%= @invitation.membership.event.dates(:long) %>.
         Will you be attending?</p>
     </div>
   </div>

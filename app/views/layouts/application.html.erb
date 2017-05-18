@@ -54,7 +54,7 @@
               <h3 class="page-header"><%= link_to @event.name, @event %></h3>
               <div class="page-header-subtitle">
                 <%= image_tag("flags/#{@event.country}.png", height: 22) %>
-                <h4><%= @event.dates('long') %></h4>
+                <h4><%= @event.dates(:long) %></h4>
               </div>
             </header>
         <% else %>

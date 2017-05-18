@@ -1,6 +1,9 @@
 Dear <%= @person.dear_name %>,
 
-Thank you for confirming that you will be in attendance at <%= @event.code %>, <%= @event.name %>, <%= @event.dates('long') %>. The registration database has been updated to reflect your attendance.
+Thank you for confirming that you will attend the BIRS Workshop:
+<%= @event.code %>, <%= @event.name %>
+on: <%= @event.dates(:long) %>
+at: <%= @event.address %>
 
 Accommodation at our residence building has been booked for you. Please check-in after 4pm on <%= @event.arrival_date %>. The workshop will begin the following morning and end on <%= @event.departure_date %>. Checkout is at noon.
 

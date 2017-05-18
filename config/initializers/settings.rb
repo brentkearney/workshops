@@ -46,7 +46,8 @@ if Setting.find_by(var: 'Locations').blank?
     'EO' => {
       'Name' => 'Example Organization',
       'Country' => 'Canada',
-      'Timezone' => 'Mountain Time (US & Canada)'
+      'Timezone' => 'Mountain Time (US & Canada)',
+      'Address' => "123 Example Street\nExampletown, Exampleton"
     }
   }
   # rewrite_cache('Locations', Setting.Locations)
@@ -84,3 +85,4 @@ if Setting.find_by(var: 'RSVP').blank?
   }
   # rewrite_cache('Locations', Setting.Locations)
 end
+

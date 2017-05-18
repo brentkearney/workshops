@@ -26,7 +26,7 @@ lib/tasks/birs.rake
 app/views/participant_mailer/rsvp/BIRS
 app/views/participant_mailer/rsvp/CMO
 
-# Docker files
+# Deployment files
 .dockerignore
 .env.db
 .env.web
@@ -37,6 +37,9 @@ entrypoint.sh
 Passengerfile.json
 nginx.conf.erb
 Gemfile.lock
+Capfile
+config/deploy.rb
+config/deploy/
 
 .idea
 app/views/memberships/old-new.html.erb

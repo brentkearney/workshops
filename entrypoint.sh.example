@@ -23,18 +23,9 @@ echo
 echo "Bundle install..."
 /usr/local/rvm/bin/rvm-exec 2.4.0 bundle install
 
-
-echo
-echo "Chowning..."
-chown -R app:app /usr/local/rvm/gems
-if [ ! -e /home/app/workshops/tmp ]; then
-  mkdir /home/app/workshops/tmp
-  mkdir -p /home/app/workshops/vendor/cache
-fi
-chown -R app:app /home/app/workshops
-
 echo
 echo "Running migrations..."
+rake db:migrate RAILS_ENV=production
 rake db:migrate RAILS_ENV=development
 rake db:migrate RAILS_ENV=test
 
@@ -45,6 +36,15 @@ if [ -e lib/tasks/birs.rake ]; then
 else
   rake ws:create_admins RAILS_ENV=development
 fi
+
+echo
+echo "Chowning..."
+chown -R app:app /usr/local/rvm/gems
+if [ ! -e /home/app/workshops/tmp ]; then
+  mkdir /home/app/workshops/tmp
+  mkdir -p /home/app/workshops/vendor/cache
+fi
+chown -R app:app /home/app/workshops
 
 # echo
 # echo "Compiling Assets..."
