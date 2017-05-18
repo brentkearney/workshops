@@ -8,9 +8,6 @@ class RsvpController < ApplicationController
   before_filter :get_invitation, except: [:feedback]
   before_filter :set_organizer_name, only: [:yes, :no, :maybe]
 
-  @update_message = 'Your attendance status was successfully updated.
-    Thanks for your reply!'
-
   # GET /rsvp/:otp
   def index
   end
@@ -67,7 +64,7 @@ class RsvpController < ApplicationController
     @invitation.organizer_message = message_params['organizer_message']
     membership = @invitation.membership
     @invitation.send(rsvp)
-    redirect_to rsvp_feedback_path(membership.id), success: @update_message
+    redirect_to rsvp_feedback_path(membership.id), success: 'Your attendance status was successfully updated. Thanks for your reply!'
   end
 
   def get_invitation

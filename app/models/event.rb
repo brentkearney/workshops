@@ -38,8 +38,10 @@ class Event < ActiveRecord::Base
     param =~ /\D/ ? find_by_code(param) : super
   end
 
-  scope :past, -> { where("end_date < ? AND template = ?", Time.now, false).order(:start_date) }
-  scope :future, -> { where("end_date >= ? AND template = ?", Time.now, false).order(:start_date) }
+  scope :past, -> { where("end_date < ? AND template = ?",
+    Date.current, false).order(:start_date) }
+  scope :future, -> { where("end_date >= ? AND template = ?",
+    Date.current, false).order(:start_date) }
   scope :year, ->(year) { where("start_date >= '?-01-01' AND end_date <= '?-12-31' AND template = ?", year.to_i, year.to_i, false) }
   scope :location, ->(location) { where("location = ? AND template = ?", location, false) }
 
@@ -89,9 +91,6 @@ class Event < ActiveRecord::Base
   private
 
   def clean_data
-    # remove leading & trailing whitespace
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }
-    true
   end
-
 end

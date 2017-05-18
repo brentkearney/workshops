@@ -7,14 +7,12 @@
 require 'rails_helper'
 
 RSpec.describe SyncEventMembersJob, type: :job do
-  include ActiveJob::TestHelper
-
-  let(:event) { create(:event, code: '12w5999') }
+  let(:event) { create(:event) }
   subject(:job) { SyncEventMembersJob.perform_later(event) }
 
   it 'queues the job' do
     expect { job }
-        .to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(1)
+      .to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(1)
   end
 
   it 'is in urgent queue' do
@@ -31,7 +29,8 @@ RSpec.describe SyncEventMembersJob, type: :job do
     allow(SyncMembers).to receive(:new).and_raise('NoResultsError')
 
     perform_enqueued_jobs do
-      expect_any_instance_of(SyncEventMembersJob).to receive(:retry_job).with(wait: 5.minutes, queue: :default)
+      expect_any_instance_of(SyncEventMembersJob)
+        .to receive(:retry_job).with(wait: 5.minutes, queue: :default)
       job
     end
   end
@@ -40,5 +39,4 @@ RSpec.describe SyncEventMembersJob, type: :job do
     clear_enqueued_jobs
     clear_performed_jobs
   end
-
 end

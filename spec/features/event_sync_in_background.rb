@@ -7,10 +7,10 @@
 require 'rails_helper'
 include ActiveJob::TestHelper
 
-describe 'Event Sync Happens in Background', :type => :feature do
+describe 'Event Sync Happens in Background', type: :feature do
   before do
     authenticate_user
-    @event = FactoryGirl.create(:event)
+    @event = create(:event)
   end
 
   it 'runs a background job to sync data when event page is accessed' do

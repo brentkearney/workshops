@@ -34,6 +34,7 @@ class Invitation < ActiveRecord::Base
 
   def accept
     update_membership('Confirmed')
+    SendParticipantConfirmationJob.perform_later(self.membership_id)
     self.destroy
   end
 

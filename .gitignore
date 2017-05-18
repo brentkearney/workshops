@@ -22,6 +22,10 @@ config/settings/*.yml
 config/newrelic.yml
 lib/tasks/birs.rake
 
+# organization-specific email templates
+app/views/participant_mailer/rsvp/BIRS
+app/views/participant_mailer/rsvp/CMO
+
 # Docker files
 .dockerignore
 .env.db

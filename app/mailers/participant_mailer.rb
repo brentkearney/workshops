@@ -18,11 +18,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-class ApplicationMailer < ActionMailer::Base
+class ParticipantMailer < ApplicationMailer
   app_email = Setting.Site['application_email'] unless Setting.Site.blank?
   if Setting.Site.blank? || app_email.nil?
     app_email = ENV['DEVISE_EMAIL']
   end
+
   default from: app_email
-  layout 'mailer'
+
+  def rsvp_confirmation(membership)
+    @person = membership.person
+    @event = membership.event
+
+    @organization = 'Staff'
+    unless Setting.Locations["#{membership.event.location}"].nil?
+      @organization = Setting.Locations["#{membership.event.location}"]['Name']
+    end
+
+    email = '"' + @person.name + '" <' + @person.email + '>'
+    subject = "[#{@event.code}] Thank you for accepting our invitation"
+    mail(to: email,
+         subject: subject,
+         template_path: "participant_mailer/rsvp/#{@event.location}",
+         template_name: @event.event_type,
+         'Importance': 'High', 'X-Priority': 1)
+  end
 end
