@@ -20,7 +20,7 @@
 
 class ParticipantMailer < ApplicationMailer
   @from_email = ENV['DEVISE_EMAIL']
-  default from: from_email
+  default from: @from_email
 
   def rsvp_confirmation(membership)
     @person = membership.person
