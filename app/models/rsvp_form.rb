@@ -50,6 +50,11 @@ class RsvpForm < ComplexForms
     (Setting.RSVP["#{@event.location}"]['special_intro'] || default).html_safe
   end
 
+  def personal_info_intro
+    default = ""
+    (Setting.RSVP["#{@event.location}"]['personal_info_intro'] || default).html_safe
+  end
+
   def privacy_notice
     default = "We promise not to share your information with anyone."
     (Setting.RSVP["#{@event.location}"]['privacy_notice'] || default).html_safe

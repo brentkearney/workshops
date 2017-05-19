@@ -19,16 +19,15 @@
 # SOFTWARE.
 
 class ParticipantMailer < ApplicationMailer
-  app_email = Setting.Site['application_email'] unless Setting.Site.blank?
-  if Setting.Site.blank? || app_email.nil?
-    app_email = ENV['DEVISE_EMAIL']
-  end
-
-  default from: app_email
+  @from_email = ENV['DEVISE_EMAIL']
+  default from: from_email
 
   def rsvp_confirmation(membership)
     @person = membership.person
     @event = membership.event
+    unless Setting.Emails.blank?
+      @from_email = Setting.Emails["#{@event.location}"]['rsvp']
+    end
 
     @organization = 'Staff'
     unless Setting.Locations["#{membership.event.location}"].nil?
@@ -38,6 +37,7 @@ class ParticipantMailer < ApplicationMailer
     email = '"' + @person.name + '" <' + @person.email + '>'
     subject = "[#{@event.code}] Thank you for accepting our invitation"
     mail(to: email,
+         from: @from_email,
          subject: subject,
          template_path: "participant_mailer/rsvp/#{@event.location}",
          template_name: @event.event_type,

@@ -34,10 +34,15 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12 form-inline text-center">
+              <div class="col-md-12 form-inline">
                 <div class="form-group">
+                  <table border="0" cellpadding="20" cellspacing="20" width="100%">
+                  <tr><td width="5">
                   <%= m.check_box :own_accommodation, { class: "form-control checkbox" }, true %>
+                  </td><td>
                   <%= m.label :own_accommodation, 'I will book my own accommodation elsewhere' %>
+                  </td></tr>
+                  </table>
                 </div>
               </div>
             </div>
@@ -85,7 +90,7 @@
         </div>
         <div class="row">
           <div class="col-md-12 form-group">
-          <%= m.text_area :special_info, size: "100x4", class: 'form-control', placeholder: 'Notes to staff' %>
+          <%= m.text_area :special_info, size: "100x4", class: "form-control", placeholder: 'Notes to staff' %>
           </div>
         </div>
         <% end %>
@@ -94,45 +99,46 @@
         <div class="row">
           <div class="col-md-12">
             <h2 class="rsvp-section midpage">Personal Information</h2>
+            <p><%= @rsvp.personal_info_intro %></p>
               <div class="form-group">
                 <%= p.label :salutation %>
-                <%= p.select :salutation, Setting.Site['salutations'], { include_blank: 'Please select' }, { class: 'form-control' } %>
+                <%= p.select :salutation, Setting.Site['salutations'], { include_blank: 'Please select' }, class: "form-control", autocomplete: "honorific-prefix" %>
               </div>
               <div class="form-group">
                 <%= p.label :firstname %>
-                <%= p.text_field :firstname, class: 'form-control', placeholder: 'Your given name' %>
+                <%= p.text_field :firstname, class: "form-control", placeholder: 'Your given name', autocomplete: "given-name" %>
               </div>
               <div class="form-group">
                 <%= p.label :lastname %>
-                <%= p.text_field :lastname, class: 'form-control', placeholder: 'Your family name' %>
+                <%= p.text_field :lastname, class: "form-control", placeholder: 'Your family name', autocomplete: "family-name" %>
               </div>
               <div class="form-group">
-                <%= p.label :gender %> (Male, Female, Other) - some rooms have shared bathrooms
-                <%= p.select :gender, ['M','F','O'], { include_blank: 'Please select' }, { class: 'form-control' } %>
+                <%= p.label :gender %>
+                <%= p.select :gender, ['M','F','O'], { include_blank: 'Please select' }, class: "form-control", autocomplete: "sex" %>
               </div>
               <div class="form-group">
                 <%= p.label :affiliation %>
-                <%= p.text_field :affiliation, class: 'form-control', placeholder: 'For whom do you work?' %>
+                <%= p.text_field :affiliation, class: "form-control", placeholder: 'For whom do you work?', autocomplete: "organization" %>
               </div>
               <div class="form-group">
                 <%= p.label :department %>
-                <%= p.text_field :department, class: 'form-control' %>
+                <%= p.text_field :department, class: "form-control" %>
               </div>
               <div class="form-group">
                 <%= p.label :title, 'Job Title' %>
-                <%= p.text_field :title, class: 'form-control' %>
+                <%= p.text_field :title, class: "form-control", autocomplete: "organization-title" %>
               </div>
               <div class="form-group">
                 <%= p.label :academic_status %>
-                <%= p.select :academic_status, Setting.Site['academic_status'], { include_blank: 'Please select' }, { class: 'form-control' } %>
+                <%= p.select :academic_status, Setting.Site['academic_status'], { include_blank: 'Please select' }, class: "form-control" %>
               </div>
               <div class="form-group">
                 <%= p.label :phd_year, 'Year of first Ph.D.' %>
-                <%= p.select :phd_year, @years, { include_blank: 'Please select if applicable' }, class: 'form-control' %>
+                <%= p.select :phd_year, @years, { include_blank: 'Please select if applicable' }, class: "form-control" %>
               </div>
               <div class="form-group">
                 <%= p.label :email, 'E-mail' %>
-                <%= p.text_field :email, class: 'form-control' %>
+                <%= p.email_field :email, class: "form-control", autocomplete: "email" %>
                 <div class="form-inline inline-checkbox">
                   <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
                     <%= m.check_box :share_email, { class: "form-control checkbox" }, true %>
@@ -142,53 +148,53 @@
               </div>
               <div class="form-group">
                 <%= p.label :url, 'Website (URL)' %>
-                <%= p.text_field :url, class: 'form-control' %>
+                <%= p.url_field :url, class: "form-control" %>
               </div>
               <div class="form-group">
                 <%= p.label :phone %>
-                <%= p.text_field :phone, class: 'form-control' %>
+                <%= p.telephone_field :phone, class: "form-control", autocomplete: "tel" %>
               </div>
               <div class="form-group" id="address-fields">
-                <label>Address</label> (required for hotel room booking)
+                <label>Address</label>
                 <div class="row">
                   <div class='col-md-12'>
-                    <%= p.text_field :address1, class: 'form-control', placeholder: 'Address line 1' %>
-                    <%= p.text_field :address2, class: 'form-control', placeholder: 'Address line 2' %>
-                    <%= p.text_field :address3, class: 'form-control', placeholder: 'Address line 3' %>
+                    <%= p.text_field :address1, class: "form-control", placeholder: 'Address line 1', autocomplete: "address-line1" %>
+                    <%= p.text_field :address2, class: "form-control", placeholder: 'Address line 2', autocomplete: "address-line2" %>
+                    <%= p.text_field :address3, class: "form-control", placeholder: 'Address line 3', autocomplete: "address-line3" %>
                   </div>
                 </div>
                 <div class="row">
                   <div class='col-md-4'>
-                    <%= p.text_field :city, class: 'form-control', placeholder: 'City' %>
+                    <%= p.text_field :city, class: "form-control", placeholder: 'City', autocomplete: "address-level2" %>
                   </div>
                   <div class='col-md-4'>
-                    <%= p.text_field :region, class: 'form-control', placeholder: 'Province/State/Region' %>
+                    <%= p.text_field :region, class: "form-control", placeholder: 'Province/State/Region', autocomplete: "address-level3" %>
                   </div>
                   <div class='col-md-4'>
-                    <%= p.text_field :postal_code, class: 'form-control', placeholder: 'Postal Code' %>
+                    <%= p.text_field :postal_code, class: "form-control", placeholder: 'Postal Code', autocomplete: "postal-code" %>
                   </div>
                 </div>
                 <div class="row">
                   <div class='col-md-4'>
-                  <%= p.text_field :country, class: 'form-control', placeholder: 'Country' %>
+                  <%= p.text_field :country, class: "form-control", placeholder: 'Country', autocomplete: "country-name" %>
                   </div>
                 </div>
               </div>
               <div class="form-group">
                 <%= p.label :emergency_contact, 'Emergency Contact Name' %>
-                <%= p.text_field :emergency_contact, class: 'form-control' %>
+                <%= p.text_field :emergency_contact, class: "form-control" %>
               </div>
               <div class="form-group">
                 <%= p.label :emergency_phone, 'Emergency Contact Phone' %>
-                <%= p.text_field :emergency_phone, class: 'form-control' %>
+                <%= p.text_field :emergency_phone, class: "form-control" %>
               </div>
               <div class="form-group">
                 <%= p.label :biography %>
-                <%= p.text_area :biography, size: "100x4", class: 'form-control', placeholder: 'An optional, brief biographical summary.' %>
+                <%= p.text_area :biography, size: "100x4", class: "form-control", placeholder: 'An optional, brief biographical summary.' %>
               </div>
               <div class="form-group">
                 <%= p.label :research_areas %>
-                <%= p.text_field :research_areas, class: 'form-control', placeholder: 'An optional comma-separated list of your areas of research (tags)' %>
+                <%= p.text_field :research_areas, class: "form-control", placeholder: 'An optional comma-separated list of your areas of research (tags)' %>
               </div>
           </div>
         </div>
@@ -206,7 +212,7 @@
         <div class="row">
           <div class="col-md-12 form-group">
           <%= text_area_tag('organizer_message', "", size: "100x4",
-                class: 'form-control',
+                class: "form-control",
                 placeholder:
                 "Optional: enter a message for the organizer here.") %>
           </div>

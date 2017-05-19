@@ -55,7 +55,7 @@ group :development do
   gem 'pronto-brakeman'
   gem 'pronto-poper'
   gem 'capistrano-rails', '~> 1.1'
-  gem 'rbnacl', '< 5.0'
   gem 'rbnacl-libsodium'
+  gem 'rbnacl', '< 5.0'
   gem 'bcrypt_pbkdf', '< 2.0'
 end

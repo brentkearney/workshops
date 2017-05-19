@@ -60,8 +60,8 @@ module EventDecorators
   end
 
   def dates(format = :short)
-    start = Date.parse(start_date)
-    finish = Date.parse(end_date)
+    start = Date.parse(start_date.to_s)
+    finish = Date.parse(end_date.to_s)
 
     if format == :long
       ld = start.strftime("%B %-d")
@@ -69,7 +69,7 @@ module EventDecorators
       ld = start.strftime("%b %-d")
     end
 
-    ld += " to "
+    ld += " - "
 
     if start.mon == finish.mon
       if format == :long

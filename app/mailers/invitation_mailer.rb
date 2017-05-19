@@ -19,22 +19,26 @@
 # SOFTWARE.
 
 class InvitationMailer < ApplicationMailer
-  app_email = Setting.Site['application_email'] unless Setting.Site.blank?
-  if Setting.Site.blank? || app_email.nil?
-    app_email = ENV['DEVISE_EMAIL']
-  end
-
-  default from: app_email
+  @from_email = ENV['DEVISE_EMAIL']
+  default from: @from_email
 
   def invite(invitation)
     @person = invitation.membership.person
     @event = invitation.membership.event
+
+    unless Setting.Emails.blank?
+      @from_email = Setting.Emails["#{@event.location}"]['rsvp']
+    end
+
     @rsvp_link = Setting.Site['app_url'] + '/rsvp/' + invitation.code
     @org_name = Setting.Locations["#{@event.location}"]['Name']
     @event_url = Setting.Site['events_url'] + @event.code
     subject = "[#{@event.code}] Your invitation to \"#{@event.name}\""
 
-    mail(to: @person.email, subject: subject, Importance: 'High', 'X-Priority': 1)
+    mail(to: @person.email,
+         from: @from_email,
+         subject: subject,
+         Importance: 'High', 'X-Priority': 1)
   end
 
 end

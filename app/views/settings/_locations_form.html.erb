@@ -19,7 +19,6 @@
         </div>
         <% if values.is_a?(Hash) && !values.blank? %>
           <% values.each do |field_name, field_value| %>
-            <p><%= field_name %>, <%= field_value %></p>
             <label><%= field_name.to_s.titleize %></label> (<%= field_name %>):
             <p>
             <% if field_name == 'Timezone' %>
