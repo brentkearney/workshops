@@ -34,13 +34,24 @@ class ParticipantMailer < ApplicationMailer
       @organization = Setting.Locations["#{membership.event.location}"]['Name']
     end
 
-    email = '"' + @person.name + '" <' + @person.email + '>'
-    subject = "[#{@event.code}] Thank you for accepting our invitation"
-    mail(to: email,
-         from: @from_email,
-         subject: subject,
-         template_path: "participant_mailer/rsvp/#{@event.location}",
-         template_name: @event.event_type,
-         'Importance': 'High', 'X-Priority': 1)
+    template_path = "participant_mailer/rsvp/#{@event.location}"
+    file_attachment = "#{template_path}/#{@event.event_type}.pdf"
+    if File.exist?(file_attachment)
+      attachments["#{@event.location}-arrival-info.pdf"] =
+        File.read(file_attachment)
+    end
+
+    mail_template = "#{template_path}/#{@event.event_type}.text.erb"
+    if File.exist?(mail_template)
+      email = '"' + @person.name + '" <' + @person.email + '>'
+      subject = "[#{@event.code}] Thank you for accepting our invitation"
+      mail(to: email,
+           from: @from_email,
+           subject: subject,
+           template_path: template_path,
+           template_name: @event.event_type,
+           attachments: attachments,
+           'Importance': 'High', 'X-Priority': 1)
+    end
   end
 end

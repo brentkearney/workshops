@@ -40,6 +40,7 @@ Gemfile.lock
 Capfile
 config/deploy.rb
 config/deploy/
+ssh-keys/
 
 .idea
 app/views/memberships/old-new.html.erb

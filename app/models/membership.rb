@@ -8,7 +8,7 @@ class Membership < ActiveRecord::Base
   belongs_to :event
   belongs_to :person
   accepts_nested_attributes_for :person
-  has_one :invitation
+  has_one :invitation, dependent: :destroy
 
   attr_accessor :sync_remote
   after_update :attendance_notification, :sync_with_legacy
