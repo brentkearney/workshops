@@ -20,4 +20,45 @@ module EventsHelper
     field
   end
 
+  def event_list_title
+    title = ''
+    case request.path
+    when '/events'
+      title = 'All'
+    when /my_events/
+      title = 'My'
+    when /future|past/
+      time = request.path.match(/events\/(\w+)/)
+      title = time[1].titleize
+    when /year/
+      year = request.path.match(/year\/(\w+)/)
+      title = year[1]
+    end
+    title << " Events"
+
+    location = request.path.match(/location\/(\w+)/)
+    title[/Events/] = "#{location[1]} Events" unless location.blank?
+    title
+  end
+
+  def location_url(location)
+    case request.path
+    when /past|future/
+      '/events/' + action_name + "/location/#{location}"
+    when /year/
+      year = request.path.match(/year\/(\w+)/)
+      "/events/year/#{year[1]}/location/#{location}"
+    else
+      events_location_path(location)
+    end
+  end
+
+  def year_url(year)
+    location = request.path.match(/location\/(\w+)/)
+    if location.blank?
+      events_year_path(year)
+    else
+      "/events/year/#{year}/location/#{location[1]}"
+    end
+  end
 end

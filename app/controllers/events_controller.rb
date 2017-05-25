@@ -9,6 +9,8 @@ class EventsController < ApplicationController
   before_filter :authenticate_user!, only: [:my_events, :new, :edit, :create, :update, :destroy]
   after_action :verify_policy_scoped, only: [:index, :past, :future, :kind]
 
+  include EventsHelper
+
   # GET /events
   # GET /events.json
   def index
@@ -28,14 +30,16 @@ class EventsController < ApplicationController
   def past
     @heading = 'Past Events'
     @events = policy_scope(Event).past.reverse_order
+    remove_locations
     render :index
   end
 
-  # GET /events/future
-  # GET /events/future.json
+  # GET /events/future(/location/:location)
+  # GET /events/future(/location/:location).json
   def future
     @heading = 'Future Events'
     @events = policy_scope(Event).future
+    remove_locations
     render :index
   end
 
@@ -46,6 +50,7 @@ class EventsController < ApplicationController
     if year =~ /^\d{4}$/
       @heading = "#{year} Events"
       @events = policy_scope(Event).year(year)
+      remove_locations
       render :index
     else
       redirect_to events_path
@@ -59,7 +64,6 @@ class EventsController < ApplicationController
     unless Setting.Locations.keys.include?(location)
       location = Setting.Locations.keys.first
     end
-
     @heading = "Events at #{location}"
     @events = Event.location(location).order(:start_date)
     render :index
@@ -68,7 +72,6 @@ class EventsController < ApplicationController
   # GET /events/kind/:kind
   def kind
     kind = params[:kind].titleize
-
     if kind == 'Research In Teams'
       kind = 'Research in Teams'
     else
@@ -120,11 +123,13 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       if @event.save
-        format.html { redirect_to @event, notice: 'Event was successfully created.' }
+        format.html { redirect_to @event,
+            notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
       else
         format.html { render :new }
-        format.json { render json: @event.errors, status: :unprocessable_entity }
+        format.json { render json: @event.errors,
+            status: :unprocessable_entity }
       end
     end
   end
@@ -137,16 +142,19 @@ class EventsController < ApplicationController
     original_event = @event.dup
     @editable_fields = policy(@event).may_edit
     @edit_form = current_user.is_admin? ? 'admin_form' : 'member_form'
-    update_params = event_params.assert_valid_keys(*@editable_fields).merge(updated_by: current_user.name)
+    update_params = event_params.assert_valid_keys(*@editable_fields)
+        .merge(updated_by: current_user.name)
 
     respond_to do |format|
       if @event.update(update_params)
         notify_staff(event: original_event, params: update_params)
-        format.html { redirect_to @event, notice: 'Event was successfully updated.' }
+        format.html { redirect_to @event,
+            notice: 'Event was successfully updated.' }
         format.json { render :show, status: :ok, location: @event }
       else
         format.html { render :edit }
-        format.json { render json: @event.errors, status: :unprocessable_entity }
+        format.json { render json: @event.errors,
+            status: :unprocessable_entity }
       end
     end
   end
@@ -157,28 +165,40 @@ class EventsController < ApplicationController
     authorize @event
     @event.destroy
     respond_to do |format|
-      format.html { redirect_to events_url, notice: 'Event was successfully destroyed.' }
+      format.html { redirect_to events_url,
+        notice: 'Event was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
 
-    def notify_staff(event: original_event, params: update_params)
-      if params[:short_name] != event.short_name
-        StaffMailer.nametag_update(original_event: event, args: params).deliver_now if event.is_upcoming?
-      end
-
-      if params[:description] != event.description || params[:press_release] != event.press_release
-        StaffMailer.event_update(original_event: event, args: params).deliver_now
-      end
+  def notify_staff(event: original_event, params: update_params)
+    if params[:short_name] != event.short_name
+      StaffMailer.nametag_update(original_event: event,
+                                 args: params).deliver_now if event.is_upcoming?
     end
 
-    def event_params
-      params.require(:event).permit(:code, :name, :short_name, :start_date, :end_date, :time_zone, :event_type, :location, :description, :press_release, :max_participants, :door_code, :booking_code, :updated_by)
+    if params[:description] != event.description ||
+        params[:press_release] != event.press_release
+      StaffMailer.event_update(original_event: event, args: params).deliver_now
     end
+  end
 
-    def set_time_zone
-      Time.zone = @event.time_zone
-    end
+  def set_time_zone
+    Time.zone = @event.time_zone
+  end
+
+  def event_params
+    params.require(:event).permit(:code, :name, :short_name, :start_date, :end_date, :time_zone, :event_type, :location, :description, :press_release, :max_participants, :door_code, :booking_code, :updated_by)
+  end
+
+  def location_params
+    params.permit(:location)
+  end
+
+  def remove_locations
+    location = location_params['location']
+    @events = @events.select {|e| e.location == location} unless location.blank?
+  end
 end

@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [ -z "$POSTGRES_USER" ]; then
+  echo "POSTGRES_USER environment variable missing!"
+  exit 1
+fi
+
 echo
 echo "Setting up $DB_USER and Workshops databases..."
 echo
