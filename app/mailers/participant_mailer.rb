@@ -25,6 +25,7 @@ class ParticipantMailer < ApplicationMailer
   def rsvp_confirmation(membership)
     @person = membership.person
     @event = membership.event
+
     unless Setting.Emails.blank?
       @from_email = Setting.Emails["#{@event.location}"]['rsvp']
     end
@@ -34,13 +35,19 @@ class ParticipantMailer < ApplicationMailer
       @organization = Setting.Locations["#{membership.event.location}"]['Name']
     end
 
-    template_path = "participant_mailer/rsvp/#{@event.location}"
-    file_attachment = "#{template_path}/#{@event.event_type}.pdf"
+    # PDF attachment in lib/assets/rsvp/[location]
+    pdf_path = template_path = Rails.root.join('lib', 'assets', 'rsvp',
+      "#{@event.location}")
+    file_attachment = "#{pdf_path}/#{@event.event_type}.pdf"
     if File.exist?(file_attachment)
-      attachments["#{@event.location}-arrival-info.pdf"] =
-        File.read(file_attachment)
+      attachments["#{@event.location}-arrival-info.pdf"] = {
+        mime_type: 'application/pdf',
+        content: File.read(file_attachment)
+      }
     end
 
+    template_path = Rails.root.join('app', 'views', 'participant_mailer',
+                      'rsvp', "#{@event.location}")
     mail_template = "#{template_path}/#{@event.event_type}.text.erb"
     if File.exist?(mail_template)
       email = '"' + @person.name + '" <' + @person.email + '>'
@@ -48,9 +55,8 @@ class ParticipantMailer < ApplicationMailer
       mail(to: email,
            from: @from_email,
            subject: subject,
-           template_path: template_path,
+           template_path: "participant_mailer/rsvp/#{@event.location}",
            template_name: @event.event_type,
-           attachments: attachments,
            'Importance': 'High', 'X-Priority': 1)
     end
   end

@@ -25,6 +25,7 @@ lib/tasks/birs.rake
 # organization-specific email templates
 app/views/participant_mailer/rsvp/BIRS
 app/views/participant_mailer/rsvp/CMO
+lib/assets/rsvp/
 
 # Deployment files
 .dockerignore
