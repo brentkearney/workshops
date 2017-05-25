@@ -37,7 +37,7 @@ describe 'RSVP', type: :feature do
 
   it 'displays the event name and date' do
     expect(page.body).to have_text(@event.name)
-    expect(page.body).to have_text(@event.dates('long'))
+    expect(page.body).to have_text(@event.dates(:long))
   end
 
   it 'has yes, no, maybe buttons' do
@@ -241,7 +241,7 @@ describe 'RSVP', type: :feature do
     end
 
     it 'has arrival and departure date section' do
-      expect(page).to have_text(@event.dates('long'))
+      expect(page).to have_text(@event.dates(:long))
       expect(page).to have_text(@rsvp.arrival_departure_intro)
     end
 
