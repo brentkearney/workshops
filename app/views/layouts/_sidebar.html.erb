@@ -48,7 +48,7 @@
         <a href="#" id="event-years-link"><i class="fa fa-calendar fa-fw"></i> Event Years <span id="years-arrow" class="fa arrow"></span></a>
         <ul class="nav nav-second-level" id="event-years-list">
           <% Event.years.each do |year| %>
-          <li id="<%= year %>">
+          <li id="year-<%= year %>">
             <div class="top-border"></div>
             <%= link_to %Q(<i class="fa fa-calendar-check-o fa-fw"></i> #{year}).html_safe, year_url(year) %>
             <div class="bottom-border"></div>
