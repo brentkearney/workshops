@@ -88,11 +88,16 @@ describe 'Event List', type: :feature do
   end
 
   describe 'All Events' do
-    it 'lists all events\' code, name, date' do
-      events = Event.all
+    before do
       visit events_path
+    end
 
-      events.each do |event|
+    it 'is titled "All Events"' do
+      expect(page.body).to have_css("h1.page-header", text: 'All Events')
+    end
+
+    it 'lists all events\' code, name, date' do
+      Event.all.each do |event|
         expect(page.body).to have_text(event.code)
         expect(page.body).to have_text(event.name)
         expect(page.body).to have_text(event.dates)
@@ -100,13 +105,11 @@ describe 'Event List', type: :feature do
     end
 
     it 'orders by date' do
-      visit events_path
       expect(page.body.index(@past.code) < page.body.index(@current.code))
       expect(page.body.index(@current.code) < page.body.index(@future.code))
     end
 
     it 'indicates which country each event is in' do
-      visit events_path
       expect(page.body).to include("flags/#{@past.country}")
       expect(page.body).to include("flags/#{@current.country}")
       expect(page.body).to include("flags/#{@future.country}")
@@ -122,10 +125,17 @@ describe 'Event List', type: :feature do
 
       expect(confirmed_counts).to eq(['0', '3', '0'])
     end
-
   end
 
   describe 'My Events' do
+    it 'is titled "My Events"' do
+      visit root_path
+
+      click_link 'My Events'
+
+      expect(page.body).to have_css("h1.page-header", text: 'My Events')
+    end
+
     it 'lists the current user\'s events' do
       person = create(:person)
       member_user = create(:user, person: person)
@@ -146,10 +156,16 @@ describe 'Event List', type: :feature do
   end
 
   describe 'Future Events' do
-    it 'lists current event + events in the future' do
+    it 'is titled "Future Events"' do
       visit root_path
 
       click_link 'Future Events'
+
+      expect(page.body).to have_css("h1.page-header", text: "Future Events")
+    end
+
+    it 'lists current event + events in the future' do
+      visit events_future_path
 
       expect(page.body).to have_text(@current.name)
       expect(page.body).not_to have_text(@past.name)
@@ -166,6 +182,8 @@ describe 'Event List', type: :feature do
 
       click_link @future.location
 
+      expect(page.body).to have_css("h1.page-header",
+        text: "Future #{@future.location} Events")
       expect(current_path).to eq("/events/future/location/#{@future.location}")
       expect(page.body).to have_text(@future.name)
       expect(page.body).not_to have_text(@current.name)
@@ -173,10 +191,16 @@ describe 'Event List', type: :feature do
   end
 
   describe 'Past Events' do
-    it 'lists events in the past' do
+    it 'is titled "Past Events"' do
       visit root_path
 
       click_link 'Past Events'
+
+      expect(page.body).to have_css("h1.page-header", text: "Past Events")
+    end
+
+    it 'lists events in the past' do
+      visit events_past_path
 
       expect(page.body).not_to have_text(@current.name)
       expect(page.body).to have_text(@past.name)
@@ -219,6 +243,13 @@ describe 'Event List', type: :feature do
       expect(page.body).not_to have_text(@future.name)
     end
 
+    it 'is titled "[year] Events"' do
+      visit events_year_path(@past.year)
+
+      expect(page.body).to have_css("h1.page-header",
+        text: "#{@past.year} Events")
+    end
+
     it 'can toggle by location' do
       @future.location = @current.location
       @future.save
@@ -232,11 +263,13 @@ describe 'Event List', type: :feature do
       expect(page.body).to have_text(other_event.name)
       expect(page.body).not_to have_text(@future.name)
 
-      click_link 'Event Years'
+      click_link 'Event Locations'
       click_link @current.location
 
-      expected_path = "/events/year/#{@current.year}/location/#{@current.location}"
-      expect(current_path).to eq(expected_path)
+      path = "/events/year/#{@current.year}/location/#{@current.location}"
+      expect(current_path).to eq(path)
+      expect(page.body).to have_css("h1.page-header",
+        text: "#{@current.year} #{@current.location} Events")
       expect(page.body).to have_text(@current.name)
       expect(page.body).not_to have_text(other_event.name)
       expect(page.body).not_to have_text(@future.name)
@@ -253,6 +286,13 @@ describe 'Event List', type: :feature do
 
       expect(current_path).to eq(events_location_path(location))
       expect(page.body).to have_text(@current.name)
+    end
+
+    it 'is titled "[location] Events"' do
+      visit events_location_path(@past.location)
+
+      expect(page.body).to have_css("h1.page-header",
+        text: "#{@past.location} Events")
     end
 
     it 'can toggle by year' do
