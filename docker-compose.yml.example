@@ -13,12 +13,17 @@
 db:
   image: postgres:9.5.3
   container_name: wsdb
+  volumes:
+    - ./db/pg-init:/docker-entrypoint-initdb.d
   volumes_from:
     - pgdata
   environment:
     - POSTGRES_USER=postgres
     - POSTGRES_PASSWORD=
+    - DB_USER=db_username
+    - DB_PASS=
     - PSQL_TRUST_LOCALNET=true
+    - PGDATA=/var/lib/postgresql/data/pgdata
     - DB_USER=db_username
     - DB_PASS=
     - DB_PORT=5433
