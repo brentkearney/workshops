@@ -7,7 +7,7 @@ if [ -z "$POSTGRES_USER" ]; then
 fi
 
 echo
-echo "Setting up $DB_USER and Workshops databases..."
+echo "Setting up database user $DB_USER and Workshops databases..."
 echo
 psql -U "$POSTGRES_USER" -c "CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASS';"
 echo
@@ -20,10 +20,6 @@ do
     ENCODING 'UTF8' LC_COLLATE='en_US.utf8' LC_CTYPE='en_US.utf8'"
 
   psql -U "$POSTGRES_USER" -c "GRANT ALL PRIVILEGES ON DATABASE $db to $DB_USER"
-
-  echo
-  echo "Loading default data into $db..."
-  cd /docker-entrypoint-initdb.d/; psql -U "$DB_USER" $db < settings-sql
 done
 
 echo

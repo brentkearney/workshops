@@ -1,18 +1,9 @@
 #!/bin/sh
 set -e
 
-export PATH=$PATH:/usr/local/rvm/bin:/usr/local/rvm/rubies/ruby-2.4.0/bin:/usr/local/rvm/gems/ruby-2.4.0/bin:./bin
-echo
-echo "PATH is: "
-echo $PATH
-
 echo
 echo "Setting system timezone..."
 dpkg-reconfigure -f noninteractive tzdata
-
-echo
-echo "Create gemset..."
-/bin/bash -lc 'rvm --default use ruby-2.4.0 --create'
 
 echo
 echo "Installing latest bundler..."
@@ -21,13 +12,24 @@ echo "Installing latest bundler..."
 
 echo
 echo "Bundle install..."
-/usr/local/rvm/bin/rvm-exec 2.4.0 bundle install
+RAILS_ENV=development ./bin/bundle install
+
+# Remove after first run
+echo
+echo "Setting up database..."
+rake db:setup RAILS_ENV=development
+rake db:setup RAILS_ENV=test
+rake db:setup RAILS_ENV=production
 
 echo
 echo "Running migrations..."
-rake db:migrate RAILS_ENV=production
 rake db:migrate RAILS_ENV=development
 rake db:migrate RAILS_ENV=test
+rake db:migrate RAILS_ENV=production
+
+echo
+echo "Adding default settings..."
+rake ws:init_settings
 
 echo
 echo "Creating admins..."
@@ -49,9 +51,9 @@ chown -R app:app /home/app/workshops
 # echo
 # echo "Compiling Assets..."
 # chown -R app /home/app/workshops/tmp
-# su - app -c "cd /home/app/workshops; RAILS_ENV=production bundle exec rake assets:precompile --trace"
+# su - app -c "cd /home/app/workshops; RAILS_ENV=production SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
 
+# Settings in Passengerfile.json
 echo
 echo "Starting web server..."
-/usr/bin/passenger start
-# /home/app/workshops/bin/rails server -e development -b 0.0.0.0 -p 80
+bundle exec passenger start

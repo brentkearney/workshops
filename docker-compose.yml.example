@@ -6,16 +6,23 @@
 # docker run -v /var/lib/postgresql --name pgdata postgres:9.5.3 echo 'Postgres data'
 # docker run -v /usr/local/rvm/gems -v /home/app/workshops/vendor/cache \
 #    --name rubygems "phusion/passenger-ruby22:0.9.19" echo 'Ruby gems'
+#
+# Generate secure strings for the keys, passwords and tokens using:
+# < /dev/urandom LC_CTYPE=C tr -dc _A-Z-a-z-0-9 | head -c${1:-64};echo
 
 db:
   image: postgres:9.5.3
   container_name: wsdb
-  volumes:
-    - ./db/pg-init:/docker-entrypoint-initdb.d
   volumes_from:
     - pgdata
-  env_file:
-    - '.env.db'
+  environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=
+    - PSQL_TRUST_LOCALNET=true
+    - DB_USER=db_username
+    - DB_PASS=
+    - DB_PORT=5433
+    - DB_NAME=workshops_production,workshops_development,workshops_test
 web:
   build: .
   container_name: ws
@@ -28,5 +35,19 @@ web:
     - rubygems
   links:
     - db
-  env_file:
-    - '.env.web'
+  environment:
+    - DB_USER=db_username
+    - DB_PASS=
+    - RAILS_ENV=development
+    - RAILS_SERVE_STATIC_FILES=true
+    - SECRET_KEY_BASE=
+    - SECRET_TOKEN=
+    - DEVISE_SECRET_KEY=
+    - DEVISE_PEPPER=
+    - DEVISE_EMAIL=webmaster@example.com
+    - LECTURES_API_KEY=
+    - APPLICATION_HOST=workshops.example.com
+    - APPLICATION_PROTOCOL=http
+    - EMAIL_SERVER=mail.example.com
+    - EMAIL_PORT=25
+    - EMAIL_STARTTLS=true

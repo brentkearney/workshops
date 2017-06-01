@@ -8,9 +8,7 @@ require 'rails_helper'
 
 describe 'Settings page', type: :feature do
   before do
-    Setting.destroy_all
-    load "#{Rails.root}/config/initializers/settings.rb"
-    expect(Setting.get_all).not_to be_empty
+    load "#{Rails.root}/spec/support/settings.rb"
   end
 
   def find_sub_tabs(section)
@@ -114,7 +112,8 @@ describe 'Settings page', type: :feature do
 
       it 'has the minimum necessary fields for the app to function' do
         required_fields = %w(title footer events_url legacy_person legacy_api
-            application_email webmaster_email sysadmin_email)
+            application_email webmaster_email sysadmin_email code_pattern
+            academic_status app_url event_types salutations event_types)
 
         required_fields.each do |field|
           expect(page).to have_field("setting[Site][#{field}]")
