@@ -37,6 +37,7 @@ class InvitationMailer < ApplicationMailer
 
     mail(to: @person.email,
          from: @from_email,
+         bcc: @from_email,
          subject: subject,
          Importance: 'High', 'X-Priority': 1)
   end
