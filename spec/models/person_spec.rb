@@ -6,8 +6,8 @@
 
 require 'rails_helper'
 
-RSpec.describe "Model validations: Person", type: :model do
-  it "has valid factory" do
+RSpec.describe 'Model validations: Person', type: :model do
+  it 'has valid factory' do
     expect(create(:person)).to be_valid
   end
 
@@ -16,7 +16,7 @@ RSpec.describe "Model validations: Person", type: :model do
     expect(p.valid?).to be_falsey
   end
 
-  it "requires a lastname" do
+  it 'requires a lastname' do
     p = build(:person, lastname: '')
     expect(p.valid?).to be_falsey
   end
@@ -26,30 +26,45 @@ RSpec.describe "Model validations: Person", type: :model do
     expect(p.valid?).to be_falsey
   end
 
-  it "requires a gender" do
+  it 'requires a gender' do
     p = build(:person, gender: '')
     expect(p.valid?).to be_falsey
   end
 
-  it "requires an affiliation" do
+  it 'requires an affiliation' do
     p = build(:person, affiliation: '')
     expect(p.valid?).to be_falsey
   end
 
-  it "requires a unique, case insensitive email address" do
+  it 'requires a unique, case insensitive email address' do
     person1 = create(:person)
-    expect(person1).not_to be_nil
-
     person2 = build(:person, email: person1.email.upcase)
+
     expect(person2.valid?).to be_falsey
-    expect(person2.errors[:email].first).to eq("has already been taken")
+    expect(person2.errors[:email].first).to eq('has already been taken')
   end
-  
+
+  it 'requires an address only if :is_rsvp' do
+    p = build(:person, address1: '')
+    expect(p).to be_valid
+
+    p.is_rsvp = true
+    expect(p).not_to be_valid
+  end
+
+  it 'requires academic_status only if :is_rsvp' do
+    p = build(:person, academic_status: '')
+    expect(p).to be_valid
+
+    p.is_rsvp = true
+    expect(p).not_to be_valid
+  end
+
   context 'Decorator functions' do
     before do
       @person = create(:person)
     end
-    
+
     it ".name returns 'firstname lastname'" do
       expect(@person.name).to eq("#{@person.firstname} #{@person.lastname}")
     end

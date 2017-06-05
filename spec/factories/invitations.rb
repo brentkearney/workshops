@@ -1,3 +1,5 @@
+require 'factory_girl_rails'
+
 FactoryGirl.define do
   factory :invitation do
     association :membership, factory: :membership

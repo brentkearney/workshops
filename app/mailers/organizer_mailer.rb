@@ -33,7 +33,7 @@ class OrganizerMailer < ApplicationMailer
     @event = membership.event
     @organizer = @event.organizer
     @message_to_organizer = organizer_message
-    @membership_url = Setting.Site['app_url'] + "/#{event_membership_path(@event)}"
+    @membership_url = Setting.Site['app_url'] + "/events/#{@event.code}/membership"
 
     @organization = 'Staff'
     unless Setting.Locations["#{membership.event.location}"].nil?

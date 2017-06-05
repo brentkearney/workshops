@@ -25,7 +25,7 @@ RSpec.describe RsvpController, type: :controller do
 
     context 'with a valid OTP in the url' do
       it 'validates the OTP via local db and renders index' do
-        get :index, { otp: @invitation.code }
+        get :index, otp: @invitation.code
 
         expect(assigns(:invitation)).to eq(@invitation)
         expect(response).to render_template(:index)
@@ -34,7 +34,7 @@ RSpec.describe RsvpController, type: :controller do
       it 'validates the OTP via legacy db' do
         allow_any_instance_of(InvitationChecker).to receive(:check_legacy_database).and_return(@invitation)
 
-        get :index, { otp: '123' }
+        get :index, otp: '123'
 
         expect(assigns(:invitation)).to eq(@invitation)
         expect(response).to render_template(:index)
@@ -47,7 +47,7 @@ RSpec.describe RsvpController, type: :controller do
         expect(LegacyConnector).to receive(:new).and_return(lc)
         allow(lc).to receive(:check_rsvp).with('123').and_return(lc.invalid_otp)
 
-        get :index, { otp: '123' }
+        get :index, otp: '123'
 
         expect(assigns(:invitation)).to be_a(InvitationChecker)
         expect(response).to render_template("rsvp/_invitation_errors")
@@ -57,28 +57,44 @@ RSpec.describe RsvpController, type: :controller do
 
   describe 'GET #no' do
     it 'renders no template' do
-      get :no, { otp: @invitation.code }
+      if @invitation.errors.any?
+        puts "Invitation errors: #{@invitation.errors.messages}"
+      else
+        puts "No invitation errors. @invitation is a: #{@invitation.class}"
+      end
+
+      get :no, otp: @invitation.code
       expect(response).to render_template(:no)
     end
   end
 
   describe 'POST #no' do
     it 'changes membership attendance to Declined' do
-      post :no, { otp: @invitation.code, organizer_message: 'Hi' }
+      post :no, otp: @invitation.code, organizer_message: 'Hi'
 
       expect(Membership.find(@membership.id).attendance).to eq('Declined')
     end
 
     it 'forwards to feedback form' do
-      post :maybe, { otp: @invitation.code, organizer_message: 'Hi' }
+      post :no, otp: @invitation.code, organizer_message: 'Hi'
 
       expect(response).to redirect_to(rsvp_feedback_path(@membership.id))
+    end
+
+    it 'with an invalid OTP, it forwards to rsvp_otp' do
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive(:new).and_return(lc)
+      allow(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
+
+      post :no, otp: 'foo'
+
+      expect(response).to redirect_to(rsvp_otp_path('foo'))
     end
   end
 
   describe 'GET #maybe' do
     it 'renders maybe template' do
-      get :maybe, { otp: @invitation.code }
+      get :maybe, otp: @invitation.code
       expect(response).to render_template(:maybe)
     end
   end
@@ -95,7 +111,64 @@ RSpec.describe RsvpController, type: :controller do
 
       expect(response).to redirect_to(rsvp_feedback_path(@membership.id))
     end
+
+    it 'with an invalid OTP, it forwards to rsvp_otp' do
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive(:new).and_return(lc)
+      allow(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
+
+      post :maybe, { otp: 'foo' }
+
+      expect(response).to redirect_to(rsvp_otp_path('foo'))
+    end
   end
+
+  describe 'GET #yes' do
+    it 'renders yes template' do
+      get :yes, { otp: @invitation.code }
+      expect(response).to render_template(:yes)
+    end
+  end
+
+  describe 'POST #yes' do
+    def yes_params
+      {'membership' => { arrival_date: @invitation.membership.event.start_date,
+          departure_date: @invitation.membership.event.end_date,
+          own_accommodation: false, has_guest: true, guest_disclaimer: true,
+          special_info: '', share_email: true },
+        'person' => { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
+          gender: 'M', affiliation: 'Foo', department: '', title: '',
+          academic_status: 'Professor', phd_year: 1970, email: 'foo@bar.com',
+           url: '', phone: '', address1: '123 Street', address2: '',
+           address3: '', city: 'City', region: 'Region', postal_code: 'XYZ',
+           country: 'Dandylion', emergency_contact: '', emergency_phone: '',
+           biography: '', research_areas: ''}
+      }
+     end
+
+    it 'changes membership attendance to Confirmed' do
+      post :yes, { otp: @invitation.code, rsvp: yes_params }
+
+      expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
+    end
+
+    it 'forwards to feedback form' do
+      post :yes, { otp: @invitation.code, rsvp: yes_params }
+
+      expect(response).to redirect_to(rsvp_feedback_path(@membership.id))
+    end
+
+    it 'with an invalid OTP, it forwards to rsvp_otp' do
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive(:new).and_return(lc)
+      allow(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
+
+      post :yes, { otp: 'foo', rsvp: yes_params }
+
+      expect(response).to redirect_to(rsvp_otp_path('foo'))
+    end
+  end
+
 
   describe 'GET #feedback' do
     it 'renders feedback template' do

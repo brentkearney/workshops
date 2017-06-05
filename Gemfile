@@ -27,19 +27,19 @@ gem 'sucker_punch'
 gem 'passenger'
 gem 'rails-settings-cached'
 
-group :development, :test do
+# group :development, :test do
   gem 'byebug'
   gem 'spring'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
-end
+# end
 
-group :test do
+# group :test do
   gem 'capybara'
   gem 'selenium-webdriver'
   gem 'faker'
   gem 'database_cleaner'
-end
+# end
 
 group :production do
   gem 'newrelic_rpm'

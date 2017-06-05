@@ -85,7 +85,7 @@ class StaffMailer < ApplicationMailer
         )
     end
 
-    mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
+    mail(to: to_email, subject: subject)
   end
 
   def event_sync(event, error_messages)
@@ -108,7 +108,7 @@ class StaffMailer < ApplicationMailer
     end
 
     @message = error.object.inspect.to_s + "\n\n" + error.message.to_s
-    mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1, template_name: 'notify_sysadmin')
+    mail(to: to_email, subject: subject, template_name: 'notify_sysadmin')
   end
 
   def event_update(original_event: event, args: params)
@@ -121,7 +121,7 @@ class StaffMailer < ApplicationMailer
     to_email = Setting.Emails[event.location.to_s]['event_updates']
     subject = "[#{event.code}] Event updated!"
 
-    mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
+    mail(to: to_email, subject: subject)
   end
 
   def nametag_update(original_event: event, args: params)
@@ -134,7 +134,7 @@ class StaffMailer < ApplicationMailer
     to_email = Setting.Emails[event.location.to_s]['name_tags']
     subject = "[#{event.code}] Name tag change notice!"
 
-    mail(to: to_email, subject: subject, Importance: 'High', 'X-Priority': 1)
+    mail(to: to_email, subject: subject)
   end
 
   def confirmation_notice(membership, msg)
@@ -144,7 +144,7 @@ class StaffMailer < ApplicationMailer
       @event = membership.event
       @message = msg
       subject = "[#{@event.code}] membership change!"
-      mail(to: staff_email, subject: subject, 'Importance': 'High', 'X-Priority': 1)
+      mail(to: staff_email, subject: subject)
     end
   end
 
@@ -152,10 +152,12 @@ class StaffMailer < ApplicationMailer
     feedback_email = Setting.Site['webmaster_email']
     unless feedback_email.blank?
       @membership = membership
+      person = membership.person
+      from = '"' + person.name + '" <' + person.email + '>"'
       @message = message
       @question = 'How was your RSVP experience?'
       subject = "[#{@membership.event.code}] #{section} feedback"
-      mail(to: feedback_email, subject: subject)
+      mail(from: from, to: feedback_email, subject: subject)
     end
   end
 end

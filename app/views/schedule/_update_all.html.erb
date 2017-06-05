@@ -3,7 +3,7 @@
     <div class="form-group col-lg-8 text-left">
       <div class="checkbox update-all">
         <label>
-        <%= check_box_tag(:change_similar) %> Check this box to update all other <%= @schedule.start_time.hour.to_s.rjust(2, '0') %>:<%= @schedule.start_time.min.to_s.rjust(2, '0') %> &quot;<em><%= @schedule.name %></em>&quot; items.
+        <%= check_box_tag(:change_similar) %> Check this box to update all <%= @schedule.start_time.hour.to_s.rjust(2, '0') %>:<%= @schedule.start_time.min.to_s.rjust(2, '0') %> &quot;<em><%= @schedule.name %></em>&quot; items at once.
         </label>
       </div>
     </div>

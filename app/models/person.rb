@@ -6,9 +6,12 @@
 
 class Person < ActiveRecord::Base
   has_many :memberships, dependent: :destroy
-  has_many :events, -> { where ("attendance != 'Not Yet Invited' AND attendance != 'Declined'") }, through: :memberships, source: :event
+  has_many :events, -> { where "attendance != 'Not Yet Invited' AND attendance != 'Declined'" },
+           through: :memberships, source: :event
   has_one :user, dependent: :destroy
   has_many :invitations, foreign_key: 'invited_by'
+
+  attr_accessor :is_rsvp
 
   before_validation :downcase_email
   before_save :clean_data
@@ -17,9 +20,16 @@ class Person < ActiveRecord::Base
                     case_sensitive: false,
                     uniqueness: true,
                     email: true
-  validates :firstname, :lastname, :affiliation, :gender, :updated_by, presence: true
-  validates :gender, format: { with: /(M|F|O)/, message: " must be 'M','F', or 'O'" }, allow_blank: true
+  validates :firstname, :lastname, :affiliation, :gender, :updated_by,
+            presence: true
+  validates :gender, format:
+                     { with: /(M|F|O)/, message: " must be 'M','F', or 'O'" },
+                     allow_blank: true
   validates :phd_year, numericality: { allow_blank: true, only_integer: true }
+  validates :address1, :city, :region, :country, :postal_code,
+            presence: { message: 'We need an address, to book your hotel room.' },
+            if: :is_rsvp
+  validates :academic_status, presence: true, if: :is_rsvp
 
   # app/models/concerns/person_decorators.rb
   include PersonDecorators
@@ -31,8 +41,7 @@ class Person < ActiveRecord::Base
   end
 
   def downcase_email
-    self.email = self.email.downcase if self.email.present?
-    self.cc_email = self.cc_email.downcase if self.cc_email.present?
-    true
+    self.email = email.downcase if email.present?
+    self.cc_email.downcase if cc_email.present?
   end
 end

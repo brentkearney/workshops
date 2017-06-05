@@ -5,7 +5,7 @@ FactoryGirl.define do
 
   factory :membership do |f|
     association :person, factory: :person
-    association :event, factory: :event
+    association :event, factory: :event, future: true
 
     f.role 'Participant'
     f.attendance 'Confirmed'

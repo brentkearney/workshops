@@ -39,55 +39,64 @@ class LegacyConnector
 
   # get event data for given year
   def get_event_data_for_year(year)
-    JSON.parse(RestClient.get "#{@rest_url}/event_data_for_year/#{year}")
+    JSON.parse((RestClient.get "#{@rest_url}/event_data_for_year/#{year}"))
   end
 
   # get membership data for an event
   def get_members(event)
-    JSON.parse(RestClient.get "#{@rest_url}/members/#{event.code}")
+    JSON.parse((RestClient.get "#{@rest_url}/members/#{event.code}"))
   end
 
   # get a person record data
   def get_person(legacy_id)
-    JSON.parse(RestClient.get "#{@rest_url}/get_person/#{legacy_id}")
+    JSON.parse((RestClient.get "#{@rest_url}/get_person/#{legacy_id}"))
   end
 
   # search legacy db for person by email
   def search_person(email)
-    JSON.parse(RestClient.get "#{@rest_url}/search_person/#{email}")
+    JSON.parse((RestClient.get "#{@rest_url}/search_person/#{email}"))
   end
 
   # add new person record
   def add_person(person)
-    JSON.parse(RestClient.post "#{@rest_url}/add_person", person.to_json,
-                                content_type: :json, accept: :json)
+    JSON.parse((RestClient.post "#{@rest_url}/add_person", person.to_json,
+                                content_type: :json, accept: :json))
   end
 
   # add new member to event
   def add_member(membership:, event_code:, person:, updated_by:)
     remote_membership = membership.attributes.merge(
-      'workshop_id' => "#{event_code}", 'person' => person.as_json,
-      'updated_by' => "#{updated_by}")
-    JSON.parse(RestClient.post "#{@rest_url}/add_member/#{event_code}",
-                remote_membership.to_json, content_type: :json, accept: :json)
+      workshop_id: event_code,
+      person:      person.as_json,
+      updated_by:  updated_by
+    )
+
+    JSON.parse((RestClient.post "#{@rest_url}/add_member/#{event_code}",
+                                remote_membership.to_json,
+                                content_type: :json,
+                                accept: :json))
   end
 
   # add new members to event
   def add_members(event_code:, members:, updated_by:)
-    responses = Array.new
+    responses = []
     members.each do |member|
-      responses[] = add_member(membership: member, event_code: event_code,
-                            legacy_id: member.legacy_id, updated_by: updated_by)
+      responses[] = add_member(membership: member,
+                               event_code: event_code,
+                               legacy_id:  member.legacy_id,
+                               updated_by: updated_by)
     end
   end
 
   # update membership & person record
   def update_member(membership)
-    person = membership.person.attributes.
-      merge('updated_by' => "#{membership.updated_by}")
+    person = membership.person.attributes
+                       .merge(updated_by: membership.updated_by)
     # add_member() adds or updates memberships
-    add_member(membership: membership, event_code: membership.event.code,
-      person: person, updated_by: membership.updated_by)
+    add_member(membership: membership,
+               event_code: membership.event.code,
+               person: person,
+               updated_by: membership.updated_by)
   end
 
   # update an event's members

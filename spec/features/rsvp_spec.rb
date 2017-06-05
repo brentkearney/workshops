@@ -14,9 +14,11 @@ describe 'RSVP', type: :feature do
     Event.destroy_all
 
     @event = create(:event, future: true)
-    @membership = create(:membership, event: @event, attendance: 'Invited')
+    @person = create(:person, address1: '123 Street', city: 'City',
+                     region: 'Region', postal_code: 'p0st4l', country: 'USA')
+    @membership = create(:membership, event: @event, person: @person,
+                         attendance: 'Invited')
     @invitation = create(:invitation, membership: @membership)
-    @person = @membership.person
   end
 
   before do

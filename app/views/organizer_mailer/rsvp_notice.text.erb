@@ -5,15 +5,18 @@ There has been a change in membership for the event:
 <%= @event.dates %>
 
 The change was:
-<%= @member.name %> was "<%= @old_attendance %>", and is now "<%= @new_attendance %>".
+"<%= @member.name %>" <<%= @member.email %>> (<%= @member.affiliation %>)
+was "<%= @old_attendance %>", and is now "<%= @new_attendance %>".
 
 <% unless @message_to_organizer.blank? %>
 <%= @member.firstname %> included this message:
 "<%= @message_to_organizer %>"
-<% end %>
 
-You may view your event membership here:
+<% end %>
+You may view the Confirmed members here:
 <%= @membership_url %>
+
+If you login (register at https://workshops.birs.ca/register), you would see all workshop members and their current attendance status.
 
 
 --

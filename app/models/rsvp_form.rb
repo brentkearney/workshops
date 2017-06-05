@@ -7,6 +7,7 @@ class RsvpForm < ComplexForms
 
     @membership = invitation.membership
     @person = @membership.person
+    @person.is_rsvp = true
     @event = @membership.event
     self
   end

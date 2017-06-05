@@ -59,6 +59,11 @@ class InvitationChecker
   end
 
   def validate(invitation)
+    if invitation.nil?
+      @errors.add(:Invitation, 'That invitation code was not found.')
+    end
+    return if invitation.nil?
+
     if DateTime.now > invitation.expires
       @errors.add(:Invitation, 'This invitation code is expired.')
     end
@@ -79,17 +84,16 @@ class InvitationChecker
     end
 
     unless @errors.empty?
-      @errors.each do |k,v|
-        invitation.errors.add(k.to_sym, "#{v}")
+      @errors.each do |k, v|
+        invitation.errors.add(k.to_sym, v.to_s)
       end
     end
   end
 
   def create_local_invitation(membership)
     invitation = Invitation.new(membership: membership, invited_by: 'Staff',
-      code: local_otp, expires: Date.tomorrow)
+                                code: local_otp)
     invitation.save
     invitation
   end
-
 end

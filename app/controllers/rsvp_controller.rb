@@ -5,18 +5,17 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RsvpController < ApplicationController
-  before_filter :get_invitation, except: [:feedback]
-  before_filter :set_organizer_name, only: [:yes, :no, :maybe]
+  before_filter :set_invitation, except: [:feedback]
+  before_filter :after_selection, only: %i[yes no maybe]
 
   # GET /rsvp/:otp
-  def index
-  end
+  def index; end
 
   # GET /rsvp/yes/:otp
   # POST /rsvp/yes/:otp
   def yes
     @rsvp = RsvpForm.new(@invitation)
-    @years = (1930..Date.current.year).to_a #.reverse
+    @years = (1930..Date.current.year).to_a.reverse
     set_default_dates
 
     if request.post? && @rsvp.validate_form(yes_params)
@@ -46,8 +45,8 @@ class RsvpController < ApplicationController
           message: message).deliver_now unless message.blank?
       redirect_to event_memberships_path(membership.event),
         success: 'Thanks for the feedback!'
-    else
-      render :feedback
+    # else
+    #   render :feedback
     end
   end
 
@@ -67,7 +66,7 @@ class RsvpController < ApplicationController
     redirect_to rsvp_feedback_path(membership.id), success: 'Your attendance status was successfully updated. Thanks for your reply!'
   end
 
-  def get_invitation
+  def set_invitation
     if params[:otp].blank?
       redirect_to invitations_new_path
     else
@@ -75,12 +74,16 @@ class RsvpController < ApplicationController
     end
   end
 
-  def set_organizer_name
+  def after_selection
+    @invitation.errors.any? ? redirect_to(rsvp_otp_path) : set_organizer
+  end
+
+  def set_organizer
     @organizer = @invitation.membership.event.organizer.name
   end
 
   def otp_params
-    params[:otp].tr('^A-Za-z0-9_-','')
+    params[:otp].tr('^A-Za-z0-9_-', '')
   end
 
   def message_params
