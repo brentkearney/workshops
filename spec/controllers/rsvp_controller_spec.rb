@@ -57,12 +57,6 @@ RSpec.describe RsvpController, type: :controller do
 
   describe 'GET #no' do
     it 'renders no template' do
-      if @invitation.errors.any?
-        puts "Invitation errors: #{@invitation.errors.messages}"
-      else
-        puts "No invitation errors. @invitation is a: #{@invitation.class}"
-      end
-
       get :no, otp: @invitation.code
       expect(response).to render_template(:no)
     end

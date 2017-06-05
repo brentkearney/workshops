@@ -42,11 +42,9 @@ class RsvpController < ApplicationController
       membership = Membership.find(feedback_params[:membership_id])
       message = feedback_params[:feedback_message]
       StaffMailer.site_feedback(section: 'RSVP', membership: membership,
-          message: message).deliver_now unless message.blank?
+        message: message).deliver_now unless message.blank?
       redirect_to event_memberships_path(membership.event),
         success: 'Thanks for the feedback!'
-    # else
-    #   render :feedback
     end
   end
 
