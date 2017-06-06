@@ -78,12 +78,6 @@ class SyncMembers
       remote['Membership']['attendance'] = 'Not Yet Invited'
     end
 
-    if remote['Membership']['sent_invitation'] == 1
-      remote['Membership']['sent_invitation'] = true
-    else
-      remote['Membership']['sent_invitation'] = false
-    end
-
     remote
   end
 
@@ -131,14 +125,14 @@ class SyncMembers
       local_membership.person = person
       save_membership(local_membership)
     else
-      remote_update = remote['Membership']['updated_at'].in_time_zone(@event.time_zone)
-      local_update = local_membership.updated_at.in_time_zone(@event.time_zone)
-      if remote_update > local_update
+      # remote_updated_at = remote['Membership']['updated_at'].in_time_zone(@event.time_zone)
+      # local_updated_at = local_membership.updated_at.in_time_zone(@event.time_zone)
+      # if remote_update > local_update
         remote['Membership'].each_pair do |k,v|
           local_membership[k] = v unless v.blank?
         end
         save_membership(local_membership)
-      end
+      # end
     end
   end
 

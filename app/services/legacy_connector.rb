@@ -58,19 +58,17 @@ class LegacyConnector
   end
 
   # add or update person record
-  def add_person(person:, updated_by:)
-    remote_person = person.attributes.merge(updated_by: updated_by)
+  def add_person(person)
     JSON.parse((RestClient.post "#{@rest_url}/add_person",
-                                remote_person.to_json,
+                                person.to_json,
                                 content_type: :json, accept: :json))
   end
 
   # add new member to event
   def add_member(membership:, event_code:, person:, updated_by:)
-    remote_person = person.attributes.merge(updated_by: updated_by)
     remote_membership = membership.attributes.merge(
       workshop_id: event_code,
-      person:      remote_person.as_json,
+      person:      person.as_json,
       updated_by:  updated_by
     )
 
@@ -84,9 +82,10 @@ class LegacyConnector
   def add_members(event_code:, members:, updated_by:)
     responses = []
     members.each do |member|
+      person = member.person.attributes.merge(updated_by: membership.updated_by)
       responses[] = add_member(membership: member,
                                event_code: event_code,
-                               legacy_id:  member.legacy_id,
+                               person:  person,
                                updated_by: updated_by)
     end
   end
