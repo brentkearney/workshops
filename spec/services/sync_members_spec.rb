@@ -133,8 +133,8 @@ describe "SyncMembers" do
         allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(e: event, m: membership, ln: 'McPerson'))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
-        expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} person: New McPerson\n")
-        expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} membership for New McPerson\n")
+        expect(Rails.logger).to receive(:info).with("\n\n* Saved #{event.code} person: New McPerson\n")
+        expect(Rails.logger).to receive(:info).with("\n\n* Saved #{event.code} membership for New McPerson\n")
 
         SyncMembers.new(event)
 
@@ -159,8 +159,8 @@ describe "SyncMembers" do
 
         person.valid?
         membership.valid?
-        expect(Rails.logger).to receive(:error).with("\n* Error saving #{event.code} person: #{person.name}, #{person.errors.full_messages}\n")
-        expect(Rails.logger).to receive(:error).with("\n* Error saving #{event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n")
+        expect(Rails.logger).to receive(:error).with("\n\n* Error saving #{event.code} person: #{person.name}, #{person.errors.full_messages}\n")
+        expect(Rails.logger).to receive(:error).with("\n\n* Error saving #{event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n")
         expect(sync_errors).to receive(:add).twice.with(anything)
         SyncMembers.new(event)
 
@@ -179,8 +179,8 @@ describe "SyncMembers" do
         allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(e: event, m: membership, ln: 'Smith'))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
-        expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} person: #{person.name}\n")
-        expect(Rails.logger).to receive(:info).with("\n* Saved #{event.code} membership for #{membership.person.name}\n")
+        expect(Rails.logger).to receive(:info).with("\n\n* Saved #{event.code} person: #{person.name}\n")
+        expect(Rails.logger).to receive(:info).with("\n\n* Saved #{event.code} membership for #{membership.person.name}\n")
         SyncMembers.new(event)
 
         lm = Event.find(event.id).memberships.last
@@ -203,7 +203,7 @@ describe "SyncMembers" do
 
 
         membership.valid?
-        expect(Rails.logger).to receive(:error).with("\n* Error saving #{event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n")
+        expect(Rails.logger).to receive(:error).with("\n\n* Error saving #{event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n")
         expect(sync_errors).to receive(:add).with(anything)
         SyncMembers.new(event)
 
