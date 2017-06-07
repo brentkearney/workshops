@@ -18,21 +18,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 # Updates local database with records from legacy database
 class SyncMembers
-  attr_reader :event, :remote_members, :sync_errors
+  attr_reader :event, :remote_members, :local_members, :sync_errors
   def initialize(event)
     @event = event
     @sync_errors = ErrorReport.new(self.class, @event)
+    @remote_members = get_remote_members
+    @local_members = @event.memberships.includes(:person)
     run
   end
 
   def run
-    get_remote_members.each do |remote|
-      remote = fix_remote_fields(remote)
-      local_person = update_person(remote)
-      update_membership(remote, local_person)
+    remote_members.each do |remote_member|
+      translated_member = fix_remote_fields(remote_member)
+      local_person = update_person(translated_member['Person'])
+      update_membership(translated_member['Membership'], local_person)
     end
 
     sync_errors.send_report
@@ -40,70 +41,85 @@ class SyncMembers
 
   def get_remote_members
     lc = LegacyConnector.new
-    @remote_members = lc.get_members(event)
+    remote_members = lc.get_members(event)
 
-    if @remote_members.empty?
-      sync_errors.add(lc, "Unable to retrieve any remote members for #{event.code}")
+    if remote_members.empty?
+      sync_errors.add(lc,
+                      "Unable to retrieve any remote members for #{event.code}")
       sync_errors.send_report
       raise 'NoResultsError'
     end
-    @remote_members
+    remote_members
   end
 
-  def fix_remote_fields(remote)
-    if remote['Person']['updated_by'].blank?
-      remote['Person']['updated_by'] = 'Workshops importer'
+  def fix_remote_fields(remote_member)
+    if remote_member['Person']['updated_by'].blank?
+      remote_member['Person']['updated_by'] = 'Workshops importer'
     end
 
-    if remote['Membership']['updated_by'].blank?
-      remote['Membership']['updated_by'] = 'Workshops importer'
+    if remote_member['Membership']['updated_by'].blank?
+      remote_member['Membership']['updated_by'] = 'Workshops importer'
     end
 
-    if remote['Person']['updated_at'].blank?
-      remote['Person']['updated_at'] = Time.now
+    if remote_member['Person']['updated_at'].blank?
+      remote_member['Person']['updated_at'] = Time.now
     else
-      remote['Person']['updated_at'] =
-        Time.at(remote['Person']['updated_at']).in_time_zone(@event.time_zone)
-    end
-
-    if remote['Membership']['updated_at'].blank?
-      remote['Membership']['updated_at'] = Time.now
-    else
-      remote['Membership']['updated_at'] =
-        Time.at(remote['Membership']['updated_at'])
+      remote_member['Person']['updated_at'] =
+        Time.at(remote_member['Person']['updated_at'])
             .in_time_zone(@event.time_zone)
     end
 
-    if remote['Membership']['role'] == 'Backup Participant'
-      remote['Membership']['attendance'] = 'Not Yet Invited'
+    if remote_member['Membership']['updated_at'].blank?
+      remote_member['Membership']['updated_at'] = Time.now
+    else
+      remote_member['Membership']['updated_at'] =
+        Time.at(remote_member['Membership']['updated_at'])
+            .in_time_zone(@event.time_zone)
     end
 
-    remote
+    if remote_member['Membership']['role'] == 'Backup Participant'
+      remote_member['Membership']['attendance'] = 'Not Yet Invited'
+    end
+
+    remote_member
   end
 
-  def update_person(remote)
-    local_person = get_local_person(remote)
+  def update_person(remote_person)
+    local_person = get_local_person(remote_person)
 
     if local_person.nil?
-      local_person = Person.new(remote['Person'])
+      local_person = Person.new(remote_person)
       save_person(local_person)
     else
-      remote_update = remote['Person']['updated_at']
-                      .in_time_zone(event.time_zone)
-      local_update = local_person.updated_at.in_time_zone(event.time_zone)
-      if remote_update > local_update
-        remote['Person'].each_pair do |k, v|
+      Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
+      Rails.logger.debug "local_person: #{local_person.attributes}\n"
+      Rails.logger.debug "remote_person: #{remote_person}\n"
+
+      if local_person.attributes.except(:id) == remote_person
+        Rails.logger.debug "\n* local_person.name attributes match, not updating.\n"
+      else
+        remote_person.each_pair do |k, v|
           local_person[k] = v unless v.blank?
         end
         save_person(local_person)
       end
+      Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
     end
 
     local_person
   end
 
+  def get_local_person(remote_person)
+    member = local_members.select do |m|
+      m.person_id == remote_person['legacy_id']
+    end.first
+
+    return member.person unless member.nil?
+    Person.find_by(email: remote_person['email'])
+  end
+
   def save_person(person)
-    if person.valid? && person.save
+    if person.save
       Rails.logger.info "\n* Saved #{@event.code} person: #{person.name}\n"
     else
       Rails.logger.error "\n* Error saving #{@event.code} person: #{person.name}, #{person.errors.full_messages}\n"
@@ -111,38 +127,34 @@ class SyncMembers
     end
   end
 
-  def get_local_person(remote)
-    Person.find_by(legacy_id: remote['Person']['legacy_id']) ||
-      Person.find_by(email: remote['Person']['email'])
-  end
-
-  def update_membership(remote, person)
-    local_membership = Membership.where(event: event.id, person: person.id).first
+  def update_membership(remote_member, local_person)
+    local_membership = local_members.select do |m|
+      m.person_id == local_person[:id]
+    end.first
 
     if local_membership.nil?
-      local_membership = Membership.new(remote['Membership'])
+      local_membership = Membership.new(remote_member)
       local_membership.event = event
-      local_membership.person = person
+      local_membership.person = local_person
       save_membership(local_membership)
     else
-      # remote_updated_at = remote['Membership']['updated_at'].in_time_zone(@event.time_zone)
-      # local_updated_at = local_membership.updated_at.in_time_zone(@event.time_zone)
-      # if remote_update > local_update
-        remote['Membership'].each_pair do |k,v|
+      if local_membership.attributes.except(:id) == remote_member
+        Rails.logger.debug "\n* Local membership is the same, not updating.\n"
+      else
+        remote_member.each_pair do |k, v|
           local_membership[k] = v unless v.blank?
         end
         save_membership(local_membership)
-      # end
+      end
     end
   end
 
   def save_membership(membership)
-    if membership.valid? && membership.save
+    if membership.save
       Rails.logger.info "\n* Saved #{@event.code} membership for #{membership.person.name}\n"
     else
       Rails.logger.error "\n* Error saving #{@event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n"
       sync_errors.add(membership)
     end
   end
-
 end

@@ -153,11 +153,10 @@ class StaffMailer < ApplicationMailer
     unless feedback_email.blank?
       @membership = membership
       person = membership.person
-      from = '"' + person.name + '" <' + person.email + '>"'
       @message = message
       @question = 'How was your RSVP experience?'
       subject = "[#{@membership.event.code}] #{section} feedback"
-      mail(from: from, to: feedback_email, subject: subject)
+      mail(to: feedback_email, subject: subject)
     end
   end
 end
