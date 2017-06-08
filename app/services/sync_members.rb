@@ -26,17 +26,25 @@ class SyncMembers
     @sync_errors = ErrorReport.new(self.class, @event)
     @remote_members = get_remote_members
     @local_members = @event.memberships.includes(:person)
-    run
+    sync_memberships
   end
 
-  def run
-    remote_members.each do |remote_member|
-      translated_member = fix_remote_fields(remote_member)
-      local_person = update_person(translated_member['Person'])
-      update_membership(translated_member['Membership'], local_person)
+  def sync_memberships
+    remote_members.each do |rm|
+      remote_member = fix_remote_fields(rm)
+      local_person = update_person(remote_member['Person'])
+      update_membership(remote_member['Membership'], local_person)
     end
 
+    prune_members
     sync_errors.send_report
+  end
+
+  def prune_members
+    remote_ids = remote_members.map { |m| m['Person']['legacy_id'].to_i }
+    Event.find(@event.id).memberships.includes(:person).each do |m|
+      m.destroy unless remote_ids.include?(m.person.legacy_id)
+    end
   end
 
   def get_remote_members

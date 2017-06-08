@@ -112,7 +112,10 @@ describe "SyncMembers" do
       it 'creates a new person record' do
         event = create(:event)
         lc = FakeLegacyConnector.new
-        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_person(e: event, m: nil, ln: 'Remoteperson'))
+        remote_members = lc.get_members_with_person(e: event,
+                                                    m: nil, ln: 'Remoteperson')
+        allow(lc).to receive(:get_members).with(event)
+          .and_return(remote_members)
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         SyncMembers.new(event)
@@ -201,7 +204,6 @@ describe "SyncMembers" do
         sync_errors = ErrorReport.new('SyncMembers', event)
         expect(ErrorReport).to receive(:new).and_return(sync_errors)
 
-
         membership.valid?
         expect(Rails.logger).to receive(:error).with("\n\n* Error saving #{event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n")
         expect(sync_errors).to receive(:add).with(anything)
@@ -238,6 +240,21 @@ describe "SyncMembers" do
 
         expect(Event.find(membership.event.id).memberships.last.staff_notes).to eq('Hi')
       end
+    end
+  end
+
+  describe '.prune_members' do
+    before do
+      @event = create(:event_with_members)
+      allow(LegacyConnector).to receive(:new).and_return(FakeLegacyConnector.new)
+      @sm = SyncMembers.new(@event)
+    end
+
+    it 'removes local members that are not in remote memberships' do
+      new_member = create(:membership, event: @event)
+      @sm.prune_members
+
+      expect(Event.find(@event.id).memberships).not_to include(new_member)
     end
   end
 end

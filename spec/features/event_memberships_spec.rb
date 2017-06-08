@@ -8,6 +8,7 @@ require 'rails_helper'
 
 describe 'Event Membership Page', type: :feature do
   before do
+    Event.destroy_all
     @event = create(:event_with_members)
     @member = @event.memberships.where("role='Participant'").first
     @user = create(:user, email: @member.person.email, person: @member.person)
@@ -20,25 +21,25 @@ describe 'Event Membership Page', type: :feature do
 
   def does_not_list_members
     @event.members.each do |p|
-      expect(page.body).not_to include(p.lastname)
+      expect(page.body).not_to have_text(p.lastname)
     end
   end
 
   def shows_confirmed_members
     @event.memberships.select {|m| m.attendance == 'Confirmed'}.each do |member|
-      expect(page.body).to include(member.person.lname)
+      expect(page.body).to have_text(member.person.lname)
     end
   end
 
   def hides_nonconfirmed_members
     @event.memberships.select {|m| m.attendance != 'Confirmed'}.each do |member|
-      expect(page.body).not_to include(member.person.lname)
+      expect(page.body).not_to have_text(member.person.lname)
     end
   end
 
   def shows_all_members
     @event.memberships.each do |member|
-      expect(page.body).to include(member.person.lname)
+      expect(page.body).to have_text(member.person.lname)
     end
   end
 
