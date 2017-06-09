@@ -26,7 +26,16 @@ describe 'Schedule Index', type: :feature do
     end
   end
 
+  def does_not_populate_empty_schedule
+    @event.schedules.destroy_all
+    visit(event_schedule_index_path(@event))
+
+    expect(@event.schedules).to be_empty
+  end
+
   def reloads_template_schedule
+    @event.schedules.destroy_all
+
     visit(event_schedule_index_path(@event))
     @template_event.schedules.each do |item|
       expect(page.body).to have_text(item.name)
@@ -38,6 +47,7 @@ describe 'Schedule Index', type: :feature do
 
     visit(event_schedule_index_path(@event))
     expect(page.body).to have_text('Altered item')
+    expect(@event.schedules.count).to eq(@template_event.schedules.count)
   end
 
   context 'Admin users' do
@@ -54,10 +64,11 @@ describe 'Schedule Index', type: :feature do
     end
   end
 
-  context 'Organizers' do
+  context 'Organizers of event' do
     before do
-      membership = create(:membership, role: 'Organizer')
-      authenticate_user(membership.person, 'member')
+      create(:membership, event: @event,
+                          person: @user.person,
+                          role: 'Organizer')
     end
 
     it 'populates an empty schedule from the template event schedule' do
@@ -69,19 +80,28 @@ describe 'Schedule Index', type: :feature do
     end
   end
 
+  context 'Organizers of other event' do
+    before do
+      Membership.destroy_all
+      new_event = create(:event)
+      create(:membership, event: new_event,
+                          person: @user.person,
+                          role: 'Organizer')
+    end
+
+    it 'does not populates an empty schedule from the template' do
+      does_not_populate_empty_schedule
+    end
+  end
+
   context 'Participants' do
     before do
       membership = create(:membership, role: 'Participant')
       authenticate_user(membership.person, 'member')
     end
 
-    it 'does not load default schedule' do
-      @event.schedules.destroy_all
-      visit(event_schedule_index_path(@event))
-
-      @template_event.schedules.each do |item|
-        expect(page.body).not_to have_text(item.name)
-      end
+    it 'does not populates an empty schedule from the template' do
+      does_not_populate_empty_schedule
     end
   end
 end

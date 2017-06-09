@@ -31,11 +31,13 @@ class User < ActiveRecord::Base
   end
 
   def is_organizer?(event)
-    self.person.memberships.where("event_id=#{event.id} AND role LIKE '%Org%'").count > 0
+    person.memberships.where("event_id=#{event.id} AND role LIKE '%Org%'")
+          .count > 0
   end
 
   def is_member?(event)
-    self.person.memberships.where("event_id=#{event.id} AND attendance != 'Declined' AND attendance != 'Not Yet Invited'").count > 0
+    person.memberships.where("event_id=#{event.id} AND attendance != 'Declined'
+      AND attendance != 'Not Yet Invited'").count > 0
   end
 
   def name

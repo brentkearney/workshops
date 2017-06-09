@@ -4,6 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
+# Authorization for Schedules
 class SchedulePolicy
   attr_reader :current_user, :model
 
@@ -14,10 +15,9 @@ class SchedulePolicy
   end
 
   def create?
-    if @current_user
-      @current_user.is_organizer?(@event) || @current_user.is_admin? ||
-          (@current_user.is_staff? && @current_user.location == @event.location)
-    end
+    return false unless @current_user
+    @current_user.is_organizer?(@event) || @current_user.is_admin? ||
+      (@current_user.is_staff? && @current_user.location == @event.location)
   end
 
   # Only organizers and admins can change event schedules
@@ -25,11 +25,9 @@ class SchedulePolicy
     if name =~ /index|show/
       true
     else
-      if @current_user
-        @current_user.is_organizer?(@event) || @current_user.is_admin? ||
-            (@current_user.is_staff? && @current_user.location == @event.location)
-      end
+      return false unless @current_user
+      @current_user.is_organizer?(@event) || @current_user.is_admin? ||
+        (@current_user.is_staff? && @current_user.location == @event.location)
     end
   end
-
 end

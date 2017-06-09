@@ -6,12 +6,12 @@
 
 # DefaultSchedule creates a default schedule for events that have none
 class DefaultSchedule
-  attr_reader :schedules
+  attr_reader :schedules, :event
 
   def initialize(event, user)
     @event = event
     @current_user = user
-    @schedules = build_event_schedule
+    @schedules = collect_event_schedule
 
     build_default_schedule if authorized?
   end
@@ -19,13 +19,20 @@ class DefaultSchedule
   private
 
   def authorized?
-    return false unless @current_user
-    @current_user.is_organizer?(@event) || @current_user.is_admin? ||
-      (@current_user.is_staff? && @current_user.location == @event.location)
+    Pundit.policy(@current_user, self).allow?
+  end
+
+  def empty_or_default
+    @schedules.empty? || only_default_entries
+  end
+
+  def only_default_entries
+    defaults = @schedules.select { |s| s.updated_by == 'Default Schedule' }
+    @event.schedules.destroy_all if (@schedules - defaults).empty?
   end
 
   def build_default_schedule
-    return unless @schedules.empty?
+    return unless empty_or_default
     template_event = Event.where(template: true, location: @event.location,
                                  event_type: @event.event_type).first
 
@@ -63,7 +70,7 @@ class DefaultSchedule
     @schedules = @event.schedules.order(:start_time)
   end
 
-  def build_event_schedule
+  def collect_event_schedule
     schedules = []
     return schedules unless published_schedule
     schedules = @event.schedules.order(:start_time,
