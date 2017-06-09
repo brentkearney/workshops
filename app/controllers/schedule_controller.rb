@@ -16,9 +16,12 @@ class ScheduleController < ApplicationController
   def index
     @schedules = DefaultSchedule.new(@event, current_user).schedules
     @schedule_policy = Schedule.new(event: @event)
-    if request.format.html? && @schedules.empty? && !current_user
-      redirect_to sign_in_path
-    end
+
+    redirect_to sign_in_path if nothing_to_see_here(@schedules)
+  end
+
+  def nothing_to_see_here(schedules)
+    request.format.html? && schedules.empty? && !current_user
   end
 
   # POST /events/:event_id/schedule/schedule_publish
@@ -32,14 +35,14 @@ class ScheduleController < ApplicationController
 
   # GET /schedule/1
   # GET /schedule/1.json
-  def show
-  end
+  def show; end
 
   # GET /schedule/new
   def new
     authorize Schedule.new(event: @event)
     @day = params[:day].to_date
-    new_params = { new_item: true, event_id: @event.id, start_time: @day.to_time, updated_by: current_user.name }
+    new_params = { new_item: true, event_id: @event.id,
+                   start_time: @day.to_time, updated_by: current_user.name }
     @schedule = ScheduleItem.new(new_params).schedule
     @members = @event.members
 
@@ -58,21 +61,31 @@ class ScheduleController < ApplicationController
   # POST /events/:event_id/schedule
   # POST /events/:event_id/schedule.json
   def create
-    @schedule = ScheduleItem.new(schedule_params.merge(:updated_by => current_user.name)).schedule
+    @schedule = ScheduleItem.new(schedule_params
+      .merge(updated_by: current_user.name)).schedule
     authorize @schedule
 
     respond_to do |format|
       if @schedule.valid? && @schedule.save
         day = @schedule.start_time.to_date
         name = @schedule.name
-        StaffMailer.schedule_change(@schedule, type: :create, user: current_user.name).deliver_now if @schedule.notify_staff?
-        format.html { redirect_to event_schedule_day_path(@event, day), notice: "\"#{name}\" was successfully scheduled." }
+        if @schedule.notify_staff?
+          StaffMailer.schedule_change(@schedule, type: :create,
+                                                 user: current_user.name)
+                     .deliver_now
+        end
+        format.html do
+          redirect_to event_schedule_day_path(@event, day),
+                      notice: "\"#{name}\" was successfully scheduled."
+        end
         format.json { render :show, status: :created, location: @schedule }
       else
         @day = params[:day].to_time
         @form_action = 'create'
         format.html { render :new }
-        format.json { render json: @schedule.errors, status: :unprocessable_entity }
+        format.json do
+          render json: @schedule.errors, status: :unprocessable_entity
+        end
       end
     end
   end
@@ -83,7 +96,9 @@ class ScheduleController < ApplicationController
     authorize @schedule
 
     @original_item = @schedule.dup
-    merged_params = ScheduleItem.update(@schedule, schedule_params.merge(:updated_by => current_user.name))
+    merged_params = ScheduleItem.update(@schedule,
+                                        schedule_params
+                                .merge(updated_by: current_user.name))
     @day = @schedule.start_time.to_date
 
     if session[:return_to]
@@ -94,10 +109,22 @@ class ScheduleController < ApplicationController
 
     respond_to do |format|
       if @schedule.update(merged_params)
-        ScheduleItem.update_others(@original_item, merged_params) if params[:change_similar]
-        StaffMailer.schedule_change(@original_item, type: :update, user: current_user.name, updated_schedule: @schedule, changed_similar: params[:change_similar]).deliver_now if @schedule.notify_staff?
+        if params[:change_similar]
+          ScheduleItem.update_others(@original_item, merged_params)
+        end
+        if @schedule.notify_staff?
+          StaffMailer.schedule_change(@original_item,
+                                      type: :update,
+                                      user: current_user.name,
+                                      updated_schedule: @schedule,
+                                      changed_similar: params[:change_similar])
+                     .deliver_now
+        end
 
-        format.html { redirect_to from_where_we_came, notice: "\"#{@schedule.name}\" was successfully updated." }
+        format.html do
+          redirect_to from_where_we_came,
+                      notice: "\"#{@schedule.name}\" was successfully updated."
+        end
         format.json { render :show, status: :ok, location: @schedule }
       else
         unless @schedule.lecture_id.nil?
@@ -106,7 +133,9 @@ class ScheduleController < ApplicationController
         end
         @form_action = 'update'
         format.html { render :edit }
-        format.json { render json: @schedule.errors, status: :unprocessable_entity }
+        format.json do
+          render json: @schedule.errors, status: :unprocessable_entity
+        end
       end
     end
   end
@@ -115,8 +144,12 @@ class ScheduleController < ApplicationController
   # DELETE /schedule/1.json
   def destroy
     authorize @schedule
-    StaffMailer.schedule_change(@schedule, type: :destroy, user: current_user.name).deliver_now if @schedule.notify_staff?
-
+    if @schedule.notify_staff?
+      StaffMailer.schedule_change(@schedule,
+                                  type: :destroy,
+                                  user: current_user.name)
+                 .deliver_now
+    end
     if @schedule.lecture.blank?
       @schedule.destroy
     else
@@ -124,11 +157,13 @@ class ScheduleController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to event_schedule_index_path(@event), notice: 'Schedule item was successfully removed.' }
+      format.html do
+        redirect_to event_schedule_index_path(@event),
+                    notice: 'Schedule item was successfully removed.'
+      end
       format.json { head :no_content }
     end
   end
-
 
   private
 
@@ -137,7 +172,11 @@ class ScheduleController < ApplicationController
   end
 
   def schedule_params
-    params.require(:schedule).permit(:id, :event_id, :start_time, :end_time, :name, :description, :location, :day, lecture_attributes: [ :person_id, :id, :keywords, :do_not_publish ] )
+    params.require(:schedule)
+          .permit(:id, :event_id, :start_time, :end_time,
+                  :name, :description, :location, :day,
+                  lecture_attributes: [:person_id, :id, :keywords,
+                                       :do_not_publish])
   end
 
   def flash_notice

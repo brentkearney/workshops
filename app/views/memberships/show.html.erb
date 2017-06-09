@@ -10,7 +10,7 @@
 	<div class="row profile-email"><%= mail_to @membership.person.email %></div>
 	<% end %>
 	<% unless @membership.person.url.blank? %>
-	<div class="row profile-url"><%= link_to @membership.person.url, @membership.person.url %></div>
+	<div class="row profile-url"><%= link_to @membership.person.uri, @membership.person.uri %></div>
 	<% end %>
 
   <div class="row profile-attendance">
@@ -26,24 +26,24 @@
   <% if policy(@membership).view_details? %>
   <div class="row pofile-arrival">
 	 <strong>Arriving on:</strong>
-	 <%= @membership.arrival_date %>
+	 <%= @membership.arrives %>
 	</div>
 
 	<div class="row profile-departure">
 	 <strong>Departing on:</strong>
-	 <%= @membership.departure_date %>
+	 <%= @membership.departs %>
 	</div>
 
 	<div class="row profile-replied-at">
-	 <strong>Replied at:</strong>
-	 <%= @membership.replied_at %>
+	 <strong>RSVP date:</strong>
+	 <%= @membership.rsvp_date %>
 	</div>
   <% end %>
 
 	<div class="row" id="member-buttons">
 	<%= link_to "Back to #{@event.code}", event_memberships_path(@event), class: 'btn btn-sm btn-default' %>
 	</div><!-- member-buttons -->
-	
+
 	</div><!-- nested row -->
 
 </div><!-- right-side column -->

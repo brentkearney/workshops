@@ -53,31 +53,31 @@ describe 'Event Membership Page', type: :feature do
     expect(page.body).not_to have_css('a', text: 'Email Confirmed Members')
   end
 
-  def shows_limited_profile(member)
-    expect(page.body).to have_css('div.profile-name', text: "#{member.person.name}")
-    expect(page.body).to have_css('div.profile-affil', text: "#{member.person.affil_with_title}")
-    expect(page.body).to have_css('div.profile-url', text: "#{member.person.url}")
+  def shows_basic_info(member)
+    expect(page.body).to have_css('div.profile-name', text: member.person.name)
+    expect(page.body).to have_css('div.profile-affil',
+                                  text: member.person.affil_with_title)
+    expect(page.body).to have_css('div.profile-url', text: member.person.uri)
+  end
 
-    expect(page.body).not_to include('Arriving on')
-    expect(page.body).not_to include(member.arrival_date.to_s)
-    expect(page.body).not_to include('Departing on')
-    expect(page.body).not_to include(member.departure_date.to_s)
-    expect(page.body).not_to include('Replied at')
-    expect(page.body).not_to include(member.replied_at.to_s)
+  def shows_limited_profile(member)
+    shows_basic_info(member)
+    expect(page.body).not_to have_text('Arriving on')
+    expect(page.body).not_to have_text('Departing on')
+    expect(page.body).not_to have_text('RSVP date')
+    expect(page.body).not_to have_text(member.rsvp_date)
   end
 
   def shows_full_profile(member)
-    expect(page.body).to have_css('div.profile-name', text: "#{member.person.name}")
-    expect(page.body).to have_css('div.profile-affil', text: "#{member.person.affil_with_title}")
-    expect(page.body).to have_css('div.profile-email', text: "#{member.person.email}")
-    expect(page.body).to have_css('div.profile-url', text: "#{member.person.url}")
-
-    expect(page.body).to include('Arriving on')
-    expect(page.body).to include(member.arrival_date.to_s)
-    expect(page.body).to include('Departing on')
-    expect(page.body).to include(member.departure_date.to_s)
-    expect(page.body).to include('Replied at')
-    expect(page.body).to include(member.replied_at.to_s)
+    shows_basic_info(member)
+    expect(page.body).to have_css('div.profile-email',
+                                  text: member.person.email)
+    expect(page.body).to have_text('Arriving on')
+    expect(page.body).to have_text(member.arrival_date.strftime('%b %-d, %Y'))
+    expect(page.body).to have_text('Departing on')
+    expect(page.body).to have_text(member.departure_date.strftime('%b %-d, %Y'))
+    expect(page.body).to have_text('RSVP date')
+    expect(page.body).to have_text(member.rsvp_date)
   end
 
   context 'As a not-logged in user' do
@@ -87,7 +87,7 @@ describe 'Event Membership Page', type: :feature do
 
     it 'does not show member email addresses' do
       @event.memberships.each do |member|
-        expect(page.body).not_to include(member.person.email)
+        expect(page.body).not_to have_text(member.person.email)
       end
     end
 
@@ -118,7 +118,7 @@ describe 'Event Membership Page', type: :feature do
       member = @event.memberships.where("role='Participant' AND attendance='Confirmed'").last
       click_link "#{member.person.lname}"
       shows_limited_profile(member)
-      expect(page.body).not_to include(member.person.email)
+      expect(page.body).not_to have_text(member.person.email)
     end
   end
 
@@ -140,11 +140,11 @@ describe 'Event Membership Page', type: :feature do
       hides_nonconfirmed_members
     end
 
-    it 'clicking a member shows limited profile information, but includes the email address' do
+    it 'clicking a member shows limited profile information, but have_texts the email address' do
       member = @event.memberships.where("role='Participant' AND attendance='Confirmed'").last
       click_link "#{member.person.lname}"
       shows_limited_profile(member)
-      expect(page.body).to include(member.person.email)
+      expect(page.body).to have_text(member.person.email)
     end
   end
 
@@ -221,10 +221,11 @@ describe 'Event Membership Page', type: :feature do
       end
 
       it 'clicking a member shows limited profile information, excludes the email address' do
-        member = @event.memberships.where("role='Participant' AND attendance='Confirmed'").last
+        member = @event.memberships.where("role='Participant'
+          AND attendance='Confirmed'").last
         click_link "#{member.person.lname}"
         shows_limited_profile(member)
-        expect(page.body).not_to include(member.person.email)
+        expect(page.body).not_to have_text(member.person.email)
       end
     end
   end

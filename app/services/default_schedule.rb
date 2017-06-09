@@ -11,26 +11,23 @@ class DefaultSchedule
   def initialize(event, user)
     @event = event
     @current_user = user
-    @schedules = schedule_with_lectures
+    @schedules = build_event_schedule
 
-    if @current_user
-      if @schedules.empty? && is_authorized?
-        build_default_schedule
-      end
-    else
-      @schedules = Array.new unless @event && @event.publish_schedule
-    end
+    build_default_schedule if authorized?
   end
 
   private
 
-  def is_authorized?
+  def authorized?
+    return false unless @current_user
     @current_user.is_organizer?(@event) || @current_user.is_admin? ||
-        (@current_user.is_staff? && @current_user.location == @event.location)
+      (@current_user.is_staff? && @current_user.location == @event.location)
   end
 
   def build_default_schedule
-    template_event = Event.where(template: true, location: @event.location, event_type: @event.event_type).first
+    return unless @schedules.empty?
+    template_event = Event.where(template: true, location: @event.location,
+                                 event_type: @event.event_type).first
 
     unless template_event.nil?
       template_schedules = template_event.schedules.order(:start_time)
@@ -45,12 +42,17 @@ class DefaultSchedule
               @event.schedules.create!(item.attributes.
                  merge(id: nil,
                        event_id: @event.id,
-                       start_time: item.start_time.change({ year: eday.year, month: eday.month, day: eday.mday }),
-                       end_time: item.end_time.change({ year: eday.year, month: eday.month, day: eday.mday }),
+                       start_time: item.start_time
+                                       .change(year: eday.year,
+                                               month: eday.month,
+                                               day: eday.mday),
+                       end_time: item.end_time
+                                     .change(year: eday.year,
+                                             month: eday.month,
+                                             day: eday.mday),
                        created_at: Time.now,
                        updated_at: Time.now,
-                       updated_by: 'Default Schedule'
-              ))
+                       updated_by: 'Default Schedule'))
               used_items << item
             end
           end
@@ -61,22 +63,26 @@ class DefaultSchedule
     @schedules = @event.schedules.order(:start_time)
   end
 
-  def schedule_with_lectures
-    if @event
-      @schedules = @event.schedules.order(:start_time, 'lecture_id DESC').includes(:lecture)
-    else
-      @schedules = Array.new
-    end
-
-    unless @schedules.empty?
-      @schedules.each_with_index do |item, index|
-        if item.lecture && item.lecture.abstract
-          item.description = item.lecture.abstract
-        end
-        @schedules[index] = item
-      end
-    end
-    @schedules
+  def build_event_schedule
+    schedules = []
+    return schedules unless published_schedule
+    schedules = @event.schedules.order(:start_time,
+                                       'lecture_id DESC').includes(:lecture)
+    add_lectures(schedules)
   end
 
+  def add_lectures(schedules)
+    schedules.each_with_index do |item, index|
+      if item.lecture && item.lecture.abstract
+        item.description = item.lecture.abstract
+      end
+      schedules[index] = item
+    end
+    schedules
+  end
+
+  def published_schedule
+    return false unless @event
+    authorized? || @event.publish_schedule
+  end
 end

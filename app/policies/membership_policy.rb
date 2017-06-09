@@ -15,10 +15,7 @@ class MembershipPolicy
 
   # Membership modification is not yet implemented
   def method_missing(name, *args)
-    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-    Rails.logger.debug "MembershipPolicy method_missing called for: #{name}, with args: #{args}\n"
-    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-    false
+    allow_staff_and_admins
   end
 
   # Members cannot see memberships for events to which they
@@ -26,10 +23,12 @@ class MembershipPolicy
   # Backup Participants.
   class Scope < Struct.new(:current_user, :model)
     def resolve
-      memberships = current_user.person.memberships.includes(:event).sort_by {|m| m.event.start_date }
+      memberships = current_user.person.memberships.includes(:event)
+                                .sort_by { |m| m.event.start_date }
       memberships.delete_if do |m|
-        (m.role !~ /Organizer/ && (m.attendance == 'Declined' || m.attendance == 'Not Yet Invited')) ||
-            m.role == 'Backup Participant'
+        (m.role !~ /Organizer/ &&
+          (m.attendance == 'Declined' || m.attendance == 'Not Yet Invited')) ||
+          m.role == 'Backup Participant'
       end
     end
   end

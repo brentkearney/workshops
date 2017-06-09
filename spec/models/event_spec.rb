@@ -131,7 +131,7 @@ RSpec.describe "Model validations: Event ", type: :model do
     @current = create(:event, current: true)
     @future = create(:event, future: true)
 
-    expect(Event.years).to eq([@past.year, @current.year, @future.year])
+    expect(Event.years).to eq([@future.year, @current.year, @past.year])
   end
 
   describe 'Event Scopes' do

@@ -30,17 +30,17 @@ class Membership < ActiveRecord::Base
   ATTENDANCE = ['Confirmed', 'Invited', 'Undecided', 'Not Yet Invited', 'Declined']
 
   def update_counter_cache
-    self.event.confirmed_count = Membership.where("attendance='Confirmed'
-      AND event_id=?", self.event.id).count
-    self.event.save
+    event.confirmed_count = Membership.where("attendance='Confirmed'
+      AND event_id=?", event.id).count
+    event.save
   end
 
   def shares_email?
-    self.share_email
+    share_email
   end
 
   def is_org?
-    self.role == 'Organizer' || self.role == 'Contact Organizer'
+    role == 'Organizer' || role == 'Contact Organizer'
   end
 
   def set_role
@@ -56,7 +56,7 @@ class Membership < ActiveRecord::Base
   end
 
   def arrival_and_departure_dates
-    w = self.event
+    w = event
 
     unless arrival_date.blank?
       if arrival_date.to_date > w.end_date.to_date
@@ -110,5 +110,20 @@ class Membership < ActiveRecord::Base
     if has_guest && !guest_disclaimer
       errors.add(:guest_disclaimer, "must be acknowledged if bringing a guest.")
     end
+  end
+
+  def arrives
+    return 'Not set' if arrival_date.blank?
+    arrival_date.strftime('%b %-d, %Y')
+  end
+
+  def departs
+    return 'Not set' if departure_date.blank?
+    departure_date.strftime('%b %-d, %Y')
+  end
+
+  def rsvp_date
+    return 'N/A' if replied_at.blank?
+    replied_at.in_time_zone(event.time_zone).strftime('%b %-d, %Y %H:%M %Z')
   end
 end

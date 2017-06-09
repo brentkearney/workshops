@@ -10,7 +10,7 @@ class Invitation < ActiveRecord::Base
   before_save :update_times
 
   # Invitations expire EXPIRES_BEFORE an event starts
-  EXPIRES_BEFORE = 1.month
+  EXPIRES_BEFORE = 3.days
 
   def generate_code
     self.code = SecureRandom.urlsafe_base64(37) if self.code.blank?
