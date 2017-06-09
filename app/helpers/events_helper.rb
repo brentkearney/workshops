@@ -25,7 +25,7 @@ module EventsHelper
     case request.path
     when '/events'
       title = 'All'
-    when /my_events/
+    when /events\/my_events/
       title = 'My'
     when /future|past/
       time = request.path.match(/events\/(\w+)/)

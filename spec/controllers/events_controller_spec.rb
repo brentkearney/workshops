@@ -20,12 +20,6 @@ RSpec.describe EventsController, type: :controller do
       expect(response).to be_success
     end
 
-    it 'assigns @heading to "All Events"' do
-      get :index
-
-      expect(assigns(:heading)).to eq('All Events')
-    end
-
     it 'assigns @events to all events' do
       event = create(:event)
 
@@ -145,12 +139,6 @@ RSpec.describe EventsController, type: :controller do
         expect(response).to be_success
       end
 
-      it 'assigns @heading to "My Events"' do
-        get :my_events
-
-        expect(assigns(:heading)).to eq('My Events')
-      end
-
       it "assigns @events to user's events" do
         event = create(:event)
         create(:membership, person: person, event: event)
@@ -202,12 +190,6 @@ RSpec.describe EventsController, type: :controller do
       get :past
 
       expect(response).to render_template(:index)
-    end
-
-    it 'assigns @heading to "Past Events"' do
-      get :past
-
-      expect(assigns(:heading)).to eq('Past Events')
     end
 
     it 'assigns @events only with events from the past' do
@@ -278,12 +260,6 @@ RSpec.describe EventsController, type: :controller do
       get :future
 
       expect(response).to render_template(:index)
-    end
-
-    it 'assigns @heading to "Future Events"' do
-      get :future
-
-      expect(assigns(:heading)).to eq('Future Events')
     end
 
     it 'assigns @events only with the current event and future events' do
@@ -359,12 +335,6 @@ RSpec.describe EventsController, type: :controller do
       expect(response).to render_template(:index)
     end
 
-    it %Q(assigns @heading to [year] Events") do
-      get :year, { year: year }
-
-      expect(assigns(:heading)).to eq("#{year} Events")
-    end
-
     it "assigns @events to events of [year]" do
       this_year = Date.parse("#{year}-09-01").next_week(:sunday)
       event1 = create(:event, start_date: this_year, end_date: this_year + 5.days)
@@ -403,12 +373,6 @@ RSpec.describe EventsController, type: :controller do
           expect(response).to render_template(:index)
         end
 
-        it %Q(assigns @heading to "Events at #{loc}") do
-          get :location, { location: location }
-
-          expect(assigns(:heading)).to eq("Events at #{loc}")
-        end
-
         it %Q(assigns @events to events at #{loc} location) do
           event1 = create(:event, location: "#{loc}")
           event2 = create(:event, location: 'Elsewhere')
@@ -428,7 +392,6 @@ RSpec.describe EventsController, type: :controller do
 
         get :location, { location: place }
 
-        expect(assigns(:heading)).to eq("Events at #{legit_location}")
         expect(assigns(:events)).to eq([event1])
         expect(response).to render_template(:index)
       end
@@ -450,12 +413,6 @@ RSpec.describe EventsController, type: :controller do
           get :kind, { kind: kind }
 
           expect(response).to render_template(:index)
-        end
-
-        it %Q(assigns @heading to "#{type.pluralize}") do
-          get :kind, { kind: kind }
-
-          expect(assigns(:heading)).to eq("#{type.pluralize}")
         end
 
         it %Q(assigns @events to events of type #{type}) do
@@ -481,7 +438,6 @@ RSpec.describe EventsController, type: :controller do
 
         get :kind, { kind: invalid_type }
 
-        expect(assigns(:heading)).to eq("#{legit_type.pluralize}")
         expect(assigns(:events)).to eq([event1])
         expect(response).to render_template(:index)
       end

@@ -58,8 +58,8 @@
               </div>
             </header>
         <% else %>
-            <% if user_signed_in? && @heading %>
-                <h1 class="page-header"><%= event_list_title || @heading %></h1>
+            <% if user_signed_in? %>
+              <h1 class="page-header"><%= event_list_title %></h1>
             <% end %>
         <% end %>
       </div>

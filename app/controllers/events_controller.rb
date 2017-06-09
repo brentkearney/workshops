@@ -5,8 +5,10 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class EventsController < ApplicationController
-  before_action :set_event, :set_time_zone, :set_attendance, only: [:show, :edit, :update, :destroy]
-  before_filter :authenticate_user!, only: [:my_events, :new, :edit, :create, :update, :destroy]
+  before_action :set_event, :set_time_zone, :set_attendance,
+                only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!,
+                only: [:my_events, :new, :edit, :create, :update, :destroy]
   after_action :verify_policy_scoped, only: [:index, :past, :future, :kind]
 
   include EventsHelper
@@ -15,12 +17,10 @@ class EventsController < ApplicationController
   # GET /events.json
   def index
     @events = policy_scope(Event)
-    @heading = 'All Events'
   end
 
   # Get /events/mine
   def my_events
-    @heading = 'My Events'
     @events = current_user.person.events.order(:start_date)
     render :index
   end
@@ -28,7 +28,6 @@ class EventsController < ApplicationController
   # GET /events/past
   # GET /events/past.json
   def past
-    @heading = 'Past Events'
     @events = policy_scope(Event).past.reverse_order
     remove_locations
     render :index
@@ -37,7 +36,6 @@ class EventsController < ApplicationController
   # GET /events/future(/location/:location)
   # GET /events/future(/location/:location).json
   def future
-    @heading = 'Future Events'
     @events = policy_scope(Event).future
     remove_locations
     render :index
@@ -48,7 +46,6 @@ class EventsController < ApplicationController
   def year
     year = params[:year]
     if year =~ /^\d{4}$/
-      @heading = "#{year} Events"
       @events = policy_scope(Event).year(year)
       remove_locations
       render :index
@@ -64,7 +61,6 @@ class EventsController < ApplicationController
     unless Setting.Locations.keys.include?(location)
       location = Setting.Locations.keys.first
     end
-    @heading = "Events at #{location}"
     @events = Event.location(location).order(:start_date)
     render :index
   end
@@ -80,7 +76,6 @@ class EventsController < ApplicationController
       end
     end
 
-    @heading = kind.pluralize
     @events = policy_scope(Event).kind(kind)
     render :index
   end
@@ -93,8 +88,12 @@ class EventsController < ApplicationController
       @organizers = []
       @members = []
       @event.memberships.includes(:person).each do |member|
-        @organizers << @event.member_info(member.person) if member.role =~ /Organizer/
-        @members << @event.member_info(member.person) if member.attendance == 'Confirmed'
+        if member.role =~ /Organizer/
+          @organizers << @event.member_info(member.person)
+        end
+        if member.attendance == 'Confirmed'
+          @members << @event.member_info(member.person)
+        end
       end
       SyncEventMembersJob.perform_later(@event) if policy(@event).sync?
     else
@@ -190,7 +189,10 @@ class EventsController < ApplicationController
   end
 
   def event_params
-    params.require(:event).permit(:code, :name, :short_name, :start_date, :end_date, :time_zone, :event_type, :location, :description, :press_release, :max_participants, :door_code, :booking_code, :updated_by)
+    params.require(:event).permit(:code, :name, :short_name, :start_date,
+                                  :end_date, :time_zone, :event_type, :location,
+                                  :description, :press_release, :door_code,
+                                  :max_participants, :booking_code, :updated_by)
   end
 
   def location_params

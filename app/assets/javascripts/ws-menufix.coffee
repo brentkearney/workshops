@@ -14,10 +14,20 @@ $(document).on 'turbolinks:load', ->
     $('span#locations-arrow').toggleClass('arrow-down')
 
   path = window.location.pathname
-  if path == '/events' then $('li#all-events').addClass('active')
-  if path == '/events/my_events' then $('li#my-events').addClass('active')
-  if path.match(/events\/past/) then $('li#past-events').addClass('active')
-  if path.match(/events\/future/) then $('li#future-events').addClass('active')
+  if path == '/events'
+      $('li#all-events').addClass('active')
+  else if path == '/events/my_events'
+      $('li#my-events').addClass('active')
+  else if path.match(/events\/past/)
+      $('li#past-events').addClass('active')
+  else if path.match(/events\/future/)
+      $('li#future-events').addClass('active')
+  else if path.match(/events\/(.+)\/schedule/)
+      $('li#event-schedule').addClass('active')
+  else if path.match(/events\/(.+)\/memberships/)
+      $('li#event-memberships').addClass('active')
+  else if path.match(/events\/(.+)$/)
+      $('li#event-details').addClass('active')
 
   if path.match(/location/)
     $('span#locations-arrow').toggleClass('arrow')
