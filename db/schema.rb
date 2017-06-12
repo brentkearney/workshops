@@ -175,9 +175,7 @@ ActiveRecord::Schema.define(version: 20170505110538) do
     t.datetime "updated_at"
   end
 
-  add_index "settings", ["id"], name: "settings_id_key", unique: true, using: :btree
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true, using: :btree
-  add_index "settings", ["var"], name: "settings_var_key", unique: true, using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false

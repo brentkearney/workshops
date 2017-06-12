@@ -6,7 +6,9 @@
 
 class Person < ActiveRecord::Base
   has_many :memberships, dependent: :destroy
-  has_many :events, -> { where "attendance != 'Not Yet Invited' AND attendance != 'Declined'" },
+  has_many :events, -> {
+    where "attendance != 'Not Yet Invited' AND attendance != 'Declined'"
+  },
            through: :memberships, source: :event
   has_one :user, dependent: :destroy
   has_many :invitations, foreign_key: 'invited_by'
@@ -27,9 +29,11 @@ class Person < ActiveRecord::Base
                      allow_blank: true
   validates :phd_year, numericality: { allow_blank: true, only_integer: true }
   validates :address1, :city, :region, :country, :postal_code,
-            presence: { message: 'We need an address, to book your hotel room.' },
+            presence: {
+              message: 'We need an address, to book your hotel room.'
+            },
             if: :is_rsvp
-  validates :academic_status, presence: true, if: :is_rsvp
+  validates :phone, :academic_status, presence: true, if: :is_rsvp
 
   # app/models/concerns/person_decorators.rb
   include PersonDecorators

@@ -133,7 +133,7 @@ RSpec.describe RsvpController, type: :controller do
         'person' => { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
           gender: 'M', affiliation: 'Foo', department: '', title: '',
           academic_status: 'Professor', phd_year: 1970, email: 'foo@bar.com',
-           url: '', phone: '', address1: '123 Street', address2: '',
+           url: '', phone: '123', address1: '123 Street', address2: '',
            address3: '', city: 'City', region: 'Region', postal_code: 'XYZ',
            country: 'Dandylion', emergency_contact: '', emergency_phone: '',
            biography: '', research_areas: ''}
