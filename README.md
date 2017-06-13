@@ -1,43 +1,53 @@
 # Workshops
 
-"Workshops" is a web-based conference/workshop management application, built with [Ruby on Rails](http://rubyonrails.org).
-A _workshop_ is like a conference, only with less people, typically experts in a subject
-domain who are invited to an event to share their research with peers. This software is intended for institutions/organizations
-who host workshops.
+"Workshops" is software for managing small conferences. It is made with [Ruby on Rails](http://rubyonrails.org)
+and released under the GPL-A open-source license. The software is intended for institutions/organizations
+who host workshops. Although it is in production use at the
+[Banff International Research Station](https://workshops.birs.ca/events/future), it is still in the early
+stages of development &mdash; meaning it is not yet ready for use by other organizations because there are
+not enough features yet.
 
-Installation instructions below.
+However, contributions are most welcome. If you would like to add features yourself, please
+[let me know](mailto:brentk@birs.ca), and/or submit a Pull Request. Or if you would like to pay me to
+develop features for you, please [contact me](mailto:brent@netmojo.ca).
+
+
+Installation instructions are below.
 
 ### Current Features
-* Workshop data is imported via calls to an external API.
-* Role-based access control allowing different levels of privilege between admin, staff, organizers and participants.
-* Staff and admin users can login, and Workshop organizers can signup and login.
-* Shows index listings of all events, future events, past events, events by location, and by year.
-* Background jobs to update event membership data from external data source.
-* Shows workshop members, plus their details to varying degrees depending on user's privilege level.
-* Staff & organizers can click a button to send email all to workshop participants.
-* Staff can edit events if the staff user's location matches the event location.
-* Organizers can edit some of their event's data.
-* Staff can edit default workshop schedule templates.
-* Organizers can easily edit and publish the schedules of their workshop(s).
+* Sign-ins and sign-ups for authorized event members, staff, and admin.
+* Workshop scheduling: organizers can enter their workshop schedules, including talks with abstracts/descriptions, and choose when to publish their schedules to the public.
+* Default schedule templates that staff can edit. Defaults get applied to all workshop's schedules which have not yet been edited.
+* All text editing areas support LaTeX formatting via [MathJax](https://www.mathjax.org), for mathematical formulae.
+* Schedules and most data from Workshops is accessible via JSON, for easy display on external websites, [like this](http://www.birs.ca/events/2017/5-day-workshops/17w5030/schedule).
 * Staff get email notifications when schedules of currently running workshops are updated.
-* Default times for new schedule items are estimated based on previous schedule entries, to reduce data entry time.
-* Authenticated JSON API for [an external video recording system](http://www.birs.ca/facilities/automated-video) to update lecture records.
-* Public access to workshop event information and schedules via JSON.
-* Application settings stored in the database, allowing admins to easily change settings with web interface.
+
+* Event Invitations feature sends a unique link to invited participants for RSVP to the event.
+* RSVP feature allows invited participants to confirm or decline the invitation, and send messages to the organizer. If confirming, collects data for hotel reservations and other needs via web form, optimized for autofill. Automatically sends confirmation email to confirmed participants, and automatically notifies organizers of all RSVP replies.
+
+* Supports events in multiple locations, each location having its own default settings, email templates, etc..
+* List of workshops can be navigated by user's events, future events, past events, events by location, and by year.
+* List of a workshop's participants grouped by attendance status (Confirmed, Invited, Declined, etc..), with more detailed profile views of each participant.
+* Convenience buttons to email all participants, or all organizers of an event.
+* Fine-grained role-based access controls for many features allowing different levels of privilege between admin, staff, organizers and participants.
+
+* Workshop data is imported via calls to an external API.
+* Background jobs to sync event membership data with external data source via API.
+* Authenticated JSON API for [an external video recording system](http://www.birs.ca/facilities/automated-video) to update lecture records based on recordings made.
+* Application settings are stored in the database, allowing staff and admins to easily change settings with web interface.
 
 
-### Future Features:
-* Staff can manage buildings and rooms, and assign participants to (i.e. hotel) rooms.
-* Staff and admin can create new events.
+### Upcoming Features:
+* Integration with external email delivery service, with email template management.
 * Staff and Organizers can add and invite members to their workshop.
-* Invitations will include a one-click RSVP link, allowing members to setup profiles, etc..
-* Staff can assign hotel rooms and manage other hospitality details for workshop participants.
-* Admin users can manage other users (add/remove/change passwords, etc) .
-* An email system to facilitate communication between various parties, including email templates and scheduled sending.
-* When organizers schedule a participant to give a talk, members get notified with a link to fill in the talk title and abstract.
+* API integration with the Visual One room booking software, used by many hotels and conference centers, for automatic room booking.
+* Staff can assign hotel rooms, generate reports for hotel room bookings, and manage other hospitality details for workshop participants.
+* Scheduled tasks, such as reminder emails for participants to RSVP, room booking tasks, etc..
+* Staff and admin can create new events.
+* Admin users can manage other users (add/remove/change passwords, etc).
 * Drag & drop interface to re-arrange schedule items.
-* Interface for admin users to manage application settings and permissions.
-* Addition of a forum/mail list software for each workshop. Considering embedding [Discourse](http://www.discourse.org), with an updated editor to support mathematics.
+* When organizers schedule a participant to give a talk, members optionally get notified with a link to fill in the talk title and abstract.
+* Addition of a forum/mail list software for each workshop, such as [Discourse](http://www.discourse.org).
 * Crowd-sourcing feature for workshop participants to post open problems to the public, soliciting solutions.
 
 
@@ -47,8 +57,6 @@ The application is setup to work in [Docker](http://www.docker.com) containers, 
 1. Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
 2. Copy the example config files, and customize them to suit your needs. These include:
   ```
-  ./.env.db.example
-  ./.env.web.example
   ./docker-compose.yml.example
   ./Dockerfile.example
   ./entrypoint.sh.example
@@ -60,7 +68,7 @@ The application is setup to work in [Docker](http://www.docker.com) containers, 
 5. Run `docker-compose up`
 6. Login, and visit /settings. Update the Site settings with correct info.
 
-After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out most of it, such as running migrations, updating RVM, etc.. After editing, copy it into your container with: `docker cp entrypoint.sh <container id>:/sbin/`
+After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out some of it, such as running migrations, updating RVM, etc..
 
 
 

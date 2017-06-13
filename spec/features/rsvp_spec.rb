@@ -81,6 +81,30 @@ describe 'RSVP', type: :feature do
       expect(page).to have_text('Invalid code')
     end
 
+    it 'event code missing from legacy invitation record' do
+      response = { 'otp_id' => '123', 'legacy_id' => '321',
+                         'event_code' => '', 'attendance' => 'Invited' }
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive('new').and_return(lc)
+      allow(lc).to receive('check_rsvp').and_return(response)
+
+      visit rsvp_otp_path(123)
+
+      expect(page).to have_text('No event associated')
+    end
+
+    it 'person_id missing from legacy invitation record' do
+      response = { 'otp_id' => '123', 'legacy_id' => '',
+                   'event_code' => @event.code, 'attendance' => 'Invited' }
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive('new').and_return(lc)
+      allow(lc).to receive('check_rsvp').and_return(response)
+
+      visit rsvp_otp_path(123)
+
+      expect(page).to have_text('No person associated')
+    end
+
     it 'participant not invited' do
       @membership.attendance = 'Not Yet Invited'
       @membership.save
@@ -98,6 +122,48 @@ describe 'RSVP', type: :feature do
       visit rsvp_otp_path(@invitation.code)
 
       expect(page).to have_text("You have already declined an invitation")
+    end
+
+    it 'non-existent membership record' do
+      @membership.destroy
+      @person.legacy_id = '321'
+      @person.save
+      response = { 'otp_id' => '123', 'legacy_id' => '321',
+                   'event_code' => @event.code, 'attendance' => 'Invited' }
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive('new').and_return(lc)
+      allow(lc).to receive('check_rsvp').and_return(response)
+
+      visit rsvp_otp_path(@invitation.code)
+
+      expect(page).to have_text('Error finding event membership')
+    end
+
+    it 'non-existent person record' do
+      @person.destroy
+      response = { 'otp_id' => '123', 'legacy_id' => '321',
+                   'event_code' => @event.code, 'attendance' => 'Invited' }
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive('new').and_return(lc)
+      allow(lc).to receive('check_rsvp').and_return(response)
+
+      visit rsvp_otp_path(@invitation.code)
+
+      expect(page).to have_text('Error finding person record')
+    end
+
+    it 'non-existent event record' do
+      code = @event.code
+      @event.destroy
+      response = { 'otp_id' => '123', 'legacy_id' => '321',
+                   'event_code' => code, 'attendance' => 'Invited' }
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive('new').and_return(lc)
+      allow(lc).to receive('check_rsvp').and_return(response)
+
+      visit rsvp_otp_path(@invitation.code)
+
+      expect(page).to have_text('Error finding event record')
     end
   end
 

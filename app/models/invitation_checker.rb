@@ -43,17 +43,33 @@ class InvitationChecker
     Rails.logger.debug "\nLegacy response: #{response.inspect}\n"
 
     @errors.add(:Invitation, response['denied']) if response['denied']
+    @errors.add(:Event, 'No event associated') if response['event_code'].blank?
+    @errors.add(:Person, 'No person associated') if response['legacy_id'].blank?
 
-    if response['event_code'] && response['legacy_id']
+    unless @errors.any?
       event = Event.find(response['event_code'])
+      if event.nil?
+        @errors.add(:Event, 'Error finding event record')
+        return nil
+      end
 
       # temporary, until members are added using Workshops
       SyncEventMembersJob.perform_now(event) unless event.nil?
-      sleep 2
+      sleep 1
 
-      person = Person.where(legacy_id: response['legacy_id']).first
+      person = Person.where(legacy_id: response['legacy_id'].to_i).first
+      if person.nil?
+        @errors.add(:Person, 'Error finding person record')
+        return nil
+      end
+
       membership = Membership.where(person: person, event: event).first
-      invitation = create_local_invitation(membership)
+      if membership.nil?
+        @errors.add(:Membership, 'Error finding event membership')
+        return nil
+      else
+        invitation = create_local_invitation(membership)
+      end
     end
     invitation
   end
@@ -64,7 +80,7 @@ class InvitationChecker
     end
     return if invitation.nil?
 
-    if DateTime.now > invitation.expires
+    if invitation.expires && DateTime.now > invitation.expires
       @errors.add(:Invitation, 'This invitation code is expired.')
     end
 
