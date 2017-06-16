@@ -24,7 +24,7 @@ class SyncMembers
   def initialize(event)
     @event = event
     @sync_errors = ErrorReport.new(self.class, @event)
-    @remote_members = get_remote_members
+    @remote_members = retrieve_remote_members
     @local_members = @event.memberships.includes(:person)
     sync_memberships
   end
@@ -47,7 +47,7 @@ class SyncMembers
     end
   end
 
-  def get_remote_members
+  def retrieve_remote_members
     lc = LegacyConnector.new
     remote_members = lc.get_members(event)
 
@@ -123,46 +123,64 @@ class SyncMembers
     local_person
   end
 
+  # local record, remote hash
   def update_record(local, remote)
     updated = false
     remote.each_pair do |k, v|
-      unless v.blank?
-        if k.eql? 'legacy_id'
-          v = v.to_i
-          local[k] = local[k].to_i
-        end
-        if k.include?('_at')
-          v = v.utc
-          local[k] = local[k].utc
-        end
-        if k.include?('_date')
-          v = nil if v == '0000-00-00 00:00:00'
-          v = Date.parse(v.to_s) unless v.nil?
-        end
-        v.strip! if v.respond_to? :strip!
+      next if v.blank?
+      v = prepare_value(k, v)
 
-        unless local[k].eql? v
-          local[k] = v
-          updated = true
+      unless local.send(k).eql? v
+        if k.eql? 'email'
+          local = update_email(local, remote, v)
+        else
+          local.send("#{k}=", v)
         end
+        updated = true
       end
     end
     return local if updated
   end
 
-  def get_local_person(remote_person)
-    legacy_id = remote_person['legacy_id']
+  def prepare_value(k, v)
+    v = v.to_i if k.eql? 'legacy_id'
+    v = v.utc if k.to_s.include?('_at')
 
-    member = nil
-    local_members.each do |m|
-      member = m if m.person.legacy_id.to_i == legacy_id.to_i
+    if k.to_s.include?('_date')
+      v = nil if v == '0000-00-00 00:00:00'
+      v = Date.parse(v.to_s) unless v.nil?
     end
 
-    if member.nil?
-      return Person.find_by(email: remote_person['email'])
+    v.strip! if v.respond_to? :strip!
+    v
+  end
+
+  def update_email(local_person, remote_person_hash, new_email)
+    other_person = Person.find_by_email(new_email)
+    if other_person.nil?
+      local_person.email = new_email
     else
-      return member.person
+      updated_other = update_record(other_person, remote_person_hash)
+      other_person = updated_other if updated_other
+      replace_person(local_person, other_person)
+      local_person = other_person
     end
+    local_person
+  end
+
+  def replace_person(person, replacement)
+    replacement.memberships.each do |m|
+      unless person.memberships.include?(m)
+        m.person = person
+        m.save
+      end
+    end
+    person.destroy
+  end
+
+  def get_local_person(remote_person)
+    Person.where(legacy_id: remote_person['legacy_id'].to_i).first ||
+      Person.find_by(email: remote_person['email'])
   end
 
   def save_person(person)
@@ -177,7 +195,7 @@ class SyncMembers
 
   def update_membership(remote_member, local_person)
     local_membership = local_members.select do |m|
-      m.person_id == local_person[:id]
+      m.person_id.to_i == local_person[:id].to_i
     end.first
 
     if local_membership.nil?

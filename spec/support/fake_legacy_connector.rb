@@ -91,11 +91,13 @@ class FakeLegacyConnector
     new_remote_members
   end
 
-  def get_members_with_person(e: event, m: membership, ln: lastname)
+  def get_members_with_person(e: event, m: membership, changed_fields:)
     if m.nil?
-      person = Person.new(lastname: ln, firstname: 'NewPerson',
-        email: 'newperson@new9000234.ca', affiliation: 'New Affil', gender: 'F',
-        legacy_id: 1234)
+      person_attributes = { lastname: 'Person', firstname: 'New',
+                            email: 'newperson@new9000234.ca', gender: 'F',
+                            affiliation: 'New Affil',
+                            legacy_id: 1234 }
+      person = Person.new(person_attributes)
       m = Membership.new(event: e, person: person, role: 'Participant',
                         replied_at: Time.now - 1.days, attendance: 'Confirmed')
     end
@@ -103,7 +105,7 @@ class FakeLegacyConnector
     remote_member = [{
         'Workshop' => '#{e.code}',
         'Person' => {
-            'lastname' => ln, 'firstname'=>m.person.firstname,
+            'lastname' => m.person.lastname, 'firstname'=>m.person.firstname,
             'email'=>m.person.email, 'cc_email'=>nil,
             'gender'=>m.person.gender, 'affiliation'=>m.person.affiliation,
             'salutation'=>nil, 'url'=>nil, 'phone'=>nil, 'fax'=>nil,
@@ -113,7 +115,8 @@ class FakeLegacyConnector
             'phd_year'=>nil, 'biography'=>nil, 'research_areas'=>nil,
             'updated_at'=>Time.now, 'legacy_id'=>m.person.legacy_id,
             'emergency_contact'=>nil, 'emergency_phone'=>nil,
-            'updated_by'=>'FakeLegacyConnector'},
+            'updated_by'=>'FakeLegacyConnector'}
+              .merge(changed_fields.stringify_keys),
         'Membership'=> {
             'arrival_date'=>m.arrival_date, 'departure_date'=>m.departure_date,
             'attendance'=>m.attendance, 'role'=>m.role,
