@@ -100,6 +100,16 @@ describe "SyncMembers" do
       end
     end
 
+    def setup_remote(event, membership, changed_fields)
+      lc = FakeLegacyConnector.new
+      remote_members = lc.get_members_with_person(
+        e: event, m: membership, changed_fields: changed_fields
+      )
+      allow(lc).to receive(:get_members).with(event)
+        .and_return(remote_members)
+      expect(LegacyConnector).to receive(:new).and_return(lc)
+    end
+
     context 'remote person with matching legacy_id' do
       it 'updates the local person with changed fields' do
         local_person = create(:person, lastname: 'Localperson', legacy_id: 666)
@@ -114,17 +124,6 @@ describe "SyncMembers" do
         updated_fields = { lastname: 'RemotePerson' }
         test_update(local_person: local_person, fields: updated_fields)
       end
-    end
-
-    def setup_remote(event, membership, changed_fields)
-      lc = FakeLegacyConnector.new
-      remote_members = lc.get_members_with_person(
-        e: event, m: membership, changed_fields: changed_fields
-      )
-      Rails.logger.debug "\n\n* FakeLegacyConnector returned remote_members: #{remote_members.inspect}\n\n"
-      allow(lc).to receive(:get_members).with(event)
-        .and_return(remote_members)
-      expect(LegacyConnector).to receive(:new).and_return(lc)
     end
 
     context 'without a local person' do
@@ -155,17 +154,41 @@ describe "SyncMembers" do
         end
       end
 
-      context 'member of another event has matching legacy_id but different email' do
-        it 'adds that person to event, updates its email address' do
-          person = create(:person, legacy_id: 12, email: 'no@bueno.mx')
-          create(:membership, person: person)
-          fields = { email: 'foo@bar.com', legacy_id: 12 }
-          setup_remote(@event, nil, fields)
+      context 'member of another event has matching email, different legacy_id' do
+        before do
+          @person1 = create(:person, email: 'sam@jones.net', legacy_id: 111)
+          @membership1 = create(:membership, person: @person1)
+          @event1 = @membership1.event
 
+          @person2 = create(:person, email: 'fred@smith.com', legacy_id: 222)
+          @membership2 = create(:membership, person: @person2, event: @event)
+          @lecture = create(:lecture, person: @person2, event: @event)
+          # @user_account =
+          create(:user, person: @person2, email: @person2.email)
+          # puts "User: #{@user_account.inspect}"
+
+          remote_fields = { email: 'sam@jones.net', legacy_id: 222 }
+          setup_remote(@event, @membership2, remote_fields)
           SyncMembers.new(@event)
+        end
 
-          expect(@event.members).to include(person)
-          expect(Person.find(person.id).email).to eq('foo@bar.com')
+        it 'consolidates event memberships into one person record' do
+          expect { Person.find(@person2.id) }
+            .to raise_exception(ActiveRecord::RecordNotFound)
+          updated_person = Person.find(@person1.id)
+          expect(updated_person.events).to match_array([@event, @event1])
+          expect(updated_person.legacy_id).to eq(222)
+        end
+
+        it 'consolidates lectures into one person record' do
+          lecture = Lecture.find(@lecture.id)
+          expect(lecture.person).to eq(@person1)
+        end
+
+        it 'moves user account to updated person record' do
+          # user = User.where(person: @person1).first
+          # expect(user.person).to eq(@person1)
+          expect(User.where(person_id: @person1.id)).not_to be_empty
         end
       end
 
@@ -182,20 +205,6 @@ describe "SyncMembers" do
           person = Person.find_by_email(email)
           expect(person.legacy_id).to eq(999)
           expect(@event.memberships).to include(person.memberships.last)
-        end
-      end
-
-      context 'member of another event has different legacy_id, same email' do
-        it 'adds person to event, updates its legacy_id' do
-          person = create(:person, legacy_id: 666)
-          create(:membership, person: person)
-          remote_fields = { email: person.email, legacy_id: 999 }
-          setup_remote(@event, nil, remote_fields)
-
-          SyncMembers.new(@event)
-
-          expect(@event.members).to include(person)
-          expect(Person.find_by_email(person.email).legacy_id).to eq(999)
         end
       end
 

@@ -160,6 +160,7 @@ class SyncMembers
     if other_person.nil?
       local_person.email = new_email
     else
+      # email is the same, so update_record will skip that field
       updated_other = update_record(other_person, remote_person_hash)
       other_person = updated_other if updated_other
       replace_person(local_person, other_person)
@@ -169,12 +170,27 @@ class SyncMembers
   end
 
   def replace_person(person, replacement)
-    replacement.memberships.each do |m|
-      unless person.memberships.include?(m)
-        m.person = person
+    person.memberships.each do |m|
+      unless replacement.events.include?(m.event)
+        m.person = replacement
         m.save
       end
     end
+
+    Lecture.where(person: person).each do |l|
+      l.person = replacement
+      l.save
+    end
+
+    user_account = User.where(person_id: person.id).first
+    unless user_account.nil?
+      user_account.person_id = replacement.id
+      user_account.email = replacement.email
+      user_account.skip_reconfirmation!
+      user_account.save
+    end
+
+    # there can be only one!
     person.destroy
   end
 
