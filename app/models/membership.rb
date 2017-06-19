@@ -108,7 +108,7 @@ class Membership < ActiveRecord::Base
 
   def guest_disclamer_acknowledgement
     if has_guest && !guest_disclaimer
-      errors.add(:guest_disclaimer, "must be acknowledged if bringing a guest.")
+      errors.add(:guest_disclaimer, "must be acknowledged if bringing a guest")
     end
   end
 

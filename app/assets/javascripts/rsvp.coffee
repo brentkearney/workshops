@@ -27,3 +27,6 @@ $(document).on 'turbolinks:load', ->
 
   $('#departure').on 'dp.change', (e) =>
     $('#departure_date').val(e.date.format('YYYY-MM-DD'));
+
+  $('#rsvp_membership_has_guest').change ->
+    $('#guest_disclaimer').toggleClass('mandatory')

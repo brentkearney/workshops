@@ -7,7 +7,7 @@
       </div>
       <div class="panel-body">
         <h1>We're happy that you can attend! 🎉<br />
-        <small>Please share your plans, and click the button at the bottom:</small></h1>
+        <small>Please share your plans, and click the "Confirm Attendance" button:</small></h1>
         <%= form_for @rsvp, as: :rsvp,
            url: rsvp_yes_path(@rsvp.invitation.code), method: :post,
           html: { role: 'form', class: 'form' } do |rsvp| %>
@@ -73,9 +73,10 @@
             <div class="form-group guest-options">
               <table border="0" cellpadding="20" cellspacing="20" width="100%">
               <tr><td width="5">
-              <%= m.check_box :guest_disclaimer, { class: "form-control checkbox" }, true %>
+                <%= m.check_box :guest_disclaimer, { class: "form-control checkbox" }, true %>
               </td><td>
-              <%= m.label :guest_disclaimer, @rsvp.guest_disclaimer %>
+                <span id="guest_disclaimer"></span>
+                <%= m.label :guest_disclaimer, @rsvp.guest_disclaimer %>
               </td></tr>
               </table>
             </div>
@@ -105,19 +106,19 @@
                 <%= p.select :salutation, Setting.Site['salutations'], { include_blank: 'Please select' }, class: "form-control", autocomplete: "honorific-prefix" %>
               </div>
               <div class="form-group">
-                <%= p.label :firstname %>
+                <%= p.label :firstname, class: "mandatory" %>
                 <%= p.text_field :firstname, class: "form-control", placeholder: 'Your given name', autocomplete: "given-name" %>
               </div>
               <div class="form-group">
-                <%= p.label :lastname %>
+                <%= p.label :lastname, class: "mandatory" %>
                 <%= p.text_field :lastname, class: "form-control", placeholder: 'Your family name', autocomplete: "family-name" %>
               </div>
               <div class="form-group">
-                <%= p.label :gender %>
+                <%= p.label :gender, class: "mandatory" %>
                 <%= p.select :gender, ['M','F','O'], { include_blank: 'Please select' }, class: "form-control", autocomplete: "sex" %>
               </div>
               <div class="form-group">
-                <%= p.label :affiliation %>
+                <%= p.label :affiliation, class: "mandatory" %>
                 <%= p.text_field :affiliation, class: "form-control", placeholder: 'For whom do you work?', autocomplete: "organization" %>
               </div>
               <div class="form-group">
@@ -129,7 +130,7 @@
                 <%= p.text_field :title, class: "form-control", autocomplete: "organization-title" %>
               </div>
               <div class="form-group">
-                <%= p.label :academic_status %>
+                <%= p.label :academic_status, class: "mandatory" %>
                 <%= p.select :academic_status, Setting.Site['academic_status'], { include_blank: 'Please select' }, class: "form-control" %>
               </div>
               <div class="form-group">
@@ -137,7 +138,7 @@
                 <%= p.select :phd_year, @years, { include_blank: 'Please select if applicable' }, class: "form-control" %>
               </div>
               <div class="form-group">
-                <%= p.label :email, 'E-mail' %>
+                <%= p.label :email, 'E-mail', class: "mandatory" %>
                 <%= p.email_field :email, class: "form-control", autocomplete: "email" %>
                 <div class="form-inline inline-checkbox">
                   <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
@@ -151,11 +152,11 @@
                 <%= p.url_field :url, class: "form-control", autocomplete: "url" %>
               </div>
               <div class="form-group">
-                <%= p.label :phone %>
+                <%= p.label :phone, class: "mandatory" %>
                 <%= p.telephone_field :phone, class: "form-control", autocomplete: "tel" %>
               </div>
               <div class="form-group" id="address-fields">
-                <label>Address</label>
+                <label class="mandatory">Address</label>
                 <div class="row">
                   <div class='col-md-12'>
                     <%= p.text_field :address1, class: "form-control", placeholder: 'Address line 1', autocomplete: "address-line1" %>

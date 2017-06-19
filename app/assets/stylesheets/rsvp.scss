@@ -58,6 +58,9 @@ label {
     color: $secondary-text-color;
     max-width: 80%;
   }
+  .mandatory:after {
+    content:"*";color:red;
+  }
 
   .date-picker {
     overflow: hidden;

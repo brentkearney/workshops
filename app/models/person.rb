@@ -5,6 +5,8 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Person < ActiveRecord::Base
+  attr_accessor :is_rsvp
+
   has_many :memberships, dependent: :destroy
   has_many :events, -> {
     where "attendance != 'Not Yet Invited' AND attendance != 'Declined'"
@@ -12,8 +14,6 @@ class Person < ActiveRecord::Base
            through: :memberships, source: :event
   has_one :user, dependent: :destroy
   has_many :invitations, foreign_key: 'invited_by'
-
-  attr_accessor :is_rsvp
 
   before_validation :downcase_email
   before_save :clean_data
@@ -30,7 +30,7 @@ class Person < ActiveRecord::Base
   validates :phd_year, numericality: { allow_blank: true, only_integer: true }
   validates :address1, :city, :region, :country, :postal_code,
             presence: {
-              message: 'We need an address, to book your hotel room.'
+              message: '← address fields cannot be blank'
             },
             if: :is_rsvp
   validates :phone, :academic_status, presence: true, if: :is_rsvp
