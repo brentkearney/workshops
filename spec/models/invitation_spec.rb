@@ -27,6 +27,11 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     expect(i.valid?).to be_falsey
   end
 
+  it 'generates a code upon initialization' do
+    i = build(:invitation)
+    expect(i.code).not_to be_blank
+  end
+
   it 'sets expires on save' do
     i = build(:invitation)
     expect(i.expires).to be_nil
@@ -34,12 +39,12 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     expect(i.expires).not_to be_nil
   end
 
-  it 'derives expiry date from Setting + event' do
+  it 'derives expiry date from rsvp_expiry Setting + event.start_date' do
     event = build(:event)
     membership = build(:membership, event: event)
-    Setting.Site['rsvp_expiry'] = '1.month'
     i = create(:invitation, membership: membership)
 
-    expect(i.expires.to_date).to eq((event.start_date - 1.month).to_date)
+    duration = Invitation.duration_setting
+    expect(i.expires.to_date).to eq((event.start_date - duration).to_date)
   end
 end

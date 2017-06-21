@@ -15,8 +15,9 @@ module EventDecorators
     day = start_date.to_time.noon
     days = [day]
     # Compare date strings so TZ issues don't interfere
-    until "#{day.strftime("%Y%m%d")}" == "#{end_date.to_time.strftime("%Y%m%d")}"
-      day = day + 1.day
+    datestring = end_date.to_time.strftime('%Y%m%d').to_s
+    until day.strftime('%Y%m%d').to_s == datestring
+      day += 1.day
       days << day
     end
     days
@@ -27,14 +28,16 @@ module EventDecorators
   end
 
   def num_invited_participants
-    memberships.where("(attendance = 'Invited' OR attendance = 'Undecided' OR attendance = 'Confirmed') AND role != 'Observer'").size
+    memberships.where("(attendance = 'Invited' OR attendance = 'Undecided'
+      OR attendance = 'Confirmed') AND role != 'Observer'").size
   end
 
-  def attendance(status='Confirmed', order='lastname')
+  def attendance(status = 'Confirmed', order = 'lastname')
     direction = 'ASC'
 
     # We want the order to be the same as the order of Membership::ROLES
-    all_members = memberships.joins(:person).where("attendance = ?", status).order("#{order} #{direction}")
+    all_members = memberships.joins(:person).where('attendance = ?', status)
+                             .order("#{order} #{direction}")
     sorted_members = []
     Membership::ROLES.each do |role|
       sorted_members.concat(all_members.select { |member| member.role == role })

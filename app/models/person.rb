@@ -25,7 +25,7 @@ class Person < ActiveRecord::Base
   validates :firstname, :lastname, :affiliation, :gender, :updated_by,
             presence: true
   validates :gender, format:
-                     { with: /(M|F|O)/, message: " must be 'M','F', or 'O'" },
+                     { with: /\A(M|F|O)\z/, message: " must be 'M','F', or 'O'" },
                      allow_blank: true
   validates :phd_year, numericality: { allow_blank: true, only_integer: true }
   validates :address1, :city, :region, :country, :postal_code,
