@@ -29,7 +29,7 @@ namespace :ws do
   task init_settings: :environment do
     puts "Adding default Settings (where necessary)..."
     if Setting.find_by(var: 'Site').blank?
-      puts "* Site settings"
+      puts "* Applying default Site settings"
       Setting.Site = {
         'title' => 'Workshop Manager',
         'logo' => 'logo.png',
@@ -44,12 +44,13 @@ namespace :ws do
         'event_types' => ['5 Day Workshop', '2 Day Workshop', 'Research in Teams', 'Focussed Research Group', 'Summer School', 'Public Lecture'],
         'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
         'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor', 'Ph.D. Student', 'Masters Student', 'Undergraduate Student', 'K-12 Teacher', 'K-12 Student', 'Other'],
-        'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.']
+        'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'],
+        'rsvp_expiry' => '2.weeks'
       }
     end
 
     if Setting.find_by(var: 'Emails').blank?
-      puts "* Emails settings"
+      puts "* Applying default Emails settings"
       Setting.Emails = {
         'EO' => {
           'program_coordinator' => 'organization@example.com',
@@ -67,7 +68,7 @@ namespace :ws do
     end
 
     if Setting.find_by(var: 'Locations').blank?
-      puts "* Locations settings"
+      puts "* Applying default Locations settings"
       Setting.Locations = {
         'EO' => {
           'Name' => 'Example Organization',
@@ -79,7 +80,7 @@ namespace :ws do
     end
 
     if Setting.find_by(var: 'Rooms').blank?
-      puts "* Rooms settings"
+      puts "* Applying default Rooms settings"
       Setting.Rooms = {
         'EO' => {
           '5 Day Workshop' => 'TCPL 201',
@@ -97,7 +98,7 @@ namespace :ws do
     end
 
     if Setting.find_by(var: 'RSVP').blank?
-      puts "* RSVP settings"
+      puts "* Applying default RSVP settings"
       Setting.RSVP = {
         'EO' => {
           'arrival_departure_intro' => "If you plan to arrive after the event starts, or to leave before it ends, please indicate when by clicking the days on the calendars below. If you plan to book your own accommodation instead, please check the box below the calendars.",

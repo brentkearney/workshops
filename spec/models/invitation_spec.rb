@@ -8,7 +8,7 @@ require 'rails_helper'
 
 RSpec.describe 'Model validations: Invitation', type: :model do
   it 'has valid factory' do
-    expect(create(:invitation)).to be_valid
+    expect(build(:invitation)).to be_valid
   end
 
   it 'requires a membership' do
@@ -32,5 +32,14 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     expect(i.expires).to be_nil
     i.save
     expect(i.expires).not_to be_nil
+  end
+
+  it 'derives expiry date from Setting + event' do
+    event = build(:event)
+    membership = build(:membership, event: event)
+    Setting.Site['rsvp_expiry'] = '1.month'
+    i = create(:invitation, membership: membership)
+
+    expect(i.expires.to_date).to eq((event.start_date - 1.month).to_date)
   end
 end

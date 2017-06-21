@@ -9,8 +9,14 @@ class Invitation < ActiveRecord::Base
   after_initialize :generate_code
   before_save :update_times
 
+  def self.duration_setting
+    return 3.days if Setting.Site['rsvp_expiry'].blank?
+    parts = Setting.Site['rsvp_expiry'].split('.')
+    parts.first.to_i.send(parts.last)
+  end
+
   # Invitations expire EXPIRES_BEFORE an event starts
-  EXPIRES_BEFORE = 3.days
+  EXPIRES_BEFORE = duration_setting
 
   def generate_code
     self.code = SecureRandom.urlsafe_base64(37) if self.code.blank?
