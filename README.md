@@ -16,7 +16,7 @@ Installation instructions are below.
 ### Current Features
 * **Sign-ins and sign-ups** for authorized event members, staff, and admin.
 * **Workshop scheduling**: organizers can enter their workshop schedules, including talks with abstracts/descriptions, and choose when to publish their schedules to the public.
-* Default schedule templates that staff can edit. Defaults get applied to all workshop's schedules which have not yet been edited.
+* **Default schedule templates** that staff can edit. Defaults get applied to all workshops' schedules which have not yet been edited.
 * **LaTeX formatting** in all text editing areas, via [MathJax](https://www.mathjax.org), for mathematical formulae.
 * **JSON output** of schedules and other event data, for easy display on external websites, [like this](http://www.birs.ca/events/2017/5-day-workshops/17w5030/schedule).
 * **Event Invitations** feature sends a unique link to potential participants, inviting them to attend a workshop.

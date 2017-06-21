@@ -79,7 +79,8 @@ class SyncMembers
       remote_member['Membership']['updated_by'] = 'Workshops importer'
     end
 
-    if remote_member['Person']['updated_at'].blank?
+    if remote_member['Person']['updated_at'].blank? ||
+       remote_member['Person']['updated_at'] == '0000-00-00 00:00:00'
       remote_member['Person']['updated_at'] = Time.now
     else
       remote_member['Person']['updated_at'] =
@@ -87,7 +88,8 @@ class SyncMembers
             .in_time_zone(@event.time_zone)
     end
 
-    if remote_member['Membership']['updated_at'].blank?
+    if remote_member['Membership']['updated_at'].blank? ||
+       remote_member['Membership']['updated_at'] == '0000-00-00 00:00:00'
       remote_member['Membership']['updated_at'] = Time.now
     else
       remote_member['Membership']['updated_at'] =
@@ -95,7 +97,8 @@ class SyncMembers
             .in_time_zone(@event.time_zone)
     end
 
-    unless remote_member['Membership']['replied_at'].blank?
+    unless remote_member['Membership']['replied_at'].blank? ||
+           remote_member['Membership']['replied_at'] == '0000-00-00 00:00:00'
       remote_member['Membership']['replied_at'] =
         DateTime.parse(remote_member['Membership']['replied_at'].to_s)
                 .in_time_zone(@event.time_zone)
@@ -144,13 +147,11 @@ class SyncMembers
 
   def prepare_value(k, v)
     v = v.to_i if k.eql? 'legacy_id'
-    v = v.utc if k.to_s.include?('_at')
-
-    if k.to_s.include?('_date')
+    if k.to_s.include?('_date') || k.to_s.include?('_at')
       v = nil if v == '0000-00-00 00:00:00'
-      v = Date.parse(v.to_s) unless v.nil?
+      v = DateTime.parse(v.to_s) unless v.nil?
     end
-
+    v = v.utc if v && k.to_s.include?('_at')
     v.strip! if v.respond_to? :strip!
     v
   end
