@@ -222,14 +222,10 @@ describe 'RSVP', type: :feature do
       end
 
       it 'updates legacy database' do
-        lc = spy('lc')
-        allow(LegacyConnector).to receive(:new).and_return(lc)
-
         reset_database
+        expect(SyncMembershipJob).to receive(:perform_later).with(@membership)
         visit rsvp_no_path(@invitation.code)
         click_button 'Decline Attendance'
-
-        expect(lc).to have_received(:update_member).with(@membership)
       end
     end
   end
@@ -288,14 +284,10 @@ describe 'RSVP', type: :feature do
       end
 
       it 'updates legacy database' do
-        lc = spy('lc')
-        allow(LegacyConnector).to receive(:new).and_return(lc)
-
         reset_database
+        expect(SyncMembershipJob).to receive(:perform_later).with(@membership)
         visit rsvp_maybe_path(@invitation.code)
         click_button 'Send Reply'
-
-        expect(lc).to have_received(:update_member).with(@membership)
       end
     end
   end
@@ -399,14 +391,10 @@ describe 'RSVP', type: :feature do
       end
 
       it 'updates legacy database' do
-        lc = spy('lc')
-        allow(LegacyConnector).to receive(:new).and_return(lc)
-
         reset_database
+        expect(SyncMembershipJob).to receive(:perform_later).with(@membership)
         visit rsvp_yes_path(@invitation.code)
         click_button 'Confirm Attendance'
-
-        expect(lc).to have_received(:update_member).with(@membership)
       end
     end
   end

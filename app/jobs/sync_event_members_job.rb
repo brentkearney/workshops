@@ -4,6 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
+# Connects to legacy database to sync membership data
 class SyncEventMembersJob < ActiveJob::Base
   queue_as :urgent
 

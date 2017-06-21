@@ -5,12 +5,13 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Membership < ActiveRecord::Base
+  attr_accessor :sync_remote
+
   belongs_to :event
   belongs_to :person
   accepts_nested_attributes_for :person
   has_one :invitation, dependent: :destroy
 
-  attr_accessor :sync_remote
   after_update :attendance_notification, :sync_with_legacy
   after_save :update_counter_cache
   after_destroy :update_counter_cache
@@ -103,7 +104,7 @@ class Membership < ActiveRecord::Base
   end
 
   def sync_with_legacy
-    LegacyConnector.new.update_member(self) if sync_remote
+    SyncMembershipJob.perform_later(self) if sync_remote
   end
 
   def guest_disclamer_acknowledgement

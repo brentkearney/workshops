@@ -20,7 +20,7 @@ RSpec.describe SyncEventMembersJob, type: :job do
   end
 
   it 'executes perform' do
-    allow(SyncMembers).to receive(:new).with(event)
+    expect(SyncMembers).to receive(:new).with(event)
     perform_enqueued_jobs { job }
   end
 
