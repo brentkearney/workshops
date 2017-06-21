@@ -178,13 +178,13 @@ describe 'RSVP', type: :feature do
 
       organizer_name = @event.organizer.name
       expect(page).to have_text(organizer_name)
-      expect(page).to have_field("organizer_message")
+      expect(page).to have_field("rsvp[organizer_message]")
     end
 
     it 'includes message in the organizer notice' do
       ActionMailer::Base.deliveries = []
       visit rsvp_no_path(@invitation.code)
-      fill_in "organizer_message", with: 'A test message'
+      fill_in "rsvp_organizer_message", with: 'A test message'
       click_button 'Decline Attendance'
 
       message_body = ActionMailer::Base.deliveries.last.body.raw_source
@@ -249,11 +249,11 @@ describe 'RSVP', type: :feature do
     it 'presents a "message to the organizer" form' do
       organizer_name = @event.organizer.name
       expect(page).to have_text(organizer_name)
-      expect(page).to have_field("organizer_message")
+      expect(page).to have_field("rsvp_organizer_message")
     end
 
     it 'includes message in the organizer notice' do
-      fill_in "organizer_message", with: 'A test message'
+      fill_in "rsvp_organizer_message", with: 'A test message'
       click_button 'Send Reply'
 
       message_body = ActionMailer::Base.deliveries.first.body.raw_source
@@ -347,16 +347,27 @@ describe 'RSVP', type: :feature do
     it 'has "message to the organizer" form' do
       organizer_name = @event.organizer.name
       expect(page).to have_text(organizer_name)
-      expect(page).to have_field("organizer_message")
+      expect(page).to have_field("rsvp_organizer_message")
     end
 
     it 'includes message in the organizer notice' do
       ActionMailer::Base.deliveries = []
-      fill_in "organizer_message", with: 'A test message'
+      fill_in 'rsvp_organizer_message', with: 'A test message'
       click_button 'Confirm Attendance'
 
       message_body = ActionMailer::Base.deliveries.first.body.raw_source
       expect(message_body).to include('A test message')
+    end
+
+    it 'persists the organizer message through form validation' do
+      fill_in 'rsvp_organizer_message', with: 'Hi Org!'
+      fill_in 'rsvp_person_firstname', with: ''
+
+      click_button 'Confirm Attendance'
+
+      expect(page.body).to have_text("firstname can't be blank")
+      expect(page).to have_css('textarea#rsvp_organizer_message',
+        text: 'Hi Org!')
     end
 
     context 'after the "Confirm Attendance" button' do

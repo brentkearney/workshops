@@ -48,8 +48,15 @@ class RsvpController < ApplicationController
     end
   end
 
-
   private
+
+  def set_organizer_message
+    if params[:rsvp].blank?
+      @organizer_message = ''
+    else
+      @organizer_message =  message_params['organizer_message']
+    end
+  end
 
   def set_default_dates
     m = @invitation.membership
@@ -58,7 +65,7 @@ class RsvpController < ApplicationController
   end
 
   def update_and_redirect(rsvp:)
-    @invitation.organizer_message = message_params['organizer_message']
+    @invitation.organizer_message = @organizer_message
     membership = @invitation.membership
     @invitation.send(rsvp)
     redirect_to rsvp_feedback_path(membership.id), success: 'Your attendance status was successfully updated. Thanks for your reply!'
@@ -73,6 +80,7 @@ class RsvpController < ApplicationController
   end
 
   def after_selection
+    set_organizer_message
     @invitation.errors.any? ? redirect_to(rsvp_otp_path) : set_organizer
   end
 
@@ -85,7 +93,7 @@ class RsvpController < ApplicationController
   end
 
   def message_params
-    params.permit(:organizer_message)
+    params.require(:rsvp).permit(:organizer_message)
   end
 
   def feedback_params
@@ -101,7 +109,7 @@ class RsvpController < ApplicationController
         :affiliation, :department, :title, :academic_status, :phd_year, :email,
         :url, :phone, :address1, :address2, :address3, :city, :region,
         :postal_code, :country, :emergency_contact, :emergency_phone,
-        :biography, :research_areas]
+        :biography, :research_areas],
     )
   end
 end

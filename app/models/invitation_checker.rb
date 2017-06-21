@@ -55,7 +55,7 @@ class InvitationChecker
 
       # temporary, until members are added using Workshops
       SyncEventMembersJob.perform_now(event) unless event.nil?
-      sleep 1
+      sleep 2
 
       person = Person.where(legacy_id: response['legacy_id'].to_i).first
       if person.nil?
