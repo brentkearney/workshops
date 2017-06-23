@@ -99,12 +99,12 @@ class Membership < ActiveRecord::Base
       msg = nil
       msg = 'is no longer confirmed' if self.attendance_was == 'Confirmed'
       msg = 'is now confirmed' if self.attendance == 'Confirmed'
-      StaffMailer.confirmation_notice(self, msg).deliver_now unless msg.nil?
+      EmailStaffConfirmationNoticeJob.perform_later(self.id, msg) unless msg.nil?
     end
   end
 
   def sync_with_legacy
-    SyncMembershipJob.perform_later(self) if sync_remote
+    SyncMembershipJob.perform_later(self.id) if sync_remote
   end
 
   def guest_disclamer_acknowledgement

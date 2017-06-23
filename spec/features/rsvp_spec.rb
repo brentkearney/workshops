@@ -181,21 +181,17 @@ describe 'RSVP', type: :feature do
       expect(page).to have_field("rsvp[organizer_message]")
     end
 
-    it 'includes message in the organizer notice' do
-      ActionMailer::Base.deliveries = []
-      visit rsvp_no_path(@invitation.code)
-      fill_in "rsvp_organizer_message", with: 'A test message'
-      click_button 'Decline Attendance'
-
-      message_body = ActionMailer::Base.deliveries.last.body.raw_source
-      expect(message_body).to include('A test message')
-    end
-
     context 'after the "Decline Attendance" button' do
       before do
-        ActionMailer::Base.deliveries = []
+        allow(EmailOrganizerNoticeJob).to receive(:perform_later)
         visit rsvp_no_path(@invitation.code)
+        fill_in "rsvp_organizer_message", with: "Sorry I can't make it!"
         click_button 'Decline Attendance'
+      end
+
+      it 'queues background task for emailing organizer with message' do
+        expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
+          .with(@invitation.membership.id, "Sorry I can't make it!")
       end
 
       it 'says thanks' do
@@ -210,20 +206,17 @@ describe 'RSVP', type: :feature do
         expect(Invitation.where(id: @invitation.id)).to be_empty
       end
 
-      it 'notifies the event organizer' do
-        expect(ActionMailer::Base.deliveries.count).not_to be_zero
-        expect(ActionMailer::Base.deliveries.first.to).to include(@event.organizer.email)
-      end
-
       it 'forwards to feedback form, with flash message' do
         expect(current_path).to eq(rsvp_feedback_path(@membership.id))
-        expect(page.body).to have_css('div.alert.alert-success.flash',
-          text: 'Your attendance status was successfully updated. Thanks for your reply!')
+        expect(page.body).to have_css('div.alert.alert-success.flash', text:
+          'Your attendance status was successfully updated. Thanks for your
+          reply!'.squish)
       end
 
       it 'updates legacy database' do
         reset_database
-        expect(SyncMembershipJob).to receive(:perform_later).with(@membership)
+        expect(SyncMembershipJob).to receive(:perform_later)
+          .with(@membership.id)
         visit rsvp_no_path(@invitation.code)
         click_button 'Decline Attendance'
       end
@@ -233,7 +226,6 @@ describe 'RSVP', type: :feature do
   context 'User says Maybe' do
     before do
       reset_database
-      ActionMailer::Base.deliveries = []
       visit rsvp_otp_path(@invitation.code)
       click_link "Maybe"
     end
@@ -252,40 +244,35 @@ describe 'RSVP', type: :feature do
       expect(page).to have_field("rsvp_organizer_message")
     end
 
-    it 'includes message in the organizer notice' do
-      fill_in "rsvp_organizer_message", with: 'A test message'
-      click_button 'Send Reply'
-
-      message_body = ActionMailer::Base.deliveries.first.body.raw_source
-      expect(message_body).to include('A test message')
-    end
-
     context 'after the "Send Reply" button' do
       before do
         reset_database
-        ActionMailer::Base.deliveries = []
+        allow(EmailOrganizerNoticeJob).to receive(:perform_later)
         visit rsvp_maybe_path(@invitation.code)
+        fill_in "rsvp_organizer_message", with: 'I might be there'
         click_button "Send Reply"
+      end
+
+      it 'includes message in the organizer notice' do
+        expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
+          .with(@invitation.membership.id, 'I might be there')
       end
 
       it 'changes membership attendance to Undecided' do
         expect(Membership.find(@membership.id).attendance).to eq('Undecided')
       end
 
-      it 'notifies organizer' do
-        expect(ActionMailer::Base.deliveries.count).not_to be_zero
-        expect(ActionMailer::Base.deliveries.first.to).to include(@event.organizer.email)
-      end
-
       it 'forwards to feedback form, with flash message' do
         expect(current_path).to eq(rsvp_feedback_path(@membership.id))
-        expect(page.body).to have_css('div.alert.alert-success.flash',
-          text: 'Your attendance status was successfully updated. Thanks for your reply!')
+        expect(page.body).to have_css('div.alert.alert-success.flash', text:
+          'Your attendance status was successfully updated. Thanks for your
+          reply!'.squish)
       end
 
       it 'updates legacy database' do
         reset_database
-        expect(SyncMembershipJob).to receive(:perform_later).with(@membership)
+        expect(SyncMembershipJob).to receive(:perform_later)
+          .with(@membership.id)
         visit rsvp_maybe_path(@invitation.code)
         click_button 'Send Reply'
       end
@@ -350,15 +337,6 @@ describe 'RSVP', type: :feature do
       expect(page).to have_field("rsvp_organizer_message")
     end
 
-    it 'includes message in the organizer notice' do
-      ActionMailer::Base.deliveries = []
-      fill_in 'rsvp_organizer_message', with: 'A test message'
-      click_button 'Confirm Attendance'
-
-      message_body = ActionMailer::Base.deliveries.first.body.raw_source
-      expect(message_body).to include('A test message')
-    end
-
     it 'persists the organizer message through form validation' do
       fill_in 'rsvp_organizer_message', with: 'Hi Org!'
       fill_in 'rsvp_person_firstname', with: ''
@@ -372,8 +350,10 @@ describe 'RSVP', type: :feature do
 
     context 'after the "Confirm Attendance" button' do
       before do
-        allow(SendParticipantConfirmationJob).to receive(:perform_later)
+        allow(EmailParticipantConfirmationJob).to receive(:perform_later)
+        allow(EmailOrganizerNoticeJob).to receive(:perform_later)
         visit rsvp_yes_path(@invitation.code)
+        fill_in "rsvp_organizer_message", with: 'Excited to attend!'
         click_button 'Confirm Attendance'
       end
 
@@ -381,13 +361,13 @@ describe 'RSVP', type: :feature do
         expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
       end
 
-      it 'sends notification email to organizer' do
-        expect(ActionMailer::Base.deliveries.count).not_to be_zero
-        expect(ActionMailer::Base.deliveries.first.to).to include(@event.organizer.email)
+      it 'includes message in the organizer notice' do
+        expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
+          .with(@invitation.membership.id, 'Excited to attend!')
       end
 
       it 'sends confirmation email to participant via background job' do
-        expect(SendParticipantConfirmationJob)
+        expect(EmailParticipantConfirmationJob)
           .to have_received(:perform_later).with(@membership.id)
       end
 
@@ -397,13 +377,15 @@ describe 'RSVP', type: :feature do
 
       it 'forwards to feedback form, with flash message' do
         expect(current_path).to eq(rsvp_feedback_path(@membership.id))
-        expect(page.body).to have_css('div.alert.alert-success.flash',
-          text: 'Your attendance status was successfully updated. Thanks for your reply!')
+        expect(page.body).to have_css('div.alert.alert-success.flash', text:
+          'Your attendance status was successfully updated. Thanks for your
+          reply!'.squish)
       end
 
       it 'updates legacy database' do
         reset_database
-        expect(SyncMembershipJob).to receive(:perform_later).with(@membership)
+        expect(SyncMembershipJob).to receive(:perform_later)
+          .with(@membership.id)
         visit rsvp_yes_path(@invitation.code)
         click_button 'Confirm Attendance'
       end
@@ -413,7 +395,7 @@ describe 'RSVP', type: :feature do
   context 'Feedback Form' do
     before :each do
       reset_database
-      ActionMailer::Base.deliveries = []
+      allow(EmailSiteFeedbackJob).to receive(:perform_later)
       visit rsvp_feedback_path(@invitation.membership_id)
     end
 
@@ -425,8 +407,8 @@ describe 'RSVP', type: :feature do
     it 'sends feedback email if user enters feedback text' do
       fill_in_feedback_from('Testing feedback form')
 
-      message_body = ActionMailer::Base.deliveries.first.body.raw_source
-      expect(message_body).to include('Testing feedback form')
+      expect(EmailSiteFeedbackJob).to have_received(:perform_later)
+        .with('RSVP', @invitation.membership.id, 'Testing feedback form')
     end
 
     it 'forwards to event membership page, with flash message' do
@@ -440,7 +422,7 @@ describe 'RSVP', type: :feature do
 
     it 'does not send email if no text is entered' do
       fill_in_feedback_from('')
-      expect(ActionMailer::Base.deliveries).to be_empty
+      expect(EmailSiteFeedbackJob).not_to have_received(:perform_later)
     end
   end
 end

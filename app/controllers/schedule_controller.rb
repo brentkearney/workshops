@@ -70,9 +70,8 @@ class ScheduleController < ApplicationController
         day = @schedule.start_time.to_date
         name = @schedule.name
         if @schedule.notify_staff?
-          StaffMailer.schedule_change(@schedule, type: :create,
-                                                 user: current_user.name)
-                     .deliver_now
+          EmailScheduleChangeNoticeJob
+            .perform_later(@schedule, type: :create, user: current_user.name)
         end
         format.html do
           redirect_to event_schedule_day_path(@event, day),
@@ -113,12 +112,12 @@ class ScheduleController < ApplicationController
           ScheduleItem.update_others(@original_item, merged_params)
         end
         if @schedule.notify_staff?
-          StaffMailer.schedule_change(@original_item,
-                                      type: :update,
-                                      user: current_user.name,
-                                      updated_schedule: @schedule,
-                                      changed_similar: params[:change_similar])
-                     .deliver_now
+          EmailScheduleChangeNoticeJob
+            .perform_later(@original_item,
+                           type: :update,
+                           user: current_user.name,
+                           updated_schedule: @schedule,
+                           changed_similar: params[:change_similar])
         end
 
         format.html do
@@ -145,10 +144,9 @@ class ScheduleController < ApplicationController
   def destroy
     authorize @schedule
     if @schedule.notify_staff?
-      StaffMailer.schedule_change(@schedule,
-                                  type: :destroy,
-                                  user: current_user.name)
-                 .deliver_now
+      EmailScheduleChangeNoticeJob.perform_later(@schedule,
+                                                 type: :destroy,
+                                                 user: current_user.name)
     end
     if @schedule.lecture.blank?
       @schedule.destroy

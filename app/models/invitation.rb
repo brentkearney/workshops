@@ -15,7 +15,7 @@ class Invitation < ActiveRecord::Base
 
   def send_invite
     save
-    InvitationMailer.invite(self).deliver_now
+    EmailInvitationJob.perform_later(id)
   end
 
   def expire_date
@@ -24,7 +24,7 @@ class Invitation < ActiveRecord::Base
 
   def accept
     update_membership('Confirmed')
-    SendParticipantConfirmationJob.perform_later(membership_id)
+    EmailParticipantConfirmationJob.perform_later(membership.id)
     destroy
   end
 
@@ -65,7 +65,7 @@ class Invitation < ActiveRecord::Base
     membership.updated_by = membership.person.name
     membership.replied_at = Time.now
 
-    OrganizerMailer.rsvp_notice(self.membership, organizer_message).deliver_now
+    EmailOrganizerNoticeJob.perform_later(membership.id, organizer_message)
     membership.sync_remote = true
     membership.save
   end

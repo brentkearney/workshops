@@ -36,10 +36,9 @@ class ParticipantMailer < ApplicationMailer
     end
 
     # PDF attachment in lib/assets/rsvp/[location]
-    pdf_path = template_path = Rails.root.join('lib', 'assets', 'rsvp',
-      "#{@event.location}")
+    pdf_path = Rails.root.join('lib', 'assets', 'rsvp', "#{@event.location}")
     file_attachment = "#{pdf_path}/#{@event.event_type}.pdf"
-    if File.exist?(file_attachment)
+    if File.exist?("#{file_attachment}") # spaces in file name
       attachments["#{@event.location}-arrival-info.pdf"] = {
         mime_type: 'application/pdf',
         content: File.read(file_attachment)

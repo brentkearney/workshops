@@ -26,7 +26,7 @@ describe "ErrorReport" do
     before do
       @er = ErrorReport.new(self.class, @event)
     end
-    
+
     it '.add accepts objects, instance.errors retrieves the object and its errors' do
       3.times do
         person = build(:person, lastname: '')
@@ -41,7 +41,7 @@ describe "ErrorReport" do
         expect(p.object).to be_a(Person)
       end
     end
-    
+
     it '.add accepts custom error messages' do
       person = build(:person)
 
@@ -55,28 +55,18 @@ describe "ErrorReport" do
     context 'from SyncMembers' do
       before do
         @er = ErrorReport.new('SyncMembers', @event)
+        allow(EmailSysadminJob).to receive(:perform_later)
       end
 
       it 'notifies sysadmin of LegacyConnector errors' do
         lc = FakeLegacyConnector.new
-        mailer = double('mailer')
-        mailer.tap do |mail|
-          allow(mailer).to receive(:deliver_now).and_return(true)
-          allow(StaffMailer).to receive(:notify_sysadmin).and_return(mailer)
-        end
-
         @er.add(lc, 'Error connecting to remote API')
         @er.send_report
 
-        expect(StaffMailer).to have_received(:notify_sysadmin)
+        expect(EmailSysadminJob).to have_received(:perform_later)
       end
 
       it 'notifies staff of Person and Membership errors' do
-        mailer = double('mailer')
-        mailer.tap do |mail|
-          allow(mailer).to receive(:deliver_now).and_return(true)
-          allow(StaffMailer).to receive(:event_sync).and_return(mailer)
-        end
         person = build(:person, lastname: '')
         membership = build(:membership, event: @event, person: nil)
 
@@ -84,10 +74,27 @@ describe "ErrorReport" do
         @er.add(membership)
         @er.send_report
 
-        expect(StaffMailer).to have_received(:event_sync)
+        expect(EmailSysadminJob).to have_received(:perform_later)
       end
 
       context 'overlapping Membership and Person errors' do
+        # Person error message from error_report.rb:64
+        def person_error_message(person, person_error)
+          legacy_url = Setting.Site['legacy_person']
+          error_message = "* #{person.name}: #{person_error}\n"
+          error_message << "   -> #{legacy_url}#{person.legacy_id}\n\n"
+        end
+
+        # Membership error message from error_report.rb:81
+        def membership_error_message(membership, membership_error)
+          error_message = "\nMembership error: #{membership_error}\n"
+          error_message << "* Membership of #{membership.person.name}:
+            #{membership_error}\n".squish
+          legacy_url = Setting.Site['legacy_person'] +
+              "#{membership.person.legacy_id}" + '&ps=events'
+          error_message << "   -> #{legacy_url}\n\n"
+        end
+
         it 'omits the Membership error if it is the same as the Person error' do
           person = build(:person, affiliation: '')
           membership = build(:membership, person: person, event: @event)
@@ -96,30 +103,29 @@ describe "ErrorReport" do
           person_error = @er.errors['Person'].first.message.to_s
           membership_error = @er.errors['Membership'].first.message.to_s
 
-          expect {
-            @er.send_report
-          }.to change { ActionMailer::Base.deliveries.count }.by(1)
+          @er.send_report
 
-          message_body = ActionMailer::Base.deliveries.last.body.raw_source
-          expect(message_body).to include(person_error)
-          expect(message_body).not_to include(membership_error)
+          expect(EmailSysadminJob).to have_received(:perform_later)
+            .with(@event.id, person_error_message(person, person_error))
         end
 
-        it 'includes the Membership error if it has messages additional to the Person error' do
+        it 'includes the Membership error if it has messages additional to the
+          Person error' do
           person = build(:person, affiliation: '')
-          membership = build(:membership, person: person, event: @event, arrival_date: '1970-01-01')
+          membership = build(:membership, person: person, event: @event,
+                                          arrival_date: '1970-01-01')
           @er.add(person)
           @er.add(membership)
           person_error = @er.errors['Person'].first.message.to_s
           membership_error = @er.errors['Membership'].first.message.to_s
 
-          expect {
-            @er.send_report
-          }.to change { ActionMailer::Base.deliveries.count }.by(1)
+          @er.send_report
 
-          message_body = ActionMailer::Base.deliveries.last.body.raw_source
-          expect(message_body).to include(person_error)
-          expect(message_body).to include(membership_error)
+          error_message = person_error_message(person, person_error) <<
+                          membership_error_message(membership, membership_error)
+
+          expect(EmailSysadminJob).to have_received(:perform_later)
+            .with(@event.id, error_message)
         end
 
         it 'includes Membership error if there are no Person errors' do
@@ -127,11 +133,11 @@ describe "ErrorReport" do
           @er.add(membership)
           membership_error = @er.errors['Membership'].first.message.to_s
 
-          expect {
-            @er.send_report
-          }.to change { ActionMailer::Base.deliveries.count }.by(1)
+          @er.send_report
 
-          expect(ActionMailer::Base.deliveries.last.body.raw_source).to include(membership_error)
+          error_message = membership_error_message(membership, membership_error)
+          expect(EmailSysadminJob).to have_received(:perform_later)
+            .with(@event.id, error_message)
         end
       end
 

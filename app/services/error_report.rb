@@ -30,13 +30,16 @@ class ErrorReport
   end
 
   def send_report
-    return if errors.empty?
+    return if errors.blank?
 
     case "#{@from}"
       when 'SyncMembers'
         if errors.has_key?('LegacyConnector')
           error = errors['LegacyConnector'].shift
-          StaffMailer.notify_sysadmin(@event, error).deliver_now
+          error_message = error.object.inspect.to_s + "\n\n" + error.message
+          unless error_message.blank?
+            EmailSysadminJob.perform_later(@event.id, error_message)
+          end
         end
 
         error_messages = ''
@@ -48,8 +51,9 @@ class ErrorReport
             legacy_url = Setting.Site['legacy_person']
 
             if person.legacy_id.nil?
-              person_error.message << "\n\nDuring #{event.code} data synchronization, we found a local person record with no legacy_id!\n\n"
-              StaffMailer.notify_sysadmin(event, person_error).deliver_now
+              error_messages << "\n\nDuring #{event.code} data synchronization,
+               a local person record with no legacy_id was found!
+               #{person.inspect}\n\n".squish
             else
               legacy_url += "#{person.legacy_id}"
             end
@@ -66,22 +70,32 @@ class ErrorReport
             message = error_obj.message.to_s
 
             unless duplicate_error(membership.person, message)
+              error_messages << "\nMembership error: #{message}\n"
               if membership.person.nil?
-                error_messages << "* #{@event.code} membership has no associated person record!\n\n#{membership.inspect}\n"
+                error_messages << "* #{@event.code} membership has no associated
+                  person record!\n\n#{membership.inspect}\n"
               else
-                legacy_url = Setting.Site['legacy_person'] + "#{membership.person.legacy_id}" + '&ps=events'
-                error_messages << "* Membership of #{membership.person.name}: #{message}\n"
+                legacy_url = Setting.Site['legacy_person'] +
+                  "#{membership.person.legacy_id}" + '&ps=events'
+                error_messages << "* Membership of #{membership.person.name}:
+                  #{message}\n".squish
                 error_messages << "   -> #{legacy_url}\n\n"
               end
             end
           end
+
         end
-        StaffMailer.event_sync(@event, error_messages).deliver_now
+        unless error_messages.blank?
+          EmailSysadminJob.perform_later(@event.id, error_messages)
+        end
       else
         # Iterate over Errors hash, send report for each type of error
         errors.each do |string, array|
-          error_object = errors[string].shift
-          StaffMailer.notify_sysadmin(@event, error_object).deliver_now
+          error_message = errors[string].shift.message
+          error_message << "\n and: #{array.inspect}"
+          unless error_message.blank?
+            EmailSysadminJob.perform_later(@event.id, error_message)
+          end
         end
     end
   end

@@ -7,7 +7,7 @@
 require "rails_helper"
 include ActiveJob::TestHelper
 
-RSpec.describe InvitationMailer, type: :mailer do
+RSpec.describe ParticipantMailer, type: :mailer do
   def expect_email_was_sent
     expect(ActionMailer::Base.deliveries.count).to eq(1)
   end
@@ -23,13 +23,14 @@ RSpec.describe InvitationMailer, type: :mailer do
     Event.destroy_all
   end
 
-  describe '.invite' do
+  describe '.rsvp_confirmation' do
     before do
       @invitation = create(:invitation)
+      @membership = @invitation.membership
     end
 
     before :each do
-      InvitationMailer.invite(@invitation).deliver_now
+      ParticipantMailer.rsvp_confirmation(@membership).deliver_now
       @sent_message = ActionMailer::Base.deliveries.first
     end
 
@@ -37,16 +38,18 @@ RSpec.describe InvitationMailer, type: :mailer do
       expect_email_was_sent
     end
 
-    it 'To: given member' do
-      expect(@sent_message.to).to include(@invitation.membership.person.email)
+    it 'From: Setting.Emails["rsvp"]' do
+      from_address = Setting.Emails[@membership.event.location.to_s]['rsvp']
+      expect(@sent_message.from).to include(from_address)
     end
 
-    it "message body includes participant's name" do
-      expect(@sent_message.body).to have_text(@invitation.membership.person.dear_name)
+    it 'To: confirmed participant' do
+      expect(@sent_message.to).to include(@membership.person.email)
     end
 
-    it 'message body includes the invitation code' do
-      expect(@sent_message.body).to have_text(@invitation.code)
+    it 'includes PDF attachment' do
+      filename = @membership.event.location + '-arrival-info.pdf'
+      expect(@sent_message.attachments.first.filename).to eq(filename)
     end
   end
 end

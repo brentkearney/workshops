@@ -7,7 +7,7 @@
 require "rails_helper"
 include ActiveJob::TestHelper
 
-RSpec.describe InvitationMailer, type: :mailer do
+RSpec.describe OrganizerMailer, type: :mailer do
   def expect_email_was_sent
     expect(ActionMailer::Base.deliveries.count).to eq(1)
   end
@@ -23,13 +23,17 @@ RSpec.describe InvitationMailer, type: :mailer do
     Event.destroy_all
   end
 
-  describe '.invite' do
+  describe '.rsvp_notice' do
     before do
-      @invitation = create(:invitation)
+      @organizer = create(:membership, role: 'Contact Organizer')
+      @participant = create(:membership, event: @organizer.event,
+                                         attendance: 'Invited')
+      @participant.attendance = 'Confirmed'
+      @participant.save
     end
 
     before :each do
-      InvitationMailer.invite(@invitation).deliver_now
+      OrganizerMailer.rsvp_notice(@participant, 'Foo bar').deliver_now
       @sent_message = ActionMailer::Base.deliveries.first
     end
 
@@ -37,16 +41,21 @@ RSpec.describe InvitationMailer, type: :mailer do
       expect_email_was_sent
     end
 
-    it 'To: given member' do
-      expect(@sent_message.to).to include(@invitation.membership.person.email)
+    it 'To: given organizer' do
+      expect(@sent_message.to).to include(@organizer.person.email)
     end
 
     it "message body includes participant's name" do
-      expect(@sent_message.body).to have_text(@invitation.membership.person.dear_name)
+      expect(@sent_message.body).to have_text(@participant.person.name)
     end
 
-    it 'message body includes the invitation code' do
-      expect(@sent_message.body).to have_text(@invitation.code)
+    it "message body includes participant's current and previous status" do
+      expect(@sent_message.body).to have_text(@participant.attendance_was)
+      expect(@sent_message.body).to have_text(@participant.attendance)
+    end
+
+    it 'message body includes given message' do
+      expect(@sent_message.body).to have_text('Foo bar')
     end
   end
 end

@@ -10,15 +10,15 @@ class SyncMembershipJob < ActiveJob::Base
 
   rescue_from(RuntimeError) do |error|
     if error.message == 'JSON::ParserError'
-      membership = arguments[0]
+      membership_id = arguments[0]
+      membership = Membership.find_by_id(membership_id)
       StaffMailer.notify_sysadmin(membership.event, error).deliver_now
     else
       retry_job wait: 10.minutes, queue: :default
     end
   end
 
-  def perform(membership)
-    LegacyConnector.new.update_member(membership)
+  def perform(membership_id)
+    LegacyConnector.new.update_member(membership_id)
   end
 end
-
