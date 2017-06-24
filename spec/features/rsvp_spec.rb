@@ -183,15 +183,19 @@ describe 'RSVP', type: :feature do
 
     context 'after the "Decline Attendance" button' do
       before do
+        @args = { 'attendance_was' => 'Invited',
+                  'attendance' => 'Declined',
+                  'organizer_message' => '' }
         allow(EmailOrganizerNoticeJob).to receive(:perform_later)
         visit rsvp_no_path(@invitation.code)
-        fill_in "rsvp_organizer_message", with: "Sorry I can't make it!"
+        fill_in 'rsvp_organizer_message', with: "Sorry I can't make it!"
         click_button 'Decline Attendance'
       end
 
       it 'queues background task for emailing organizer with message' do
+        @args['organizer_message'] = "Sorry I can't make it!"
         expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
-          .with(@invitation.membership.id, "Sorry I can't make it!")
+          .with(@invitation.membership.id, @args)
       end
 
       it 'says thanks' do
@@ -247,6 +251,9 @@ describe 'RSVP', type: :feature do
     context 'after the "Send Reply" button' do
       before do
         reset_database
+        @args = { 'attendance_was' => 'Invited',
+                  'attendance' => 'Undecided',
+                  'organizer_message' => '' }
         allow(EmailOrganizerNoticeJob).to receive(:perform_later)
         visit rsvp_maybe_path(@invitation.code)
         fill_in "rsvp_organizer_message", with: 'I might be there'
@@ -254,8 +261,9 @@ describe 'RSVP', type: :feature do
       end
 
       it 'includes message in the organizer notice' do
+        @args['organizer_message'] = 'I might be there'
         expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
-          .with(@invitation.membership.id, 'I might be there')
+          .with(@invitation.membership.id, @args)
       end
 
       it 'changes membership attendance to Undecided' do
@@ -350,6 +358,9 @@ describe 'RSVP', type: :feature do
 
     context 'after the "Confirm Attendance" button' do
       before do
+        @args = { 'attendance_was' => 'Invited',
+                  'attendance' => 'Confirmed',
+                  'organizer_message' => '' }
         allow(EmailParticipantConfirmationJob).to receive(:perform_later)
         allow(EmailOrganizerNoticeJob).to receive(:perform_later)
         visit rsvp_yes_path(@invitation.code)
@@ -362,8 +373,9 @@ describe 'RSVP', type: :feature do
       end
 
       it 'includes message in the organizer notice' do
+        @args['organizer_message'] = 'Excited to attend!'
         expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
-          .with(@invitation.membership.id, 'Excited to attend!')
+          .with(@invitation.membership.id, @args)
       end
 
       it 'sends confirmation email to participant via background job' do

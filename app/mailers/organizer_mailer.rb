@@ -26,13 +26,14 @@ class OrganizerMailer < ApplicationMailer
 
   default from: app_email
 
-  def rsvp_notice(membership, organizer_message = nil)
-    @old_attendance = membership.attendance_was
-    @new_attendance = membership.attendance
+  def rsvp_notice(membership, args)
+    @old_attendance = args['attendance_was'] || 'Invited'
+    @new_attendance = args['attendance'] || 'Invited'
+    @message_to_organizer = args['organizer_message'] || ''
+
     @member = membership.person
     @event = membership.event
     @organizer = @event.organizer
-    @message_to_organizer = organizer_message
     @membership_url = Setting.Site['app_url'] + "/events/#{@event.code}/membership"
 
     @organization = 'Staff'

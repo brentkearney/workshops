@@ -33,7 +33,10 @@ RSpec.describe OrganizerMailer, type: :mailer do
     end
 
     before :each do
-      OrganizerMailer.rsvp_notice(@participant, 'Foo bar').deliver_now
+      args = { 'attendance_was' => 'Invited',
+               'attendance' => 'Confirmed',
+               'organizer_message' => 'Foo bar' }
+      OrganizerMailer.rsvp_notice(@participant, args).deliver_now
       @sent_message = ActionMailer::Base.deliveries.first
     end
 

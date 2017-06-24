@@ -61,17 +61,19 @@ class Invitation < ActiveRecord::Base
   private
 
   def update_membership(status)
-    updated_at = DateTime.now.in_time_zone(membership.event.time_zone)
-    updated_by = membership.person.name
-    membership.attendance = status
-    membership.updated_by = updated_by
-    membership.replied_at = updated_at
-    membership.updated_at = updated_at
-    membership.person.updated_by = updated_by
-    membership.person.updated_at = updated_at
+    args = { 'attendance_was' => membership.attendance,
+             'attendance' => status,
+             'organizer_message' => organizer_message }
+    EmailOrganizerNoticeJob.perform_later(membership.id, args)
 
-    # Send message before save to keep membership.attendance_was
-    EmailOrganizerNoticeJob.perform_later(membership.id, organizer_message)
+    update_time = DateTime.now.in_time_zone(membership.event.time_zone)
+    update_name = membership.person.name
+    membership.attendance = status
+    membership.updated_by = update_name
+    membership.replied_at = update_time
+    membership.updated_at = update_time
+    membership.person.updated_by = update_name
+    membership.person.updated_at = update_time
     membership.sync_remote = true
     membership.save
   end

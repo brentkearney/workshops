@@ -8,8 +8,8 @@
 class EmailOrganizerNoticeJob < ActiveJob::Base
   queue_as :urgent
 
-  def perform(membership_id, msg)
+  def perform(membership_id, args)
     membership = Membership.find_by_id(membership_id)
-    OrganizerMailer.rsvp_notice(membership, msg).deliver_now
+    OrganizerMailer.rsvp_notice(membership, args).deliver_now
   end
 end
