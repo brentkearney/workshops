@@ -8,8 +8,7 @@
 class EmailScheduleChangeNoticeJob < ActiveJob::Base
   queue_as :urgent
 
-  def perform(schedule_id, args)
-    schedule = Schedule.find_by_id(schedule_id)
-    StaffMailer.schedule_change(schedule, args).deliver_now
+  def perform(args)
+    StaffMailer.schedule_change(args).deliver_now
   end
 end

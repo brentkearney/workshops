@@ -7,8 +7,8 @@
 require 'rails_helper'
 
 RSpec.describe SyncMembershipJob, type: :job do
-  let(:membership) { create(:membership) }
-  subject(:job) { SyncMembershipJob.perform_later(membership) }
+  let(:membership) { build(:membership, id: 1) }
+  subject(:job) { SyncMembershipJob.perform_later(membership.id) }
 
   it 'queues the job' do
     expect { job }
@@ -26,13 +26,14 @@ RSpec.describe SyncMembershipJob, type: :job do
 
     perform_enqueued_jobs { job }
 
-    expect(lc).to have_received(:update_member).with(membership)
+    expect(lc).to have_received(:update_member).with(membership.id)
   end
 
   it 'notifies sysadmin if there is a parse error' do
     lc = double('lc')
     allow(LegacyConnector).to receive(:new).and_return(lc)
     allow(lc).to receive(:update_member).and_raise('JSON::ParserError')
+    allow(Membership).to receive(:find_by_id).and_return(membership)
 
     perform_enqueued_jobs do
       expect_any_instance_of(StaffMailer).to receive(:notify_sysadmin)
@@ -47,7 +48,7 @@ RSpec.describe SyncMembershipJob, type: :job do
 
     perform_enqueued_jobs do
       expect_any_instance_of(SyncMembershipJob)
-        .to receive(:retry_job).with(wait: 10.minutes, queue: :default)
+        .to receive(:retry_job).with(wait: 1.minutes, queue: :default)
       job
     end
   end

@@ -12,8 +12,8 @@ class Membership < ActiveRecord::Base
   accepts_nested_attributes_for :person
   has_one :invitation, dependent: :destroy
 
-  after_update :attendance_notification, :sync_with_legacy
-  after_save :update_counter_cache
+  after_save :update_counter_cache, :attendance_notification
+  after_commit :sync_with_legacy
   after_destroy :update_counter_cache
 
   validates :event, presence: true
@@ -95,16 +95,15 @@ class Membership < ActiveRecord::Base
   end
 
   def attendance_notification
-    if self.changed.include?('attendance')
-      msg = nil
-      msg = 'is no longer confirmed' if self.attendance_was == 'Confirmed'
-      msg = 'is now confirmed' if self.attendance == 'Confirmed'
-      EmailStaffConfirmationNoticeJob.perform_later(self.id, msg) unless msg.nil?
-    end
+    return unless changed.include?('attendance')
+    msg = nil
+    msg = 'is no longer confirmed' if attendance_was == 'Confirmed'
+    msg = 'is now confirmed' if attendance == 'Confirmed'
+    EmailStaffConfirmationNoticeJob.perform_later(id, msg) unless msg.nil?
   end
 
   def sync_with_legacy
-    SyncMembershipJob.perform_later(self.id) if sync_remote
+    SyncMembershipJob.perform_later(id) if sync_remote
   end
 
   def guest_disclamer_acknowledgement

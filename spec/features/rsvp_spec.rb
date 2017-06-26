@@ -218,11 +218,14 @@ describe 'RSVP', type: :feature do
       end
 
       it 'updates legacy database' do
+        allow(SyncMembershipJob).to receive(:perform_later)
         reset_database
-        expect(SyncMembershipJob).to receive(:perform_later)
-          .with(@membership.id)
+
         visit rsvp_no_path(@invitation.code)
         click_button 'Decline Attendance'
+
+        expect(SyncMembershipJob).to have_received(:perform_later)
+          .with(@membership.id)
       end
     end
   end
@@ -278,11 +281,14 @@ describe 'RSVP', type: :feature do
       end
 
       it 'updates legacy database' do
+        allow(SyncMembershipJob).to receive(:perform_later)
         reset_database
-        expect(SyncMembershipJob).to receive(:perform_later)
-          .with(@membership.id)
+
         visit rsvp_maybe_path(@invitation.code)
         click_button 'Send Reply'
+
+        expect(SyncMembershipJob).to have_received(:perform_later)
+          .with(@membership.id)
       end
     end
   end
@@ -395,11 +401,14 @@ describe 'RSVP', type: :feature do
       end
 
       it 'updates legacy database' do
+        allow(SyncMembershipJob).to receive(:perform_later)
         reset_database
-        expect(SyncMembershipJob).to receive(:perform_later)
-          .with(@membership.id)
+
         visit rsvp_yes_path(@invitation.code)
         click_button 'Confirm Attendance'
+
+        expect(SyncMembershipJob).to have_received(:perform_later)
+          .with(@membership.id)
       end
     end
   end

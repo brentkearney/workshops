@@ -66,20 +66,10 @@ class LegacyConnector
 
   # add new member to event
   def add_member(membership:, event_code:, person:, updated_by:)
-    event = Event.find_by_code(event_code)
-    unless event.blank?
-      person.updated_at = DateTime.now if person.updated_at.nil?
-      person.updated_at = person.updated_at.in_time_zone(event.time_zone)
-
-      membership.updated_at = DateTime.now if membership.updated_at.nil?
-      m_updated = membership.updated_at.in_time_zone(event.time_zone)
-    end
-
     remote_membership = membership.attributes.merge(
       workshop_id: event_code,
       person:      person.as_json,
-      updated_by:  updated_by,
-      updated_at:  m_updated
+      updated_by:  updated_by
     )
 
     JSON.parse((RestClient.post "#{@rest_url}/add_member/#{event_code}",

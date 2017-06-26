@@ -255,7 +255,7 @@ describe 'Settings page', type: :feature do
 
       it 'has a "+/- Location" tab to remove locations' do
         key = Setting.Locations.keys.first
-        Setting.Locations = Setting.Locations.merge(:XYZ => Setting.Locations[key])
+        Setting.Locations = Setting.Locations.merge('XYZ' => Setting.Locations[key])
 
         click_link '+/- Location'
         select 'XYZ', from: 'setting[Locations][remove_location]'
@@ -291,7 +291,7 @@ describe 'Settings page', type: :feature do
 
     context '+/- Setting tab' do
       before :each do
-        visit new_setting_path
+        visit new_setting_path('Site')
       end
 
       it 'adds a new setting section' do

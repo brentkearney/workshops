@@ -66,14 +66,17 @@ class Invitation < ActiveRecord::Base
              'organizer_message' => organizer_message }
     EmailOrganizerNoticeJob.perform_later(membership.id, args)
 
-    update_time = DateTime.now.in_time_zone(membership.event.time_zone)
+    Time.zone = ActiveSupport::TimeZone.new(membership.event.time_zone)
+    update_time = DateTime.now
     update_name = membership.person.name
     membership.attendance = status
     membership.updated_by = update_name
     membership.replied_at = update_time
     membership.updated_at = update_time
-    membership.person.updated_by = update_name
-    membership.person.updated_at = update_time
+    if status == 'Confirmed'
+      membership.person.updated_by = update_name
+      membership.person.updated_at = update_time
+    end
     membership.sync_remote = true
     membership.save
   end

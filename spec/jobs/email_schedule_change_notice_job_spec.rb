@@ -15,34 +15,36 @@ RSpec.describe EmailScheduleChangeNoticeJob, type: :job do
 
     it 'calls on the StaffMailer with :create' do
       schedule = double('schedule', id: 1)
-      args = { type: :create, user: 'Rspec' }
+      args = { type: :create, original_schedule: schedule, user: 'Rspec' }
 
-      described_class.new.perform(schedule, args)
+      described_class.new.perform(args)
 
       expect(StaffMailer).to have_received(:schedule_change)
-        .with(schedule, args)
+        .with(args)
     end
 
     it 'calls on the StaffMailer with :update' do
       original_schedule = double('schedule', id: 1)
       updated_schedule = double('schedule', id: 1)
       args = { type: :update, user: 'Rspec',
-               updated_schedule: updated_schedule, changed_similar: false }
+               original_schedule: original_schedule,
+               updated_schedule: updated_schedule,
+               changed_similar: false }
 
-      described_class.new.perform(original_schedule, args)
+      described_class.new.perform(args)
 
       expect(StaffMailer).to have_received(:schedule_change)
-        .with(original_schedule, args)
+        .with(args)
     end
 
     it 'calls on the StaffMailer with :destroy' do
       schedule = double('schedule', id: 1)
-      args = { type: :destroy, user: 'Rspec' }
+      args = { type: :destroy, original_schedule: schedule, user: 'Rspec' }
 
-      described_class.new.perform(schedule, args)
+      described_class.new.perform(args)
 
       expect(StaffMailer).to have_received(:schedule_change)
-        .with(schedule, args)
+        .with(args)
     end
   end
 

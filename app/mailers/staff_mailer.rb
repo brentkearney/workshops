@@ -26,13 +26,20 @@ class StaffMailer < ApplicationMailer
 
   default from: app_email
 
-  def schedule_change(schedule, args)
-    type = args['type'] || ''
-    user = args['user'] || ''
-    updated_schedule = args['updated_schedule'] || false
-    changed_similar = args['changed_similar'] || false
+  def schedule_change(args)
+    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
+    Rails.logger.debug "StaffMailer schedule_change received: #{args.inspect}"
+    type = args[:type] || ''
+    user = args[:user] || ''
+    original_schedule = args[:original_schedule] || false
+    updated_schedule = args[:updated_schedule] || false
+    changed_similar = args[:changed_similar] || false
 
-    @event = schedule.event
+    Rails.logger.debug "original_schedule is a: #{original_schedule.class}"
+    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
+
+
+    @event = original_schedule.event
     schedule_emails = 'schedule@example.com'
     unless Setting.Emails.blank? ||
       Setting.Emails[@event.location.to_s]['schedule_staff'].nil?
@@ -40,21 +47,21 @@ class StaffMailer < ApplicationMailer
     end
     to_email = schedule_emails
     subject = "[#{@event.code}] Schedule change notice!"
-    if schedule.lecture.nil?
-      publish = 'N/A'
-    else
-      publish = schedule.lecture.do_not_publish ? 'OFF' : 'ON'
+
+    publish = 'N/A'
+    unless original_schedule.lecture.nil?
+      publish = original_schedule.lecture.do_not_publish ? 'OFF' : 'ON'
     end
 
 
     @change_notice = %Q(
     THIS:
-      Name: #{schedule.name}
-      Start time: #{schedule.start_time}
-      End time: #{schedule.end_time}
-      Location: #{schedule.location}
+      Name: #{original_schedule.name}
+      Start time: #{original_schedule.start_time}
+      End time: #{original_schedule.end_time}
+      Location: #{original_schedule.location}
       Lecture publishing: #{publish}
-      Description: #{schedule.description}
+      Description: #{original_schedule.description}
     )
 
     case type
@@ -64,8 +71,12 @@ class StaffMailer < ApplicationMailer
       By: #{user} at #{Time.now}
         )
 
-      when :update
-        @change_notice << %Q(
+    unless updated_schedule.lecture.nil?
+      publish = updated_schedule.lecture.do_not_publish ? 'OFF' : 'ON'
+    end
+
+    when :update
+      @change_notice << %Q(
     CHANGED TO:
       Name: #{updated_schedule.name}
       Start time: #{updated_schedule.start_time}
@@ -76,17 +87,17 @@ class StaffMailer < ApplicationMailer
       Updated by: #{updated_schedule.updated_by}
     )
 
-        if changed_similar
-          @change_notice << %Q(
-**** All "#{schedule.name}" items at #{schedule.start_time.strftime("%H:%M")} were changed to the new time. ****
-      )
-        end
-
-      when :destroy
+      if changed_similar
         @change_notice << %Q(
+**** All "#{original_schedule.name}" items at #{original_schedule.start_time.strftime("%H:%M")} were changed to the new time. ****
+      )
+      end
+
+    when :destroy
+      @change_notice << %Q(
     WAS DELETED!
       By: #{user} at #{Time.now}
-        )
+      )
     end
 
     mail(to: to_email, subject: subject)

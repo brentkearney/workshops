@@ -14,7 +14,7 @@ class SyncMembershipJob < ActiveJob::Base
       membership = Membership.find_by_id(membership_id)
       StaffMailer.notify_sysadmin(membership.event, error).deliver_now
     else
-      retry_job wait: 10.minutes, queue: :default
+      retry_job wait: 1.minutes, queue: :default
     end
   end
 

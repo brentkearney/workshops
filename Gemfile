@@ -39,6 +39,7 @@ group :test do
   gem 'selenium-webdriver'
   gem 'faker'
   gem 'database_cleaner'
+  gem "test_after_commit"
 end
 
 group :production do

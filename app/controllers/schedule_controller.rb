@@ -71,7 +71,9 @@ class ScheduleController < ApplicationController
         name = @schedule.name
         if @schedule.notify_staff?
           EmailScheduleChangeNoticeJob
-            .perform_later(@schedule, type: :create, user: current_user.name)
+            .perform_later(type: :create,
+                           user: current_user.name,
+                           original_schedule: @schedule)
         end
         format.html do
           redirect_to event_schedule_day_path(@event, day),
@@ -113,9 +115,9 @@ class ScheduleController < ApplicationController
         end
         if @schedule.notify_staff?
           EmailScheduleChangeNoticeJob
-            .perform_later(@original_item,
-                           type: :update,
+            .perform_later(type: :update,
                            user: current_user.name,
+                           original_schedule: @original_item,
                            updated_schedule: @schedule,
                            changed_similar: params[:change_similar])
         end
@@ -144,9 +146,11 @@ class ScheduleController < ApplicationController
   def destroy
     authorize @schedule
     if @schedule.notify_staff?
-      EmailScheduleChangeNoticeJob.perform_later(@schedule.id,
-                                                 type: :destroy,
-                                                 user: current_user.name)
+      EmailScheduleChangeNoticeJob
+        .perform_later(type: :destroy,
+                       user: current_user.name,
+                       original_schedule: @schedule,
+                       changed_similar: params[:change_similar])
     end
     if @schedule.lecture.blank?
       @schedule.destroy

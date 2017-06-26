@@ -1,12 +1,16 @@
 Dear <%= @organizer.dear_name %>,
 
-There has been a change in membership for the event:
+There has been an update in membership for the event:
 <%= @event.code %>: <%= @event.name %>
 <%= @event.dates %>
 
-The change was:
+
 "<%= @member.name %>" <<%= @member.email %>> (<%= @member.affiliation %>)
-was "<%= @old_attendance %>", and is now "<%= @new_attendance %>".
+<% if @old_attendance == @new_attendance %>
+Attendance status is: <%= @new_attendance %>
+<% else %>
+Changed attendance status from: "<%= @old_attendance %>" to "<%= @new_attendance %>".
+<% end %>
 
 <% unless @message_to_organizer.blank? %>
 <%= @member.firstname %> included this message:
