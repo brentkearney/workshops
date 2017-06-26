@@ -96,11 +96,13 @@ class LegacyConnector
     updated = membership.updated_at.in_time_zone("Pacific Time (US & Canada)")
     updated = updated.strftime('%Y-%m-%d %H:%M:%S')
     person = membership.person
-    person.updated_at = updated
-    person.updated_by = person.name
     membership.updated_at = updated
     membership.replied_at = updated
     membership.updated_by = person.name
+    if membership.attendance == 'Confirmed'
+      person.updated_at = updated
+      person.updated_by = person.name
+    end
 
     # add_member() adds or updates memberships
     add_member(membership: membership,
