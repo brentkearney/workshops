@@ -144,7 +144,7 @@ class ScheduleController < ApplicationController
   def destroy
     authorize @schedule
     if @schedule.notify_staff?
-      EmailScheduleChangeNoticeJob.perform_later(@schedule,
+      EmailScheduleChangeNoticeJob.perform_later(@schedule.id,
                                                  type: :destroy,
                                                  user: current_user.name)
     end
