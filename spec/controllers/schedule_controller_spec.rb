@@ -185,10 +185,10 @@ RSpec.describe ScheduleController, type: :controller do
       it 'notifies staff (for current event)' do
         allow_any_instance_of(Schedule).to receive(:notify_staff?)
           .and_return(true)
-        allow(EmailScheduleChangeNoticeJob).to receive(:perform_later)
+        allow(StaffMailer).to receive(:schedule_change)
 
         post :create, event_id: @event.id, schedule: @valid_attributes
-        expect(EmailScheduleChangeNoticeJob).to have_received(:perform_later)
+        expect(StaffMailer).to have_received(:schedule_change)
       end
     end
 
@@ -262,12 +262,12 @@ RSpec.describe ScheduleController, type: :controller do
       it 'notifies staff (for current events)' do
         allow_any_instance_of(Schedule).to receive(:notify_staff?)
           .and_return(true)
-        allow(EmailScheduleChangeNoticeJob).to receive(:perform_later)
+        allow(StaffMailer).to receive(:schedule_change)
 
         put :update, event_id: @event.id, id: @schedule.to_param,
                              schedule: @valid_attributes
 
-        expect(EmailScheduleChangeNoticeJob).to have_received(:perform_later)
+        expect(StaffMailer).to have_received(:schedule_change)
       end
 
       it 'updates similar schedule items if params[:change_similar]' do
@@ -316,10 +316,10 @@ RSpec.describe ScheduleController, type: :controller do
       schedule = Schedule.create! @valid_attributes
       allow_any_instance_of(Schedule).to receive(:notify_staff?)
         .and_return(true)
-      allow(EmailScheduleChangeNoticeJob).to receive(:perform_later)
+      allow(StaffMailer).to receive(:schedule_change)
 
       delete :destroy, event_id: @event.id, id: schedule.to_param
-      expect(EmailScheduleChangeNoticeJob).to have_received(:perform_later)
+      expect(StaffMailer).to have_received(:schedule_change)
     end
 
     it 'destroys the requested schedule' do

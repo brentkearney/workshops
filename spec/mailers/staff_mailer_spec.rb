@@ -68,10 +68,10 @@ RSpec.describe StaffMailer, type: :mailer do
 
     before :each do
       StaffMailer.schedule_change(
-        original_schedule: original_schedule.attributes,
+        original_schedule: original_schedule,
         type: 'update',
         user: 'Test User',
-        updated_schedule: new_schedule.attributes
+        updated_schedule: new_schedule
       ).deliver_now
     end
 

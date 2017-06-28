@@ -338,6 +338,21 @@ describe 'Editing a Schedule Item', type: :feature do
         @membership.save!
       end
 
+      context 'staff notifications' do
+        it 'notifies staff of changes to current event schedules' do
+          allow_any_instance_of(Schedule).to receive(:notify_staff?)
+            .and_return(true)
+          allow(StaffMailer).to receive(:schedule_change)
+
+          visit event_schedule_edit_path(@event, @item)
+          fill_in :schedule_name, with: 'Current event: new name'
+          click_button 'Update Schedule'
+
+          expect(page.body).to have_text('successfully updated')
+          expect(StaffMailer).to have_received(:schedule_change)
+        end
+      end
+
       context 'unpublished schedule' do
         before do
           @event.publish_schedule = false
@@ -356,19 +371,6 @@ describe 'Editing a Schedule Item', type: :feature do
 
         it 'allows editing of schedule items' do
           allows_editing
-        end
-
-        it 'notifies staff of changes to current event schedules' do
-          allow_any_instance_of(Schedule).to receive(:notify_staff?)
-            .and_return(true)
-          allow(EmailScheduleChangeNoticeJob).to receive(:perform_later)
-
-          visit event_schedule_edit_path(@event, @item)
-          fill_in :schedule_name, with: 'Current event: new name'
-          click_button 'Update Schedule'
-
-          expect(page.body).to have_text('successfully updated')
-          expect(EmailScheduleChangeNoticeJob).to have_received(:perform_later)
         end
       end
     end

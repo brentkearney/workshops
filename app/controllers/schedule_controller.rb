@@ -70,10 +70,9 @@ class ScheduleController < ApplicationController
         day = @schedule.start_time.to_date
         name = @schedule.name
         if @schedule.notify_staff?
-          EmailScheduleChangeNoticeJob
-            .perform_later(type: 'create',
-                           user: current_user.name,
-                           original_schedule: @schedule.attributes)
+          StaffMailer.schedule_change(type: 'create',
+                                      user: current_user.name,
+                                      original_schedule: @schedule)
         end
         format.html do
           redirect_to event_schedule_day_path(@event, day),
@@ -114,11 +113,10 @@ class ScheduleController < ApplicationController
           ScheduleItem.update_others(@original_item, merged_params)
         end
         if @schedule.notify_staff?
-          EmailScheduleChangeNoticeJob
-            .perform_later(type: 'update',
+          StaffMailer.schedule_change(type: 'update',
                            user: current_user.name,
-                           original_schedule: @original_item.attributes,
-                           updated_schedule: @schedule.attributes,
+                           original_schedule: @original_item,
+                           updated_schedule: @schedule,
                            changed_similar: params[:change_similar])
         end
 
@@ -146,11 +144,10 @@ class ScheduleController < ApplicationController
   def destroy
     authorize @schedule
     if @schedule.notify_staff?
-      EmailScheduleChangeNoticeJob
-        .perform_later( type: 'destroy',
-                        user: current_user.name,
-                        original_schedule: @schedule.attributes,
-                        changed_similar: params[:change_similar])
+      StaffMailer.schedule_change(type: 'destroy',
+                                  user: current_user.name,
+                                  original_schedule: @schedule,
+                                  changed_similar: params[:change_similar])
     end
     if @schedule.lecture.blank?
       @schedule.destroy

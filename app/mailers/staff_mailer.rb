@@ -43,19 +43,19 @@ class StaffMailer < ApplicationMailer
     subject = "[#{@event.code}] Schedule change notice!"
 
     publish = 'N/A'
-    unless original_schedule['lecture_id'].blank?
-      lecture = Lecture.find_by_id(original_schedule['lecture_id'])
+    unless original_schedule.lecture_id.blank?
+      lecture = Lecture.find_by_id(original_schedule.lecture_id)
       publish = lecture.do_not_publish ? 'OFF' : 'ON'
     end
 
     @change_notice = %(
     THIS:
-      Name: #{original_schedule['name']}
-      Start time: #{original_schedule['start_time']}
-      End time: #{original_schedule['end_time']}
-      Location: #{original_schedule['location']}
+      Name: #{original_schedule.name}
+      Start time: #{original_schedule.start_time}
+      End time: #{original_schedule.end_time}
+      Location: #{original_schedule.location}
       Lecture publishing: #{publish}
-      Description: #{original_schedule['description']}
+      Description: #{original_schedule.description}
     )
 
     case type
@@ -65,26 +65,26 @@ class StaffMailer < ApplicationMailer
       By: #{user} at #{Time.now}
       )
 
-      unless updated_schedule['lecture_id'].blank?
-        lecture = Lecture.find_by_id(updated_schedule['lecture_id'])
+      unless updated_schedule.lecture_id.blank?
+        lecture = Lecture.find_by_id(updated_schedule.lecture_id)
         publish = lecture.do_not_publish ? 'OFF' : 'ON'
       end
 
     when 'update'
       @change_notice << %(
     CHANGED TO:
-      Name: #{updated_schedule['name']}
-      Start time: #{updated_schedule['start_time']}
-      End time: #{updated_schedule['end_time']}
-      Location: #{updated_schedule['location']}
+      Name: #{updated_schedule.name}
+      Start time: #{updated_schedule.start_time}
+      End time: #{updated_schedule.end_time}
+      Location: #{updated_schedule.location}
       Lecture publishing: #{publish}
-      Description: #{updated_schedule['description']}
-      Updated by: #{updated_schedule['updated_by']}
+      Description: #{updated_schedule.description}
+      Updated by: #{updated_schedule.updated_by}
     )
 
       if changed_similar
         @change_notice << %(
-**** All "#{original_schedule['name']}" items at #{original_schedule['start_time'].strftime("%H:%M")} were changed to the new time. ****
+**** All "#{original_schedule.name}" items at #{original_schedule.start_time.strftime("%H:%M")} were changed to the new time. ****
       )
       end
 

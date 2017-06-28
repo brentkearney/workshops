@@ -7,12 +7,11 @@
 require 'rails_helper'
 
 describe "Adding a Schedule Item", type: :feature do
-
   before do
     authenticate_user
     @event = create(:event)
     @day = @event.start_date + 3.days
-    @weekday = @day.strftime("%A")
+    @weekday = @day.strftime('%A')
     create(:schedule, event: @event)
     visit event_schedule_index_path(@event)
   end
@@ -28,27 +27,29 @@ describe "Adding a Schedule Item", type: :feature do
 
   it 'adds an item to the schedule' do
     click_link "Add an item on #{@weekday}"
-    page.fill_in 'schedule_name', :with => 'New item for test schedule'
-    page.fill_in 'schedule_location', :with => 'Somewhere'
+    page.fill_in 'schedule_name', with: 'New item for test schedule'
+    page.fill_in 'schedule_location', with: 'Somewhere'
     click_button 'Add New Schedule Item'
 
-    expect(page).to have_content '"New item for test schedule" was successfully scheduled.'
-    expect(@event.schedules.select {|s| s.name == 'New item for test schedule'}).not_to be_empty
+    expect(page).to have_content '"New item for test schedule" was successfully
+      scheduled.'.squish
+    expect(@event.schedules.select {|s| s.name == 'New item for test schedule'})
+      .not_to be_empty
   end
 
   it 'sets new schedule item times in the associated event\'s time zone' do
     event = create(:event, name: 'TZ Test Event', time_zone: 'Brisbane')
     create(:schedule, event: event)
     day = event.start_date + 2.days
-    weekday = day.strftime("%A")
+    weekday = day.strftime('%A')
     visit event_schedule_index_path(event)
 
     click_link "Add an item on #{weekday}"
-    page.fill_in 'schedule_name', :with => 'Testing TZ'
-    page.fill_in 'schedule_location', :with => 'Australia'
+    page.fill_in 'schedule_name', with: 'Testing TZ'
+    page.fill_in 'schedule_location', with: 'Australia'
     click_button 'Add New Schedule Item'
 
-    new_item = event.schedules.select {|s| s.name == 'Testing TZ'}.first
+    new_item = event.schedules.select { |s| s.name == 'Testing TZ' }.first
     expect(new_item.start_time.time_zone.name).to eq(event.time_zone)
     expect(new_item.end_time.time_zone.name).to eq(event.time_zone)
   end
@@ -61,9 +62,9 @@ describe "Adding a Schedule Item", type: :feature do
   it 'changing the day on the add form schedules the item for the selected day' do
     click_link "Add an item on #{@weekday}"
     new_day = @day + 1.days
-    page.select new_day.strftime("%A"), :from => 'schedule_day'
-    page.fill_in 'schedule_name', :with => 'Another item for testing'
-    page.fill_in 'schedule_location', :with => 'Somewhere'
+    page.select new_day.strftime("%A"), from: 'schedule_day'
+    page.fill_in 'schedule_name', with: 'Another item for testing'
+    page.fill_in 'schedule_location', with: 'Somewhere'
     click_button 'Add New Schedule Item'
     new_item = @event.schedules.select {|s| s.name == 'Another item for testing'}.first
     expect(new_item.start_time.to_date).to eq(new_day)
@@ -71,18 +72,18 @@ describe "Adding a Schedule Item", type: :feature do
 
   it 'adding an item that overlaps with another item (in a different room) produces a warning notice' do
     click_link "Add an item on #{@weekday}"
-    page.fill_in 'schedule_name', :with => 'Item One'
-    page.fill_in 'schedule_location', :with => 'Location One'
-    page.select '09', :from => 'schedule_start_time_4i'
-    page.select '10', :from => 'schedule_end_time_4i'
+    page.fill_in 'schedule_name', with: 'Item One'
+    page.fill_in 'schedule_location', with: 'Location One'
+    page.select '09', from: 'schedule_start_time_4i'
+    page.select '10', from: 'schedule_end_time_4i'
     click_button 'Add New Schedule Item'
 
-    page.fill_in 'schedule_name', :with => 'Item Two'
-    page.fill_in 'schedule_location', :with => 'Location Two'
-    page.select '09', :from => 'schedule_start_time_4i'
-    page.select '30', :from => 'schedule_start_time_5i'
-    page.select '10', :from => 'schedule_end_time_4i'
-    page.select '30', :from => 'schedule_end_time_5i'
+    page.fill_in 'schedule_name', with: 'Item Two'
+    page.fill_in 'schedule_location', with: 'Location Two'
+    page.select '09', from: 'schedule_start_time_4i'
+    page.select '30', from: 'schedule_start_time_5i'
+    page.select '10', from: 'schedule_end_time_4i'
+    page.select '30', from: 'schedule_end_time_5i'
     click_button 'Add New Schedule Item'
 
     expect(find("div.alert-warning").text).to match(/^Warning: .+overlaps with.+ \"Item One\"/)
@@ -92,11 +93,25 @@ describe "Adding a Schedule Item", type: :feature do
     click_link "Add an item on #{@weekday}"
     expect(current_path).to eq(event_schedule_day_path(@event, @day))
 
-    page.fill_in 'schedule_name', :with => 'New item for test schedule'
-    page.fill_in 'schedule_location', :with => 'Somewhere'
+    page.fill_in 'schedule_name', with: 'New item for test schedule'
+    page.fill_in 'schedule_location', with: 'Somewhere'
     click_button 'Add New Schedule Item'
 
     expect(current_path).to eq(event_schedule_day_path(@event, @day))
+  end
+
+  it 'notifies staff of changes to current event schedules' do
+    allow_any_instance_of(Schedule).to receive(:notify_staff?)
+      .and_return(true)
+    allow(StaffMailer).to receive(:schedule_change)
+
+    click_link "Add an item on #{@weekday}"
+    page.fill_in 'schedule_name', with: 'New item for test schedule'
+    page.fill_in 'schedule_location', with: 'Somewhere'
+    click_button 'Add New Schedule Item'
+
+    expect(page.body).to have_text('was successfully scheduled')
+    expect(StaffMailer).to have_received(:schedule_change)
   end
 
   context 'Is authorized only for admin users (above), and staff and organizers of the event' do

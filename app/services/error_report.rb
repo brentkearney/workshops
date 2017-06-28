@@ -36,10 +36,15 @@ class ErrorReport
       when 'SyncMembers'
         if errors.has_key?('LegacyConnector')
           error = errors['LegacyConnector'].shift
-          error_message = error.object.inspect.to_s + "\n\n" + error.message
-          unless error_message.blank?
-            EmailSysadminJob.perform_later(@event.id, error_message)
+          error_message = "Error message:\n"
+          unless error.object.nil?
+            error_message << error.object.inspect.to_s
+          else
+            error_message << error.inspect
           end
+          error_message << "\n\n" + error.message
+
+          EmailSysadminJob.perform_later(@event.id, error_message)
         end
 
         error_messages = ''
