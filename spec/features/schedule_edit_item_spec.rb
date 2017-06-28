@@ -357,6 +357,19 @@ describe 'Editing a Schedule Item', type: :feature do
         it 'allows editing of schedule items' do
           allows_editing
         end
+
+        it 'notifies staff of changes to current event schedules' do
+          allow_any_instance_of(Schedule).to receive(:notify_staff?)
+            .and_return(true)
+          allow(EmailScheduleChangeNoticeJob).to receive(:perform_later)
+
+          visit event_schedule_edit_path(@event, @item)
+          fill_in :schedule_name, with: 'Current event: new name'
+          click_button 'Update Schedule'
+
+          expect(page.body).to have_text('successfully updated')
+          expect(EmailScheduleChangeNoticeJob).to have_received(:perform_later)
+        end
       end
     end
 

@@ -60,15 +60,19 @@ RSpec.describe StaffMailer, type: :mailer do
   end
 
   describe '.schedule_change' do
-    let(:event) { build(:event) }
-    let(:original_schedule) { build(:schedule, event: event, name: 'Original') }
-    let(:new_schedule) { build(:schedule, event: event, name: 'New name') }
+    before do
+      @event = create(:event)
+    end
+    let(:original_schedule) { build(:schedule, event: @event, name: 'Original') }
+    let(:new_schedule) { build(:schedule, event: @event, name: 'New name') }
 
     before :each do
-      StaffMailer.schedule_change(original_schedule: original_schedule,
-                                  type: :update,
-                                  user: 'Test User',
-                                  updated_schedule: new_schedule).deliver_now
+      StaffMailer.schedule_change(
+        original_schedule: original_schedule.attributes,
+        type: 'update',
+        user: 'Test User',
+        updated_schedule: new_schedule.attributes
+      ).deliver_now
     end
 
     it 'sends email' do
@@ -76,7 +80,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: schedule_staff' do
-      schedule_staff = Setting.Emails[event.location.to_s]['schedule_staff']
+      schedule_staff = Setting.Emails[@event.location]['schedule_staff']
       mailto = ActionMailer::Base.deliveries.first.to
       expect(mailto).to eq(schedule_staff.split(', '))
     end

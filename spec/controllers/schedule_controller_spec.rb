@@ -181,6 +181,15 @@ RSpec.describe ScheduleController, type: :controller do
         day = @event.start_date + 1.days
         expect(response).to redirect_to(event_schedule_day_path(@event, day))
       end
+
+      it 'notifies staff (for current event)' do
+        allow_any_instance_of(Schedule).to receive(:notify_staff?)
+          .and_return(true)
+        allow(EmailScheduleChangeNoticeJob).to receive(:perform_later)
+
+        post :create, event_id: @event.id, schedule: @valid_attributes
+        expect(EmailScheduleChangeNoticeJob).to have_received(:perform_later)
+      end
     end
 
     context 'with invalid params' do
@@ -250,6 +259,17 @@ RSpec.describe ScheduleController, type: :controller do
         expect(response).to redirect_to(event_schedule_index_path(@event))
       end
 
+      it 'notifies staff (for current events)' do
+        allow_any_instance_of(Schedule).to receive(:notify_staff?)
+          .and_return(true)
+        allow(EmailScheduleChangeNoticeJob).to receive(:perform_later)
+
+        put :update, event_id: @event.id, id: @schedule.to_param,
+                             schedule: @valid_attributes
+
+        expect(EmailScheduleChangeNoticeJob).to have_received(:perform_later)
+      end
+
       it 'updates similar schedule items if params[:change_similar]' do
         other = create(:schedule, event: @event, name: @schedule.name,
                                   start_time: @schedule.start_time + 1.days,
@@ -265,26 +285,6 @@ RSpec.describe ScheduleController, type: :controller do
         other.reload
         @schedule.reload
         expect(other.start_time).to eq(@schedule.start_time + 1.days)
-      end
-
-      it 'invokes StaffMailer if schedule.staff_item and event.is_current?' do
-        @event.start_date = Date.today - 1.day
-        @event.end_date = Date.today + 4.days
-        @event.save
-        schedule = create(:schedule, name: 'New item', event: @event,
-                                     staff_item: true, start_time: Time.now,
-                                     end_time: Time.now + 1.hour)
-
-        attributes = schedule.attributes.merge(name: 'Updated item',
-                                               start_time: Time.now + 1.hour,
-                                               end_time: Time.now + 2.hours)
-
-        allow(EmailScheduleChangeNoticeJob).to receive(:perform_later)
-
-        put :update, event_id: @event.id, id: schedule.to_param,
-                     schedule: attributes
-
-        expect(EmailScheduleChangeNoticeJob).to have_received(:perform_later)
       end
     end
 
@@ -312,21 +312,13 @@ RSpec.describe ScheduleController, type: :controller do
       @valid_attributes.delete :new_item
     end
 
-    it 'invokes StaffMailer if schedule.staff_item and event.is_current?' do
-      @event.start_date = Date.today - 1.day
-      @event.end_date = Date.today + 4.days
-      @event.save
-      schedule = create(:schedule, name: 'New item', event: @event,
-                                   staff_item: true, start_time: Time.now,
-                                   end_time: Time.now + 1.hour)
-      schedule.attributes.merge(name: 'Updated item',
-                                start_time: Time.now + 1.hour,
-                                end_time: Time.now + 2.hours)
-
+    it 'notifies staff (for current events)' do
+      schedule = Schedule.create! @valid_attributes
+      allow_any_instance_of(Schedule).to receive(:notify_staff?)
+        .and_return(true)
       allow(EmailScheduleChangeNoticeJob).to receive(:perform_later)
 
       delete :destroy, event_id: @event.id, id: schedule.to_param
-
       expect(EmailScheduleChangeNoticeJob).to have_received(:perform_later)
     end
 

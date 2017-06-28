@@ -27,74 +27,69 @@ class StaffMailer < ApplicationMailer
   default from: app_email
 
   def schedule_change(args)
-    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-    Rails.logger.debug "StaffMailer schedule_change received: #{args.inspect}"
     type = args[:type] || ''
     user = args[:user] || ''
     original_schedule = args[:original_schedule] || false
     updated_schedule = args[:updated_schedule] || false
     changed_similar = args[:changed_similar] || false
 
-    Rails.logger.debug "original_schedule is a: #{original_schedule.class}"
-    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-
-
-    @event = original_schedule.event
+    @event = Event.find_by_id(original_schedule['event_id'])
     schedule_emails = 'schedule@example.com'
     unless Setting.Emails.blank? ||
-      Setting.Emails[@event.location.to_s]['schedule_staff'].nil?
+           Setting.Emails[@event.location.to_s]['schedule_staff'].nil?
       schedule_emails = Setting.Emails[@event.location.to_s]['schedule_staff']
     end
     to_email = schedule_emails
     subject = "[#{@event.code}] Schedule change notice!"
 
     publish = 'N/A'
-    unless original_schedule.lecture.nil?
-      publish = original_schedule.lecture.do_not_publish ? 'OFF' : 'ON'
+    unless original_schedule['lecture_id'].blank?
+      lecture = Lecture.find_by_id(original_schedule['lecture_id'])
+      publish = lecture.do_not_publish ? 'OFF' : 'ON'
     end
 
-
-    @change_notice = %Q(
+    @change_notice = %(
     THIS:
-      Name: #{original_schedule.name}
-      Start time: #{original_schedule.start_time}
-      End time: #{original_schedule.end_time}
-      Location: #{original_schedule.location}
+      Name: #{original_schedule['name']}
+      Start time: #{original_schedule['start_time']}
+      End time: #{original_schedule['end_time']}
+      Location: #{original_schedule['location']}
       Lecture publishing: #{publish}
-      Description: #{original_schedule.description}
+      Description: #{original_schedule['description']}
     )
 
     case type
-      when :create
-        @change_notice << %Q(
+    when 'create'
+      @change_notice << %(
     WAS ADDED!
       By: #{user} at #{Time.now}
-        )
+      )
 
-    unless updated_schedule.lecture.nil?
-      publish = updated_schedule.lecture.do_not_publish ? 'OFF' : 'ON'
-    end
+      unless updated_schedule['lecture_id'].blank?
+        lecture = Lecture.find_by_id(updated_schedule['lecture_id'])
+        publish = lecture.do_not_publish ? 'OFF' : 'ON'
+      end
 
-    when :update
-      @change_notice << %Q(
+    when 'update'
+      @change_notice << %(
     CHANGED TO:
-      Name: #{updated_schedule.name}
-      Start time: #{updated_schedule.start_time}
-      End time: #{updated_schedule.end_time}
-      Location: #{updated_schedule.location}
+      Name: #{updated_schedule['name']}
+      Start time: #{updated_schedule['start_time']}
+      End time: #{updated_schedule['end_time']}
+      Location: #{updated_schedule['location']}
       Lecture publishing: #{publish}
-      Description: #{updated_schedule.description}
-      Updated by: #{updated_schedule.updated_by}
+      Description: #{updated_schedule['description']}
+      Updated by: #{updated_schedule['updated_by']}
     )
 
       if changed_similar
-        @change_notice << %Q(
-**** All "#{original_schedule.name}" items at #{original_schedule.start_time.strftime("%H:%M")} were changed to the new time. ****
+        @change_notice << %(
+**** All "#{original_schedule['name']}" items at #{original_schedule['start_time'].strftime("%H:%M")} were changed to the new time. ****
       )
       end
 
     when :destroy
-      @change_notice << %Q(
+      @change_notice << %(
     WAS DELETED!
       By: #{user} at #{Time.now}
       )
