@@ -11,16 +11,13 @@ RSpec.describe StaffMailer, type: :mailer do
   before do
     @sysadmin_email = Setting.Site['sysadmin_email']
     expect(@sysadmin_email).not_to be_nil
+    ActionMailer::Base.delivery_method = :test
+    ActionMailer::Base.perform_deliveries = true
+    ActionMailer::Base.deliveries.clear
   end
 
   def expect_email_was_sent
     expect(ActionMailer::Base.deliveries.count).to eq(1)
-  end
-
-  before :each do
-    ActionMailer::Base.delivery_method = :test
-    ActionMailer::Base.perform_deliveries = true
-    ActionMailer::Base.deliveries = []
   end
 
   after(:each) do

@@ -5,13 +5,12 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Person < ActiveRecord::Base
-  attr_accessor :is_rsvp
+  attr_accessor :is_rsvp, :member_import
 
   has_many :memberships, dependent: :destroy
   has_many :events, -> {
     where "attendance != 'Not Yet Invited' AND attendance != 'Declined'"
-  },
-           through: :memberships, source: :event
+  }, through: :memberships, source: :event
   has_one :user, dependent: :destroy
   has_many :invitations, foreign_key: 'invited_by'
 
@@ -22,17 +21,16 @@ class Person < ActiveRecord::Base
                     case_sensitive: false,
                     uniqueness: true,
                     email: true
-  validates :firstname, :lastname, :affiliation, :gender, :updated_by,
-            presence: true
+  validates :firstname, :lastname, :updated_by, presence: true
+  validates :gender, :affiliation, presence: true, unless: :member_import
   validates :gender, format:
                      { with: /\A(M|F|O)\z/, message: " must be 'M','F', or 'O'" },
-                     allow_blank: true
+                     allow_blank: true, unless: :member_import
   validates :phd_year, numericality: { allow_blank: true, only_integer: true }
   validates :address1, :city, :region, :country, :postal_code,
             presence: {
               message: '← address fields cannot be blank'
-            },
-            if: :is_rsvp
+            }, if: :is_rsvp
   validates :phone, :academic_status, presence: true, if: :is_rsvp
 
   # app/models/concerns/person_decorators.rb

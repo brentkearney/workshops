@@ -201,6 +201,7 @@ class SyncMembers
   end
 
   def save_person(person)
+    person.member_import = true
     if person.save
       Rails.logger.info "\n\n* Saved #{@event.code} person: #{person.name}\n"
     else
@@ -228,6 +229,7 @@ class SyncMembers
   end
 
   def save_membership(membership)
+    membership.person.member_import = true
     if membership.save
       Rails.logger.info "\n\n* Saved #{@event.code} membership for #{membership.person.name}\n"
     else

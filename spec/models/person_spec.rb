@@ -31,9 +31,19 @@ RSpec.describe 'Model validations: Person', type: :model do
     expect(p.valid?).to be_falsey
   end
 
+  it 'does not require a gender if importing memberships' do
+    p = build(:person, gender: '', member_import: true)
+    expect(p.valid?).to be_truthy
+  end
+
   it 'requires an affiliation' do
     p = build(:person, affiliation: '')
     expect(p.valid?).to be_falsey
+  end
+
+  it 'does not require an affiliation if importing memberships' do
+    p = build(:person, affiliation: '', member_import: true)
+    expect(p.valid?).to be_truthy
   end
 
   it 'requires a unique, case insensitive email address' do
