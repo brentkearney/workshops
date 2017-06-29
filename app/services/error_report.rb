@@ -44,7 +44,7 @@ class ErrorReport
           end
           error_message << "\n\n" + error.message
 
-          EmailSysadminJob.perform_later(@event.id, error_message)
+          StaffMailer.notify_sysadmin(@event, error_message).deliver_now
         end
 
         error_messages = ''
@@ -91,7 +91,7 @@ class ErrorReport
 
         end
         unless error_messages.blank?
-          EmailSysadminJob.perform_later(@event.id, error_messages)
+          StaffMailer.event_sync(@event, error_messages).deliver_now
         end
       else
         # Iterate over Errors hash, send report for each type of error
@@ -99,7 +99,7 @@ class ErrorReport
           error_message = errors[string].shift.message
           error_message << "\n and: #{array.inspect}"
           unless error_message.blank?
-            EmailSysadminJob.perform_later(@event.id, error_message)
+            StaffMailer.notify_sysadmin(@event, error_message).deliver_now
           end
         end
     end

@@ -132,10 +132,10 @@ class StaffMailer < ApplicationMailer
     if event.nil?
       subject = "Workshops error!"
     else
-      subject = "[#{event.code}] (#{event.location}) error from #{error.object.class}"
+      subject = "[#{event.code}] (#{event.location}) error"
     end
 
-    @message = error.object.inspect.to_s + "\n\n" + error.message.to_s
+    @message = error.inspect
     mail(to: to_email, subject: subject, template_name: 'notify_sysadmin')
   end
 
