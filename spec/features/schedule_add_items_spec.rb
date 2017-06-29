@@ -103,7 +103,7 @@ describe "Adding a Schedule Item", type: :feature do
   it 'notifies staff of changes to current event schedules' do
     allow_any_instance_of(Schedule).to receive(:notify_staff?)
       .and_return(true)
-    allow(StaffMailer).to receive(:schedule_change)
+    ActionMailer::Base.deliveries.clear
 
     click_link "Add an item on #{@weekday}"
     page.fill_in 'schedule_name', with: 'New item for test schedule'
@@ -111,7 +111,7 @@ describe "Adding a Schedule Item", type: :feature do
     click_button 'Add New Schedule Item'
 
     expect(page.body).to have_text('was successfully scheduled')
-    expect(StaffMailer).to have_received(:schedule_change)
+    expect(ActionMailer::Base.deliveries.count).to eq(1)
   end
 
   context 'Is authorized only for admin users (above), and staff and organizers of the event' do

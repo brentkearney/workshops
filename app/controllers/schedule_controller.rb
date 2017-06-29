@@ -67,13 +67,13 @@ class ScheduleController < ApplicationController
 
     respond_to do |format|
       if @schedule.valid? && @schedule.save
-        day = @schedule.start_time.to_date
-        name = @schedule.name
         if @schedule.notify_staff?
           StaffMailer.schedule_change(type: 'create',
                                       user: current_user.name,
-                                      original_schedule: @schedule)
+                                      original_schedule: @schedule).deliver_now
         end
+        day = @schedule.start_time.to_date
+        name = @schedule.name
         format.html do
           redirect_to event_schedule_day_path(@event, day),
                       notice: "\"#{name}\" was successfully scheduled."
@@ -94,11 +94,9 @@ class ScheduleController < ApplicationController
   # PATCH/PUT /event/:event_id/schedule/1.json
   def update
     authorize @schedule
-
-    @original_item = @schedule.dup
-    merged_params = ScheduleItem.update(@schedule,
-                                        schedule_params
-                                .merge(updated_by: current_user.name))
+    original_item = @schedule.dup
+    original_lecture = original_item.lecture
+    merged_params = ScheduleItem.update(@schedule, schedule_params.merge(updated_by: current_user.name))
     @day = @schedule.start_time.to_date
 
     if session[:return_to]
@@ -110,14 +108,15 @@ class ScheduleController < ApplicationController
     respond_to do |format|
       if @schedule.update(merged_params)
         if params[:change_similar]
-          ScheduleItem.update_others(@original_item, merged_params)
+          ScheduleItem.update_others(original_item, merged_params)
         end
         if @schedule.notify_staff?
           StaffMailer.schedule_change(type: 'update',
                            user: current_user.name,
-                           original_schedule: @original_item,
+                           original_schedule: original_item,
+                           original_lecture: original_lecture,
                            updated_schedule: @schedule,
-                           changed_similar: params[:change_similar])
+                           changed_similar: params[:change_similar]).deliver_now
         end
 
         format.html do
@@ -148,6 +147,7 @@ class ScheduleController < ApplicationController
                                   user: current_user.name,
                                   original_schedule: @schedule,
                                   changed_similar: params[:change_similar])
+                 .deliver_now
     end
     if @schedule.lecture.blank?
       @schedule.destroy

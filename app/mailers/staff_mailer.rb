@@ -30,6 +30,7 @@ class StaffMailer < ApplicationMailer
     type = args[:type] || ''
     user = args[:user] || ''
     original_schedule = args[:original_schedule] || false
+    original_lecture = args[:original_lecture] || false
     updated_schedule = args[:updated_schedule] || false
     changed_similar = args[:changed_similar] || false
 
@@ -43,9 +44,9 @@ class StaffMailer < ApplicationMailer
     subject = "[#{@event.code}] Schedule change notice!"
 
     publish = 'N/A'
-    unless original_schedule.lecture_id.blank?
-      lecture = Lecture.find_by_id(original_schedule.lecture_id)
-      publish = lecture.do_not_publish ? 'OFF' : 'ON'
+    if original_lecture
+      publish = original_lecture.do_not_publish ? 'OFF' : 'ON'
+      original_schedule.description = original_lecture.abstract
     end
 
     @change_notice = %(
@@ -56,21 +57,30 @@ class StaffMailer < ApplicationMailer
       Location: #{original_schedule.location}
       Lecture publishing: #{publish}
       Description: #{original_schedule.description}
+      Updated by: #{original_schedule.updated_by}
     )
 
     case type
     when 'create'
+      unless original_schedule.lecture_id.blank?
+        lecture = Lecture.find_by_id(original_schedule.lecture_id)
+        publish = lecture.do_not_publish ? 'OFF' : 'ON'
+        @change_notice.sub!('Lecture publishing: N/A',
+                           "Lecture publishing: #{publish}")
+        @change_notice.sub!('Description: ', "Description: #{lecture.abstract}")
+      end
+
       @change_notice << %(
     WAS ADDED!
       By: #{user} at #{Time.now}
       )
 
+    when 'update'
       unless updated_schedule.lecture_id.blank?
-        lecture = Lecture.find_by_id(updated_schedule.lecture_id)
-        publish = lecture.do_not_publish ? 'OFF' : 'ON'
+        publish = updated_schedule.lecture.do_not_publish ? 'OFF' : 'ON'
+        updated_schedule.description = updated_schedule.lecture.abstract
       end
 
-    when 'update'
       @change_notice << %(
     CHANGED TO:
       Name: #{updated_schedule.name}
@@ -88,7 +98,15 @@ class StaffMailer < ApplicationMailer
       )
       end
 
-    when :destroy
+    when 'destroy'
+      unless original_schedule.lecture_id.blank?
+        lecture = Lecture.find_by_id(original_schedule.lecture_id)
+        publish = lecture.do_not_publish ? 'OFF' : 'ON'
+        @change_notice.sub!('Lecture publishing: N/A',
+                           "Lecture publishing: #{publish}")
+        @change_notice.sub!('Description: ', "Description: #{lecture.abstract}")
+      end
+
       @change_notice << %(
     WAS DELETED!
       By: #{user} at #{Time.now}
