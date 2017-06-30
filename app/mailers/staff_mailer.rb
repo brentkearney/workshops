@@ -180,7 +180,6 @@ class StaffMailer < ApplicationMailer
     feedback_email = Setting.Site['webmaster_email']
     unless feedback_email.blank?
       @membership = membership
-      person = membership.person
       @message = message
       @question = 'How was your RSVP experience?'
       subject = "[#{@membership.event.code}] #{section} feedback"

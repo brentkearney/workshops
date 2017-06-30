@@ -60,23 +60,35 @@ class Invitation < ActiveRecord::Base
 
   private
 
-  def update_membership(status)
+  def update_membership_fields(status)
+    membership.attendance = status
+    membership.replied_at = DateTime.current
+                                    .in_time_zone(membership.event.time_zone)
+    membership.updated_by = membership.person.name
+  end
+
+  def update_person_fields
+    membership.person.updated_by = membership.person.name
+  end
+
+  def email_organizer(status)
     args = { 'attendance_was' => membership.attendance,
              'attendance' => status,
              'organizer_message' => organizer_message }
     EmailOrganizerNoticeJob.perform_later(membership.id, args)
+  end
 
-    Time.zone = ActiveSupport::TimeZone.new(membership.event.time_zone)
-    update_time = DateTime.now
-    update_name = membership.person.name
-    membership.attendance = status
-    membership.updated_by = update_name
-    membership.replied_at = update_time
-    membership.updated_at = update_time
-    if status == 'Confirmed'
-      membership.person.updated_by = update_name
-      membership.person.updated_at = update_time
-    end
+  def log_rsvp(status)
+    Rails.logger.info "\n\n*** RSVP: #{membership.person.name}
+    (#{membership.person_id}) is now #{status} for
+    #{membership.event.code} ***\n\n".squish
+  end
+
+  def update_membership(status)
+    email_organizer(status)
+    log_rsvp(status)
+    update_membership_fields(status)
+    update_person_fields if status == 'Confirmed'
     membership.sync_remote = true
     membership.save
   end

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rails', '4.2.8'
-gem 'pg'
+gem 'pg', '0.20'
 gem 'sass-rails'
 gem 'bootstrap-sass'
 gem 'uglifier'
