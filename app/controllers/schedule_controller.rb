@@ -82,6 +82,7 @@ class ScheduleController < ApplicationController
       else
         @day = params[:day].to_time
         @form_action = 'create'
+        prefill_lecture_fields if @schedule.lecture
         format.html { render :new }
         format.json do
           render json: @schedule.errors, status: :unprocessable_entity
@@ -165,6 +166,11 @@ class ScheduleController < ApplicationController
   end
 
   private
+
+  def prefill_lecture_fields
+    @schedule.name = @schedule.lecture.title
+    @schedule.description = @schedule.lecture.abstract
+  end
 
   def set_schedule
     @schedule = Schedule.find(params[:id])
