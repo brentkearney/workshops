@@ -64,12 +64,8 @@ RSpec.describe StaffMailer, type: :mailer do
     let(:new_schedule) { build(:schedule, event: @event, name: 'New name') }
 
     before :each do
-      StaffMailer.schedule_change(
-        original_schedule: original_schedule,
-        type: 'update',
-        user: 'Test User',
-        updated_schedule: new_schedule
-      ).deliver_now
+      StaffMailer.schedule_change(event_code: @event.code, message: 'Hi!')
+                 .deliver_now
     end
 
     it 'sends email' do

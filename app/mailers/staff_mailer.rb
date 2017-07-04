@@ -27,93 +27,15 @@ class StaffMailer < ApplicationMailer
   default from: app_email
 
   def schedule_change(args)
-    type = args[:type] || ''
-    user = args[:user] || ''
-    original_schedule = args[:original_schedule] || false
-    original_lecture = args[:original_lecture] || false
-    updated_schedule = args[:updated_schedule] || false
-    changed_similar = args[:changed_similar] || false
+    @event = Event.find_by_code(args[:event_code])
+    @change_notice = args[:message]
 
-    @event = Event.find_by_id(original_schedule['event_id'])
-    schedule_emails = 'schedule@example.com'
     unless Setting.Emails.blank? ||
-           Setting.Emails[@event.location.to_s]['schedule_staff'].nil?
-      schedule_emails = Setting.Emails[@event.location.to_s]['schedule_staff']
+           Setting.Emails[@event.location.to_s]['schedule_staff'].blank?
+      to_emails = Setting.Emails[@event.location]['schedule_staff']
+      subject = "[#{@event.code}] Schedule change notice!"
+      mail(to: to_emails, subject: subject)
     end
-    to_email = schedule_emails
-    subject = "[#{@event.code}] Schedule change notice!"
-
-    publish = 'N/A'
-    if original_lecture
-      publish = original_lecture.do_not_publish ? 'OFF' : 'ON'
-      original_schedule.description = original_lecture.abstract
-    end
-
-    @change_notice = %(
-    THIS:
-      Name: #{original_schedule.name}
-      Start time: #{original_schedule.start_time}
-      End time: #{original_schedule.end_time}
-      Location: #{original_schedule.location}
-      Lecture publishing: #{publish}
-      Description: #{original_schedule.description}
-      Updated by: #{original_schedule.updated_by}
-    )
-
-    case type
-    when 'create'
-      unless original_schedule.lecture_id.blank?
-        lecture = Lecture.find_by_id(original_schedule.lecture_id)
-        publish = lecture.do_not_publish ? 'OFF' : 'ON'
-        @change_notice.sub!('Lecture publishing: N/A',
-                           "Lecture publishing: #{publish}")
-        @change_notice.sub!('Description: ', "Description: #{lecture.abstract}")
-      end
-
-      @change_notice << %(
-    WAS ADDED!
-      By: #{user} at #{Time.now}
-      )
-
-    when 'update'
-      unless updated_schedule.lecture_id.blank?
-        publish = updated_schedule.lecture.do_not_publish ? 'OFF' : 'ON'
-        updated_schedule.description = updated_schedule.lecture.abstract
-      end
-
-      @change_notice << %(
-    CHANGED TO:
-      Name: #{updated_schedule.name}
-      Start time: #{updated_schedule.start_time}
-      End time: #{updated_schedule.end_time}
-      Location: #{updated_schedule.location}
-      Lecture publishing: #{publish}
-      Description: #{updated_schedule.description}
-      Updated by: #{updated_schedule.updated_by}
-    )
-
-      if changed_similar
-        @change_notice << %(
-**** All "#{original_schedule.name}" items at #{original_schedule.start_time.strftime("%H:%M")} were changed to the new time. ****
-      )
-      end
-
-    when 'destroy'
-      unless original_schedule.lecture_id.blank?
-        lecture = Lecture.find_by_id(original_schedule.lecture_id)
-        publish = lecture.do_not_publish ? 'OFF' : 'ON'
-        @change_notice.sub!('Lecture publishing: N/A',
-                           "Lecture publishing: #{publish}")
-        @change_notice.sub!('Description: ', "Description: #{lecture.abstract}")
-      end
-
-      @change_notice << %(
-    WAS DELETED!
-      By: #{user} at #{Time.now}
-      )
-    end
-
-    mail(to: to_email, subject: subject)
   end
 
   def event_sync(event, error_messages)

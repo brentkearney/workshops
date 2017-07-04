@@ -344,12 +344,17 @@ describe 'Editing a Schedule Item', type: :feature do
           allow_any_instance_of(Schedule).to receive(:notify_staff?)
             .and_return(true)
 
+          original_name = @item.name
           visit event_schedule_edit_path(@event, @item)
           fill_in :schedule_name, with: 'Current event: new name'
           click_button 'Update Schedule'
 
           expect(page.body).to have_text('successfully updated')
           expect(ActionMailer::Base.deliveries.count).to eq(1)
+          message = ActionMailer::Base.deliveries.first.body
+          expect(message).to have_text(original_name)
+          expect(message).to have_text('Current event: new name')
+          expect(message).to have_text("Updated by: #{@user.person.name}")
         end
       end
 

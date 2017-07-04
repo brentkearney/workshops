@@ -68,9 +68,7 @@ class ScheduleController < ApplicationController
     respond_to do |format|
       if @schedule.valid? && @schedule.save
         if @schedule.notify_staff?
-          StaffMailer.schedule_change(type: 'create',
-                                      user: current_user.name,
-                                      original_schedule: @schedule).deliver_now
+          ScheduleNotice.new(schedule: @schedule).create
         end
         day = @schedule.start_time.to_date
         name = @schedule.name
@@ -97,7 +95,9 @@ class ScheduleController < ApplicationController
     authorize @schedule
     original_item = @schedule.dup
     original_lecture = original_item.lecture
-    merged_params = ScheduleItem.update(@schedule, schedule_params.merge(updated_by: current_user.name))
+    merged_params = ScheduleItem.update(@schedule,
+                                        schedule_params
+                                .merge(updated_by: current_user.name))
     @day = @schedule.start_time.to_date
 
     if session[:return_to]
@@ -112,12 +112,10 @@ class ScheduleController < ApplicationController
           ScheduleItem.update_others(original_item, merged_params)
         end
         if @schedule.notify_staff?
-          StaffMailer.schedule_change(type: 'update',
-                           user: current_user.name,
-                           original_schedule: original_item,
-                           original_lecture: original_lecture,
-                           updated_schedule: @schedule,
-                           changed_similar: params[:change_similar]).deliver_now
+          ScheduleNotice.new(original_schedule: original_item,
+                             original_lecture: original_lecture,
+                             updated_schedule: @schedule,
+                             changed_similar: params[:change_similar]).update
         end
 
         format.html do
@@ -144,11 +142,8 @@ class ScheduleController < ApplicationController
   def destroy
     authorize @schedule
     if @schedule.notify_staff?
-      StaffMailer.schedule_change(type: 'destroy',
-                                  user: current_user.name,
-                                  original_schedule: @schedule,
-                                  changed_similar: params[:change_similar])
-                 .deliver_now
+      ScheduleNotice.new(schedule: @schedule,
+                         changed_similar: params[:change_similar]).destroy
     end
     if @schedule.lecture.blank?
       @schedule.destroy

@@ -101,7 +101,7 @@ describe "Adding a Lecture Item to the Schedule", type: :feature do
     expect(lecture.do_not_publish).to be_falsey
   end
 
-  it 'disallows overlapping lectures in the same room' do
+  it 'repopulates lecture description and title fields if validation fails' do
     page.fill_in 'schedule_name', with: 'Lecture 1'
     page.fill_in 'schedule_location', with: 'Lecture room'
     select @person.lname, from: 'schedule[lecture_attributes][person_id]'
@@ -119,6 +119,29 @@ describe "Adding a Lecture Item to the Schedule", type: :feature do
     select start_hour, from: 'schedule_start_time_4i'
     select start_min, from: 'schedule_start_time_5i'
     select @person.lname, from: 'schedule[lecture_attributes][person_id]'
+    click_button 'Add New Schedule Item'
+
+    expect(page).to have_content 'schedule could not be saved'
+    expect(find_field('schedule_name').value).to eq('Lecture 2')
+    expect(find_field('schedule_description').value).to eq('Best talk ever!')
+  end
+
+  it 'repopulates schedule description and title fields if validation fails' do
+    page.fill_in 'schedule_name', with: 'Non-lecture'
+    page.fill_in 'schedule_location', with: 'Lecture room'
+    click_button 'Add New Schedule Item'
+
+    schedule = Schedule.last
+    start_hour = schedule.start_time.strftime('%H')
+    start_min = schedule.start_time.strftime('%M')
+
+    visit event_schedule_index_path(@event)
+    click_link "Add an item on #{@weekday}"
+    page.fill_in 'schedule_name', with: 'Lecture 2'
+    page.fill_in 'schedule_location', with: ''
+    page.fill_in 'schedule_description', with: 'Best talk ever!'
+    select start_hour, from: 'schedule_start_time_4i'
+    select start_min, from: 'schedule_start_time_5i'
     click_button 'Add New Schedule Item'
 
     expect(page).to have_content 'schedule could not be saved'
