@@ -50,6 +50,7 @@ class ScheduleNotice
       Lecture publishing: #{publish}
       Description: #{updated_schedule.description}
       Updated by: #{updated_schedule.updated_by}
+      Updated at: #{updated_schedule.updated_at}
     )
 
     if changed_similar

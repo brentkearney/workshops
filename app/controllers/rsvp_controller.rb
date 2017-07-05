@@ -67,9 +67,9 @@ class RsvpController < ApplicationController
 
   def update_and_redirect(rsvp:)
     @invitation.organizer_message = @organizer_message
-    membership = @invitation.membership
     @invitation.send(rsvp)
-    redirect_to rsvp_feedback_path(membership.id), success: 'Your attendance status was successfully updated. Thanks for your reply!'
+    redirect_to rsvp_feedback_path(@invitation.membership_id), success: 'Your
+      attendance status was successfully updated. Thanks for your reply!'.squish
   end
 
   def set_invitation

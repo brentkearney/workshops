@@ -63,7 +63,6 @@ class Invitation < ActiveRecord::Base
   def update_membership_fields(status)
     membership.attendance = status
     membership.replied_at = DateTime.current
-                                    .in_time_zone(membership.event.time_zone)
     membership.updated_by = membership.person.name
   end
 

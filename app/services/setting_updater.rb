@@ -111,7 +111,7 @@ class SettingUpdater
     (Setting.get_all.keys - ['Site', 'Locations']).each do |section|
       setting = Setting.find_by(var: section)
       setting_value = setting.value
-      setting_value[new_key] = setting_value.delete(old_key)
+      setting_value[new_key.to_s] = setting_value.delete(old_key)
       setting.value = setting_value
       @setting = setting
       save
@@ -143,7 +143,7 @@ class SettingUpdater
       settings = @setting.value
       @setting.value.each do |param_key, param_value|
         if param_value.is_a?(Hash)
-          settings[:"#{param_key}"] = merge_new_field(param_value)
+          settings[param_key.to_s] = merge_new_field(param_value)
         end
       end
       @setting.value = settings
