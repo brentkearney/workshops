@@ -18,30 +18,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# Notification messages to Staff
 class StaffMailer < ApplicationMailer
   app_email = Setting.Site['application_email'] unless Setting.Site.blank?
-  if Setting.Site.blank? || app_email.nil?
-    app_email = ENV['DEVISE_EMAIL']
-  end
+  app_email = ENV['DEVISE_EMAIL'] if app_email.nil?
 
   default from: app_email
 
+  def missing_email_settings(event)
+    Setting.Emails.blank? || Setting.Emails[event.location].blank? ||
+      Setting.Emails[event.location]['schedule_staff'].blank?
+  end
+
   def schedule_change(args)
     @event = Event.find_by_code(args[:event_code])
+    return if missing_email_settings(@event)
     @change_notice = args[:message]
 
-    unless Setting.Emails.blank? ||
-           Setting.Emails[@event.location.to_s]['schedule_staff'].blank?
-      to_emails = Setting.Emails[@event.location]['schedule_staff']
-      subject = "[#{@event.code}] Schedule change notice!"
-      mail(to: to_emails, subject: subject)
-    end
+    mail(to: Setting.Emails[@event.location]['schedule_staff'],
+         subject: "[#{@event.code}] Schedule change notice!")
   end
 
   def event_sync(event, error_messages)
     @event = event
     @error_messages = error_messages
-    to_email = Setting.Emails[event.location.to_s]['program_coordinator']
+    to_email = Setting.Emails[event.location]['program_coordinator']
     cc_email = Setting.Site['sysadmin_email']
     subject = "!! #{event.code} (#{event.location}) Data errors !!"
 
@@ -50,62 +51,58 @@ class StaffMailer < ApplicationMailer
 
   def notify_sysadmin(event, error)
     to_email = Setting.Site['sysadmin_email']
-
-    if event.nil?
-      subject = "Workshops error!"
-    else
-      subject = "[#{event.code}] (#{event.location}) error"
-    end
+    subject = if event.nil?
+                'Workshops error!'
+              else
+                "[#{event.code}] (#{event.location}) error"
+              end
 
     @message = error.inspect
     mail(to: to_email, subject: subject, template_name: 'notify_sysadmin')
   end
 
-  def event_update(original_event: event, args: params)
-    event = original_event
+  def event_update(event, args:)
     @updated_by = args[:updated_by]
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
     @event_url = event.url
     @workshops_url = event_url(event)
 
-    to_email = Setting.Emails[event.location.to_s]['event_updates']
+    to_email = Setting.Emails[event.location]['event_updates']
     subject = "[#{event.code}] Event updated!"
 
     mail(to: to_email, subject: subject)
   end
 
-  def nametag_update(original_event: event, args: params)
-    event = original_event
+  def nametag_update(event, args:)
     @short_name = args[:short_name]
     @updated_by = args[:updated_by]
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
     @workshops_url = event_url(event)
 
-    to_email = Setting.Emails[event.location.to_s]['name_tags']
+    to_email = Setting.Emails[event.location]['name_tags']
     subject = "[#{event.code}] Name tag change notice!"
 
     mail(to: to_email, subject: subject)
   end
 
   def confirmation_notice(membership, msg)
-    staff_email = Setting.Emails["#{membership.event.location}"]['confirmation_notices']
-    unless staff_email.blank?
-      @person = membership.person
-      @event = membership.event
-      @message = msg
-      subject = "[#{@event.code}] membership change!"
-      mail(to: staff_email, subject: subject)
-    end
+    location = membership.event.location
+    staff_email = Setting.Emails[location]['confirmation_notices']
+    return if staff_email.blank?
+    @person = membership.person
+    @event = membership.event
+    @message = msg
+    subject = "[#{@event.code}] membership change!"
+    mail(to: staff_email, subject: subject)
   end
 
   def site_feedback(section:, membership:, message:)
     feedback_email = Setting.Site['webmaster_email']
-    unless feedback_email.blank?
-      @membership = membership
-      @message = message
-      @question = 'How was your RSVP experience?'
-      subject = "[#{@membership.event.code}] #{section} feedback"
-      mail(to: feedback_email, subject: subject)
-    end
+    return if feedback_email.blank?
+    @membership = membership
+    @message = message
+    @question = 'How was your RSVP experience?'
+    subject = "[#{@membership.event.code}] #{section} feedback"
+    mail(to: feedback_email, subject: subject)
   end
 end

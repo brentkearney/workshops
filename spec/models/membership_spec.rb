@@ -7,9 +7,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Model validations: Membership', type: :model do
-
   before do
-    @event = create(:event, code: '16w5666')
+    @event = create(:event, current: true)
     @person = create(:person)
     @membership = create(:membership, person: @person, event: @event)
     om = create(:membership, event: @event, role: 'Contact Organizer')
@@ -23,38 +22,38 @@ RSpec.describe 'Model validations: Membership', type: :model do
   it 'is invalid without an event association' do
     @membership.event = nil
     expect(@membership.valid?).to be_falsey
-    expect(@membership.errors.has_key?(:event)).to be_truthy
+    expect(@membership.errors.key?(:event)).to be_truthy
   end
 
   it 'is invalid without a person association' do
     @membership.person_id = nil
     expect(@membership.valid?).to be_falsey
-    expect(@membership.errors.has_key?(:person)).to be_truthy
+    expect(@membership.errors.key?(:person)).to be_truthy
   end
 
   it 'is invalid without unique people per event' do
     new_membership = build(:membership, person: @person, event: @event)
 
     expect(new_membership.valid?).to be_falsey
-    expect(new_membership.errors.has_key?(:person)).to be_truthy
+    expect(new_membership.errors.key?(:person)).to be_truthy
   end
 
   it 'is invalid if arrival dates are after the event ends' do
     @membership.arrival_date = @event.end_date + 2.days
     @membership.valid?
-    expect(@membership.errors.has_key?(:arrival_date)).to be_truthy
+    expect(@membership.errors.key?(:arrival_date)).to be_truthy
   end
 
   it 'is invalid if departure dates are before the event begins' do
     @membership.departure_date = @event.start_date - 2.days
     @membership.valid?
-    expect(@membership.errors.has_key?(:departure_date)).to be_truthy
+    expect(@membership.errors.key?(:departure_date)).to be_truthy
   end
 
   it 'is invalid if arrival dates are a month before the event begins' do
     @membership.arrival_date = @event.start_date - 31.days
     @membership.valid?
-    expect(@membership.errors.has_key?(:arrival_date)).to be_truthy
+    expect(@membership.errors.key?(:arrival_date)).to be_truthy
   end
 
   it 'is valid if arrival dates are within the period of the event' do
@@ -129,12 +128,52 @@ RSpec.describe 'Model validations: Membership', type: :model do
   end
 
   it 'notifies staff if attendance changes to or from confirmed' do
-    allow(EmailStaffConfirmationNoticeJob).to receive(:perform_later)
     expect(@membership.attendance).to eq('Confirmed')
     @membership.attendance = 'Not Yet Invited'
     @membership.save
 
-    expect(EmailStaffConfirmationNoticeJob).to have_received(:perform_later)
+    # puts "\n\nMethods: #{ActiveJob::Base.methods}\n\n"
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 1
+    msg = ActiveJob::Base.queue_adapter.enqueued_jobs.first[:args].last
+    expect(msg).to eq('is no longer confirmed')
+  end
+
+  it 'skips attendance notification if .changed_fields? is untrue' do
+    allow_any_instance_of(Membership).to receive(:changed_fields?).and_return(false)
+    expect(@membership.attendance).to eq('Confirmed')
+    @membership.attendance = 'Not Yet Invited'
+    @membership.save
+
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
+  end
+
+  it 'skips notification if event date is outside "confirmation_lead" time' do
+    parts = Setting.Emails[@event.location]['confirmation_lead'].split('.')
+    lead_time = parts.first.to_i.send(parts.last)
+
+    new_start = Date.current + lead_time + 1.week
+    @event.start_date = new_start
+    @event.end_date = new_start + 5.days
+    @event.save
+
+    expect(@membership.attendance).to eq('Confirmed')
+    @membership.attendance = 'Not Yet Invited'
+    @membership.save
+
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
+  end
+
+  it 'skips notification if event date is in the past' do
+    new_start = Date.current - 2.weeks
+    @event.start_date = new_start
+    @event.end_date = new_start + 5.days
+    @event.save
+
+    expect(@membership.attendance).to eq('Confirmed')
+    @membership.attendance = 'Not Yet Invited'
+    @membership.save
+
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
   end
 
   it 'syncs with legacy db if sync_remote flag is set' do
@@ -169,5 +208,39 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.departure_date = date
     @membership.save
     expect(@membership.departs).to eq(date.strftime('%b %-d, %Y'))
+  end
+
+  it '.rsvp_date returns "N/A" or formatted date' do
+    @membership.replied_at = nil
+    @membership.save
+    expect(@membership.rsvp_date).to eq('N/A')
+
+    rsvp_time = DateTime.yesterday.midday
+    @membership.replied_at = rsvp_time
+    @membership.save
+
+    formatted = rsvp_time.in_time_zone(@membership.event.time_zone)
+                         .strftime('%b %-d, %Y %H:%M %Z')
+    expect(@membership.rsvp_date).to eq(formatted)
+  end
+
+  it '.shares_email? indicates email sharing preference' do
+    @membership.share_email = true
+    @membership.save
+    expect(@membership.shares_email?).to be_truthy
+
+    @membership.share_email = false
+    @membership.save
+    expect(@membership.shares_email?).to be_falsey
+  end
+
+  it '.is_org? tests if member is organizer' do
+    @membership.role = 'Participant'
+    @membership.save
+    expect(@membership.is_org?).to be_falsey
+
+    @membership.role = 'Organizer'
+    @membership.save
+    expect(@membership.is_org?).to be_truthy
   end
 end

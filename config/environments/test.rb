@@ -31,6 +31,9 @@ Rails.application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
+  # ActiveJob
+  config.active_job.queue_adapter = :inline
+
   # Randomize the order test cases are executed.
   config.active_support.test_order = :random
 
@@ -43,5 +46,5 @@ Rails.application.configure do
   # Access session variables via rack_session_access gem
   #config.middleware.use RackSessionAccess::Middleware
 
-  config.action_mailer.default_url_options = { :host => 'http://localhost:3000' }
+  config.action_mailer.default_url_options = { host: 'http://localhost:3000' }
 end

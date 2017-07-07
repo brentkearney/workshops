@@ -9,6 +9,7 @@ class EmailStaffConfirmationNoticeJob < ActiveJob::Base
   queue_as :urgent
 
   def perform(membership_id, msg)
+    Rails.logger.debug "EmailStaffConfirmationNoticeJob invoked! (#{membership_id}, #{msg})"
     membership = Membership.find_by_id(membership_id)
     StaffMailer.confirmation_notice(membership, msg).deliver_now
   end

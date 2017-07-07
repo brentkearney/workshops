@@ -175,8 +175,9 @@ describe 'Settings page', type: :feature do
 
       it 'has a form field for each field of the location' do
         Setting.Locations.each do |location, properties|
-          properties.each do |field, value|
-            expect(page).to have_field("setting[Locations][#{location}][#{field}]")
+          properties.each do |field, _value|
+            field_name = "setting[Locations][#{location}][#{field}]"
+            expect(page).to have_field(field_name)
           end
         end
       end

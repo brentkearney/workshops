@@ -84,7 +84,7 @@ RSpec.describe StaffMailer, type: :mailer do
 
     before :each do
       params = { short_name: 'Shorter name' }
-      StaffMailer.nametag_update(original_event: event,
+      StaffMailer.nametag_update(event,
           args: params).deliver_now
     end
 
@@ -104,7 +104,7 @@ RSpec.describe StaffMailer, type: :mailer do
     before :each do
       params = { description: 'New description',
         press_release: 'New press release' }
-      StaffMailer.event_update(original_event: event, args: params).deliver_now
+      StaffMailer.event_update(event, args: params).deliver_now
     end
 
     it 'sends email' do

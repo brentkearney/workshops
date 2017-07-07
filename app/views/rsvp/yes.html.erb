@@ -201,6 +201,7 @@
         </div>
         <% end %>
 
+        <% unless @rsvp.membership.role == 'Contact Organizer' %>
         <div class="row">
           <div class="col-md-12">
             <h2 class="rsvp-section midpage">Note to the Contact Organizer</h2>
@@ -219,6 +220,7 @@
                  "Optional: enter a message for the organizer here." %>
           </div>
         </div>
+        <% end %>
 
         <div class="row">
           <div class="col-md-12">

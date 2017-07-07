@@ -10,6 +10,6 @@ class EmailEventUpdateJob < ActiveJob::Base
 
   def perform(event_id, params)
     event = Event.find_by_id(event_id)
-    StaffMailer.event_update(original_event: event, args: params).deliver_now
+    StaffMailer.event_update(event, args: params).deliver_now
   end
 end

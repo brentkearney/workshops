@@ -27,7 +27,7 @@ class ParticipantMailer < ApplicationMailer
     @event = membership.event
 
     unless Setting.Emails.blank?
-      @from_email = Setting.Emails["#{@event.location}"]['rsvp']
+      @from_email = Setting.Emails[@event.location]['rsvp']
     end
 
     @organization = 'Staff'

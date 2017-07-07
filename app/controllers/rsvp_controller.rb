@@ -39,7 +39,7 @@ class RsvpController < ApplicationController
   # POST /rsvp/feedback
   def feedback
     if request.post?
-      membership = Membership.find(feedback_params[:membership_id])
+      membership = Membership.find_by_id(feedback_params[:membership_id])
       message = feedback_params[:feedback_message]
       unless message.blank?
         EmailSiteFeedbackJob.perform_later('RSVP', membership.id, message)

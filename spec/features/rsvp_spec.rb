@@ -121,7 +121,7 @@ describe 'RSVP', type: :feature do
 
       visit rsvp_otp_path(@invitation.code)
 
-      expect(page).to have_text("You have already declined an invitation")
+      expect(page).to have_text('You have already declined an invitation')
     end
 
     it 'non-existent membership record' do
@@ -360,6 +360,18 @@ describe 'RSVP', type: :feature do
       expect(page.body).to have_text("firstname can't be blank")
       expect(page).to have_css('textarea#rsvp_organizer_message',
         text: 'Hi Org!')
+    end
+
+    it 'skips the "message to organizer" form if the user is the organizer' do
+      @membership.role = 'Contact Organizer'
+      @membership.save
+
+      visit rsvp_otp_path(@invitation.code)
+      click_link "Yes"
+      expect(page).not_to have_field("rsvp_organizer_message")
+
+      @membership.role = 'Participant'
+      @membership.save
     end
 
     context 'after the "Confirm Attendance" button' do
