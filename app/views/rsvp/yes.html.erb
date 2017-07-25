@@ -10,7 +10,7 @@
         <small>Please share your plans, and click the "Confirm Attendance" button:</small></h1>
         <%= form_for @rsvp, as: :rsvp,
            url: rsvp_yes_path(@rsvp.invitation.code), method: :post,
-          html: { role: 'form', class: 'form' } do |rsvp| %>
+          html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |rsvp| %>
         <fieldset>
 
         <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
@@ -169,7 +169,7 @@
                     <%= p.text_field :city, class: "form-control", placeholder: 'City', autocomplete: "address-level2" %>
                   </div>
                   <div class='col-md-4'>
-                    <%= p.text_field :region, class: "form-control", placeholder: 'Province/State/Region', autocomplete: "address-level1" %>
+                    <%= p.text_field :region, class: "form-control", placeholder: 'Region/Province/State', autocomplete: "address-level1" %>
                   </div>
                   <div class='col-md-4'>
                     <%= p.text_field :postal_code, class: "form-control", placeholder: 'Postal Code', autocomplete: "postal-code" %>

@@ -27,7 +27,7 @@ class Person < ActiveRecord::Base
                      { with: /\A(M|F|O)\z/, message: " must be 'M','F', or 'O'" },
                      allow_blank: true, unless: :member_import
   validates :phd_year, numericality: { allow_blank: true, only_integer: true }
-  validates :address1, :city, :region, :country, :postal_code,
+  validates :address1, :city, :country, :postal_code,
             presence: {
               message: '← address fields cannot be blank'
             }, if: :is_rsvp
