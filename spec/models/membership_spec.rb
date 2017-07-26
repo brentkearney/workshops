@@ -128,11 +128,13 @@ RSpec.describe 'Model validations: Membership', type: :model do
   end
 
   it 'notifies staff if attendance changes to or from confirmed' do
+    @event.start_date = Date.current + 1.day
+    @event.end_date = @event.start_date + 5.days
+    @event.save
     expect(@membership.attendance).to eq('Confirmed')
     @membership.attendance = 'Not Yet Invited'
     @membership.save
 
-    # puts "\n\nMethods: #{ActiveJob::Base.methods}\n\n"
     expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 1
     msg = ActiveJob::Base.queue_adapter.enqueued_jobs.first[:args].last
     expect(msg).to eq('is no longer confirmed')
@@ -161,6 +163,22 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.save
 
     expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
+  end
+
+  it 'sends notification if event date is inside "confirmation_lead" time' do
+    parts = Setting.Emails[@event.location]['confirmation_lead'].split('.')
+    lead_time = parts.first.to_i.send(parts.last)
+
+    new_start = Date.current + lead_time - 2.weeks
+    @event.start_date = new_start
+    @event.end_date = new_start + 5.days
+    @event.save
+
+    expect(@membership.attendance).to eq('Confirmed')
+    @membership.attendance = 'Not Yet Invited'
+    @membership.save
+
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 1
   end
 
   it 'skips notification if event date is in the past' do

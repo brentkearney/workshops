@@ -140,11 +140,11 @@ module EventDecorators
   end
 
   def is_current?
-    Time.now >= start_date.to_time && Time.now <= end_date.to_time.change({ hour: 23, min: 59})
+    Time.current >= start_date.to_time && Time.current <= end_date.to_time.change({ hour: 23, min: 59})
   end
 
   def is_upcoming?
-    (start_date.to_time.to_i - Time.now.to_i) <= 7.days.to_i
+    Time.current <= start_date.to_time
   end
 
   def url

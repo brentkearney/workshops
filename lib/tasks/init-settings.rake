@@ -62,7 +62,8 @@ namespace :ws do
           'event_updates' => 'webmaster@example.com, communications@example.com',
           'name_tags' => 'organization-secretary@example.com',
           'confirmation_notices' => 'organization@example.com',
-          'rsvp' => 'rsvp@example.com'
+          'rsvp' => 'rsvp@example.com',
+          'confirmation_lead' => '1.year'
         }
       }
     end

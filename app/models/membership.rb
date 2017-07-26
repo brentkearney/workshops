@@ -140,8 +140,8 @@ class Membership < ActiveRecord::Base
   end
 
   def staff_event_notifications?
-    event.is_current? && changed_fields? &&
-      event.start_date <= Date.current + confirmation_lead_time
+    event.is_upcoming? && changed_fields? &&
+      event.start_date <= (Date.current + confirmation_lead_time)
   end
 
   def attendance_notification
