@@ -8,8 +8,8 @@
 class EmailStaffConfirmationNoticeJob < ActiveJob::Base
   queue_as :urgent
 
-  def perform(membership_id, msg)
+  def perform(membership_id, msg, to)
     membership = Membership.find_by_id(membership_id)
-    StaffMailer.confirmation_notice(membership, msg).deliver_now
+    StaffMailer.confirmation_notice(membership, msg, to).deliver_now
   end
 end

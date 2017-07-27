@@ -13,7 +13,7 @@ class Membership < ActiveRecord::Base
   has_one :invitation, dependent: :destroy
 
   after_save :update_counter_cache
-  after_update :attendance_notification
+  after_update :notify_staff
   after_commit :sync_with_legacy
   after_destroy :update_counter_cache
 
@@ -122,39 +122,11 @@ class Membership < ActiveRecord::Base
     event.save
   end
 
-  def changed_fields?
-    changed.include?('attendance') || changed.include?('arrival_date') ||
-      changed.include?('departure_date')
-  end
-
-  def invalid_lead_time_setting
-    Setting.Emails.blank? || Setting.Emails[event.location].blank? ||
-      Setting.Emails[event.location]['confirmation_lead'].blank? ||
-      Setting.Emails[event.location]['confirmation_lead'] !~ /\A\d+\.\w+$/
-  end
-
-  def confirmation_lead_time
-    return 6.months if invalid_lead_time_setting
-    parts = Setting.Emails[event.location]['confirmation_lead'].split('.')
-    parts.first.to_i.send(parts.last)
-  end
-
-  def staff_event_notifications?
-    event.is_upcoming? && changed_fields? &&
-      event.start_date <= (Date.current + confirmation_lead_time)
-  end
-
-  def attendance_notification
-    return unless staff_event_notifications?
-    msg = nil
-    msg = 'is no longer confirmed' if attendance_was == 'Confirmed'
-    msg = 'is now confirmed' if attendance == 'Confirmed'
-
-    EmailStaffConfirmationNoticeJob.perform_later(id, msg) unless msg.nil?
-  end
-
   def sync_with_legacy
     SyncMembershipJob.perform_later(id) if sync_remote
   end
-end
 
+  def notify_staff
+    MembershipChangeNotice.new(changed, self).run
+  end
+end

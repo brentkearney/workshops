@@ -135,13 +135,14 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.attendance = 'Not Yet Invited'
     @membership.save
 
-    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 1
-    msg = ActiveJob::Base.queue_adapter.enqueued_jobs.first[:args].last
-    expect(msg).to eq('is no longer confirmed')
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).not_to eq 0
+    recipient = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last
+    expect(recipient).to eq('confirmation_notices')
   end
 
   it 'skips attendance notification if .changed_fields? is untrue' do
-    allow_any_instance_of(Membership).to receive(:changed_fields?).and_return(false)
+    allow_any_instance_of(MembershipChangeNotice).to receive(:changed_fields?)
+      .and_return(false)
     expect(@membership.attendance).to eq('Confirmed')
     @membership.attendance = 'Not Yet Invited'
     @membership.save
@@ -149,7 +150,8 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
   end
 
-  it 'skips notification if event date is outside "confirmation_lead" time' do
+  it 'skips staff notice if event date is outside "confirmation_lead" time,
+    but still sends notice to program_coordinator' do
     parts = Setting.Emails[@event.location]['confirmation_lead'].split('.')
     lead_time = parts.first.to_i.send(parts.last)
 
@@ -162,10 +164,12 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.attendance = 'Not Yet Invited'
     @membership.save
 
-    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 1
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last)
+      .to eq('program_coordinator')
   end
 
-  it 'sends notification if event date is inside "confirmation_lead" time' do
+  it 'sends staff notice if event date is inside "confirmation_lead" time' do
     parts = Setting.Emails[@event.location]['confirmation_lead'].split('.')
     lead_time = parts.first.to_i.send(parts.last)
 
@@ -178,7 +182,9 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.attendance = 'Not Yet Invited'
     @membership.save
 
-    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 1
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 2
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last)
+      .to eq('confirmation_notices')
   end
 
   it 'skips notification if event date is in the past' do

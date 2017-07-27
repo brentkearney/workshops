@@ -1,9 +1,11 @@
 Dear Staff,
 
-There has been a membership change for the event:
+<%= @person.name %>'s membership for the event:
 <%= @event.code %>: <%= @event.name %>
 <%= @event.dates %>
 
-The change is:
-<%= @person.name %> <%= @message %>.
+...has changed:
+<%= @message %>
 
+<%= @person.name %>'s <%= @event.code %> Membership:
+<%= @membership_url %>

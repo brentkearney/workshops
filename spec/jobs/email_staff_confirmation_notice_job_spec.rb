@@ -14,7 +14,8 @@ RSpec.describe EmailStaffConfirmationNoticeJob, type: :job do
       allow(StaffMailer).to receive_message_chain(:confirmation_notice,
                                                   :deliver_now)
 
-      described_class.new.perform(membership.id, 'test msg')
+      described_class.new.perform(membership.id, 'test msg',
+        'confirmation_notices')
 
       expect(StaffMailer).to have_received(:confirmation_notice)
     end

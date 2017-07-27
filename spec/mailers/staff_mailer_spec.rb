@@ -125,7 +125,8 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     before :each do
-      StaffMailer.confirmation_notice(@member, 'Hi!').deliver_now
+      StaffMailer.confirmation_notice(@member, 'Hi!', 'confirmation_notices')
+        .deliver_now
     end
 
     it 'sends email' do
