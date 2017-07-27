@@ -95,7 +95,7 @@ class EventsController < ApplicationController
           @members << @event.member_info(member.person)
         end
       end
-      SyncEventMembersJob.perform_later(@event) if policy(@event).sync?
+      SyncEventMembersJob.perform_later(@event.id) if policy(@event).sync?
     else
       redirect_to root_path, error: 'No valid event specified.'
     end
