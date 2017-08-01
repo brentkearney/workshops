@@ -150,6 +150,25 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
   end
 
+  it 'sends staff notice if event date is inside "confirmation_lead" time' do
+    parts = Setting.Emails[@event.location]['confirmation_lead'].split('.')
+    lead_time = parts.first.to_i.send(parts.last)
+
+    new_start = Date.current + lead_time - 2.weeks
+    @event.start_date = new_start
+    @event.end_date = new_start + 5.days
+    @event.save
+
+    expect(@membership.attendance).to eq('Confirmed')
+    @membership.attendance = 'Not Yet Invited'
+    @membership.updated_by = @membership.person.name
+    @membership.save
+
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 2
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last)
+      .to eq('confirmation_notices')
+  end
+
   it 'skips staff notice if event date is outside "confirmation_lead" time,
     but still sends notice to program_coordinator' do
     parts = Setting.Emails[@event.location]['confirmation_lead'].split('.')
@@ -162,6 +181,7 @@ RSpec.describe 'Model validations: Membership', type: :model do
 
     expect(@membership.attendance).to eq('Confirmed')
     @membership.attendance = 'Not Yet Invited'
+    @membership.updated_by = @membership.person.name
     @membership.save
 
     expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 1
@@ -169,22 +189,21 @@ RSpec.describe 'Model validations: Membership', type: :model do
       .to eq('program_coordinator')
   end
 
-  it 'sends staff notice if event date is inside "confirmation_lead" time' do
+  it 'skips staff notice to program_coordinator if updated_by is not member' do
     parts = Setting.Emails[@event.location]['confirmation_lead'].split('.')
     lead_time = parts.first.to_i.send(parts.last)
 
-    new_start = Date.current + lead_time - 2.weeks
+    new_start = Date.current + lead_time + 1.week
     @event.start_date = new_start
     @event.end_date = new_start + 5.days
     @event.save
 
     expect(@membership.attendance).to eq('Confirmed')
     @membership.attendance = 'Not Yet Invited'
+    @membership.updated_by = 'Workshops importer'
     @membership.save
 
-    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 2
-    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last)
-      .to eq('confirmation_notices')
+    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
   end
 
   it 'skips notification if event date is in the past' do

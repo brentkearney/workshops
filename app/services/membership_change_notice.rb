@@ -4,7 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# MembershipChangeNotice prepares schedule change notices, sends to StaffMailer
+# MembershipChangeNotice prepares membership change notices, sends to StaffMailer
 class MembershipChangeNotice
   attr_reader :changed, :membership, :event
 
@@ -46,9 +46,13 @@ class MembershipChangeNotice
     event.start_date <= (Date.current + confirmation_lead_time)
   end
 
+  def changed_by_member?
+    membership.updated_by == membership.person.name
+  end
+
   def notify_coordinator
     return unless valid_change?
-    send_notice(to: 'program_coordinator')
+    send_notice(to: 'program_coordinator') if changed_by_member?
   end
 
   def notify_staff

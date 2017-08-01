@@ -88,6 +88,7 @@ class StaffMailer < ApplicationMailer
   def confirmation_notice(membership, msg, to)
     staff_email = Setting.Emails[membership.event.location][to]
     return if staff_email.blank?
+    @membership = membership
     @person = membership.person
     @event = membership.event
     @message = msg
