@@ -39,7 +39,8 @@ class MembershipChangeNotice
   end
 
   def valid_change?
-    event.is_upcoming? && changed_fields?
+    event.is_upcoming? && membership.updated_by != 'Workshops importer' &&
+      changed_fields?
   end
 
   def within_lead_time?

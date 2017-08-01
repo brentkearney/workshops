@@ -19,7 +19,7 @@ describe 'SignIn', type: :feature do
 
     @event = create(:event)
     @membership = create(:membership, event: @event, person: @person,
-      attendance: 'Invited')
+                                      attendance: 'Invited')
   end
 
   before :each do
