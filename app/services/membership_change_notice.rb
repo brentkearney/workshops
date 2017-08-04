@@ -82,7 +82,8 @@ class MembershipChangeNotice
   def attendance_change_message
     msg = ''
     if changed.include?('attendance')
-      msg = "Attendance was #{membership.attendance_was} and is now
+      was = membership.attendance_was || 'unset'
+      msg = "Attendance was #{was} and is now
         #{membership.attendance}.".squish
     end
     msg

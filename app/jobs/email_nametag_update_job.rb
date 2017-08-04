@@ -8,8 +8,8 @@
 class EmailNametagUpdateJob < ActiveJob::Base
   queue_as :urgent
 
-  def perform(event_id, params)
-    event = Event.find_by_id(event_id)
+  def perform(event_code, params)
+    event = Event.find(event_code)
     StaffMailer.nametag_update(event, args: params).deliver_now
   end
 end

@@ -174,12 +174,12 @@ class EventsController < ApplicationController
 
   def notify_staff(event: original_event, params: update_params)
     if params[:short_name] != event.short_name && event.is_upcoming?
-      EmailNametagUpdateJob.perform_later(event.id, params)
+      EmailNametagUpdateJob.perform_later(event.code, params)
     end
 
     if params[:description] != event.description ||
         params[:press_release] != event.press_release
-      EmailEventUpdateJob.perform_later(event.id, params)
+      EmailEventUpdateJob.perform_later(event.code, params)
     end
   end
 
