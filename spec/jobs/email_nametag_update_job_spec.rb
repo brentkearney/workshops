@@ -10,7 +10,7 @@ RSpec.describe EmailNametagUpdateJob, type: :job do
   describe "#perform" do
     it "calls on the StaffMailer" do
       event = double('event', id: 1)
-      allow(Event).to receive(:find_by_id).and_return(event)
+      allow(Event).to receive(:find).and_return(event)
       allow(StaffMailer).to receive_message_chain(:nametag_update, :deliver_now)
       args = { short_name: 'Short', updated_by: 'Rspec' }
 

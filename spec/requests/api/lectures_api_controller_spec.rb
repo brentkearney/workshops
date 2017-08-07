@@ -13,7 +13,7 @@ describe Api::V1::LecturesController do
       @event = create(:event)
       @lecture = create(:lecture, event: @event)
       create(:schedule, lecture: @lecture, event: @event)
-      key = ENV['LECTURES_API_KEY']
+      key = Setting.Site['LECTURES_API_KEY']
       @payload = {
           api_key: key,
           lecture_id: @lecture.id,
@@ -24,12 +24,13 @@ describe Api::V1::LecturesController do
 
     it 'authenticates with the correct api key' do
       put "/api/v1/lectures.json", @payload.to_json
-      expect(response).not_to be_unauthorized
+      expect(response).to be_success
     end
 
     it 'does not authenticate with an invalid api key' do
       @payload['api_key'] = '123'
       put "/api/v1/lectures.json", @payload.to_json
+
       expect(response).to be_unauthorized
     end
 
@@ -40,7 +41,7 @@ describe Api::V1::LecturesController do
     end
 
     it 'given invalid or missing lecture_id, it fails' do
-      @payload['lecture_id'] = 'X'
+      @payload[:lecture_id] = 'X'
       put "/api/v1/lectures.json", @payload.to_json
       expect(response).to be_bad_request
 
@@ -50,7 +51,7 @@ describe Api::V1::LecturesController do
     end
 
     it 'given invalid or missing event_id, it fails' do
-      @payload['event_id'] = 'X'
+      @payload[:event_id] = 'X'
       put "/api/v1/lectures.json", @payload.to_json
       expect(response).to be_bad_request
 
@@ -72,15 +73,5 @@ describe Api::V1::LecturesController do
       put "/api/v1/lectures.json", @payload.to_json
       expect(response).to be_bad_request
     end
-
-    # Leave the schedule alone (for now)
-    # it 'also updates the linked Schedule item' do
-    #   put "/api/v1/lectures.json", @payload.to_json
-    #   expect(response).to be_created
-    #   s = Schedule.find_by_lecture_id(@lecture.id)
-    #   expect(s).not_to be_nil
-    #   expect(s.name).to include('A new title')
-    # end
-
   end
 end
