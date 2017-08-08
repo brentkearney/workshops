@@ -45,7 +45,9 @@ namespace :ws do
         'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
         'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor', 'Ph.D. Student', 'Masters Student', 'Undergraduate Student', 'K-12 Teacher', 'K-12 Student', 'Other'],
         'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'],
-        'rsvp_expiry' => '2.weeks'
+        'rsvp_expiry' => '2.weeks',
+        'LECTURES_API_KEY' => 'hQxZjijNMQ1sNf4fc-j9qE3OoEN8RaoodZI44FKkALJTEAbP',
+        'EVENTS_API_KEY' => 'SRPXv7pvG22XHIIGjJiIbGJtIr7GQdnaF8xcS1nWaGb3xaNe2'
       }
     end
 

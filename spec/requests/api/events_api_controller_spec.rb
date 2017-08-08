@@ -20,30 +20,30 @@ describe Api::V1::EventsController do
     end
 
     it 'authenticates with the correct api key' do
-      post "/api/v1/event.json", @payload.to_json
+      post "/api/v1/events.json", @payload.to_json
       expect(response).to be_success
     end
 
     it 'does not authenticate with an invalid api key' do
       @payload['api_key'] = '123'
-      post "/api/v1/event.json", @payload.to_json
+      post "/api/v1/events.json", @payload.to_json
 
       expect(response).to be_unauthorized
     end
 
     it 'given appropriate keys and event data, it creates an event' do
-      post "/api/v1/event.json", @payload.to_json
+      post "/api/v1/events.json", @payload.to_json
       expect(response).to be_created
       expect(Event.find(@event.code)).not_to be_nil
     end
 
     it 'given invalid or missing event code, it fails' do
       @payload[:event_id] = 'X'
-      post "/api/v1/event.json", @payload.to_json
+      post "/api/v1/events.json", @payload.to_json
       expect(response).to be_bad_request
 
       @payload.delete(:event_id)
-      post "/api/v1/event.json", @payload.to_json
+      post "/api/v1/events.json", @payload.to_json
       expect(response).to be_bad_request
     end
 
@@ -55,21 +55,21 @@ describe Api::V1::EventsController do
         event: existing_event.as_json
       }
 
-      post "/api/v1/event.json", new_payload.to_json
+      post "/api/v1/events.json", new_payload.to_json
       expect(response).to be_bad_request
     end
 
     it 'given missing, invalid or empty event, it fails' do
       @payload['event'] = {}
-      post "/api/v1/event.json", @payload.to_json
+      post "/api/v1/events.json", @payload.to_json
       expect(response).to be_bad_request
 
       @payload['event'] = Array.new
-      post "/api/v1/event.json", @payload.to_json
+      post "/api/v1/events.json", @payload.to_json
       expect(response).to be_bad_request
 
       @payload.delete(:event)
-      post "/api/v1/event.json", @payload.to_json
+      post "/api/v1/events.json", @payload.to_json
       expect(response).to be_bad_request
     end
   end

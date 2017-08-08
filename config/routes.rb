@@ -63,7 +63,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       patch 'lectures' => 'lectures#update'
       put 'lectures' => 'lectures#update'
-      post 'event' => 'events#create'
+      post 'events' => 'events#create'
     end
   end
 end
