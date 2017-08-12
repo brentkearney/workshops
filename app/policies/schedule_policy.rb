@@ -14,10 +14,25 @@ class SchedulePolicy
     @event = @schedule.event
   end
 
+  # set or unset the staff_item field
+  def update_staff_item?
+    Rails.logger.debug "schedule policy.update_staff_item? called!"
+
+    answer = staff_or_admin
+    Rails.logger.debug "staff_or_admin returned: #{answer}"
+    answer
+  end
+
+  def update?
+    staff_or_admin || (event_organizer && within_lock_staff_schedule)
+  end
+
+  def edit_staff_items?
+    staff_or_admin
+  end
+
   def create?
-    return false unless @current_user
-    @current_user.is_organizer?(@event) || @current_user.is_admin? ||
-      (@current_user.is_staff? && @current_user.location == @event.location)
+    event_organizer || staff_or_admin
   end
 
   # Only organizers and admins can change event schedules
@@ -25,9 +40,24 @@ class SchedulePolicy
     if name =~ /index|show/
       true
     else
-      return false unless @current_user
-      @current_user.is_organizer?(@event) || @current_user.is_admin? ||
-        (@current_user.is_staff? && @current_user.location == @event.location)
+      event_organizer || staff_or_admin
     end
+  end
+
+  def within_lock_staff_schedule
+    return true unless @schedule.staff_item
+    Date.current + Setting.Site['lock_staff_schedule'].to_time <
+      @event.start_date
+  end
+
+  def event_organizer
+    return false unless @current_user
+    @current_user.is_organizer?(@event)
+  end
+
+  def staff_or_admin
+    return false unless @current_user
+    @current_user.is_admin? ||
+      (@current_user.is_staff? && @current_user.location == @event.location)
   end
 end

@@ -78,7 +78,7 @@ class ScheduleController < ApplicationController
         end
         format.json { render :show, status: :created, location: @schedule }
       else
-        @day = params[:day].to_time
+        @day = Date.parse(params[:day])
         @form_action = 'create'
         prefill_lecture_fields if @schedule.lecture
         format.html { render :new }
@@ -92,12 +92,21 @@ class ScheduleController < ApplicationController
   # PATCH/PUT /event/:event_id/schedule/1
   # PATCH/PUT /event/:event_id/schedule/1.json
   def update
+    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
     authorize @schedule
     original_item = @schedule.dup
     original_lecture = original_item.lecture
+
     merged_params = ScheduleItem.update(@schedule,
                                         schedule_params
                                 .merge(updated_by: current_user.name))
+
+    if policy(@schedule).update_staff_item?
+      staff_item = schedule_params[:staff_item] || false
+      merged_params['staff_item'] = staff_item
+    end
+    Rails.logger.debug "Merged params: #{merged_params.inspect}"
+
     @day = @schedule.start_time.to_date
 
     if session[:return_to]
@@ -134,6 +143,7 @@ class ScheduleController < ApplicationController
           render json: @schedule.errors, status: :unprocessable_entity
         end
       end
+      Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
     end
   end
 
@@ -174,15 +184,15 @@ class ScheduleController < ApplicationController
   def schedule_params
     params.require(:schedule)
           .permit(:id, :event_id, :start_time, :end_time,
-                  :name, :description, :location, :day,
+                  :name, :description, :location, :day, :staff_item,
                   lecture_attributes: [:person_id, :id, :keywords,
                                        :do_not_publish])
   end
 
   def flash_notice
-    unless @schedule.flash_notice.blank?
-      @schedule.flash_notice.each {|k, v| flash[k] = "<strong>#{k.capitalize}:</strong> #{v}" }
+    return if @schedule.flash_notice.blank?
+    @schedule.flash_notice.each do |k, v|
+      flash[k] = "<strong>#{k.capitalize}:</strong> #{v}"
     end
   end
-
 end

@@ -220,6 +220,7 @@ RSpec.describe ScheduleController, type: :controller do
       }
 
       before do
+        @user.admin!
         @schedule = Schedule.create! @valid_attributes
       end
 
@@ -289,6 +290,10 @@ RSpec.describe ScheduleController, type: :controller do
     end
 
     context 'with invalid params' do
+      before do
+        @user.admin!
+      end
+
       it 'assigns the schedule as @schedule' do
         schedule = Schedule.create! @valid_attributes
         put :update, event_id: @event.id, id: schedule.to_param,
@@ -301,6 +306,186 @@ RSpec.describe ScheduleController, type: :controller do
         put :update, event_id: @event.id, id: schedule.to_param,
                      schedule: @invalid_attributes
         expect(response).to render_template('edit')
+      end
+    end
+
+    context 'for staff items' do
+      before do
+        @user.member!
+        @s_event = create(:event, future: true)
+        @membership = create(:membership, role: 'Organizer', event: @s_event,
+          person: @person)
+        @s_schedule = create(:schedule, staff_item: true, event: @s_event)
+        @lock_time = Setting.Site['lock_staff_schedule'].to_time
+      end
+
+      context 'as an organizer outside of locked time' do
+        it 'updates the schedule' do
+          put :update, event_id: @s_event.id, id: @s_schedule.to_param,
+                       schedule: @s_schedule.attributes.merge('name' => 'Yes')
+          @s_schedule.reload
+
+          expect(@s_schedule.name).to eq('Yes')
+        end
+      end
+
+      context 'as an organizer inside of locked time' do
+        it 'does not update the schedule' do
+          original_start = @s_event.start_date
+          @s_event.start_date = Date.current + @lock_time - 1.day
+          @s_event.end_date = @s_event.start_date + 5.days
+          @s_event.save
+          schedule = create(:schedule, staff_item: true, event: @s_event)
+          original_name = schedule.name
+
+          put :update, event_id: @s_event.id, id: schedule.to_param,
+                       schedule: schedule.attributes.merge(name: 'No')
+
+          schedule.reload
+          expect(schedule.name).to eq(original_name)
+
+          @s_event.start_date = original_start
+          @s_event.end_date = original_start + 5.days
+          @s_event.save
+          schedule.destroy
+        end
+      end
+
+      context 'as staff' do
+        before do
+          @membership.destroy!
+          @user.staff!
+        end
+
+        context 'from different location as event' do
+          before do
+            @user.location = 'FOO'
+            @user.save
+            expect(Date.current + @lock_time).to be < @s_event.start_date
+          end
+
+          it 'does not update the schedule' do
+            @s_schedule.name = 'Before update'
+            @s_schedule.save
+
+            put :update, event_id: @s_event.id, id: @s_schedule.to_param,
+                         schedule: @s_schedule.attributes.merge(name: 'New')
+
+            @s_schedule.reload
+            expect(@s_schedule.name).to eq('Before update')
+          end
+        end
+
+        context 'from same location as event, within lock time' do
+          before do
+            @user.location = @s_event.location
+            @user.save
+
+            # event within lock time
+            @original_start = @s_event.start_date
+            @s_event.start_date = Date.current + @lock_time - 1.day
+            @s_event.end_date = @s_event.start_date + 5.days
+            @s_event.save
+          end
+
+          after do
+            @s_event.start_date = @original_start
+            @s_event.end_date = @s_event.start_date + 5.days
+            @s_event.save
+          end
+
+          it 'updates the schedule' do
+            schedule = create(:schedule, staff_item: true, event: @s_event)
+
+            put :update, event_id: @s_event.id, id: schedule.to_param,
+                         schedule: schedule.attributes.merge('name' => 'New')
+
+            expect(Schedule.find(schedule.id).name).to eq('New')
+          end
+
+          it 'can change "staff item: true" to false' do
+            schedule = create(:schedule, staff_item: true, event: @s_event)
+
+            put :update, event_id: @s_event.id, id: schedule.to_param,
+                         schedule: schedule.attributes
+                           .merge('staff_item' => false)
+
+            expect(Schedule.find(schedule.id).staff_item).to eq(false)
+          end
+
+          it 'can change "staff item: false" to true' do
+            schedule = create(:schedule, staff_item: false, event: @s_event)
+
+            put :update, event_id: @s_event.id, id: schedule.to_param,
+                         schedule: schedule.attributes
+                           .merge('staff_item' => true)
+
+            expect(Schedule.find(schedule.id).staff_item).to eq(true)
+          end
+        end
+      end
+
+
+      context 'as an admin' do
+        before do
+          @user.admin!
+        end
+
+        context 'from different location as event' do
+          before do
+            @user.location = 'Elsewhere'
+            @user.save
+          end
+
+          it 'updates the schedule' do
+            schedule = create(:schedule, staff_item: true, event: @s_event)
+
+            put :update, event_id: @s_event.id, id: schedule.to_param,
+                         schedule: schedule.attributes.merge('name' => 'New')
+
+            expect(Schedule.find(schedule.id).name).to eq('New')
+          end
+
+          it 'can alter the "staff item" attribute' do
+            schedule = create(:schedule, staff_item: false, event: @s_event)
+
+            put :update, event_id: @s_event.id, id: schedule.to_param,
+                         schedule: schedule.attributes
+                           .merge('staff_item' => true)
+
+            expect(Schedule.find(schedule.id).staff_item).to eq(true)
+          end
+        end
+
+        context 'inside of locked time' do
+          before do
+            @user.location = @s_event.location
+            @user.save
+
+            # event within lock time
+            @original_start = @s_event.start_date
+            @s_event.start_date = Date.current + @lock_time - 1.day
+            @s_event.end_date = @s_event.start_date + 5.days
+            @s_event.save
+          end
+
+          after do
+            @s_event.start_date = @original_start
+            @s_event.end_date = @s_event.start_date + 5.days
+            @s_event.save
+          end
+
+          it 'updates the schedule' do
+            schedule = create(:schedule, staff_item: true, event: @s_event)
+
+            put :update, event_id: @s_event.id, id: schedule.to_param,
+                         schedule: schedule.attributes.merge('name' => 'New')
+
+            expect(Schedule.find(schedule.id).name).to eq('New')
+
+            schedule.destroy
+          end
+        end
       end
     end
   end

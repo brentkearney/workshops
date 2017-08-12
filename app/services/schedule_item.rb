@@ -31,7 +31,6 @@ class ScheduleItem
     @schedule
   end
 
-
   def self.update(schedule, params)
     @schedule = schedule
     new_day = params.delete :day
@@ -43,12 +42,13 @@ class ScheduleItem
       keywords = params[:lecture_attributes].delete :keywords unless params[:lecture_attributes][:keywords].blank?
     end
 
-    new_schedule = Schedule.new(params.merge(id: @schedule.id, staff_item: @schedule.staff_item))
+    new_schedule = Schedule.new(params.merge(id: @schedule.id,
+                                             staff_item: @schedule.staff_item))
     if new_schedule.created_at.nil?
-      new_schedule.created_at = Time.now
+      new_schedule.created_at = DateTime.current
     end
     if new_schedule.updated_at.nil?
-      new_schedule.updated_at = Time.now
+      new_schedule.updated_at = DateTime.current
     end
 
     if new_day && @schedule.start_time.to_date != new_day.to_date

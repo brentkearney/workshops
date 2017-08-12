@@ -42,43 +42,60 @@
   </div>
   <!-- /.row -->
 
-  <div class="form-group">
-      <%= f.label "Title" %>:
-      <%= f.text_field :name, class: 'form-control' %>
-  </div>
+  <div class="row">
+    <div class="form-group">
+        <%= f.label "Title" %>:
+        <%= f.text_field :name, class: 'form-control' %>
+    </div>
 
-  <%= f.fields_for :lecture do |lecture| %>
-      <div class="form-group">
-        <%= lecture.label "Speaker (if this is a talk): " %>
-          <%= lecture.collection_select(:person_id, @event.confirmed, :id, :lname, {:prompt=>true, :order => "LOWER(:lname)"}, { class: 'form-control' }) %>
-      </div>
+    <%= f.fields_for :lecture do |lecture| %>
+        <div class="form-group">
+          <%= lecture.label "Speaker (if this is a talk): " %>
+            <%= lecture.collection_select(:person_id, @event.confirmed, :id, :lname, {:prompt=>true, :order => "LOWER(:lname)"}, { class: 'form-control' }) %>
+        </div>
 
-      <div class="form-group checkbox" style="margin: 2em 0;">
-        <%= f.label :do_not_publish %>:
-        <label>
-          <%= lecture.check_box :do_not_publish %> Check this box if the speaker has requested that the talk be recorded, but not automatically published.
-        </label>
-      </div>
+        <div class="form-group checkbox" style="margin: 2em 0;">
+          <%= f.label :do_not_publish %>:
+          <label>
+            <%= lecture.check_box :do_not_publish %> Check this box if the speaker has requested that the talk be recorded, but not automatically published.
+          </label>
+        </div>
 
-      <div class="form-group">
-          <%= lecture.label :keywords %>:
-          <%= lecture.text_field :keywords, class: 'form-control' %>
-      </div>
-  <% end %>
-  <div class="form-group">
-      <%= f.label "Description or Abstract" %>:
-      <%= f.text_area :description, rows: 5, class: 'form-control' %>
-			<p id="mathjax">Enclose LaTeX with these delimiters: <span class="tex2jax_ignore">\(...\) or $...$ for in-line math, and \[...\] or $$...$$</span> for displayed equations. See the <%= link_to 'MathJax Documentation', 'http://docs.mathjax.org/en/latest/tex.html', :target => "_blank" %> for detailed instructions.</p>
+        <div class="form-group">
+            <%= lecture.label :keywords %>:
+            <%= lecture.text_field :keywords, class: 'form-control' %>
+        </div>
+    <% end %>
+    <div class="form-group">
+        <%= f.label "Description or Abstract" %>:
+        <%= f.text_area :description, rows: 5, class: 'form-control' %>
+  			<p id="mathjax">Enclose LaTeX with these delimiters: <span class="tex2jax_ignore">\(...\) or $...$ for in-line math, and \[...\] or $$...$$</span> for displayed equations. See the <%= link_to 'MathJax Documentation', 'http://docs.mathjax.org/en/latest/tex.html', :target => "_blank" %> for detailed instructions.</p>
+    </div>
+    <div class="form-group">
+        <%= f.label :location %>:
+        <%= f.text_field :location, class: 'form-control' %>
+    </div>
+
+    <% if policy(@schedule).edit_staff_items? %>
+    <div class="form-group checkbox">
+      <%= f.label :staff_item %>:
+      <label>
+        <%= f.check_box :staff_item %> check this box to prevent non-staff from changing this item within <%= distance_of_time_in_words(Setting.Site['lock_staff_schedule']) %> of the event.
+      </label>
+    </div>
+    <% end %>
   </div>
-  <div class="form-group">
-      <%= f.label :location %>:
-      <%= f.text_field :location, class: 'form-control' %>
-  </div>
+  <!-- ./row -->
 
   <div class="row buttons">
     <div class="col-xs-7">
       <div class="form-group">
-          <%= link_to "Back to Schedule", event_schedule_index_path(@event), class: 'btn btn-sm btn-default' %> | <%= f.submit (f.object.new_record? ? "Add New Schedule Item" : "Update Schedule"), class: 'btn btn-sm btn-default' %>
+          <%= link_to "Back to Schedule", event_schedule_index_path(@event), class: 'btn btn-sm btn-default' %>
+          <% if f.object.new_record? %>
+            | <%= f.submit 'Add New Schedule Item', class: 'btn btn-sm btn-default' %>
+          <% elsif policy(@schedule).update? %>
+            | <%= f.submit 'Update Schedule', class: 'btn btn-sm btn-default' %>
+          <% end %>
       </div>
 
       <% unless f.object.new_record? %>

@@ -203,13 +203,13 @@ describe 'Editing a Schedule Item', type: :feature do
     def no_add_item_button
       visit event_schedule_index_path(@event)
       expect(page.body).to have_text(@item.name)
-      expect(page.body).not_to have_text('Add an item')
+      expect(page.body).not_to have_link('Add an item')
     end
 
     def has_add_item_button
       visit event_schedule_index_path(@event)
       expect(page.body).to have_text(@item.name)
-      expect(page.body).to have_text('Add an item')
+      expect(page.body).to have_link('Add an item')
     end
 
     def disallows_editing
@@ -328,6 +328,11 @@ describe 'Editing a Schedule Item', type: :feature do
         it 'allows editing of schedule items' do
           allows_editing
         end
+
+        it 'has a "staff item" checkbox' do
+          visit event_schedule_edit_path(@event, @item)
+          expect(page.body).to have_css('input#schedule_staff_item')
+        end
       end
     end
 
@@ -336,6 +341,32 @@ describe 'Editing a Schedule Item', type: :feature do
         @user.member!
         @membership.role = 'Organizer'
         @membership.save!
+      end
+
+      context 'unpublished schedule' do
+        before do
+          @event.publish_schedule = false
+          @event.save
+        end
+
+        it 'shows the schedule' do
+          visit event_schedule_index_path(@event)
+
+          expect(page.body).to have_text(@item.name)
+        end
+
+        it 'shows the "Add Item" buttons on the schedule' do
+          has_add_item_button
+        end
+
+        it 'allows editing of schedule items' do
+          allows_editing
+        end
+
+        it 'has no "staff item" checkbox' do
+          visit event_schedule_edit_path(@event, @item)
+          expect(page.body).not_to have_css('input#schedule_staff_item')
+        end
       end
 
       context 'staff notifications' do
@@ -358,24 +389,27 @@ describe 'Editing a Schedule Item', type: :feature do
         end
       end
 
-      context 'unpublished schedule' do
+      context 'editing staff items' do
         before do
-          @event.publish_schedule = false
-          @event.save
+          @item.staff_item = true
+          @item.save
         end
 
-        it 'shows the schedule' do
-          visit event_schedule_index_path(@event)
+        context 'within schedule lock time' do
+          before do
+            lead_time = Setting.Site['lock_staff_schedule'].to_time
+            @event.start_date = Date.current + lead_time - 1.day
+            @event.end_date = @event.start_date + 5.days
+            @event.save
+          end
 
-          expect(page.body).to have_text(@item.name)
-        end
+          it 'does not allow editing' do
+            visit event_schedule_edit_path(@event, @item)
+            expect(page).not_to have_button('Update Schedule')
+          end
 
-        it 'shows the "Add Item" buttons on the schedule' do
-          has_add_item_button
-        end
-
-        it 'allows editing of schedule items' do
-          allows_editing
+          it 'shows an explanatory message'
+          it 'offers contact info for changing the item'
         end
       end
     end

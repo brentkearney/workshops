@@ -5,7 +5,6 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class InvitationsController < ApplicationController
-
   def index
     redirect_to invitations_new_path
   end
