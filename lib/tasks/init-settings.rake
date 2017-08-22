@@ -46,6 +46,7 @@ namespace :ws do
         'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor', 'Ph.D. Student', 'Masters Student', 'Undergraduate Student', 'K-12 Teacher', 'K-12 Student', 'Other'],
         'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'],
         'rsvp_expiry' => '2.weeks',
+        'lock_staff_schedule' => '15.days',
         'LECTURES_API_KEY' => 'Example-ChangeMe',
         'EVENTS_API_KEY' => 'Example-ChangeMe'
       }
@@ -59,6 +60,7 @@ namespace :ws do
           'secretary' => 'organization-secretary@example.com',
           'administrator' => 'organization-administrator@example.com',
           'director' => 'organization-director@example.com',
+          'station_manager' => 'stnmgr@example.com',
           'videos' => 'videos@example.com',
           'schedule_staff' => 'barista@example.com, photographer@example.com',
           'event_updates' => 'webmaster@example.com, communications@example.com',

@@ -6,6 +6,7 @@
 
 class ScheduleController < ApplicationController
   before_action :set_schedule, only: [:show, :update, :destroy]
+  before_action :set_lock_time, only: [:new, :edit, :update, :create]
   before_action :set_event, :set_attendance, :set_time_zone
 
   before_filter :authenticate_user!, except: [:index]
@@ -92,7 +93,6 @@ class ScheduleController < ApplicationController
   # PATCH/PUT /event/:event_id/schedule/1
   # PATCH/PUT /event/:event_id/schedule/1.json
   def update
-    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
     authorize @schedule
     original_item = @schedule.dup
     original_lecture = original_item.lecture
@@ -105,8 +105,6 @@ class ScheduleController < ApplicationController
       staff_item = schedule_params[:staff_item] || false
       merged_params['staff_item'] = staff_item
     end
-    Rails.logger.debug "Merged params: #{merged_params.inspect}"
-
     @day = @schedule.start_time.to_date
 
     if session[:return_to]
@@ -143,7 +141,6 @@ class ScheduleController < ApplicationController
           render json: @schedule.errors, status: :unprocessable_entity
         end
       end
-      Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
     end
   end
 
@@ -171,6 +168,10 @@ class ScheduleController < ApplicationController
   end
 
   private
+
+  def set_lock_time
+    @lock_time = Setting.Site['lock_staff_schedule'].to_duration
+  end
 
   def prefill_lecture_fields
     @schedule.name = @schedule.lecture.title

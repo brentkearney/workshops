@@ -14,13 +14,9 @@ class SchedulePolicy
     @event = @schedule.event
   end
 
-  # set or unset the staff_item field
+  # permission to change the staff_item field
   def update_staff_item?
-    Rails.logger.debug "schedule policy.update_staff_item? called!"
-
-    answer = staff_or_admin
-    Rails.logger.debug "staff_or_admin returned: #{answer}"
-    answer
+    staff_or_admin
   end
 
   def update?
@@ -46,7 +42,7 @@ class SchedulePolicy
 
   def within_lock_staff_schedule
     return true unless @schedule.staff_item
-    Date.current + Setting.Site['lock_staff_schedule'].to_time <
+    Date.current + Setting.Site['lock_staff_schedule'].to_duration <
       @event.start_date
   end
 

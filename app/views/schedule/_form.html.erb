@@ -80,7 +80,8 @@
     <div class="form-group checkbox">
       <%= f.label :staff_item %>:
       <label>
-        <%= f.check_box :staff_item %> check this box to prevent non-staff from changing this item within <%= distance_of_time_in_words(Setting.Site['lock_staff_schedule']) %> of the event.
+        <%= f.check_box :staff_item %> check this box to prevent non-staff from changing this item within
+        <%= distance_of_time_in_words(@lock_time) %> of the event.
       </label>
     </div>
     <% end %>
@@ -93,8 +94,8 @@
           <%= link_to "Back to Schedule", event_schedule_index_path(@event), class: 'btn btn-sm btn-default' %>
           <% if f.object.new_record? %>
             | <%= f.submit 'Add New Schedule Item', class: 'btn btn-sm btn-default' %>
-          <% elsif policy(@schedule).update? %>
-            | <%= f.submit 'Update Schedule', class: 'btn btn-sm btn-default' %>
+          <% else %>
+            | <%= render partial: 'update_button', locals: { form: f } %>
           <% end %>
       </div>
 

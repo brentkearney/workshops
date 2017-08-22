@@ -6,8 +6,8 @@
 
 # Helper extensions to String class
 class String
-  # Convert strings like "3.days" into Time objects (via Integer)
-  def to_time
+  # Convert strings like "3.days" into Durations (via Integer)
+  def to_duration
     super unless self =~ /\A\d+\.\w+\z/
     parts = split('.')
     parts.first.to_i.send(parts.last)

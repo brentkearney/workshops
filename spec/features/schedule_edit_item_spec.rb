@@ -397,7 +397,7 @@ describe 'Editing a Schedule Item', type: :feature do
 
         context 'within schedule lock time' do
           before do
-            lead_time = Setting.Site['lock_staff_schedule'].to_time
+            lead_time = Setting.Site['lock_staff_schedule'].to_duration
             @event.start_date = Date.current + lead_time - 1.day
             @event.end_date = @event.start_date + 5.days
             @event.save
@@ -408,8 +408,17 @@ describe 'Editing a Schedule Item', type: :feature do
             expect(page).not_to have_button('Update Schedule')
           end
 
-          it 'shows an explanatory message'
-          it 'offers contact info for changing the item'
+          it 'shows an explanatory message' do
+            visit event_schedule_edit_path(@event, @item)
+            expect(page).to have_css('p#staff_item_locked')
+          end
+
+          it 'offers contact info for changing the item' do
+            visit event_schedule_edit_path(@event, @item)
+            station_manager = Setting.Emails[@event.location]['station_manager']
+            expect(page).to have_link('Request Change')
+            expect(page.body).to include("mailto:#{station_manager}")
+          end
         end
       end
     end

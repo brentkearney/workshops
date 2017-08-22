@@ -4,8 +4,8 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
+# Helpers for schedule pages
 module ScheduleHelper
-
   def schedule_link item
     link_text = ''
     item.lecture.nil? ? link_class = 'schedule-item' : link_class = 'lecture-item'
@@ -27,11 +27,11 @@ module ScheduleHelper
       link_text += "\n<div class=\"item-description\" id=\"description-#{item[:id]}\">#{item[:description]}</div>".html_safe
     end
 
-    return link_text.html_safe
+    link_text.html_safe
   end
 
   def skip_day?(day)
-    day == @event.days.first && @current_user && @current_user.is_staff? && @event.location == 'BIRS'
+    day == @event.days.first && @current_user && @current_user.is_staff? &&
+      @event.location == 'BIRS'
   end
-
 end
