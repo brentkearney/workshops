@@ -327,6 +327,23 @@ RSpec.describe ScheduleController, type: :controller do
 
           expect(@s_schedule.name).to eq('Yes')
         end
+
+        it 'preserves the staff_item attribute value' do
+          expect(@s_schedule.staff_item).to be(true)
+          put :update, event_id: @s_event.id, id: @s_schedule.to_param,
+                       schedule: @s_schedule.attributes.merge('name' => 'New')
+          @s_schedule.reload
+
+          expect(@s_schedule.staff_item).to be(true)
+
+          @s_schedule.staff_item = false
+          @s_schedule.save
+          put :update, event_id: @s_event.id, id: @s_schedule.to_param,
+                       schedule: @s_schedule.attributes.merge('name' => 'Foo')
+          @s_schedule.reload
+
+          expect(@s_schedule.staff_item).to be(false)
+        end
       end
 
       context 'as an organizer inside of locked time' do
