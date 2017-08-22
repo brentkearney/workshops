@@ -12,7 +12,8 @@ describe 'DefaultSchedule' do
     @event = create(:event)
     authenticate_user # sets @user & @person
     @user.member!
-    @membership = create(:membership, event: @event, person: @person, role: 'Organizer')
+    @membership = create(:membership, event: @event, person: @person,
+                                      role: 'Organizer')
   end
 
   after do
@@ -27,29 +28,33 @@ describe 'DefaultSchedule' do
 
   context 'If there is NO Template Schedule in the database' do
     before(:all) do
-      Event.where(:template => true).each do |template_event|
-        template_event.destroy!
-      end
+      Event.where(template: true).destroy_all
       membership = @event.memberships.first
       expect(membership.role).to eq('Organizer')
     end
 
     it 'does not add any items to the event\'s schedule' do
-      schedules = DefaultSchedule.new(@event, @user).schedules
-      expect(schedules).to be_empty
+      expect(DefaultSchedule.new(@event, @user).schedules).to be_empty
     end
   end
 
   context 'If there is a Template Schedule in the database' do
     before(:all) do
       @tevent = create(:event_with_schedule,
-        code: '15w0001',
-        name: 'Testing Schedule Template event',
-        event_type: @event.event_type,
-        start_date: '2015-01-04',
-        end_date: '2015-01-09',
-        template: true
+                       code: '15w0001',
+                       name: 'Testing Schedule Template event',
+                       event_type: @event.event_type,
+                       start_date: '2015-01-04',
+                       end_date: '2015-01-09',
+                       template: true
       )
+      @tevent.schedules.each do |s|
+        s.staff_item = true
+        s.save
+      end
+      @not_staff_item = @tevent.schedules.last
+      @not_staff_item.staff_item = false
+      @not_staff_item.save
     end
 
     context 'And the user IS an organizer of the event' do
@@ -77,28 +82,50 @@ describe 'DefaultSchedule' do
         before(:each) do
           @event.schedules.delete_all
           expect(@tevent.schedules).not_to be_empty
+          DefaultSchedule.new(@event, @user)
         end
 
         it 'copies schedule items from the template event' do
-          expect(@event.schedules).to be_empty
-          expect(@tevent.schedules).not_to be_empty
-
-          ds = DefaultSchedule.new(@event, @user)
-          expect(@event.schedules).not_to be_empty
+          expect(@event.schedules.count).to eq(@tevent.schedules.count)
         end
 
-        it 'changes the dates of the template event schedules to match the given event' do
-          expect(@event.schedules).to be_empty
-          expect(@tevent.schedules).not_to be_empty
-          ds = DefaultSchedule.new(@event, @user)
-
+        it 'changes the template schedule dates to match the given event' do
           @tevent.schedules.each do |t_item|
-            e_item = @event.schedules.select {|i| i.name == t_item.name }.first
+            e_item = @event.schedules.select { |i| i.name == t_item.name }.first
             expect(e_item.start_time.hour).to eq(t_item.start_time.hour)
             expect(e_item.start_time.min).to eq(t_item.start_time.min)
             expect(e_item.end_time.hour).to eq(t_item.end_time.hour)
             expect(e_item.end_time.min).to eq(t_item.end_time.min)
           end
+        end
+
+        it 'preserves the "staff_item" attribute for added items' do
+          @event.schedules.each do |s|
+            if s.name == @not_staff_item.name
+              expect(s.staff_item).to be(false)
+            else
+              expect(s.staff_item).to be(true)
+            end
+          end
+        end
+      end
+
+      context 'If the event has only "Default Schedule" items' do
+        before do
+          @event.schedules.delete_all
+          item = build(:schedule, name: 'Default item', event_id: @event.id,
+            start_time: (@event.start_date + 2.days).to_time
+              .change(hour: 9),
+            end_time: (@event.start_date + 2.days).to_time.change(hour: 10),
+            updated_by: 'Default Schedule'
+          )
+          @event.schedules.create(item.attributes)
+        end
+
+        it 'reloads template event schedule' do
+          expect(@event.schedules.count).to eq(1)
+          DefaultSchedule.new(@event, @user)
+          expect(@event.schedules.count).to eq(@tevent.schedules.count)
         end
       end
     end
@@ -117,10 +144,9 @@ describe 'DefaultSchedule' do
         expect(@event.schedules).to be_empty
         expect(@tevent.schedules).not_to be_empty
 
-        ds = DefaultSchedule.new(@event, @user)
+        DefaultSchedule.new(@event, @user)
         expect(@event.schedules).to be_empty
       end
     end
   end
-
 end
