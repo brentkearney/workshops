@@ -42,8 +42,8 @@ class SchedulePolicy
 
   def within_lock_staff_schedule
     return true unless @schedule.staff_item
-    Date.current + Setting.Site['lock_staff_schedule'].to_duration <
-      @event.start_date
+    Date.current + Setting.Locations[@event.location]['lock_staff_schedule']
+                   .to_duration < @event.start_date
   end
 
   def event_organizer

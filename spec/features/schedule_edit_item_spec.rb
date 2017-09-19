@@ -397,7 +397,8 @@ describe 'Editing a Schedule Item', type: :feature do
 
         context 'within schedule lock time' do
           before do
-            lead_time = Setting.Site['lock_staff_schedule'].to_duration
+            lc = @event.location
+            lead_time = Setting.Locations[lc]['lock_staff_schedule'].to_duration
             @event.start_date = Date.current + lead_time - 1.day
             @event.end_date = @event.start_date + 5.days
             @event.save

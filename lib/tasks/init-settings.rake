@@ -43,10 +43,11 @@ namespace :ws do
         'sysadmin_email' => 'sysadmin@example.com',
         'event_types' => ['5 Day Workshop', '2 Day Workshop', 'Research in Teams', 'Focussed Research Group', 'Summer School', 'Public Lecture'],
         'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
-        'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor', 'Ph.D. Student', 'Masters Student', 'Undergraduate Student', 'K-12 Teacher', 'K-12 Student', 'Other'],
+        'academic_status' => ["Professor Emeritus", "Professor", "Associate Professor", "Assistant Professor",
+                              "Post Doctoral Fellow", "Medical Doctor", "Ph.D. Student", "Masters Student",
+                              "Undergraduate Student", "K-12 Teacher", "K-12 Student", "Other"],
         'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'],
         'rsvp_expiry' => '2.weeks',
-        'lock_staff_schedule' => '15.days',
         'LECTURES_API_KEY' => 'Example-ChangeMe',
         'EVENTS_API_KEY' => 'Example-ChangeMe'
       }
@@ -79,7 +80,8 @@ namespace :ws do
           'Name' => 'Example Organization',
           'Country' => 'Canada',
           'Timezone' => 'Mountain Time (US & Canada)',
-          'Address' => "123 Example Street\nExampletown, Exampleton"
+          'Address' => "123 Example Street\nExampletown, Exampleton",
+          'lock_staff_schedule' => '15.days'
         }
       }
     end

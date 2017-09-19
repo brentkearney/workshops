@@ -34,15 +34,15 @@ describe 'Event Show Page', type: :feature do
   def shows_full_details
     shows_partial_details
     expect(page.body).to have_text(@event.short_name)
-    expect(page.body).to have_text(@event.door_code)
-    expect(page.body).to have_text(@event.max_participants)
+    expect(page.body).to have_text("Door Access Code: #{@event.door_code}")
+    expect(page.body).to have_text("Max participants: #{@event.max_participants}")
     expect(page.body).to have_text(@event.booking_code)
   end
 
   def hides_some_details
-    expect(page.body).not_to have_text(@event.door_code)
+    expect(page.body).not_to have_text("Door Access Code: #{@event.door_code}")
     expect(page.body).not_to have_text(@event.booking_code)
-    expect(page.body).not_to have_text(@event.max_participants)
+    expect(page.body).not_to have_text("Max participants: #{@event.max_participants}")
   end
 
   def has_no_edit_button

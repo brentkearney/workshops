@@ -5,9 +5,9 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class ScheduleController < ApplicationController
+  before_action :set_event, :set_attendance, :set_time_zone
   before_action :set_schedule, only: [:show, :update, :destroy]
   before_action :set_lock_time, only: [:new, :edit, :update, :create]
-  before_action :set_event, :set_attendance, :set_time_zone
 
   before_filter :authenticate_user!, except: [:index]
   after_filter :flash_notice, only: [:create, :update, :edit]
@@ -170,7 +170,8 @@ class ScheduleController < ApplicationController
   private
 
   def set_lock_time
-    @lock_time = Setting.Site['lock_staff_schedule'].to_duration
+    location = @event.location
+    @lock_time = Setting.Locations[location]['lock_staff_schedule'].to_duration
   end
 
   def prefill_lecture_fields

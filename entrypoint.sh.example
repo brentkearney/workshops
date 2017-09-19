@@ -3,16 +3,32 @@ set -e
 
 echo
 echo "Setting system timezone..."
-dpkg-reconfigure -f noninteractive tzdata
+export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
+echo "tzdata tzdata/Areas select America" > /tmp/tz.txt
+echo "tzdata tzdata/Zones/America select Edmonton" >> /tmp/tz.txt
+debconf-set-selections /tmp/tz.txt
+rm /etc/timezone
+rm /etc/localtime
+dpkg-reconfigure --frontend noninteractive tzdata
+
+# First-time run only: setup RVM + 2.4.1
+# echo
+# echo "Create gemset..."
+# bash -lc 'rvm --default use ruby-2.4.1'
+# gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+# /usr/bin/curl -sSL https://get.rvm.io | bash -s stable
+# /usr/local/rvm/bin/rvm gemset create ruby-2.4.1
+# /usr/local/rvm/bin/rvm 2.4.1@ruby-2.4.1
+# /usr/local/rvm/bin/rvm reload
 
 echo
 echo "Installing latest bundler..."
-/usr/local/rvm/bin/rvm-exec 2.4.0 gem install bundler
-/usr/local/rvm/bin/rvm-exec 2.4.0 gem install rubygems-bundler
+/usr/local/rvm/bin/rvm-exec 2.4.1 gem install bundler
+/usr/local/rvm/bin/rvm-exec 2.4.1 gem install rubygems-bundler
 
 echo
 echo "Bundle install..."
-RAILS_ENV=development ./bin/bundle install
+RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.4.1 bundle install
 
 # Remove after first run
 echo

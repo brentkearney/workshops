@@ -1,6 +1,8 @@
 # See: https://github.com/phusion/passenger-docker
 # Latest image versions: https://github.com/phusion/passenger-docker/blob/master/Changelog.md
-FROM phusion/passenger-ruby22:0.9.20
+FROM phusion/passenger-full:0.9.24
+
+ENV HOME /root
 
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
@@ -8,11 +10,10 @@ CMD ["/sbin/my_init"]
 RUN apt-get update -qq && apt-get install --yes pkg-config apt-utils \
   build-essential cmake automake && apt-get upgrade --fix-missing --yes \
   --allow-remove-essential -o Dpkg::Options::="--force-confold"
-RUN apt-get install --yes udev locales curl git gnupg ca-certificates \
+RUN apt-get install --yes tzdata udev locales curl git gnupg ca-certificates \
   zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev libxslt-dev \
   libxslt1-dev libqtwebkit4 libqt4-dev xvfb gnupg libpq-dev nodejs wget \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
   apt-key add -
 
@@ -22,30 +23,29 @@ ENV LANG en_CA.utf8
 ENV LANGUAGE en_CA:en
 ENV LC_ALL en_CA.utf8
 
-RUN ln -sf /usr/share/zoneinfo/America/Edmonton /etc/localtime
-RUN echo 'export PATH=$PATH:/usr/local/rvm/bin:/usr/local/rvm/rubies/ruby-2.4.0/bin:/usr/local/rvm/gems/ruby/2.4.0/bin:./bin' > ~/.bashrc
-
-# Update RVM
-RUN /usr/bin/gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-RUN /usr/bin/curl -sSL https://rvm.io/mpapis.asc | gpg --import -
-RUN /usr/bin/curl https://keybase.io/mpapis/pgp_keys.asc | gpg --import
-RUN /usr/local/rvm/bin/rvm get stable --auto-dotfiles
-RUN /usr/local/rvm/bin/rvm install 2.4.0
-RUN /usr/local/rvm/bin/rvm remove 2.2.5
-RUN bash -lc 'rvm --default use ruby-2.4.0'
+# Use Ruby 2.4.1
+RUN /usr/local/rvm/bin/rvm remove jruby-9.1.2.0
+RUN /usr/local/rvm/bin/rvm remove ruby-2.0.0-p648
+RUN /usr/local/rvm/bin/rvm remove ruby-2.1.9
+RUN /usr/local/rvm/bin/rvm remove ruby-2.2.5
+RUN /usr/local/rvm/bin/rvm remove ruby-2.3.3
+RUN bash -lc 'rvm --default use ruby-2.4.1'
 RUN /usr/local/rvm/bin/rvm all do gem regenerate_binstubs
 RUN /usr/local/rvm/bin/rvm reload && /usr/local/rvm/bin/rvm repair all
-RUN /usr/local/rvm/bin/rvm wrapper ruby --no-prefix --all
+RUN /usr/local/rvm/bin/rvm wrapper 2.4.1 --no-prefix --all
 
-# Local machine uses 999 for docker user
+RUN echo 'export PATH=$PATH:/usr/local/rvm/bin:./bin:/usr/local/rvm/rubies/ruby-2.4.1/bin:/usr/local/rvm/gems/ruby-2.4.1/bin' > ~/.bashrc
+
 ENV APP_HOME /home/app/workshops
 ADD . $APP_HOME
-RUN /usr/sbin/usermod -u 999 app
-RUN chown app -R $APP_HOME
 WORKDIR $APP_HOME
+RUN rm docker-compose.yml
+RUN rm Dockerfile
+RUN chown app -R ./
 
 EXPOSE 80 443
 ADD entrypoint.sh /sbin/
+RUN rm entrypoint.sh
 RUN chmod 755 /sbin/entrypoint.sh
 RUN mkdir -p /etc/my_init.d
 RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
