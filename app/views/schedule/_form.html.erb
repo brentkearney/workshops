@@ -99,7 +99,7 @@
           <% end %>
       </div>
 
-      <% unless f.object.new_record? %>
+      <% if policy(@schedule).destroy? && !f.object.new_record? %>
       <div class="form-group">
           <%= link_to 'Delete Schedule Item', event_schedule_path(@event, @schedule), method: :delete, class: 'btn btn-sm btn-default', data: { confirm: "Are you sure you want to remove #{@schedule.name}?" } %>
       </div>

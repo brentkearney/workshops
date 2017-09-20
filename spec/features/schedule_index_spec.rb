@@ -9,7 +9,7 @@ require 'rails_helper'
 describe 'Schedule Index', type: :feature do
   before do
     authenticate_user
-    @event = create(:event)
+    @event = create(:event, future: true)
     @template_event = build_schedule_template(@event.event_type)
   end
 
@@ -21,6 +21,8 @@ describe 'Schedule Index', type: :feature do
     @event.schedules.destroy_all
     visit(event_schedule_index_path(@event))
 
+    @event.reload
+    expect(@event.schedules).not_to be_empty
     @template_event.schedules.each do |item|
       expect(page.body).to have_text(item.name)
     end
@@ -66,6 +68,7 @@ describe 'Schedule Index', type: :feature do
 
   context 'Organizers of event' do
     before do
+      @user.member!
       create(:membership, event: @event,
                           person: @user.person,
                           role: 'Organizer')
@@ -77,6 +80,44 @@ describe 'Schedule Index', type: :feature do
 
     it 'reloads the template schedule if no schedule changes have been made' do
       reloads_template_schedule
+    end
+
+    it 'has delete buttons on schedule items' do
+      @event.schedules.destroy_all
+
+      visit(event_schedule_index_path(@event))
+      @event.reload
+      expect(@event.schedules).not_to be_empty
+
+      @event.schedules.each do |item|
+        item_path = "/events/#{@event.code}/schedule/#{item.id}"
+        delete_link = page.find(:xpath, "//a[@href='#{item_path}'
+          and @data-method='delete']")
+        expect(delete_link).not_to be_nil
+      end
+    end
+
+    it 'has no delete buttons on staff items when current time is within lock
+      period' do
+      @event.schedules.destroy_all
+
+      lc = @event.location
+      lead_time = Setting.Locations[lc]['lock_staff_schedule'].to_duration
+      @event.start_date = Date.current + lead_time - 3.days
+      @event.end_date = @event.start_date + 5.days
+      @event.save
+      @event.reload
+      # puts "Event: #{@event.inspect}"
+
+      visit(event_schedule_index_path(@event))
+      @event.reload
+      expect(@event.schedules).not_to be_empty
+
+      @event.schedules.each do |item|
+        item_path = "/events/#{@event.code}/schedule/#{item.id}"
+        expect(page).to have_no_selector(:xpath, "//a[@href='#{item_path}'
+          and @data-method='delete']")
+      end
     end
   end
 

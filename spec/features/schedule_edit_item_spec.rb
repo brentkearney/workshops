@@ -420,6 +420,11 @@ describe 'Editing a Schedule Item', type: :feature do
             expect(page).to have_link('Request Change')
             expect(page.body).to include("mailto:#{station_manager}")
           end
+
+          it 'has no delete button' do
+            visit event_schedule_edit_path(@event, @item)
+            expect(page).not_to have_link('Delete Schedule Item')
+          end
         end
       end
     end

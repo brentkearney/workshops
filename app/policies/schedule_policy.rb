@@ -20,7 +20,11 @@ class SchedulePolicy
   end
 
   def update?
-    staff_or_admin || (event_organizer && within_lock_staff_schedule)
+    staff_or_unlocked_organizers
+  end
+
+  def destroy?
+    staff_or_unlocked_organizers
   end
 
   def edit_staff_items?
@@ -38,6 +42,10 @@ class SchedulePolicy
     else
       event_organizer || staff_or_admin
     end
+  end
+
+  def staff_or_unlocked_organizers
+    staff_or_admin || (event_organizer && within_lock_staff_schedule)
   end
 
   def within_lock_staff_schedule

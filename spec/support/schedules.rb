@@ -13,7 +13,8 @@ def build_schedule_template(event_type)
                .change(hour: hour, min: 30)
     name = "Template Item at #{hour}"
     create(:schedule, event: template_event, start_time: start_time,
-                      end_time: end_time, name: name, updated_by: 'Staff')
+                      end_time: end_time, name: name, updated_by: 'Staff',
+                      staff_item: true)
   end
   template_event
 end
