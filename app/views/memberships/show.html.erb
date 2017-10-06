@@ -4,37 +4,37 @@
 <div id="profile-pic" class="col-md-3"><%= profile_pic(@membership.person) %></div>
 
 <div class="col-md-9 profile">
-	<div class="row profile-name"><%= @membership.person.name %></div>
-	<div class="row profile-affil"><%= @membership.person.affil_with_title %></div>
+	<div class="row" id="profile-name"><%= @membership.person.name %></div>
+	<div class="row" id="profile-affil"><%= @membership.person.affil_with_title %></div>
 	<% if policy(@membership).use_email_address? %>
-	<div class="row profile-email"><%= mail_to @membership.person.email %></div>
+	<div class="row" id="profile-email"><%= mail_to @membership.person.email %></div>
 	<% end %>
 	<% unless @membership.person.url.blank? %>
-	<div class="row profile-url"><%= link_to @membership.person.uri, @membership.person.uri %></div>
+	<div class="row" id="profile-url"><%= link_to @membership.person.uri, @membership.person.uri %></div>
 	<% end %>
 
-  <div class="row profile-attendance">
+  <div class="row" id="profile-attendance">
     <strong>Attendance:</strong>
     <%= @membership.attendance %>
   </div>
 
-  <div class="row profile-role">
+  <div class="row" id="profile-role">
     <strong>Role:</strong>
     <%= @membership.role %>
   </div>
 
   <% if policy(@membership).view_details? %>
-  <div class="row pofile-arrival">
+  <div class="row" id="profile-arrival">
 	 <strong>Arriving on:</strong>
 	 <%= @membership.arrives %>
 	</div>
 
-	<div class="row profile-departure">
+	<div class="row" id="profile-departure">
 	 <strong>Departing on:</strong>
 	 <%= @membership.departs %>
 	</div>
 
-	<div class="row profile-replied-at">
+	<div class="row" id="profile-replied-at">
 	 <strong>RSVP date:</strong>
 	 <%= @membership.rsvp_date %>
 	</div>

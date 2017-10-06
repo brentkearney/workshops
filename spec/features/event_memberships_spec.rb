@@ -15,8 +15,12 @@ describe 'Event Membership Page', type: :feature do
     @non_member_user = create(:user)
   end
 
-  after(:each) do
-    Warden.test_reset!
+  # after(:each) do
+  #   Warden.test_reset!
+  # end
+
+  def links_to_profile(member)
+    expect(page).to have_link(nil, href: event_membership_path(@event, member))
   end
 
   def does_not_list_members
@@ -53,36 +57,25 @@ describe 'Event Membership Page', type: :feature do
     expect(page.body).not_to have_css('a', text: 'Email Confirmed Members')
   end
 
-  def shows_basic_info(member)
-    expect(page.body).to have_css('div.profile-name', text: member.person.name)
-    expect(page.body).to have_css('div.profile-affil',
-                                  text: member.person.affil_with_title)
-    expect(page.body).to have_css('div.profile-url', text: member.person.uri)
+  def links_to_confirmed_member_profiles
+    @event.memberships.select {|m| m.attendance == 'Confirmed'}.each do |member|
+      links_to_profile(member)
+    end
   end
 
-  def shows_limited_profile(member)
-    shows_basic_info(member)
-    expect(page.body).not_to have_text('Arriving on')
-    expect(page.body).not_to have_text('Departing on')
-    expect(page.body).not_to have_text('RSVP date')
-    expect(page.body).not_to have_text(member.rsvp_date)
-  end
-
-  def shows_full_profile(member)
-    shows_basic_info(member)
-    expect(page.body).to have_css('div.profile-email',
-                                  text: member.person.email)
-    expect(page.body).to have_text('Arriving on')
-    expect(page.body).to have_text(member.arrival_date.strftime('%b %-d, %Y'))
-    expect(page.body).to have_text('Departing on')
-    expect(page.body).to have_text(member.departure_date.strftime('%b %-d, %Y'))
-    expect(page.body).to have_text('RSVP date')
-    expect(page.body).to have_text(member.rsvp_date)
+  def links_to_all_member_profiles
+    @event.memberships.each do |member|
+      links_to_profile(member)
+    end
   end
 
   context 'As a not-logged in user' do
     before do
       visit event_memberships_path(@event)
+    end
+
+    it 'shows a list of confirmed participants' do
+      shows_confirmed_members
     end
 
     it 'does not show member email addresses' do
@@ -94,7 +87,12 @@ describe 'Event Membership Page', type: :feature do
     it 'hides email buttons' do
       hides_email_buttons
     end
+
+    it "has links to Confirmed participants' profiles" do
+      links_to_confirmed_member_profiles
+    end
   end
+
 
   context 'As a logged-in user who is not a member of the event' do
     before do
@@ -114,13 +112,11 @@ describe 'Event Membership Page', type: :feature do
       hides_nonconfirmed_members
     end
 
-    it 'clicking a member shows limited profile information, excludes email address' do
-      member = @event.memberships.where("role='Participant' AND attendance='Confirmed'").last
-      click_link "#{member.person.lname}"
-      shows_limited_profile(member)
-      expect(page.body).not_to have_text(member.person.email)
+    it "has links to Confirmed participants' profiles" do
+      links_to_confirmed_member_profiles
     end
   end
+
 
   context 'As a logged-in user who is a member of the event' do
     before do
@@ -140,11 +136,8 @@ describe 'Event Membership Page', type: :feature do
       hides_nonconfirmed_members
     end
 
-    it 'clicking a member shows limited profile information, but have_texts the email address' do
-      member = @event.memberships.where("role='Participant' AND attendance='Confirmed'").last
-      click_link "#{member.person.lname}"
-      shows_limited_profile(member)
-      expect(page.body).to have_text(member.person.email)
+    it "has links to Confirmed participants' profiles" do
+      links_to_confirmed_member_profiles
     end
   end
 
@@ -170,10 +163,8 @@ describe 'Event Membership Page', type: :feature do
       end
     end
 
-    it 'clicking a member shows full profile information' do
-      member = @event.memberships.where("role='Participant' AND attendance='Confirmed'").last
-      click_link "#{member.person.lname}"
-      shows_full_profile(member)
+    it "has links to all members' profiles" do
+      links_to_all_member_profiles
     end
   end
 
@@ -198,10 +189,8 @@ describe 'Event Membership Page', type: :feature do
         shows_email_buttons
       end
 
-      it 'clicking a member shows full profile information' do
-        member = @event.memberships.where("role='Participant' AND attendance='Confirmed'").last
-        click_link "#{member.person.lname}"
-        shows_full_profile(member)
+      it "has links to all members' profiles" do
+        links_to_all_member_profiles
       end
     end
 
@@ -220,12 +209,8 @@ describe 'Event Membership Page', type: :feature do
         hides_email_buttons
       end
 
-      it 'clicking a member shows limited profile information, excludes the email address' do
-        member = @event.memberships.where("role='Participant'
-          AND attendance='Confirmed'").last
-        click_link "#{member.person.lname}"
-        shows_limited_profile(member)
-        expect(page.body).not_to have_text(member.person.email)
+      it "has links to Confirmed participants' profiles" do
+        links_to_confirmed_member_profiles
       end
     end
   end
@@ -245,10 +230,8 @@ describe 'Event Membership Page', type: :feature do
       shows_email_buttons
     end
 
-    it 'clicking a member shows full profile information' do
-      member = @event.memberships.where("role='Participant' AND attendance='Confirmed'").last
-      click_link "#{member.person.lname}"
-      shows_full_profile(member)
+    it "has links to all members' profiles" do
+      links_to_all_member_profiles
     end
   end
 end

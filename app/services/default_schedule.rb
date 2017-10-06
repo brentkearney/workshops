@@ -35,6 +35,7 @@ class DefaultSchedule
     return unless empty_or_default
     template_event = Event.where(template: true, location: @event.location,
                                  event_type: @event.event_type).first
+
     return if template_event.nil?
 
     template_schedules = template_event.schedules.order(:start_time)
@@ -45,6 +46,7 @@ class DefaultSchedule
       template_schedules.each do |item|
         next if used_items.include?(item)
         next if item.start_time.wday != eday.wday
+
         @event.schedules.create!(item.attributes
           .merge(id: nil,
                  event_id: @event.id,

@@ -99,15 +99,13 @@ describe 'Schedule Index', type: :feature do
 
     it 'has no delete buttons on staff items when current time is within lock
       period' do
-      @event.schedules.destroy_all
-
       lc = @event.location
       lead_time = Setting.Locations[lc]['lock_staff_schedule'].to_duration
       @event.start_date = Date.current + lead_time - 3.days
       @event.end_date = @event.start_date + 5.days
       @event.save
-      @event.reload
-      # puts "Event: #{@event.inspect}"
+
+      @event.schedules.destroy_all
 
       visit(event_schedule_index_path(@event))
       @event.reload

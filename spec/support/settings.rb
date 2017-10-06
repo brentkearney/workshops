@@ -48,7 +48,7 @@ if Setting.find_by(var: 'Emails').blank?
   }
 end
 
-if Setting.find_by(var: 'Locations').blank?
+# if Setting.find_by(var: 'Locations').blank?
   Setting.Locations = {
     'EO' => {
       'Name' => 'Example Organization',
@@ -58,7 +58,7 @@ if Setting.find_by(var: 'Locations').blank?
       'lock_staff_schedule' => '15.days'
     }
   }
-end
+# end
 
 if Setting.find_by(var: 'Rooms').blank?
   Setting.Rooms = {
