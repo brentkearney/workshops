@@ -97,8 +97,7 @@ class ScheduleController < ApplicationController
     original_item = @schedule.dup
     original_lecture = original_item.lecture
 
-    merged_params = ScheduleItem.update(@schedule,
-                                        schedule_params
+    merged_params = ScheduleItem.update(@schedule, schedule_params
                                 .merge(updated_by: current_user.name))
 
     if policy(@schedule).update_staff_item?

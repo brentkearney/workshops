@@ -6,7 +6,13 @@
 
 module MembershipsHelper
   def show_roles(f)
-    f.select :role, Membership::ROLES, {}, { required: 'true', autofocus: 'true', class: 'form-control' }
+    f.select :role, Membership::ROLES, {},
+             required: 'true', autofocus: 'true', class: 'form-control'
+  end
+
+  def show_attendances(f)
+    f.select :attendance, Membership::ATTENDANCE,
+             { include_blank: false }, required: 'true', class: 'form-control'
   end
 
   def show_email(member)
@@ -34,5 +40,4 @@ module MembershipsHelper
     end
     column.html_safe
   end
-
 end

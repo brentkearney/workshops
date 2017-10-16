@@ -4,8 +4,6 @@
 	<h4><%= @event.dates %></h4>
 <% end %>
 
-<%= form_for([@event, @membership], :html => { :role => "form", :class => "form-horizontal" }) do |f| %>
-<%= render 'form', :f => f %>
-<% end %>
+<%= render 'form'%>
 
 </article>

@@ -65,14 +65,13 @@ describe 'Membership Show Page', type: :feature do
     expect(page.body).to have_css('div#profile-address')
     expect(page.body).to have_css('div#profile-billing')
     expect(page.body).to have_css('div#profile-special-info')
-    expect(page.body).to have_css('div#profile-guest')
+    expect(page.body).to have_css('div#profile-has-guest')
     expect(page.body).to have_css('div#profile-staff-notes')
-    expect(page.body).to have_css('div#profile-room-notes')
     expect(page.body).to have_css('div#profile-org-notes')
     expect(page.body).to have_css('div#profile-reviewed')
     expect(page.body).to have_css('div#profile-updated-by',
                                   text: member.updated_by)
-    expect(page.body).to have_text(member.updated_on)
+    expect(page.body).to have_text(member.updated_at)
   end
 
 

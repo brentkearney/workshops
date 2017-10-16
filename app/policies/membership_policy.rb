@@ -42,22 +42,28 @@ class MembershipPolicy
   end
 
   def use_email_address?
-    if @current_user
-      @current_user.is_organizer?(@event) || @current_user.is_admin? ||
-        (@current_user.staff? && @current_user.location == @event.location) ||
-        (@current_user.is_member?(@event) && @membership.share_email)
-    end
+    return false if @current_user.nil?
+    @current_user.is_organizer?(@event) || @current_user.is_admin? ||
+      (@current_user.staff? && @current_user.location == @event.location) ||
+      (@current_user.is_member?(@event) && @membership.share_email)
   end
 
   def view_details?
-    if @current_user
-      @current_user.is_organizer?(@event) || @current_user.is_admin? ||
-        (@current_user.staff? && @current_user.location == @event.location)
-    end
+    return false if @current_user.nil?
+    @current_user.is_organizer?(@event) || allow_staff_and_admins
   end
 
   def invite?
     allow_staff_and_admins
+  end
+
+  def staff_info?
+    allow_staff_and_admins
+  end
+
+  def allow_edit?
+    return false if @current_user.nil?
+    @membership.person == @current_user.person || allow_staff_and_admins
   end
 
   private
@@ -67,8 +73,7 @@ class MembershipPolicy
   end
 
   def allow_staff_and_admins
-    if @current_user
-      @current_user.is_admin?  || staff_at_location
-    end
+    return false if @current_user.nil?
+    @current_user.is_admin? || staff_at_location
   end
 end
