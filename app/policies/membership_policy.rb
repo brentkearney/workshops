@@ -15,7 +15,7 @@ class MembershipPolicy
 
   # Membership modification is not yet implemented
   def method_missing(name, *args)
-    allow_staff_and_admins
+    staff_and_admins
   end
 
   # Members cannot see memberships for events to which they
@@ -50,29 +50,41 @@ class MembershipPolicy
 
   def view_details?
     return false if @current_user.nil?
-    @current_user.is_organizer?(@event) || allow_staff_and_admins
+    @membership.person == @current_user.person ||
+      @current_user.is_organizer?(@event) || staff_and_admins
   end
 
   def invite?
-    allow_staff_and_admins
+    staff_and_admins
   end
 
   def staff_info?
-    allow_staff_and_admins
+    staff_and_admins
   end
 
   def allow_edit?
     return false if @current_user.nil?
-    @membership.person == @current_user.person || allow_staff_and_admins
+    @membership.person == @current_user.person || staff_and_admins
+  end
+
+  def view_org_notes?
+    return false if @current_user.nil?
+    organizer_and_staff
   end
 
   private
 
+  def organizer_and_staff
+    return false if @current_user.nil?
+    @current_user.is_organizer?(@event) || staff_and_admins
+  end
+
   def staff_at_location
+    return false if @current_user.nil?
     @current_user.staff? && @current_user.location == @event.location
   end
 
-  def allow_staff_and_admins
+  def staff_and_admins
     return false if @current_user.nil?
     @current_user.is_admin? || staff_at_location
   end

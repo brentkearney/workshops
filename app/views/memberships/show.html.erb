@@ -1,96 +1,110 @@
 <article>
 <h4><strong>Event Member:</strong></h4>
 
-<div id="profile-pic" class="col-md-3"><%= profile_pic(@person) %></div>
+<div class="row">
+  <div id="profile-pic" class="col-md-4"><%= profile_pic(@person) %></div>
 
-<div class="col-md-9 profile">
-	<div class="row" id="profile-name"><%= @person.name %></div>
-	<div class="row" id="profile-affil"><%= @person.affil_with_title %></div>
-	<% if policy(@membership).use_email_address? %>
-	<div class="row" id="profile-email"><%= mail_to @person.email %></div>
-	<% end %>
-	<% unless @person.url.blank? %>
-	<div class="row" id="profile-url"><%= link_to @person.uri, @person.uri %></div>
-	<% end %>
+  <div class="col-md-6 profile">
+  	<div class="row" id="profile-name"><%= @person.name %></div>
+  	<div class="row" id="profile-affil"><%= @person.affil_with_title %></div>
+  	<% if policy(@membership).use_email_address? %>
+  	<div class="row" id="profile-email"><%= mail_to @person.email %></div>
+  	<% end %>
+  	<% unless @person.url.blank? %>
+  	<div class="row" id="profile-url"><%= link_to @person.uri, @person.uri %></div>
+  	<% end %>
 
-  <% if policy(@membership).view_details? %>
-  <div class="row" id="profile-address">
-    <%= print_address(@person) %>
+    <% if policy(@membership).staff_info? %>
+    <div class="row" id="profile-address">
+      <%= print_address(@person) %>
+    </div>
+    <% end %>
   </div>
-  <% end %>
+</div><!-- row -->
 
-  <div class="row" id="profile-attendance">
-    <strong>Attendance:</strong>
-    <%= @membership.attendance %>
-  </div>
+<% if policy(@membership).view_details? %>
+<div class="row profile membership-details">
+  <div class="col-md-4">
+    <h3>Membership Details</h3>
+    <div class="row" id="profile-role">
+      <strong>Role:</strong>
+      <%= @membership.role %>
+    </div>
 
-  <div class="row" id="profile-role">
-    <strong>Role:</strong>
-    <%= @membership.role %>
-  </div>
+    <div class="row" id="profile-attendance">
+      <strong>Attendance:</strong>
+      <%= @membership.attendance %>
+    </div>
 
-  <% if policy(@membership).view_details? %>
-  <div class="row" id="profile-arrival">
-	 <strong>Arriving on:</strong>
-	 <%= @membership.arrives %>
-	</div>
+    <div class="row" id="profile-arrival">
+  	 <strong>Arriving on:</strong>
+  	 <%= @membership.arrives %>
+  	</div>
 
-	<div class="row" id="profile-departure">
-	 <strong>Departing on:</strong>
-	 <%= @membership.departs %>
-	</div>
+  	<div class="row" id="profile-departure">
+  	 <strong>Departing on:</strong>
+  	 <%= @membership.departs %>
+  	</div>
 
-	<div class="row" id="profile-replied-at">
-	 <strong>RSVP date:</strong>
-	 <%= @membership.rsvp_date %>
-	</div>
+  	<div class="row" id="profile-rsvp-date">
+  	 <strong>RSVP date:</strong>
+  	 <%= @membership.rsvp_date %>
+  	</div>
+
+    <% if policy(@membership).view_org_notes? %>
+    <div class="row" id="profile-org-notes">
+      <strong>Organizer Notes:</strong>
+      <p><%= @membership.org_notes %></p>
+    </div>
+    <% end %>
+  </div><!-- col-md-3 -->
   <% end %>
 
   <% if policy(@membership).staff_info? %>
-  <div class="row" id="profile-reviewed">
-   <strong>Reviewed:</strong> <%= @membership.reviewed ? 'Yes' : 'No' %>
-  </div>
+  <div class="col-md-4">
+    <h3>Hotel & Billing</h3>
+    <div class="row" id="profile-reviewed">
+     <strong>Reviewed:</strong> <%= @membership.reviewed ? 'Yes' : 'No' %>
+    </div>
 
-  <div class="row" id="profile-billing">
-    <strong>Billing:</strong>
-    <%= @membership.billing %>
-  </div>
+    <div class="row" id="profile-billing">
+      <strong>Billing:</strong>
+      <%= @membership.billing %>
+    </div>
 
-  <div class="row" id="profile-stay-id">
-    <strong>Hotel Stay Id:</strong>
-    <%= @membership.stay_id %>
-  </div>
+    <div class="row" id="profile-room">
+      <strong>Hotel Room:</strong>
+      <%= @membership.room %>
+    </div>
 
-  <div class="row" id="profile-special-info">
-    <strong>Special Info:</strong>
-    <p><%= @membership.special_info %></p>
-  </div>
+    <div class="row" id="profile-stay-id">
+      <strong>Hotel Stay Id:</strong>
+      <%= @membership.stay_id %>
+    </div>
 
-  <div class="row" id="profile-has-guest">
-    <strong>Has Guest:</strong> <%= @membership.has_guest ? 'Yes' : 'No' %>
-  </div>
+    <div class="row" id="profile-has-guest">
+      <strong>Has Guest:</strong> <%= @membership.has_guest ? 'Yes' : 'No' %>
+    </div>
 
-  <div class="row" id="profile-staff-notes">
-    <strong>Staff Notes:</strong>
-    <p><%= @membership.staff_notes %></p>
-  </div>
+    <div class="row" id="profile-special-info">
+      <strong>Special Info:</strong> <%= @membership.special_info %>
+    </div>
+
+    <div class="row" id="profile-staff-notes">
+      <strong>Staff Notes:</strong>
+      <p><%= @membership.staff_notes %></p>
+    </div>
+	</div><!-- col-md-4 profile -->
   <% end %>
+</div><!-- row -->
 
-  <% if policy(@membership).view_details? %>
-  <div class="row" id="profile-org-notes">
-    <strong>Organizer Notes:</strong>
-    <p><%= @membership.org_notes %></p>
-  </div>
+<div class="row" id="profile-updated-by">
+  <p>Updated by:
+    <%= @membership.updated_by %> on <%= @membership.updated_at %></p>
+</div>
 
-  <div class="row" id="profile-updated-by">
-    <strong>Updated by:</strong>
-    <p><%= @membership.updated_by %> on <%= @membership.updated_at %></p>
-  </div>
-
-  <% end %>
-
-	<div class="row" id="member-buttons">
-	<%= link_to "Back to #{@event.code}", event_memberships_path(@event),
+  <div class="row" id="member-buttons">
+  <%= link_to "Back to #{@event.code}", event_memberships_path(@event),
         class: 'btn btn-sm btn-default' %>
   <% if policy(@membership).allow_edit? %>
     <%= link_to "Edit Membership", edit_event_membership_path(@event, @membership),
@@ -99,10 +113,7 @@
           method: :delete, class: 'btn btn-sm btn-default',
           data: { confirm: "Are you sure you want to remove #{@person.name} from #{@event.code}?" } %>
   <% end %>
-	</div><!-- member-buttons -->
-
-	</div><!-- nested row -->
-
+  </div><!-- member-buttons -->
 </div><!-- right-side column -->
 </article>
 

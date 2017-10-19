@@ -23,7 +23,6 @@ describe 'Membership Show Page', type: :feature do
 
   def shows_basic_info(member)
     expect(page.body).to have_css('div#profile-name', text: member.person.name)
-    expect(page.body).to have_css('div#profile-role', text: member.role)
     expect(page.body).to have_css('div#profile-affil',
                                   text: member.person.affil_with_title)
     expect(page.body).to have_css('div#profile-url', text: member.person.uri)
@@ -31,10 +30,14 @@ describe 'Membership Show Page', type: :feature do
 
   def shows_limited_profile(member)
     shows_basic_info(member)
+    expect(page.body).not_to have_css('div#profile-address')
+    expect(page.body).not_to have_text('Attendance')
+    expect(page.body).not_to have_text('Role')
     expect(page.body).not_to have_text('Arriving on')
     expect(page.body).not_to have_text('Departing on')
     expect(page.body).not_to have_text('RSVP date')
     expect(page.body).not_to have_text(member.rsvp_date)
+    expect(page.body).not_to have_text('Organizer Notes')
   end
 
   def shows_limited_profile_without_email(member)
@@ -51,12 +54,16 @@ describe 'Membership Show Page', type: :feature do
     shows_basic_info(member)
     expect(page.body).to have_text(member.person.email)
 
+    expect(page.body).to have_css('div#profile-attendance',
+                                  text: member.attendance)
+    expect(page.body).to have_css('div#profile-role', text: member.role)
+
     arrival_date = member.arrival_date.strftime('%b %-d, %Y')
     expect(page.body).to have_css('div#profile-arrival', text: arrival_date)
 
     departure_date = member.departure_date.strftime('%b %-d, %Y')
     expect(page.body).to have_css('div#profile-departure', text: departure_date)
-    expect(page.body).to have_css('div#profile-replied-at',
+    expect(page.body).to have_css('div#profile-rsvp-date',
                                   text: member.rsvp_date)
   end
 
@@ -107,6 +114,17 @@ describe 'Membership Show Page', type: :feature do
     it 'shows a limited profile with email' do
       shows_limited_profile_with_email(@organizer)
     end
+
+    context 'viewing her own profile' do
+      it 'shows a limited profile with email and dates' do
+        visit event_membership_path(@event, @participant)
+        shows_limited_profile_with_email_and_dates(@participant)
+      end
+
+      it 'excludes organizer notes' do
+        expect(page.body).not_to have_css('div#profile-org-notes')
+      end
+    end
   end
 
 
@@ -120,6 +138,10 @@ describe 'Membership Show Page', type: :feature do
 
     it 'shows a limited profile with email and dates' do
       shows_limited_profile_with_email_and_dates(@participant)
+    end
+
+    it 'includes organizer notes' do
+      expect(page.body).to have_css('div#profile-org-notes')
     end
   end
 

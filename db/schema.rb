@@ -105,6 +105,7 @@ ActiveRecord::Schema.define(version: 20171016220447) do
     t.string   "stay_id"
     t.string   "billing"
     t.boolean  "reviewed",          default: false
+    t.string   "room"
   end
 
   add_index "memberships", ["event_id"], name: "index_memberships_on_event_id", using: :btree
