@@ -38,6 +38,8 @@ describe 'Membership Show Page', type: :feature do
     expect(page.body).not_to have_text('RSVP date')
     expect(page.body).not_to have_text(member.rsvp_date)
     expect(page.body).not_to have_text('Organizer Notes')
+    expect(page.body).not_to have_css('div#profile-updated-by',
+                                      text: member.updated_by)
   end
 
   def shows_limited_profile_without_email(member)

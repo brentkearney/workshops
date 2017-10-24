@@ -43,15 +43,32 @@ class MembershipPolicy
 
   def use_email_address?
     return false if @current_user.nil?
-    @current_user.is_organizer?(@event) || @current_user.is_admin? ||
-      (@current_user.staff? && @current_user.location == @event.location) ||
+    organizer_and_staff ||
       (@current_user.is_member?(@event) && @membership.share_email)
   end
 
+  def edit_person?
+    self_organizer_staff
+  end
+
+  def edit_membership?
+    staff_and_admins
+  end
+
+  def edit_dates?
+    staff_and_admins || @membership.person == @current_user.person
+  end
+
+  def edit_hotel?
+    staff_and_admins
+  end
+
+  def edit_organizer_notes?
+    organizer_and_staff
+  end
+
   def view_details?
-    return false if @current_user.nil?
-    @membership.person == @current_user.person ||
-      @current_user.is_organizer?(@event) || staff_and_admins
+    self_organizer_staff
   end
 
   def invite?
@@ -63,29 +80,32 @@ class MembershipPolicy
   end
 
   def allow_edit?
-    return false if @current_user.nil?
-    @membership.person == @current_user.person || staff_and_admins
+    self_organizer_staff
   end
 
   def view_org_notes?
-    return false if @current_user.nil?
     organizer_and_staff
   end
 
   private
+
+  def self_organizer_staff
+    return false if @current_user.nil?
+    organizer_and_staff || @membership.person == @current_user.person
+  end
 
   def organizer_and_staff
     return false if @current_user.nil?
     @current_user.is_organizer?(@event) || staff_and_admins
   end
 
+  def staff_and_admins
+    return false if @current_user.nil?
+    staff_at_location || @current_user.is_admin?
+  end
+
   def staff_at_location
     return false if @current_user.nil?
     @current_user.staff? && @current_user.location == @event.location
-  end
-
-  def staff_and_admins
-    return false if @current_user.nil?
-    @current_user.is_admin? || staff_at_location
   end
 end

@@ -1,5 +1,3 @@
-
-/* Membership#show */
 #profile-pic {
   margin: 8px 0;
 }
@@ -39,15 +37,10 @@
   width: 50px;
 }
 
-.invites {
-  font-weight: bold;
-  text-align: center;
+h3#personal {
+  margin-bottom: -15px;
 }
-
-td.invite {
-  vertical-align: middle;
-}
-
-td.invite a.invite-btn a:visited {
-  color: #fff;
+h3#membership, h3#hotel {
+  margin-top: 60px;
+  margin-bottom: 30px;
 }

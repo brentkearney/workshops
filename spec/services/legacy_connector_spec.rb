@@ -19,7 +19,7 @@
 
 require 'rails_helper'
 
-describe "LegacyConnector", :type => :feature do
+describe "LegacyConnector", type: :feature do
   before do
     @lc = LegacyConnector.new
   end
@@ -92,9 +92,8 @@ describe "LegacyConnector", :type => :feature do
 
   it '#get_members' do
     members = ['Workshop' => event1.code,
-               'Membership' => {role: 'Organizer', attendance: 'Confirmed'},
-               'Person' => {lastname: 'Smith', firstname: 'Agent'}
-    ]
+               'Membership' => { role: 'Organizer', attendance: 'Confirmed' },
+               'Person' => { lastname: 'Smith', firstname: 'Agent' }]
     stub_rest_client(:get, members)
 
     members = @lc.get_members(event1)
@@ -137,7 +136,9 @@ describe "LegacyConnector", :type => :feature do
     it 'fails gracefully with invalid event code' do
       stub_rest_client(:post, ['Invalid event_id'])
 
-      response = @lc.add_member(membership: membership1, event_code: 'foo', person: person, updated_by: 'RSpec Test')
+      response = @lc.add_member(membership: membership1,
+                                event_code: 'foo', person: person,
+                                updated_by: 'RSpec Test')
 
       expect(response.first).to include('Invalid event_id')
     end
@@ -145,7 +146,8 @@ describe "LegacyConnector", :type => :feature do
     it 'adds a member to given event' do
       stub_rest_client(:post, ['Added membership'])
 
-      response = @lc.add_member(membership: membership1, event_code: '16w5666', person: person, updated_by: 'RSpec Test')
+      response = @lc.add_member(membership: membership1, event_code: '16w5666',
+                                person: person, updated_by: 'RSpec Test')
 
       expect(response.last).to include('Added membership')
     end
@@ -153,7 +155,8 @@ describe "LegacyConnector", :type => :feature do
   end
 
   it '#get_lectures' do
-    stub_rest_client(:get, [{'legacy_id'=>'123', 'event_id'=>'16w5666', 'title' => 'An Exciting Talk'}])
+    stub_rest_client(:get, [{ 'legacy_id' => '123', 'event_id' => '16w5666',
+                              'title' => 'An Exciting Talk' }])
 
     lectures = @lc.get_lectures('16w5666')
 
@@ -162,7 +165,8 @@ describe "LegacyConnector", :type => :feature do
   end
 
   it '#get_lecture' do
-    stub_rest_client(:get, {'legacy_id'=>'123', 'event_id'=>'16w5666', 'title' => 'An Exciting Talk'})
+    stub_rest_client(:get, 'legacy_id' => '123', 'event_id' => '16w5666',
+                           'title' => 'An Exciting Talk')
 
     the_lecture = @lc.get_lecture(123)
 

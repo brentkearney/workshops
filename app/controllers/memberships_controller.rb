@@ -130,7 +130,8 @@ class MembershipsController < ApplicationController
   def membership_params
     params.require(:membership).permit(
       :id, :event_id, :person_id, :share_email, :role, :attendance,
-      :arrival_date, :departure_date, :updated_by,
+      :arrival_date, :departure_date, :reviewed, :billing, :room, :has_guest,
+      :special_info, :staff_notes, :org_notes,
       person_attributes: [:salutation, :firstname, :lastname, :email, :phone,
                           :gender, :affiliation, :department, :title, :url,
                           :academic_status, :research_areas, :biography, :id]

@@ -54,7 +54,7 @@
     <% if policy(@membership).view_org_notes? %>
     <div class="row" id="profile-org-notes">
       <strong>Organizer Notes:</strong>
-      <p><%= @membership.org_notes %></p>
+      <p><%= simple_format(@membership.org_notes) %></p>
     </div>
     <% end %>
   </div><!-- col-md-3 -->
@@ -87,21 +87,23 @@
     </div>
 
     <div class="row" id="profile-special-info">
-      <strong>Special Info:</strong> <%= @membership.special_info %>
+      <strong>Special Info:</strong> <%= simple_format(@membership.special_info) %>
     </div>
 
     <div class="row" id="profile-staff-notes">
       <strong>Staff Notes:</strong>
-      <p><%= @membership.staff_notes %></p>
+      <p><%= simple_format(@membership.staff_notes) %></p>
     </div>
 	</div><!-- col-md-4 profile -->
   <% end %>
 </div><!-- row -->
 
+<% if policy(@membership).view_details? %>
 <div class="row" id="profile-updated-by">
   <p>Updated by:
     <%= @membership.updated_by %> on <%= @membership.updated_at %></p>
 </div>
+<% end %>
 
   <div class="row" id="member-buttons">
   <%= link_to "Back to #{@event.code}", event_memberships_path(@event),

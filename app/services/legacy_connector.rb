@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Banff International Research Station
+  # Copyright (c) 2016 Banff International Research Station
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,13 @@ class LegacyConnector
 
   # get a list of events within a given date range
   def list_events(from_date, to_date)
-     JSON.parse(RestClient.get "#{@rest_url}/event_list",
-                {params: {year1: from_date, year2: to_date}})
+    JSON.parse((RestClient.get "#{@rest_url}/event_list",
+                               params: { year1: from_date, year2: to_date }))
   end
 
   # get data for specific events
   def get_event_data(event_id)
-    JSON.parse(RestClient.get "#{@rest_url}/event_data/#{event_id}")
+    JSON.parse((RestClient.get "#{@rest_url}/event_data/#{event_id}"))
   end
 
   # get event data for given year
@@ -109,38 +109,39 @@ class LegacyConnector
   end
 
   # update an event's members
-  def update_members(event_id, members)
-  end
+  def update_members(event_id, members); end
 
   # get an events lectures
   def get_lectures(event_id)
-    JSON.parse(RestClient.get "#{@rest_url}/event_lectures/#{event_id}")
+    JSON.parse((RestClient.get "#{@rest_url}/event_lectures/#{event_id}"))
   end
 
   def get_lecture(legacy_id)
-    JSON.parse(RestClient.get "#{@rest_url}/get_lecture/#{legacy_id}")
+    JSON.parse((RestClient.get "#{@rest_url}/get_lecture/#{legacy_id}"))
   end
 
   # get legacy_id of a given lecture
   def get_lecture_id(lecture)
-    day = lecture.start_time.strftime("%Y-%m-%d")
-    lecture_hash = JSON.parse(RestClient.get "#{@rest_url}/new_lecture_id/#{lecture.event.code}/#{day}/#{lecture.id}")
-    lecture_hash["legacy_id"].to_i
+    day = lecture.start_time.strftime('%Y-%m-%d')
+    u = "#{@rest_url}/new_lecture_id/#{lecture.event.code}/#{day}/#{lecture.id}"
+    lecture_hash = JSON.parse((RestClient.get u))
+    lecture_hash['legacy_id'].to_i
   end
 
   # add a lecture
   def add_lecture(lecture)
     event_id = lecture.event.code
     lecture.person_id = lecture.person.legacy_id
-    RestClient.post "#{@rest_url}/add_lecture/#{event_id}", lecture.to_json, content_type: :json, accept: :json
+    url = "#{@rest_url}/add_lecture/#{event_id}"
+    RestClient.post url, lecture.to_json, content_type: :json, accept: :json
     get_lecture_id(lecture)
   end
 
   def delete_lecture(lecture_id)
-    JSON.parse(RestClient.get "#{@rest_url}/delete_lecture/#{lecture_id}")
+    JSON.parse((RestClient.get "#{@rest_url}/delete_lecture/#{lecture_id}"))
   end
 
   def check_rsvp(otp)
-    JSON.parse(RestClient.get "#{@rest_url}/check_rsvp/#{otp}")
+    JSON.parse((RestClient.get "#{@rest_url}/check_rsvp/#{otp}"))
   end
 end
