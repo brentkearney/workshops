@@ -4,6 +4,7 @@ require 'faker'
 
 FactoryGirl.define do
   sequence(:code) do |n|
+    n = 1 if n > 998
     DateTime.current.strftime("%y") + 'w5' + n.to_s.rjust(3, '0')
   end
   sequence(:start_date, 1) do |n|
