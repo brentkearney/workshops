@@ -8,6 +8,7 @@ require 'rails_helper'
 
 describe "ScheduleItem" do
   before do
+    Event.destroy_all
     @user = authenticate_user
     @event = create(:event)
     @person = create(:person)

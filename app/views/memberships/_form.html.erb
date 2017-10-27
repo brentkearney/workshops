@@ -20,8 +20,8 @@
 		<%= person.label :salutation, "Salutation: " %>
 	</div>
 	<div class="col-sm-2">
-		<%= person.select :salutation, Setting.Site['salutations'], {},
-			{ required: 'true', autofocus: 'true', class: 'form-control' } %>
+		<%= person.select :salutation, Setting.Site['salutations'],
+			{ include_blank: true}, { class: 'form-control' } %>
 	</div>
 	<div class="col-sm-7"></div>
 </div>
@@ -83,16 +83,18 @@
 		</div>
 	</div>
 
+	<% if policy(@membership).edit_personal_info? %>
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :gender, "Gender: " %>
 		</div>
 		<div class="col-sm-3">
-			<%= person.select :gender, {"Male" => "M", "Female" => "F"}, {},
-					{ required: 'true', autofocus: 'true', class: 'form-control' } %>
+			<%= person.select :gender, {"Male" => "M", "Female" => "F",
+				"Other" => "O"}, {}, { required: 'true', class: 'form-control' } %>
 		</div>
 		<div class="col-sm-6"></div>
 	</div>
+	<% end %>
 
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
@@ -121,16 +123,33 @@
 		</div>
 	</div>
 
+	<% if policy(@membership).edit_personal_info? %>
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= person.label :academic_status, "Academic Status: " %>
 		</div>
 		<div class="col-sm-3">
 			<%= person.select :academic_status, Setting.Site['academic_status'], {},
-					{ required: 'true', autofocus: 'true', class: 'form-control' } %>
+					{ class: 'form-control' } %>
 		</div>
 		<div class="col-sm-6"></div>
 	</div>
+
+	<div class="form-group">
+		<div class="col-sm-3 control-label">
+			<%= person.label :address, "Address: " %>
+		</div>
+		<div class="col-sm-9">
+			<%= person.text_field :address1, class: 'form-control', placeholder: 'Address line 1' %>
+			<%= person.text_field :address2, class: 'form-control', placeholder: 'Address line 2' %>
+			<%= person.text_field :address3, class: 'form-control', placeholder: 'Address line 3' %>
+			<%= person.text_field :city, class: 'form-control', placeholder: 'City' %>
+			<%= person.text_field :region, class: 'form-control', placeholder: 'Region' %>
+			<%= person.text_field :postal_code, class: 'form-control', placeholder: 'Postal Code' %>
+			<%= person.text_field :country, class: 'form-control', placeholder: 'Country' %>
+		</div>
+	</div>
+	<% end %>
 
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
@@ -228,6 +247,7 @@
 		<div class="col-sm-6"></div>
 	</div>
 <% end %>
+
 <% if policy(@membership).edit_organizer_notes? %>
 	<div class="form-group">
 		<div class="col-sm-3 control-label">

@@ -7,10 +7,8 @@
 require 'rails_helper'
 
 describe "SyncMembers" do
-  before :each do
+  before do
     Event.destroy_all
-    Membership.destroy_all
-    Person.destroy_all
   end
 
   it '.initialize' do

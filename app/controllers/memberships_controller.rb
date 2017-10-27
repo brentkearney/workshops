@@ -71,24 +71,24 @@ class MembershipsController < ApplicationController
     respond_to do |format|
       Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
       form_data = membership_params
-      Rails.logger.debug "Permitted params are: #{form_data.inspect}"
-      Rails.logger.debug "Membership id is: #{form_data['id']}"
-      # Rails.logger.debug "Person id is: #{form_data[person_attributes['id']]}"
+      Rails.logger.debug "form_data: #{form_data.inspect}\n\n"
+      person_data = form_data.delete(:person_attributes)
 
+      membership = Membership.find(@membership.id)
+      membership.assign_attributes(form_data)
+      form_data['updated_by'] = @current_user.name if membership.changed?
 
-      # membership = Membership.find(form_data['id'])
-      # membership.assign_attributes(form_data)
-      # membership.updated_by = @current_user.name if membership.changed?
-      # Rails.logger.debug "Membership is now: #{membership.inspect}"
+      person = Person.find(@membership.person_id)
+      person.assign_attributes(person_data)
+      if person.changed?
+        person_data['updated_by'] = @current_user.name
+        form_data['person_attributes'] = person_data
+      end
 
-      # person = Person.find(form_data[person_attributes['id']])
-      # person.assign_attributes(form_data)
-      # person.updated_by = @current_user.name if person.changed?
-      # Rails.logger.debug "Person is now: #{person.inspect}"
-
+      Rails.logger.debug "form_data is now: is now: #{form_data.inspect}\n"
       Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
 
-      if @membership.update(membership_params)
+      if @membership.update(form_data)
         format.html do
           redirect_to event_membership_path(@event, @membership),
                       notice: 'Membership successfully updated.'
@@ -134,7 +134,9 @@ class MembershipsController < ApplicationController
       :special_info, :staff_notes, :org_notes,
       person_attributes: [:salutation, :firstname, :lastname, :email, :phone,
                           :gender, :affiliation, :department, :title, :url,
-                          :academic_status, :research_areas, :biography, :id]
+                          :academic_status, :research_areas, :biography, :id,
+                          :address1, :address2, :address3, :city, :region,
+                          :postal_code, :country]
     )
   end
 end

@@ -7,22 +7,49 @@
   <div class="col-md-6 profile">
   	<div class="row" id="profile-name"><%= @person.name %></div>
   	<div class="row" id="profile-affil"><%= @person.affil_with_title %></div>
-  	<% if policy(@membership).use_email_address? %>
+  	<% if policy(@membership).show_email_address? %>
   	<div class="row" id="profile-email"><%= mail_to @person.email %></div>
   	<% end %>
+
   	<% unless @person.url.blank? %>
   	<div class="row" id="profile-url"><%= link_to @person.uri, @person.uri %></div>
   	<% end %>
 
-    <% if policy(@membership).staff_info? %>
+    <% if policy(@membership).show_personal_info? %>
+    <div class="row" id="profile-phone"><%= @person.phone %></div>
+
     <div class="row" id="profile-address">
       <%= print_address(@person) %>
     </div>
     <% end %>
-  </div>
+
+    <% if policy(@membership).show_details? %>
+    <div class="row" id="profile-academic-status">
+      <strong>Academic Status:</strong> <%= @person.academic_status %>
+    </div>
+    <% end %>
+
+    <% unless @person.research_areas.blank? %>
+    <div class="row" id="profile-research">
+      <strong>Research:</strong> <%= @person.research_areas %>
+    </div>
+    <% end %>
+
+    <% unless @person.biography.blank? %>
+    <div class="row" id="profile-bio">
+      <strong>Bio:</strong> <%= simple_format(@person.biography) %>
+    </div>
+    <% end %>
+
+    <% if policy(@membership).show_details? %>
+    <div class="row updated-by">
+      Last updated by: <%= @person.updated_by %> on <%= @person.updated_at %>
+    </div>
+    <% end %>
+  </div><!-- col-md-6 profile -->
 </div><!-- row -->
 
-<% if policy(@membership).view_details? %>
+<% if policy(@membership).show_details? %>
 <div class="row profile membership-details">
   <div class="col-md-4">
     <h3>Membership Details</h3>
@@ -60,48 +87,44 @@
   </div><!-- col-md-3 -->
   <% end %>
 
-  <% if policy(@membership).staff_info? %>
-  <div class="col-md-4">
+  <% if policy(@membership).hotel_and_billing? %>
+  <div class="col-md-4 hotel-billing">
     <h3>Hotel & Billing</h3>
     <div class="row" id="profile-reviewed">
      <strong>Reviewed:</strong> <%= @membership.reviewed ? 'Yes' : 'No' %>
     </div>
-
     <div class="row" id="profile-billing">
       <strong>Billing:</strong>
       <%= @membership.billing %>
     </div>
-
+    <div class="row" id="profile-gender">
+      <strong>Gender:</strong> <%= @person.gender %>
+    </div>
     <div class="row" id="profile-room">
       <strong>Hotel Room:</strong>
       <%= @membership.room %>
     </div>
-
     <div class="row" id="profile-stay-id">
       <strong>Hotel Stay Id:</strong>
       <%= @membership.stay_id %>
     </div>
-
     <div class="row" id="profile-has-guest">
       <strong>Has Guest:</strong> <%= @membership.has_guest ? 'Yes' : 'No' %>
     </div>
-
     <div class="row" id="profile-special-info">
       <strong>Special Info:</strong> <%= simple_format(@membership.special_info) %>
     </div>
-
     <div class="row" id="profile-staff-notes">
       <strong>Staff Notes:</strong>
       <p><%= simple_format(@membership.staff_notes) %></p>
     </div>
-	</div><!-- col-md-4 profile -->
+	</div><!-- col-md-4 hotel-billing -->
   <% end %>
 </div><!-- row -->
 
-<% if policy(@membership).view_details? %>
-<div class="row" id="profile-updated-by">
-  <p>Updated by:
-    <%= @membership.updated_by %> on <%= @membership.updated_at %></p>
+<% if policy(@membership).show_details? %>
+<div class="row updated-by" id="member-updated-by">
+  <p>Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at %></p>
 </div>
 <% end %>
 

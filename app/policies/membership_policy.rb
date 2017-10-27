@@ -38,10 +38,10 @@ class MembershipPolicy
   end
 
   def show?
-    true
+    self_organizer_staff || confirmed_member
   end
 
-  def use_email_address?
+  def show_email_address?
     return false if @current_user.nil?
     organizer_and_staff ||
       (@current_user.is_member?(@event) && @membership.share_email)
@@ -63,11 +63,16 @@ class MembershipPolicy
     staff_and_admins
   end
 
+  def show_personal_info?
+    return false if @current_user.nil?
+    staff_and_admins || @membership.person == @current_user.person
+  end
+
   def edit_organizer_notes?
     organizer_and_staff
   end
 
-  def view_details?
+  def show_details?
     self_organizer_staff
   end
 
@@ -75,7 +80,7 @@ class MembershipPolicy
     staff_and_admins
   end
 
-  def staff_info?
+  def hotel_and_billing?
     staff_and_admins
   end
 
@@ -84,10 +89,16 @@ class MembershipPolicy
   end
 
   def view_org_notes?
-    organizer_and_staff
+    return false if @current_user.nil?
+    @current_user.is_organizer?(@event) || @current_user.is_admin?
   end
 
   private
+
+  def confirmed_member
+    @membership.attendance == 'Confirmed' ||
+      @membership.attendance == 'Undecided'
+  end
 
   def self_organizer_staff
     return false if @current_user.nil?

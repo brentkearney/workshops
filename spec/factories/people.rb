@@ -12,14 +12,20 @@ FactoryGirl.define do
     f.firstname
     f.lastname
     f.salutation 'Prof.'
-    f.gender ['M', 'F'].sample
+    f.gender %w[M F].sample
     f.email
     f.url { Faker::Internet.url }
     f.phone { Faker::PhoneNumber.phone_number }
-    f.affiliation { Faker::Company.name }
+    f.affiliation { Faker::University.name }
     f.department { Faker::Commerce.department }
     f.academic_status 'Professor'
+    f.address1 { Faker::Address.street_address }
+    f.city { Faker::Address.city }
+    f.postal_code { Faker::Address.postcode }
+    f.country { Faker::Address.country }
     f.legacy_id
+    f.biography { Faker::Lorem.paragraph }
+    f.research_areas { Faker::Lorem.words(4).join(', ') }
     f.updated_by 'FactoryGirl'
   end
 end
