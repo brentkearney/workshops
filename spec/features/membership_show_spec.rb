@@ -8,7 +8,6 @@ require 'rails_helper'
 
 describe 'Membership#show', type: :feature do
   before do
-    Event.destroy_all
     @event = create(:event_with_members)
     @organizer = @event.memberships.where("role='Contact Organizer'").first
     @participant = @event.memberships.where("role='Participant'").first
@@ -33,7 +32,7 @@ describe 'Membership#show', type: :feature do
 
   end
 
-  def does_not_show_email(member)
+  def hides_email(member)
     expect(page.body).not_to have_text(member.person.email)
   end
 
@@ -166,7 +165,7 @@ describe 'Membership#show', type: :feature do
     end
 
     it 'excludes email' do
-      does_not_show_email(@organizer)
+      hides_email(@organizer)
     end
 
     it 'excludes personal info' do
@@ -209,7 +208,7 @@ describe 'Membership#show', type: :feature do
     end
 
     it 'excludes email' do
-      does_not_show_email(@organizer)
+      hides_email(@organizer)
     end
 
     it 'excludes personal info' do
@@ -358,7 +357,7 @@ describe 'Membership#show', type: :feature do
     end
 
     it 'excludes email' do
-      does_not_show_email(@organizer)
+      hides_email(@organizer)
     end
 
     it 'excludes personal info' do

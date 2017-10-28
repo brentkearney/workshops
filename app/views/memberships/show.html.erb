@@ -78,7 +78,7 @@
   	 <%= @membership.rsvp_date %>
   	</div>
 
-    <% if policy(@membership).view_org_notes? %>
+    <% if policy(@membership).organizer_notes? %>
     <div class="row" id="profile-org-notes">
       <strong>Organizer Notes:</strong>
       <p><%= simple_format(@membership.org_notes) %></p>

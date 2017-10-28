@@ -14,11 +14,6 @@ describe 'Event List', type: :feature do
     authenticate_user # creates @person, @user
   end
 
-  after do
-    Event.destroy_all
-    Person.destroy_all
-  end
-
   describe 'Navigation Links' do
     it '#My Events has a link' do
       visit root_path

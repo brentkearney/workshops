@@ -9,9 +9,6 @@ require 'rails_helper'
 describe 'Post-login Welcome Page', type: :feature do
 
   before do
-    Person.destroy_all
-    Event.destroy_all
-    Membership.destroy_all
     @user = create(:user, password: 'secret123456',
                    password_confirmation: 'secret123456')
   end

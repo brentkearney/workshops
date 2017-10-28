@@ -8,16 +8,11 @@ require 'rails_helper'
 
 describe 'Event Membership Page', type: :feature do
   before do
-    Event.destroy_all
     @event = create(:event_with_members)
     @member = @event.memberships.where("role='Participant'").first
     @user = create(:user, email: @member.person.email, person: @member.person)
     @non_member_user = create(:user)
   end
-
-  # after(:each) do
-  #   Warden.test_reset!
-  # end
 
   def links_to_profile(member)
     expect(page).to have_link(nil, href: event_membership_path(@event, member))
