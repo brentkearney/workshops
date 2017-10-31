@@ -60,7 +60,11 @@ class MembershipPolicy
   end
 
   def edit_membership?
-    staff_and_admins
+    organizer_and_staff
+  end
+
+  def edit_role?
+    @membership.role =~ /Organizer/ ? staff_and_admins : organizer_and_staff
   end
 
   def edit_dates?

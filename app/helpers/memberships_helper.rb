@@ -6,8 +6,13 @@
 
 module MembershipsHelper
   def show_roles(f)
-    f.select :role, Membership::ROLES, {},
-             required: 'true', autofocus: 'true', class: 'form-control'
+    if @current_user.is_organizer?(@event)
+      org_roles = ['Contact Organizer', 'Organizer']
+      f.select :role, Membership::ROLES, disabled: org_roles,
+               class: 'form-control'
+    else
+      f.select :role, Membership::ROLES, {}, class: 'form-control'
+    end
   end
 
   def show_attendances(f)

@@ -36,7 +36,7 @@ describe 'Membership#edit', type: :feature do
     fill_in 'membership_person_attributes_affiliation', with: 'Hollywood'
     fill_in 'membership_person_attributes_department', with: 'Movies'
     fill_in 'membership_person_attributes_title', with: 'Actor'
-    fill_in 'membership_person_attributes_research_areas', with: 'drama, cash'
+    fill_in 'membership_person_attributes_research_areas', with: 'drama, fame'
     fill_in 'membership_person_attributes_biography', with: 'I did a thing.'
 
     click_button 'Update Member'
@@ -47,7 +47,7 @@ describe 'Membership#edit', type: :feature do
                                   text: 'Hollywood, Movies — Actor')
     expect(page.body).to have_css('div#profile-url', text: 'http://sam.i.am')
     expect(page.body).to have_css('div#profile-bio', text: 'I did a thing.')
-    expect(page.body).to have_css('div#profile-research', text: 'drama, cash')
+    expect(page.body).to have_css('div#profile-research', text: 'drama, fame')
   end
 
   def allows_personal_info_editing(member)
@@ -70,6 +70,44 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).to have_css('div#profile-phone', text: '123-456-7890')
     expect(page.body).to have_css('div#profile-address',
       text: "\n      1 Infinity Loop\nCupertino, CA  95014\nZimbabwe\n    ")
+  end
+
+  def allows_membership_info_editing(member)
+    select 'Organizer', from: 'membership_role'
+    select 'Undecided', from: 'membership_attendance'
+
+    click_button 'Update Member'
+    visit event_membership_path(@event, member)
+
+    expect(page.body).to have_css('div#profile-role', text: 'Organizer')
+    expect(page.body).to have_css('div#profile-attendance', text: 'Undecided')
+
+    visit edit_event_membership_path(@event, member)
+    allows_arrival_departure_editing(member)
+  end
+
+  def allows_billing_info_editing(member)
+    expect(page).to have_field('membership_reviewed', checked: false)
+    check 'membership_reviewed'
+    fill_in 'membership_billing', with: 'SOS'
+    fill_in 'membership_room', with: 'AB 123'
+    expect(page).to have_field('membership_has_guest', checked: false)
+    check 'membership_has_guest'
+    fill_in 'membership_special_info', with: 'Very.'
+    fill_in 'membership_staff_notes', with: 'Beware.'
+    select 'Other', from: 'membership_person_attributes_gender'
+
+    click_button 'Update Member'
+    visit event_membership_path(@event, member)
+
+    expect(page.body).to have_css('div#profile-reviewed', text: 'Yes')
+    expect(page.body).to have_css('div#profile-billing', text: 'SOS')
+    expect(page.body).to have_css('div#profile-gender', text: 'O')
+    expect(page.body).to have_css('div#profile-room', text: 'AB 123')
+    expect(page.body).to have_css('div#profile-stay-id')
+    expect(page.body).to have_css('div#profile-has-guest', text: 'Yes')
+    expect(page.body).to have_css('div#profile-special-info', text: 'Very.')
+    expect(page.body).to have_css('div#profile-staff-notes', text: 'Beware.')
   end
 
   def allows_arrival_departure_editing(member)
@@ -168,9 +206,10 @@ describe 'Membership#edit', type: :feature do
       allows_arrival_departure_editing(@participant)
     end
 
-    it 'disables other event membership fields'
-      # expect(page.body).not_to have_field 'membership_role'
-      # expect(page.body).not_to have_field 'membership_attendance'
+    it 'disables role & attendance fields' do
+      expect(page.body).not_to have_field 'membership_role'
+      expect(page.body).not_to have_field 'membership_attendance'
+    end
 
     it 'hides organizer notes' do
       expect(page.body).not_to have_field 'membership_org_notes'
@@ -205,7 +244,44 @@ describe 'Membership#edit', type: :feature do
       disallows_personal_info_editing
     end
 
-    it 'allows limited editing of membership feilds'
+    it 'allows changing membership role' do
+      select 'Backup Participant', from: 'membership_role'
+
+      click_button 'Update Member'
+      visit event_membership_path(@event, @participant)
+
+      expect(page.body).to have_css('div#profile-role',
+                                    text: 'Backup Participant')
+    end
+
+    it 'does not allow changing Participants to Organizer role' do
+      select = find(:select, 'membership_role')
+      expect(select).to have_selector(:option, 'Contact Organizer',
+                                      disabled: true)
+      expect(select).to have_selector(:option, 'Organizer', disabled: true)
+      expect(select).to have_selector(:option, 'Participant', disabled: false)
+      expect(select).to have_selector(:option, 'Backup Participant')
+      expect(select).to have_selector(:option, 'Observer', disabled: false)
+    end
+
+    it 'does not allow changing roles of Organizers' do
+      visit edit_event_membership_path(@event, @organizer)
+      expect(page).not_to have_select('membership_role')
+    end
+
+    it 'allows changing attendance status' do
+      select 'Declined', from: 'membership_attendance'
+
+      click_button 'Update Member'
+      visit event_membership_path(@event, @participant)
+
+      expect(page.body).to have_css('div#profile-attendance', text: 'Declined')
+    end
+
+    it 'disallows changing of travel dates' do
+      expect(page.body).not_to have_field 'membership[arrival_date]'
+      expect(page.body).not_to have_field 'membership[departure_date]'
+    end
 
     it 'allows organizer notes' do
       allows_organizer_notes(@participant)
@@ -233,6 +309,7 @@ describe 'Membership#edit', type: :feature do
       @non_member_user.role = :staff
       @non_member_user.location = @event.location
       @non_member_user.save
+      @participant = create(:membership, event: @event, has_guest: false)
       login_as @non_member_user, scope: :user
     end
 
@@ -253,13 +330,22 @@ describe 'Membership#edit', type: :feature do
       allows_personal_info_editing(@participant)
     end
 
-    it 'allows editing of all membership info'
+    it 'allows editing of membership info' do
+      allows_membership_info_editing(@participant)
+    end
+
+    it 'has travel dates' do
+      expect(page.body).to have_field 'membership[arrival_date]'
+      expect(page.body).to have_field 'membership[departure_date]'
+    end
 
     it 'hides organizer notes' do
       expect(page.body).not_to have_field 'membership_org_notes'
     end
 
-    it 'allows editing of all billing info'
+    it 'allows editing of billing info' do
+      allows_billing_info_editing(@participant)
+    end
   end
 
   context 'As an admin user' do
@@ -267,6 +353,7 @@ describe 'Membership#edit', type: :feature do
       @non_member_user.role = :admin
       @non_member_user.save
       login_as @non_member_user, scope: :user
+      @participant = create(:membership, event: @event, has_guest: false)
     end
 
     before :each do
@@ -290,12 +377,16 @@ describe 'Membership#edit', type: :feature do
       allows_arrival_departure_editing(@participant)
     end
 
-    it 'allows editing of all membership info'
+    it 'allows editing of membership info' do
+      allows_membership_info_editing(@participant)
+    end
 
     it 'allows organizer notes' do
       allows_organizer_notes(@participant)
     end
 
-    it 'allows editing of all billing info'
+    it 'allows editing of billing info' do
+      allows_billing_info_editing(@participant)
+    end
   end
 end
