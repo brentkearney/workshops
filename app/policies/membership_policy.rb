@@ -71,6 +71,10 @@ class MembershipPolicy
     staff_and_admins || @membership.person == @current_user.person
   end
 
+  def extended_stay?
+    staff_and_admins
+  end
+
   def edit_hotel?
     staff_and_admins
   end

@@ -68,26 +68,27 @@ class MembershipsController < ApplicationController
   # PATCH/PUT /events/:event_id/memberships/1.json
   def update
     authorize @membership
+
+    form_data = membership_params
+    person_data = form_data.delete(:person_attributes)
+    membership = Membership.find(@membership.id)
+    membership.assign_attributes(form_data)
+    if membership.changed?
+      form_data['updated_by'] = @current_user.name
+      @membership.sync_remote = true
+    end
+
+    person = Person.find(@membership.person_id)
+    person.assign_attributes(person_data)
+    if person.changed?
+      person_data['updated_by'] = @current_user.name
+      form_data['person_attributes'] = person_data
+      @membership.sync_remote = true
+    end
+
+    @membership.update_by_staff = true if policy(@membership).extended_stay?
+
     respond_to do |format|
-      Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-      form_data = membership_params
-      Rails.logger.debug "form_data: #{form_data.inspect}\n\n"
-      person_data = form_data.delete(:person_attributes)
-
-      membership = Membership.find(@membership.id)
-      membership.assign_attributes(form_data)
-      form_data['updated_by'] = @current_user.name if membership.changed?
-
-      person = Person.find(@membership.person_id)
-      person.assign_attributes(person_data)
-      if person.changed?
-        person_data['updated_by'] = @current_user.name
-        form_data['person_attributes'] = person_data
-      end
-
-      Rails.logger.debug "form_data is now: is now: #{form_data.inspect}\n"
-      Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-
       if @membership.update(form_data)
         format.html do
           redirect_to event_membership_path(@event, @membership),

@@ -205,7 +205,8 @@ class SyncMembers
     if person.save
       Rails.logger.info "\n\n* Saved #{@event.code} person: #{person.name}\n"
     else
-      Rails.logger.error "\n\n* Error saving #{@event.code} person: #{person.name}, #{person.errors.full_messages}\n"
+      Rails.logger.error "\n\n" + "* Error saving #{@event.code} person:
+        #{person.name}, #{person.errors.full_messages}".squish + "\n"
       sync_errors.add(person)
     end
     person
@@ -230,10 +231,14 @@ class SyncMembers
 
   def save_membership(membership)
     membership.person.member_import = true
+    membership.update_by_staff = true
     if membership.save
-      Rails.logger.info "\n\n* Saved #{@event.code} membership for #{membership.person.name}\n"
+      Rails.logger.info "\n\n" + "* Saved #{@event.code} membership for
+        #{membership.person.name}".squish + "\n"
     else
-      Rails.logger.error "\n\n* Error saving #{@event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n"
+      Rails.logger.error "\n\n" + "* Error saving #{@event.code} membership for
+        #{membership.person.name}:
+        #{membership.errors.full_messages}".squish + "\n"
       sync_errors.add(membership)
     end
     membership

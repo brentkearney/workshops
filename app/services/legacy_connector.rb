@@ -92,20 +92,26 @@ class LegacyConnector
 
   # update membership & person record
   def update_member(membership_id)
-    membership = Membership.find_by_id(membership_id)
-    updated = membership.updated_at.in_time_zone('Pacific Time (US & Canada)')
-                        .strftime('%Y-%m-%d %H:%M:%S')
-    membership.updated_at = updated
-    membership.replied_at = updated
-    if membership.attendance == 'Confirmed'
-      membership.person.updated_at = updated
+    member = Membership.find_by_id(membership_id)
+    member.updated_at = member.updated_at
+                               .in_time_zone('Pacific Time (US & Canada)')
+                               .strftime('%Y-%m-%d %H:%M:%S')
+    member.replied_at = member.replied_at
+                              .in_time_zone('Pacific Time (US & Canada)')
+                              .strftime('%Y-%m-%d %H:%M:%S')
+
+    if member.attendance == 'Confirmed'
+      person = member.person
+      person.updated_at = person.updated_at
+                                .in_time_zone('Pacific Time (US & Canada)')
+                                .strftime('%Y-%m-%d %H:%M:%S')
     end
 
     # add_member() adds or updates memberships
-    add_member(membership: membership,
-               event_code: membership.event.code,
-               person: membership.person,
-               updated_by: membership.updated_by)
+    add_member(membership: member,
+               event_code: member.event.code,
+               person: member.person,
+               updated_by: member.updated_by)
   end
 
   # update an event's members

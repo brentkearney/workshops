@@ -66,6 +66,28 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@membership.valid?).to be_truthy
   end
 
+  it 'is invalid if arrival is before event start' do
+    @membership.arrival_date = @event.start_date - 1.days
+    expect(@membership.valid?).to be_falsey
+  end
+
+  it '  ...but early arrivals can be set by staff' do
+    @membership.update_by_staff = true
+    @membership.arrival_date = @event.start_date - 1.days
+    expect(@membership.valid?).to be_truthy
+  end
+
+  it 'is invalid if departure is after event end' do
+    @membership.departure_date = @event.end_date + 1.days
+    expect(@membership.valid?).to be_falsey
+  end
+
+  it '  ...but late departures can be set by staff' do
+    @membership.update_by_staff = true
+    @membership.departure_date = @event.end_date + 1.days
+    expect(@membership.valid?).to be_truthy
+  end
+
   it 'is valid with nil arrival and departure dates' do
     @membership.arrival_date = nil
     expect(@membership.valid?).to be_truthy

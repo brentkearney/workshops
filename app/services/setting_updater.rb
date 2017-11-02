@@ -56,9 +56,7 @@ class SettingUpdater
     settings = @setting.value
     location_key = settings.delete('remove_location')
     @setting.value = settings.except(location_key)
-    unless location_key.blank?
-      remove_locations(location_key: location_key)
-    end
+    remove_locations(location_key: location_key) unless location_key.blank?
   end
 
   def remove_locations(location_key: '')
@@ -81,7 +79,7 @@ class SettingUpdater
     (Setting.get_all.keys - ['Site']).each do |section|
       setting = Setting.find_by(var: section)
       section_settings = Setting.send(section)
-      new_location = {new_key => create_empty_setting(section_settings)}
+      new_location = { new_key => create_empty_setting(section_settings) }
       new_value = section_settings.merge(new_location)
 
       if section == 'Locations'

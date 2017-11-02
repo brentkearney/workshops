@@ -125,6 +125,21 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).to have_css('div#profile-departure', text: departure)
   end
 
+  def allows_extended_stays(member)
+    arrival = (@event.start_date - 1.day).strftime('%Y-%m-%d')
+    fill_in 'arrival_date', with: arrival
+    departure = (@event.end_date + 1.day).strftime('%Y-%m-%d')
+    fill_in 'departure_date', with: departure
+
+    click_button 'Update Member'
+
+    expect(page.body).not_to include('special permission required')
+    arrival = (@event.start_date - 1.day).strftime('%b %-d, %Y')
+    expect(page.body).to have_css('div#profile-arrival', text: arrival)
+    departure = (@event.end_date + 1.day).strftime('%b %-d, %Y')
+    expect(page.body).to have_css('div#profile-departure', text: departure)
+  end
+
   def disallows_personal_info_editing
     field_name = 'membership_person_attributes_academic_status'
     expect(page.body).not_to have_field field_name
@@ -204,6 +219,20 @@ describe 'Membership#edit', type: :feature do
 
     it 'allows editing of arrival & departure dates' do
       allows_arrival_departure_editing(@participant)
+    end
+
+    it 'does not allow travel dates outside of event dates' do
+      arrival = (@event.start_date - 1.day).strftime('%Y-%m-%d')
+      fill_in 'arrival_date', with: arrival
+      departure = (@event.end_date + 1.day).strftime('%Y-%m-%d')
+      fill_in 'departure_date', with: departure
+
+      click_button 'Update Member'
+
+      expect(page.body).to include('Arrival date - special permission required
+                                    for early arrival'.squish)
+      expect(page.body).to include('Departure date - special permission required
+                                    for late departure'.squish)
     end
 
     it 'disables role & attendance fields' do
@@ -334,9 +363,13 @@ describe 'Membership#edit', type: :feature do
       allows_membership_info_editing(@participant)
     end
 
-    it 'has travel dates' do
+    it 'allows editing of travel dates' do
       expect(page.body).to have_field 'membership[arrival_date]'
       expect(page.body).to have_field 'membership[departure_date]'
+    end
+
+    it 'allows changing travel dates to outside of event dates' do
+      allows_extended_stays(@participant)
     end
 
     it 'hides organizer notes' do
@@ -375,6 +408,10 @@ describe 'Membership#edit', type: :feature do
 
     it 'allows editing of arrival & departure dates' do
       allows_arrival_departure_editing(@participant)
+    end
+
+    it 'allows changing travel dates to outside of event dates' do
+      allows_extended_stays(@participant)
     end
 
     it 'allows editing of membership info' do

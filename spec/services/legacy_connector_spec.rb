@@ -21,6 +21,7 @@ require 'rails_helper'
 
 describe "LegacyConnector", type: :feature do
   before do
+    Event.destroy_all
     @lc = LegacyConnector.new
   end
 

@@ -8,6 +8,7 @@ require 'rails_helper'
 
 describe "ErrorReport" do
   before do
+    Event.destroy_all
     @event = create(:event)
   end
 

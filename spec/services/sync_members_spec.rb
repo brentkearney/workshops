@@ -161,9 +161,7 @@ describe "SyncMembers" do
           @person2 = create(:person, email: 'fred@smith.com', legacy_id: 222)
           @membership2 = create(:membership, person: @person2, event: @event)
           @lecture = create(:lecture, person: @person2, event: @event)
-          # @user_account =
           create(:user, person: @person2, email: @person2.email)
-          # puts "User: #{@user_account.inspect}"
 
           remote_fields = { email: 'sam@jones.net', legacy_id: 222 }
           setup_remote(@event, @membership2, remote_fields)
@@ -184,9 +182,7 @@ describe "SyncMembers" do
         end
 
         it 'moves user account to updated person record' do
-          # user = User.where(person: @person1).first
-          # expect(user.person).to eq(@person1)
-          expect(User.where(person_id: @person1.id)).not_to be_empty
+          expect(User.where(person_id: @person1.id)).not_to be_nil
         end
       end
 
@@ -237,8 +233,10 @@ describe "SyncMembers" do
                                                  changed_fields: fields))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
-        expect(Rails.logger).to receive(:info).with("\n\n* Saved #{event.code} person: New McPerson\n")
-        expect(Rails.logger).to receive(:info).with("\n\n* Saved #{event.code} membership for New McPerson\n")
+        expect(Rails.logger).to receive(:info).with("\n\n" + "* Saved
+          #{event.code} person: New McPerson".squish + "\n")
+        expect(Rails.logger).to receive(:info).with("\n\n" + "* Saved
+          #{event.code} membership for New McPerson".squish + "\n")
 
         SyncMembers.new(event)
 
@@ -266,8 +264,12 @@ describe "SyncMembers" do
 
         person.valid?
         membership.valid?
-        expect(Rails.logger).to receive(:error).with("\n\n* Error saving #{event.code} person: #{person.name}, #{person.errors.full_messages}\n")
-        expect(Rails.logger).to receive(:error).with("\n\n* Error saving #{event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n")
+        expect(Rails.logger).to receive(:error).with("\n\n" + "* Error saving
+          #{event.code} person: #{person.name},
+          #{person.errors.full_messages}".squish + "\n")
+        expect(Rails.logger).to receive(:error).with("\n\n" + "* Error saving
+          #{event.code} membership for #{membership.person.name}:
+          #{membership.errors.full_messages}".squish + "\n")
         expect(sync_errors).to receive(:add).twice.with(anything)
         SyncMembers.new(event)
 
@@ -278,27 +280,54 @@ describe "SyncMembers" do
 
   describe '.save_membership' do
     context 'valid membership' do
-      it 'saves the Membership and logs a message' do
-        event = create(:event)
-        person = create(:person, lastname: 'Smith')
-        membership = build(:membership, person: person, event: event,
+      before do
+        @event = create(:event)
+        @person = create(:person, lastname: 'Smith')
+        @membership = build(:membership, person: @person, event: @event,
                                         staff_notes: 'Hi there!')
-        lc = FakeLegacyConnector.new
+        @lc = FakeLegacyConnector.new
+      end
+
+      it 'saves the Membership and logs a message' do
         fields = { lastname: 'Smith' }
-        allow(lc).to receive(:get_members).with(event)
-          .and_return(lc.get_members_with_person(e: event, m:
-                                                 membership,
+        allow(@lc).to receive(:get_members).with(@event)
+          .and_return(@lc.get_members_with_person(e: @event, m:
+                                                 @membership,
                                                  changed_fields: fields))
-        expect(LegacyConnector).to receive(:new).and_return(lc)
+        expect(LegacyConnector).to receive(:new).and_return(@lc)
 
         expect(Rails.logger).to receive(:info)
-          .with("\n\n* Saved #{event.code} person: #{person.name}\n")
+          .with("\n\n* Saved #{@event.code} person: #{@person.name}\n")
         expect(Rails.logger).to receive(:info)
-          .with("\n\n* Saved #{event.code} membership for #{membership.person.name}\n")
-        SyncMembers.new(event)
+          .with("\n\n* Saved #{@event.code} membership for #{@membership.person.name}\n")
+        SyncMembers.new(@event)
 
-        lm = Event.find(event.id).memberships.last
+        lm = Event.find(@event.id).memberships.last
         expect(lm.staff_notes).to eq('Hi there!')
+      end
+
+      it 'accepts arrival & depature dates outside of event dates' do
+        arrival = @event.start_date - 2.days
+        @membership.arrival_date = arrival
+        departure = @event.end_date + 2.days
+        @membership.departure_date = departure
+
+        fields = { lastname: 'Claus' }
+        allow(@lc).to receive(:get_members).with(@event)
+          .and_return(@lc.get_members_with_person(e: @event, m:
+                                                 @membership,
+                                                 changed_fields: fields))
+        expect(LegacyConnector).to receive(:new).and_return(@lc)
+
+        # sync_errors = ErrorReport.new('SyncMembers', @event)
+        # expect(ErrorReport).to receive(:new).and_return(sync_errors)
+        # expect(sync_errors).to receive(:add).with(anything)
+        SyncMembers.new(@event)
+
+        saved_member = Event.find(@event.id).memberships.last
+        expect(saved_member).not_to be_nil
+        expect(saved_member.arrival_date).to eq(arrival)
+        expect(saved_member.departure_date).to eq(departure)
       end
     end
 
@@ -323,7 +352,6 @@ describe "SyncMembers" do
 
         membership.valid?
         expect(Rails.logger).to receive(:error)
-          .with("\n\n* Error saving #{event.code} membership for #{membership.person.name}: #{membership.errors.full_messages}\n")
         expect(sync_errors).to receive(:add).with(anything)
         SyncMembers.new(event)
 

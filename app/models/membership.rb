@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Membership < ActiveRecord::Base
-  attr_accessor :sync_remote
+  attr_accessor :sync_remote, :update_by_staff
 
   belongs_to :event
   belongs_to :person
@@ -74,15 +74,12 @@ class Membership < ActiveRecord::Base
 
   # max_participants - (invited + confirmed participants)
   def check_max_participants
-    if attendance == 'Declined' || attendance == 'Not Yet Invited'
-      return true
-    else
-      unless event_id.nil?
-        unless event.max_participants.to_i - event.num_invited_participants.to_i >= 0
-          errors.add(:attendance, "- the maximum number of invited participants for #{event.code} has been reached.")
-        end
-      end
-    end
+    return if attendance == 'Declined' || attendance == 'Not Yet Invited'
+    return if event_id.nil?
+    invited = event.num_invited_participants.to_i
+    return if event.max_participants.to_i - invited >= 0
+    errors.add(:attendance, "- the maximum number of invited participants for
+               #{event.code} has been reached.".squish)
   end
 
   def arrival_and_departure_dates
@@ -90,16 +87,31 @@ class Membership < ActiveRecord::Base
 
     unless arrival_date.blank?
       if arrival_date.to_date > w.end_date.to_date
-        errors.add(:arrival_date, "- arrival date must be before the end of the event.")
+        errors.add(:arrival_date,
+                   '- arrival date must be before the end of the event.')
       end
       if (arrival_date.to_date - w.start_date.to_date).to_i.abs >= 30
-        errors.add(:arrival_date, "- arrival date must be within 30 days of the event.")
+        errors.add(:arrival_date,
+                   '- arrival date must be within 30 days of the event.')
+      end
+
+      return if update_by_staff
+      if arrival_date.to_date < w.start_date.to_date
+        errors.add(:arrival_date,
+                   '- special permission required for early arrival.')
       end
     end
 
     unless departure_date.blank?
       if departure_date.to_date < w.start_date.to_date
-        errors.add(:departure_date, "- departure date must be after the beginning of the event.")
+        errors.add(:departure_date,
+                   '- departure date must be after the beginning of the event.')
+      end
+
+      return if update_by_staff
+      if departure_date.to_date > w.end_date.to_date
+        errors.add(:departure_date,
+                   '- special permission required for late departure.')
       end
     end
 
@@ -112,7 +124,7 @@ class Membership < ActiveRecord::Base
 
   def guest_disclamer_acknowledgement
     if has_guest && !guest_disclaimer
-      errors.add(:guest_disclaimer, "must be acknowledged if bringing a guest")
+      errors.add(:guest_disclaimer, 'must be acknowledged if bringing a guest.')
     end
   end
 
