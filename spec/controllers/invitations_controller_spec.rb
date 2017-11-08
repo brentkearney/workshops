@@ -92,7 +92,7 @@ RSpec.describe InvitationsController, type: :controller do
 
     context 'invalid params' do
       before do
-        @form_params = {'invitation': {'event': 'foo', 'email': 'bar'}}
+        @form_params = {'invitation' => {'event' => 'foo', 'email' => 'bar'}}
         post :create, @form_params
       end
 

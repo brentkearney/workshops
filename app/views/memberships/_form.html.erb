@@ -115,6 +115,16 @@
 
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
+			<%= person.label :phd_year, "Year of Ph.D.: " %>
+		</div>
+		<div class="col-sm-3">
+			<%= person.text_field :phd_year, class: 'form-control' %>
+		</div>
+		<div class="col-sm-6"></div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-3 control-label">
 			<%= person.label :gender, "Gender: " %>
 		</div>
 		<div class="col-sm-3">
@@ -146,6 +156,24 @@
 			<%= person.text_field :region, class: 'form-control', placeholder: 'Region' %>
 			<%= person.text_field :postal_code, class: 'form-control', placeholder: 'Postal Code' %>
 			<%= person.text_field :country, class: 'form-control', placeholder: 'Country' %>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-3 control-label">
+			<%= person.label :emergency_contact, "Emergency Contact: " %>
+		</div>
+		<div class="col-sm-9">
+			<%= person.text_field :emergency_contact, class: 'form-control' %>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-3 control-label">
+			<%= person.label :emergency_phone, "Emergency Phone: " %>
+		</div>
+		<div class="col-sm-9">
+			<%= person.text_field :emergency_phone, class: 'form-control' %>
 		</div>
 	</div>
 	<% end %>
@@ -290,6 +318,15 @@
 		</div>
 		<div class="col-sm-9">
 			<%= f.text_field :room, class: 'form-control' %>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-3 control-label">
+			<%= f.label :own_accommodation, "Own Accommodation:" %>
+		</div>
+		<div class="col-sm-9">
+			<%= f.check_box :own_accommodation, class: "form-control" %>
 		</div>
 	</div>
 

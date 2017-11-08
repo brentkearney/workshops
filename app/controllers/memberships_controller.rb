@@ -6,7 +6,7 @@
 
 class MembershipsController < ApplicationController
   before_filter :authenticate_user!, except: [:index, :show]
-  before_action :set_event
+  before_action :set_event, :set_user
   before_action :set_membership, only: [:show, :edit, :update, :destroy, :invite]
 
   # GET /events/:event_id/memberships
@@ -14,19 +14,9 @@ class MembershipsController < ApplicationController
   def index
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
-    @current_user = current_user
 
     # For the "Email Organizers/Participants" buttons
-    if policy(@event).use_email_addresses?
-      @member_emails = []
-      @organizer_emails = []
-      @memberships.each do |key, members|
-        members.each do |m|
-          @member_emails << "\"#{m.person.name}\" <#{m.person.email}>" if m.attendance == 'Confirmed'
-          @organizer_emails << "\"#{m.person.name}\" <#{m.person.email}>" if m.role =~ /Organizer/
-        end
-      end
-    end
+    assign_buttons if policy(@event).use_email_addresses?
   end
 
   # GET /events/:event_id/memberships/1
@@ -55,11 +45,16 @@ class MembershipsController < ApplicationController
 
     respond_to do |format|
       if @membership.save
-        format.html { redirect_to @membership, notice: 'Membership was successfully created.' }
+        format.html do
+          redirect_to @membership,
+                      notice: 'Membership was successfully created.'
+        end
         format.json { render :show, status: :created, location: @membership }
       else
         format.html { render :new }
-        format.json { render json: @membership.errors, status: :unprocessable_entity }
+        format.json do
+          render json: @membership.errors, status: :unprocessable_entity
+        end
       end
     end
   end
@@ -68,28 +63,10 @@ class MembershipsController < ApplicationController
   # PATCH/PUT /events/:event_id/memberships/1.json
   def update
     authorize @membership
-
-    form_data = membership_params
-    person_data = form_data.delete(:person_attributes)
-    membership = Membership.find(@membership.id)
-    membership.assign_attributes(form_data)
-    if membership.changed?
-      form_data['updated_by'] = @current_user.name
-      @membership.sync_remote = true
-    end
-
-    person = Person.find(@membership.person_id)
-    person.assign_attributes(person_data)
-    if person.changed?
-      person_data['updated_by'] = @current_user.name
-      form_data['person_attributes'] = person_data
-      @membership.sync_remote = true
-    end
-
-    @membership.update_by_staff = true if policy(@membership).extended_stay?
-
+    mp = MembershipParametizer.new(@membership, membership_params,
+                                   @current_user)
     respond_to do |format|
-      if @membership.update(form_data)
+      if @membership.update(mp.data)
         format.html do
           redirect_to event_membership_path(@event, @membership),
                       notice: 'Membership successfully updated.'
@@ -122,22 +99,39 @@ class MembershipsController < ApplicationController
   end
 
   private
+
+  def assign_buttons
+    @member_emails = map_emails(@memberships['Confirmed'])
+    organizers = @memberships.values[0].select { |m| m.role =~ /Organizer/ }
+    @organizer_emails = map_emails(organizers)
+  end
+
+  def map_emails(members)
+    members.map { |m| "\"#{m.person.name}\" <#{m.person.email}>" }
+  end
+
   def set_membership
     @membership = Membership.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to event_memberships_path(@event), error: 'Member not found.'
   end
 
+  def set_user
+    @current_user = current_user
+  end
+
   def membership_params
     params.require(:membership).permit(
       :id, :event_id, :person_id, :share_email, :role, :attendance,
-      :arrival_date, :departure_date, :reviewed, :billing, :room, :has_guest,
-      :special_info, :staff_notes, :org_notes,
+      :arrival_date, :departure_date, :reviewed, :billing, :room,
+      :special_info, :staff_notes, :org_notes, :own_accommodation, :has_guest,
+      :guest_disclaimer,
       person_attributes: [:salutation, :firstname, :lastname, :email, :phone,
                           :gender, :affiliation, :department, :title, :url,
                           :academic_status, :research_areas, :biography, :id,
                           :address1, :address2, :address3, :city, :region,
-                          :postal_code, :country]
+                          :postal_code, :country, :phd_year, :emergency_contact,
+                          :emergency_phone]
     )
   end
 end

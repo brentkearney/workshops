@@ -6,7 +6,7 @@
 
 require 'rails_helper'
 
-describe "SortedMembers" do
+describe 'SortedMembers' do
   before do
     Event.destroy_all
     @event = create(:event)
@@ -21,10 +21,10 @@ describe "SortedMembers" do
     expect(sm.class).to eq(SortedMembers)
   end
 
-  it '.get_members_hash' do
+  it '.make_members_hash' do
     membership = create(:membership, event: @event, attendance: 'Declined')
 
-    memberships = SortedMembers.new(@event).get_members_hash
+    memberships = SortedMembers.new(@event).make_members_hash
 
     expect(memberships).to eq({"Declined" => [membership]})
   end
@@ -35,7 +35,7 @@ describe "SortedMembers" do
     end
 
     sm = SortedMembers.new(@event)
-    sm.get_members_hash
+    sm.make_members_hash
     sorted_attendance = sm.sort_by_attendance.keys
 
     sorted_attendance.each_with_index do |status, index|
@@ -50,7 +50,7 @@ describe "SortedMembers" do
       end
 
       sm = SortedMembers.new(@event)
-      sm.get_members_hash
+      sm.make_members_hash
       sorted_members = sm.sort_by_role_and_name
 
       sorted_members["Not Yet Invited"].each_with_index do |member, index|
@@ -66,7 +66,7 @@ describe "SortedMembers" do
       end
 
       sm = SortedMembers.new(@event)
-      sm.get_members_hash
+      sm.make_members_hash
       sorted_members = sm.sort_by_role_and_name
 
       sorted_members['Confirmed'].each_with_index do |member, index|

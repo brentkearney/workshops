@@ -30,7 +30,7 @@ RSpec.describe EventsController, type: :controller do
 
     def excludes_template_events_test
       event1 = create(:event, template: false)
-      event2 = create(:event, template: true)
+      create(:event, template: true)
 
       get :index
 
