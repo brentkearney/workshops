@@ -79,7 +79,7 @@ RSpec.describe MembershipsController, type: :controller do
     end
   end
 
-  context 'As an authenticated member user' do
+  context 'As an authenticated user' do
     before do
       @user = create(:user, person: build(:person), role: 'member')
       allow(request.env['warden']).to receive(:authenticate!).and_return(@user)
@@ -369,21 +369,180 @@ RSpec.describe MembershipsController, type: :controller do
       end
 
       describe '#update' do
-        it 'assigns @member' do
-          membership = create(:membership, event: @event)
-
-          patch :update, event_id: @event.id, id: membership.id
-
-          expect(assigns(:membership)).to eq(membership)
+        before do
+          @event = create(:event)
+          @person = create(:person)
+          @membership = create(:membership, event: @event, person: @person)
+          @params = {
+            'event_id' => @event.id,
+            'id' => @membership.id,
+            'membership' =>
+            { arrival_date: @membership.event.start_date,
+              departure_date: @membership.event.end_date,
+              own_accommodation: false, has_guest: true, guest_disclaimer: true,
+              special_info: '', share_email: true,
+            'person_attributes' =>
+              { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
+                gender: 'M', affiliation: 'Foo', department: '', title: '',
+                academic_status: 'Professor', phd_year: 1970, email: 'foo@bar.com',
+                url: '', phone: '123', address1: '123 Street', address2: '',
+                address3: '', city: 'City', region: 'Region', postal_code: 'XYZ',
+                country: 'Dandylion', emergency_contact: '', emergency_phone: '',
+                biography: '', research_areas: '' }
+            }
+          }
         end
 
-        it 'denies access, redirects with error' do
-          membership = create(:membership, event: @event)
+        context 'as role: member, updating another member' do
+          before do
+            @user.member!
+          end
 
-          patch :update, event_id: @event.id, id: membership.id
+          it 'assigns @member' do
+            patch :update, @params
 
-          expect(response).to redirect_to(my_events_path)
-          expect(flash[:error]).to eq('Access denied.')
+            expect(assigns(:membership)).to eq(@membership)
+          end
+
+          it 'denies access, redirects with error' do
+            patch :update, @params
+
+            expect(response).to redirect_to(my_events_path)
+            expect(flash[:error]).to eq('Access denied.')
+          end
+        end
+
+        context 'as role: member, updating herself' do
+          before do
+            @user.member!
+            @membership.person_id = @user.person_id
+            @membership.save
+          end
+
+          it 'assigns @member' do
+            patch :update, @params
+
+            expect(assigns(:membership)).to eq(@membership)
+          end
+
+          it 'updates membership, redirects with flash message' do
+            patch :update, @params
+
+            expect(response).to redirect_to(event_membership_path(@event,
+                                                                  @membership))
+            expect(flash[:notice]).to eq('Membership successfully updated.')
+          end
+
+          it 'allows updating travel dates'
+          it 'disallows updating other membership details'
+          it 'allows updating has_guest, special_info, own_accommodation'
+          it 'disallows updating other hotel & billing details'
+        end
+
+        context 'as role: organizer' do
+          before do
+            @user.member!
+            @membership.person = @person
+            @membership.save
+            create(:membership, role: 'Organizer', person: @user.person,
+                                event: @event)
+          end
+
+          it 'assigns @member' do
+            patch :update, @params
+
+            expect(assigns(:membership)).to eq(@membership)
+          end
+
+          it 'updates membership, redirects with flash message' do
+            patch :update, @params
+
+            expect(response).to redirect_to(event_membership_path(@event,
+                                                                  @membership))
+            expect(flash[:notice]).to eq('Membership successfully updated.')
+          end
+
+          it 'allows updating person info'
+          it 'disallows updating some personal info'
+          it 'allows updating role'
+          it 'disallows changing role to or from Organizer roles'
+          it 'allows updating attendance status'
+          it 'disallows updating travel dates'
+          it 'allows updating organizer notes'
+          it 'disallows updating hotel and billing details'
+        end
+
+        context 'as role: staff, from different location' do
+          before do
+            @user.role = :staff
+            @user.location = 'Elsewhere'
+            @user.save
+          end
+
+          it 'assigns @member' do
+            patch :update, @params
+
+            expect(assigns(:membership)).to eq(@membership)
+          end
+
+          it 'denies access, redirects with error' do
+            patch :update, @params
+
+            expect(response).to redirect_to(my_events_path)
+            expect(flash[:error]).to eq('Access denied.')
+          end
+        end
+
+        context 'as role: staff, from same location' do
+          before do
+            @user.role = :staff
+            @user.location = @event.location
+            @user.save
+          end
+
+          it 'assigns @member' do
+            patch :update, @params
+
+            expect(assigns(:membership)).to eq(@membership)
+          end
+
+          it 'updates membership, redirects with flash message' do
+            patch :update, @params
+
+            expect(response).to redirect_to(event_membership_path(@event,
+                                                                  @membership))
+            expect(flash[:notice]).to eq('Membership successfully updated.')
+          end
+
+          it 'allows updating personal info'
+          it 'allows updating membership details'
+          it 'disallows updating organizer notes'
+          it 'allows editing hotel and billing details'
+        end
+
+        context 'as role: admin' do
+          before do
+            @user.admin!
+          end
+
+          it 'assigns @membership' do
+            patch :update, @params
+
+            expect(assigns(:membership)).to eq(@membership)
+          end
+
+          it 'updates membership, redirects with flash message' do
+            patch :update, @params
+
+            expect(response).to redirect_to(event_membership_path(@event,
+                                                                  @membership))
+            expect(flash[:notice]).to eq('Membership successfully updated.')
+          end
+
+          it 'allows updating personal info'
+          it 'allows updating membership details'
+          it 'allows updating organizer notes'
+          it 'allows editing hotel and billing details'
         end
       end
 
@@ -405,57 +564,6 @@ RSpec.describe MembershipsController, type: :controller do
           expect(flash[:error]).to eq('Access denied.')
         end
       end
-    end
-  end
-
-  context 'As an authenticated admin user' do
-    let(:person) { build(:person) }
-    let(:user) { build(:user, person: person, role: :admin) }
-
-    before do
-      allow(request.env['warden']).to receive(:authenticate!).and_return(user)
-      allow(user).to receive(:name).and_return('Admin User')
-      allow(controller).to receive(:current_user).and_return(user)
-      @current_user = user
-      @event = create(:event)
-      @membership = create(:membership, event: @event)
-
-      @params = {
-        'event_id' => @event.id,
-        'id' => @membership.id,
-        'membership' =>
-        { arrival_date: @membership.event.start_date,
-          departure_date: @membership.event.end_date,
-          own_accommodation: false, has_guest: true, guest_disclaimer: true,
-          special_info: '', share_email: true,
-        'person_attributes' =>
-          { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
-            gender: 'M', affiliation: 'Foo', department: '', title: '',
-            academic_status: 'Professor', phd_year: 1970, email: 'foo@bar.com',
-            url: '', phone: '123', address1: '123 Street', address2: '',
-            address3: '', city: 'City', region: 'Region', postal_code: 'XYZ',
-            country: 'Dandylion', emergency_contact: '', emergency_phone: '',
-            biography: '', research_areas: '' }
-        }
-      }
-    end
-
-    describe '#update' do
-      it 'assigns @membership' do
-        patch :update, @params
-
-        expect(assigns(:membership)).to eq(@membership)
-      end
-
-      it 'updates membership, redirects with flash message' do
-        patch :update, @params
-
-        expect(response).to redirect_to(event_membership_path(@event,
-                                                              @membership))
-        expect(flash[:notice]).to eq('Membership successfully updated.')
-      end
-
-
     end
   end
 end
