@@ -44,20 +44,22 @@ class EventPolicy
   end
 
   def may_edit
-    all_fields = event.attributes.keys - %w(id updated_by created_at updated_at confirmed_count publish_schedule)
+    all_fields = event.attributes.keys - %w[id updated_by created_at updated_at
+                                            confirmed_count publish_schedule]
     case current_user.role
-      when 'admin', 'super_admin'
-        all_fields
-      when 'staff'
-        all_fields - %w(code name start_date end_date location event_type time_zone max_participants template)
-      when 'member'
-        if current_user.is_organizer?(event)
-            %w(short_name description press_release)
-        else
-          []
-        end
+    when 'admin', 'super_admin'
+      all_fields
+    when 'staff'
+      all_fields - %w[code name start_date end_date location event_type
+                      time_zone max_participants template]
+    when 'member'
+      if current_user.is_organizer?(event)
+        %w[short_name description press_release]
       else
         []
+      end
+    else
+      []
     end
   end
 

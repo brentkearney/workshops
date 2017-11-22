@@ -33,6 +33,44 @@ class MembershipPolicy
     end
   end
 
+  def allowed_fields?
+    case current_user.role
+    when 'admin', 'super_admin'
+      all_fields
+    when 'staff'
+      staff_at_location ? all_fields : []
+    when 'member'
+      return organizer_fields if organizer?
+      return [] unless member_self?
+      all_fields - [:id, :event_id, :person_id, :share_email, :role, :room,
+                    :attendance, :reviewed, :billing, :special_info,
+                    :staff_notes, :org_notes, :own_accommodation, :has_guest,
+                    :guest_disclaimer]
+    else
+      []
+    end
+  end
+
+  def organizer_fields
+    [:id, :event_id, :person_id, :share_email, :role, :attendance, :org_notes,
+     person_attributes: [:salutation, :firstname, :lastname, :email, :url,
+                         :affiliation, :department, :title, :research_areas,
+                         :biography, :gender]]
+  end
+
+  def all_fields
+    [:id, :event_id, :person_id, :share_email, :role, :attendance,
+     :arrival_date, :departure_date, :reviewed, :billing, :room,
+     :special_info, :staff_notes, :org_notes, :own_accommodation, :has_guest,
+     :guest_disclaimer,
+     person_attributes: [:salutation, :firstname, :lastname, :email, :phone,
+                         :gender, :affiliation, :department, :title, :url,
+                         :academic_status, :research_areas, :biography, :id,
+                         :address1, :address2, :address3, :city, :region,
+                         :postal_code, :country, :phd_year, :emergency_contact,
+                         :emergency_phone]]
+  end
+
   def index?
     true
   end
@@ -60,7 +98,7 @@ class MembershipPolicy
   end
 
   def edit_membership?
-    organizer_and_staff
+    self_organizer_staff
   end
 
   def edit_role?
@@ -113,13 +151,21 @@ class MembershipPolicy
   end
 
   def self_organizer_staff
+    organizer_and_staff || member_self?
+  end
+
+  def member_self?
     return false if @current_user.nil?
-    organizer_and_staff || @membership.person == @current_user.person
+    @membership.person == @current_user.person
   end
 
   def organizer_and_staff
-    return false if @current_user.nil?
-    @current_user.is_organizer?(@event) || staff_and_admins
+    organizer? || staff_and_admins
+  end
+
+  def organizer?
+    return false if @current_user.nil? || @event.nil?
+    @current_user.is_organizer?(@event)
   end
 
   def staff_and_admins
@@ -128,7 +174,7 @@ class MembershipPolicy
   end
 
   def staff_at_location
-    return false if @current_user.nil?
+    return false if @current_user.nil? || @event.nil?
     @current_user.staff? && @current_user.location == @event.location
   end
 end

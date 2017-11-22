@@ -415,6 +415,7 @@ RSpec.describe MembershipsController, type: :controller do
         context 'as role: member, updating herself' do
           before do
             @user.member!
+            @membership.role = 'Participant'
             @membership.person_id = @user.person_id
             @membership.save
           end
@@ -433,19 +434,78 @@ RSpec.describe MembershipsController, type: :controller do
             expect(flash[:notice]).to eq('Membership successfully updated.')
           end
 
-          it 'allows updating travel dates'
-          it 'disallows updating other membership details'
-          it 'allows updating has_guest, special_info, own_accommodation'
-          it 'disallows updating other hotel & billing details'
+          it 'allows updating travel dates' do
+            arrival = @membership.event.start_date + 1.day
+            @params['membership']['arrival_date'] = arrival
+            depart = @membership.event.end_date - 1.day
+            @params['membership']['departure_date'] = depart
+
+            patch :update, @params
+
+            expect(Membership.find(@membership.id).arrival_date).to eq(arrival)
+            expect(Membership.find(@membership.id).departure_date).to eq(depart)
+          end
+
+          it 'disallows updating other membership details' do
+            role = @membership.role
+            @params['membership']['role'] = 'Organizer'
+            reviewed = @membership.reviewed
+            @params['membership']['reviewed'] = false
+            attendance = @membership.attendance
+            @params['membership']['attendance'] = 'Declined'
+            @params['membership']['staff_notes'] = 'Foo'
+            @params['membership']['org_notes'] = 'Bar'
+
+            patch :update, @params
+
+            membership = Membership.find(@membership.id)
+            expect(membership.role).to eq(role)
+            expect(membership.role).not_to eq('Organizer')
+            expect(membership.reviewed).to eq(reviewed)
+            expect(membership.reviewed).not_to eq(false)
+            expect(membership.attendance).to eq(attendance)
+            expect(membership.attendance).not_to eq('Declined')
+            expect(membership.staff_notes).not_to eq('Foo')
+            expect(membership.org_notes).not_to eq('Bar')
+
+          end
+
+          it 'disallows updating other hotel & billing details' do
+            @params['membership']['room'] = 'Forest'
+            billing = @membership.billing
+            @params['membership']['billing'] = '$$$'
+            special_info = @membership.special_info
+            @params['membership']['special_info'] = 'special'
+            own_accommodation = @membership.own_accommodation
+            @params['membership']['own_accommodation'] = !own_accommodation
+            has_guest = @membership.has_guest
+            @params['membership']['has_guest'] = !has_guest
+            guest_disclaimer = @membership.guest_disclaimer
+            @params['membership']['guest_disclaimer'] = false
+
+            patch :update, @params
+
+            membership = Membership.find(@membership.id)
+            expect(membership.room).not_to eq('Forest')
+            expect(membership.billing).to eq(billing)
+            expect(membership.billing).not_to eq('$$$')
+            expect(membership.has_guest).to eq(has_guest)
+            expect(membership.special_info).to eq(special_info)
+            expect(membership.special_info).not_to eq('special')
+            expect(membership.own_accommodation).to eq(own_accommodation)
+            expect(membership.guest_disclaimer).to eq(guest_disclaimer)
+          end
         end
 
         context 'as role: organizer' do
           before do
-            @user.member!
-            @membership.person = @person
+            @user.role = :member
+            @user.person = @membership.person
+            @user.save
+            @membership.role = 'Organizer'
             @membership.save
-            create(:membership, role: 'Organizer', person: @user.person,
-                                event: @event)
+            # create(:membership, role: 'Organizer', person: @user.person,
+            #                     event: @event)
           end
 
           it 'assigns @member' do

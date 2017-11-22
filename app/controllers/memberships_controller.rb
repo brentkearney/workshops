@@ -63,10 +63,10 @@ class MembershipsController < ApplicationController
   # PATCH/PUT /events/:event_id/memberships/1.json
   def update
     authorize @membership
-    mp = MembershipParametizer.new(@membership, membership_params,
-                                   @current_user)
+    member_params = MembershipParametizer.new(@membership, membership_params,
+                                              @current_user)
     respond_to do |format|
-      if @membership.update(mp.data)
+      if @membership.update(member_params.data)
         format.html do
           redirect_to event_membership_path(@event, @membership),
                       notice: 'Membership successfully updated.'
@@ -121,17 +121,9 @@ class MembershipsController < ApplicationController
   end
 
   def membership_params
-    params.require(:membership).permit(
-      :id, :event_id, :person_id, :share_email, :role, :attendance,
-      :arrival_date, :departure_date, :reviewed, :billing, :room,
-      :special_info, :staff_notes, :org_notes, :own_accommodation, :has_guest,
-      :guest_disclaimer,
-      person_attributes: [:salutation, :firstname, :lastname, :email, :phone,
-                          :gender, :affiliation, :department, :title, :url,
-                          :academic_status, :research_areas, :biography, :id,
-                          :address1, :address2, :address3, :city, :region,
-                          :postal_code, :country, :phd_year, :emergency_contact,
-                          :emergency_phone]
-    )
+    @membership = Membership.new(event: @event) if @membership.nil?
+    allowed_fields = policy(@membership).allowed_fields?
+    Rails.logger.debug "\n\n************ allowed parameters: #{allowed_fields} **********\n\n"
+    params.require(:membership).permit(allowed_fields)
   end
 end
