@@ -53,9 +53,9 @@ class MembershipPolicy
 
   def organizer_fields
     [:id, :event_id, :person_id, :share_email, :role, :attendance, :org_notes,
-     person_attributes: [:salutation, :firstname, :lastname, :email, :url,
+     person_attributes: [:id, :salutation, :firstname, :lastname, :email, :url,
                          :affiliation, :department, :title, :research_areas,
-                         :biography, :gender]]
+                         :biography]]
   end
 
   def all_fields
@@ -124,6 +124,10 @@ class MembershipPolicy
 
   def edit_personal_info?
     show_personal_info?
+  end
+
+  def edit_attendance?
+    organizer_and_staff
   end
 
   def organizer_notes?

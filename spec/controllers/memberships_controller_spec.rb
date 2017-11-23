@@ -374,23 +374,49 @@ RSpec.describe MembershipsController, type: :controller do
           @person = create(:person)
           @membership = create(:membership, event: @event, person: @person)
           @params = {
-            'event_id' => @event.id,
-            'id' => @membership.id,
+            id: @membership.id, event_id: @event.id,
             'membership' =>
-            { arrival_date: @membership.event.start_date,
+            { person_id: @person.id,
+              arrival_date: @membership.event.start_date,
               departure_date: @membership.event.end_date,
               own_accommodation: false, has_guest: true, guest_disclaimer: true,
               special_info: '', share_email: true,
-            'person_attributes' =>
+              'person_attributes' =>
               { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
                 gender: 'M', affiliation: 'Foo', department: '', title: '',
-                academic_status: 'Professor', phd_year: 1970, email: 'foo@bar.com',
-                url: '', phone: '123', address1: '123 Street', address2: '',
-                address3: '', city: 'City', region: 'Region', postal_code: 'XYZ',
-                country: 'Dandylion', emergency_contact: '', emergency_phone: '',
-                biography: '', research_areas: '' }
-            }
+                academic_status: 'Professor', phd_year: 1970, id: @person.id,
+                email: 'foo@bar.com', url: '', phone: '123',
+                address1: '123 Street', address2: '', address3: '',
+                city: 'City', region: 'Region', postal_code: 'XYZ',
+                country: 'Dandylion', emergency_contact: '',
+                emergency_phone: '', biography: '', research_areas: '' } }
           }
+        end
+
+        def disallows_hotel_updates
+          @params['membership']['room'] = 'Forest'
+          billing = @membership.billing
+          @params['membership']['billing'] = '$$$'
+          special_info = @membership.special_info
+          @params['membership']['special_info'] = 'special'
+          own_accommodation = @membership.own_accommodation
+          @params['membership']['own_accommodation'] = !own_accommodation
+          has_guest = @membership.has_guest
+          @params['membership']['has_guest'] = !has_guest
+          guest_disclaimer = @membership.guest_disclaimer
+          @params['membership']['guest_disclaimer'] = false
+
+          patch :update, @params
+
+          membership = Membership.find(@membership.id)
+          expect(membership.room).not_to eq('Forest')
+          expect(membership.billing).to eq(billing)
+          expect(membership.billing).not_to eq('$$$')
+          expect(membership.has_guest).to eq(has_guest)
+          expect(membership.special_info).to eq(special_info)
+          expect(membership.special_info).not_to eq('special')
+          expect(membership.own_accommodation).to eq(own_accommodation)
+          expect(membership.guest_disclaimer).to eq(guest_disclaimer)
         end
 
         context 'as role: member, updating another member' do
@@ -414,9 +440,10 @@ RSpec.describe MembershipsController, type: :controller do
 
         context 'as role: member, updating herself' do
           before do
-            @user.member!
+            @user.role = :member
+            @user.person = @person
+            @user.save
             @membership.role = 'Participant'
-            @membership.person_id = @user.person_id
             @membership.save
           end
 
@@ -470,42 +497,17 @@ RSpec.describe MembershipsController, type: :controller do
 
           end
 
-          it 'disallows updating other hotel & billing details' do
-            @params['membership']['room'] = 'Forest'
-            billing = @membership.billing
-            @params['membership']['billing'] = '$$$'
-            special_info = @membership.special_info
-            @params['membership']['special_info'] = 'special'
-            own_accommodation = @membership.own_accommodation
-            @params['membership']['own_accommodation'] = !own_accommodation
-            has_guest = @membership.has_guest
-            @params['membership']['has_guest'] = !has_guest
-            guest_disclaimer = @membership.guest_disclaimer
-            @params['membership']['guest_disclaimer'] = false
-
-            patch :update, @params
-
-            membership = Membership.find(@membership.id)
-            expect(membership.room).not_to eq('Forest')
-            expect(membership.billing).to eq(billing)
-            expect(membership.billing).not_to eq('$$$')
-            expect(membership.has_guest).to eq(has_guest)
-            expect(membership.special_info).to eq(special_info)
-            expect(membership.special_info).not_to eq('special')
-            expect(membership.own_accommodation).to eq(own_accommodation)
-            expect(membership.guest_disclaimer).to eq(guest_disclaimer)
+          it 'disallows updating hotel & billing details' do
+            disallows_hotel_updates
           end
         end
 
         context 'as role: organizer' do
           before do
+            organizer = create(:membership, role: 'Organizer', event: @event)
             @user.role = :member
-            @user.person = @membership.person
+            @user.person = organizer.person
             @user.save
-            @membership.role = 'Organizer'
-            @membership.save
-            # create(:membership, role: 'Organizer', person: @user.person,
-            #                     event: @event)
           end
 
           it 'assigns @member' do
@@ -522,14 +524,136 @@ RSpec.describe MembershipsController, type: :controller do
             expect(flash[:notice]).to eq('Membership successfully updated.')
           end
 
-          it 'allows updating person info'
-          it 'disallows updating some personal info'
-          it 'allows updating role'
-          it 'disallows changing role to or from Organizer roles'
-          it 'allows updating attendance status'
-          it 'disallows updating travel dates'
-          it 'allows updating organizer notes'
-          it 'disallows updating hotel and billing details'
+          it 'allows updating some person fields' do
+            pa = { salutation: 'Mr.', firstname: 'Aleister',
+                   lastname: 'Crowley', email: 'aleister@crowley.co.uk',
+                   url: 'http://crowley.org', affiliation: 'AC Inc.',
+                   department: 'Mysticism', title: 'Protagonist',
+                   research_areas: 'pansexualism, mysticism, deviance',
+                   biography: 'The Great Beast 666.', id: @person.id }
+            @params['membership']['person_attributes'] = pa
+
+            patch :update, @params
+
+            p = Membership.find(@membership.id).person
+            expect(p.salutation).to eq('Mr.')
+            expect(p.firstname).to eq('Aleister')
+            expect(p.lastname).to eq('Crowley')
+            expect(p.email).to eq('aleister@crowley.co.uk')
+            expect(p.url).to eq('http://crowley.org')
+            expect(p.affiliation).to eq('AC Inc.')
+            expect(p.department).to eq('Mysticism')
+            expect(p.title).to eq('Protagonist')
+            expect(p.research_areas).to eq('pansexualism, mysticism, deviance')
+            expect(p.biography).to eq('The Great Beast 666.')
+          end
+
+          it 'disallows updating some personal info' do
+            pa = { firstname: 'Aleister', lastname: 'Crowley',
+                   email: 'aleister@crowley.co.uk', affiliation: 'AC Inc.',
+                   phone: '1234', gender: 'O',
+                   academic_status: 'Student', address1: '123 45th Street',
+                   address2: 'Unit 67', address3: 'B',
+                   city: 'Leeds', region: 'N/A',
+                   postal_code: '891011', country: 'United Kingdom',
+                   phd_year: '2047', emergency_contact: 'Mom',
+                   emergency_phone: '5678', id: @person.id }
+            @params['membership']['person_attributes'] = pa
+            p1 = Membership.find(@membership.id).person
+
+            patch :update, @params
+
+            p2 = Membership.find(@membership.id).person
+            expect(p2.phone).to eq(p1.phone)
+            expect(p2.gender).to eq(p1.gender)
+            expect(p2.academic_status).to eq(p1.academic_status)
+            expect(p2.address1).to eq(p1.address1)
+            expect(p2.address2).to eq(p1.address2)
+            expect(p2.address3).to eq(p1.address3)
+            expect(p2.city).to eq(p1.city)
+            expect(p2.region).to eq(p1.region)
+            expect(p2.postal_code).to eq(p1.postal_code)
+            expect(p2.country).to eq(p1.country)
+            expect(p2.phd_year).to eq(p1.phd_year)
+            expect(p2.emergency_contact).to eq(p1.emergency_contact)
+            expect(p2.emergency_phone).to eq(p1.emergency_phone)
+          end
+
+          it 'allows updating role' do
+            @membership.role = 'Participant'
+            @membership.save
+            @params['membership']['role'] = 'Backup Participant'
+
+            patch :update, @params
+
+            updated_member = Membership.find(@membership.id)
+            expect(updated_member.role).to eq('Backup Participant')
+          end
+
+          it 'disallows changing role to an Organizer role' do
+            @membership.role = 'Participant'
+            @membership.save
+            @params['membership']['role'] = 'Organizer'
+
+            patch :update, @params
+
+            updated_member = Membership.find(@membership.id)
+            expect(updated_member.role).not_to eq('Organizer')
+          end
+
+          it 'disallows changing role from an Organizer role' do
+            @membership.role = 'Organizer'
+            @membership.save
+            @params['membership']['role'] = 'Participant'
+
+            patch :update, @params
+
+            updated_member = Membership.find(@membership.id)
+            expect(updated_member.role).not_to eq('Participant')
+          end
+
+          it 'allows updating attendance status' do
+            @membership.attendance = 'Declined'
+            @membership.save
+            @params['membership']['attendance'] = 'Confirmed'
+
+            patch :update, @params
+
+            updated_member = Membership.find(@membership.id)
+            expect(updated_member.attendance).to eq('Confirmed')
+          end
+
+          it 'disallows updating travel dates' do
+            @membership.role = 'Participant'
+            @membership.arrival_date = @event.start_date
+            @membership.departure_date = @event.end_date
+            @membership.save
+            new_arrival = @event.start_date + 1.day
+            @params['membership']['arrival_date'] = new_arrival
+            new_departure = @event.end_date - 1.day
+            @params['membership']['departure_date'] = new_departure
+
+            patch :update, @params
+
+            updated_member = Membership.find(@membership.id)
+            expect(updated_member.arrival_date).not_to eq(new_arrival)
+            expect(updated_member.departure_date).not_to eq(new_departure)
+          end
+
+          it 'allows updating organizer notes' do
+            @membership.org_notes = ''
+            @membership.save
+            @params['membership']['org_notes'] = 'Foo'
+
+            patch :update, @params
+
+            updated_member = Membership.find(@membership.id)
+            expect(updated_member.org_notes).to eq('Foo')
+          end
+
+          it 'disallows updating hotel and billing details' do
+            disallows_hotel_updates
+          end
         end
 
         context 'as role: staff, from different location' do

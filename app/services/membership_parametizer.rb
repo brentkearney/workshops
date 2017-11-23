@@ -7,7 +7,7 @@
 # Authorizes and tweaks posted form data
 class MembershipParametizer
   include Pundit
-  attr_reader :form_data, :current_user, :person_data
+  attr_accessor :form_data, :current_user, :person_data
 
   def initialize(membership, form_data, current_user)
     @form_data = form_data
@@ -24,17 +24,35 @@ class MembershipParametizer
     db_member.assign_attributes(form_data)
     if db_member.changed?
       form_data['updated_by'] = @current_user.name
+      update_role?(db_member)
       @membership.sync_remote = true
     end
+  end
+
+  def update_role?(updated_member)
+    return unless updated_member.changed_attributes.key?('role')
+    form_data.delete('role') unless role_edit_allowed?(updated_member)
+  end
+
+  def role_edit_allowed?(updated_member)
+    # To and from Organizer role
+    policy(@membership).edit_role? &&
+      MembershipPolicy.new(current_user, updated_member).edit_role?
   end
 
   def update_person
     person = Person.find(@membership.person_id)
     person.assign_attributes(person_data)
-    if person.changed?
-      person_data['updated_by'] = @current_user.name
-      form_data['person_attributes'] = person_data
-      @membership.sync_remote = true
+    return unless person.changed?
+    person_data['updated_by'] = @current_user.name
+    update_gender?
+    form_data['person_attributes'] = person_data
+    @membership.sync_remote = true
+  end
+
+  def update_gender?
+    if person_data['gender'].nil? || !policy(@membership).edit_personal_info?
+      person_data['gender'] = Person.find(@membership.person_id).gender
     end
   end
 

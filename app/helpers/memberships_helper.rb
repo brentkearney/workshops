@@ -16,8 +16,12 @@ module MembershipsHelper
   end
 
   def show_attendances(f)
-    f.select :attendance, Membership::ATTENDANCE,
-             { include_blank: false }, required: 'true', class: 'form-control'
+    if policy(@membership).edit_attendance?
+      f.select :attendance, Membership::ATTENDANCE,
+               { include_blank: false }, required: 'true', class: 'form-control'
+    else
+      @membership.attendance
+    end
   end
 
   def show_email(member)

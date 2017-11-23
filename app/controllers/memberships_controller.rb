@@ -65,6 +65,9 @@ class MembershipsController < ApplicationController
     authorize @membership
     member_params = MembershipParametizer.new(@membership, membership_params,
                                               @current_user)
+
+    Rails.logger.debug "\n\n*******Parametizer returned: #{member_params.data} **********\n\n"
+
     respond_to do |format|
       if @membership.update(member_params.data)
         format.html do
@@ -76,6 +79,7 @@ class MembershipsController < ApplicationController
                         location: event_membership_path(@event, @membership)
         end
       else
+        Rails.logger.debug "\n\n*******Errors: #{@membership.errors.messages} **********\n\n"
         format.html { render :edit }
         format.json do
           render json: @membership.errors, status: :unprocessable_entity

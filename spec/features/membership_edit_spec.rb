@@ -338,7 +338,8 @@ describe 'Membership#edit', type: :feature do
       @non_member_user.role = :staff
       @non_member_user.location = @event.location
       @non_member_user.save
-      @participant = create(:membership, event: @event, has_guest: false)
+      @participant = create(:membership, event: @event, has_guest: false,
+                                         reviewed: false)
       login_as @non_member_user, scope: :user
     end
 
@@ -386,7 +387,8 @@ describe 'Membership#edit', type: :feature do
       @non_member_user.role = :admin
       @non_member_user.save
       login_as @non_member_user, scope: :user
-      @participant = create(:membership, event: @event, has_guest: false)
+      @participant = create(:membership, event: @event, has_guest: false,
+                                         reviewed: false)
     end
 
     before :each do
