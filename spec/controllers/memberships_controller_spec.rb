@@ -373,11 +373,11 @@ RSpec.describe MembershipsController, type: :controller do
           @event = create(:event)
           @person = create(:person)
           @membership = create(:membership, event: @event, person: @person)
+
           @params = {
-            id: @membership.id, event_id: @event.id,
+            event_id: @event.id, id: @membership.id,
             'membership' =>
-            { person_id: @person.id,
-              arrival_date: @membership.event.start_date,
+            { arrival_date: @membership.event.start_date,
               departure_date: @membership.event.end_date,
               own_accommodation: false, has_guest: true, guest_disclaimer: true,
               special_info: '', share_email: true,
@@ -393,30 +393,74 @@ RSpec.describe MembershipsController, type: :controller do
           }
         end
 
-        def disallows_hotel_updates
+        def allows_person_updates
+          person_params = @params['membership']['person_attributes']
+          expect(@person.lastname).not_to eq(person_params['lastname'])
+          expect(@person.firstname).not_to eq(person_params['firstname'])
+          expect(@person.email).not_to eq(person_params['email'])
+
+          patch :update, @params
+
+          person = Membership.find(@membership.id).person
+          person_params.each do |key, value|
+            expect(person.send(key).to_s).to eq(value.to_s)
+          end
+        end
+
+        def allows_membership_updates
+          @membership.arrival_date = @event.start_date
+          @membership.departure_date = @event.departure_date
+          @membership.save
+
+          mp = @params['membership']
+          mp.delete('person_attributes')
+          expect(@membership.arrival_date).not_to eq(mp['arrival_date'])
+          expect(@membership.departure_date).not_to eq(mp['departure_date'])
+
+          patch :update, @params
+
+          member = Membership.find(@membership.id)
+          mp.each do |key, value|
+            expect(member.send(key).to_s).to eq(value.to_s)
+          end
+        end
+
+        def allows_hotel_updates
           @params['membership']['room'] = 'Forest'
-          billing = @membership.billing
           @params['membership']['billing'] = '$$$'
-          special_info = @membership.special_info
           @params['membership']['special_info'] = 'special'
           own_accommodation = @membership.own_accommodation
           @params['membership']['own_accommodation'] = !own_accommodation
-          has_guest = @membership.has_guest
-          @params['membership']['has_guest'] = !has_guest
-          guest_disclaimer = @membership.guest_disclaimer
-          @params['membership']['guest_disclaimer'] = false
+          @params['membership']['has_guest'] = !@membership.has_guest
+
+          patch :update, @params
+
+          membership = Membership.find(@membership.id)
+          expect(membership.room).to eq('Forest')
+          expect(membership.billing).to eq('$$$')
+          expect(membership.has_guest).to eq(!@membership.has_guest)
+          expect(membership.special_info).to eq('special')
+          expect(membership.own_accommodation).to eq(!own_accommodation)
+        end
+
+        def disallows_hotel_updates
+          @params['membership']['room'] = 'Forest'
+          @params['membership']['billing'] = '$$$'
+          @params['membership']['special_info'] = 'special'
+          own_accommodation = @membership.own_accommodation
+          @params['membership']['own_accommodation'] = !own_accommodation
+          @params['membership']['has_guest'] = !@membership.has_guest
 
           patch :update, @params
 
           membership = Membership.find(@membership.id)
           expect(membership.room).not_to eq('Forest')
-          expect(membership.billing).to eq(billing)
+          expect(membership.billing).to eq(@membership.billing)
           expect(membership.billing).not_to eq('$$$')
-          expect(membership.has_guest).to eq(has_guest)
-          expect(membership.special_info).to eq(special_info)
+          expect(membership.has_guest).to eq(@membership.has_guest)
+          expect(membership.special_info).to eq(@membership.special_info)
           expect(membership.special_info).not_to eq('special')
           expect(membership.own_accommodation).to eq(own_accommodation)
-          expect(membership.guest_disclaimer).to eq(guest_disclaimer)
         end
 
         context 'as role: member, updating another member' do
@@ -461,6 +505,10 @@ RSpec.describe MembershipsController, type: :controller do
             expect(flash[:notice]).to eq('Membership successfully updated.')
           end
 
+          it 'allows updating person fields' do
+            allows_person_updates
+          end
+
           it 'allows updating travel dates' do
             arrival = @membership.event.start_date + 1.day
             @params['membership']['arrival_date'] = arrival
@@ -494,7 +542,6 @@ RSpec.describe MembershipsController, type: :controller do
             expect(membership.attendance).not_to eq('Declined')
             expect(membership.staff_notes).not_to eq('Foo')
             expect(membership.org_notes).not_to eq('Bar')
-
           end
 
           it 'disallows updating hotel & billing details' do
@@ -698,10 +745,26 @@ RSpec.describe MembershipsController, type: :controller do
             expect(flash[:notice]).to eq('Membership successfully updated.')
           end
 
-          it 'allows updating personal info'
-          it 'allows updating membership details'
-          it 'disallows updating organizer notes'
-          it 'allows editing hotel and billing details'
+          it 'allows updating personal info' do
+            allows_person_updates
+          end
+
+          it 'allows updating membership details' do
+            allows_membership_updates
+          end
+
+          it 'disallows updating organizer notes' do
+            @params['membership']['org_notes'] = 'Notey note note'
+
+            patch :update, @params
+
+            member = Membership.find(@membership.id)
+            expect(member.org_notes).not_to eq('Notey note note')
+          end
+
+          it 'allows editing hotel and billing details' do
+            allows_hotel_updates
+          end
         end
 
         context 'as role: admin' do
@@ -723,10 +786,28 @@ RSpec.describe MembershipsController, type: :controller do
             expect(flash[:notice]).to eq('Membership successfully updated.')
           end
 
-          it 'allows updating personal info'
-          it 'allows updating membership details'
-          it 'allows updating organizer notes'
-          it 'allows editing hotel and billing details'
+          it 'allows updating personal info' do
+            allows_person_updates
+          end
+
+          it 'allows updating membership details' do
+            allows_membership_updates
+          end
+
+          it 'allows updating organizer notes' do
+            @membership.org_notes = ''
+            @membership.save
+            @params['membership']['org_notes'] = 'Foo'
+
+            patch :update, @params
+
+            updated_member = Membership.find(@membership.id)
+            expect(updated_member.org_notes).to eq('Foo')
+          end
+
+          it 'allows editing hotel and billing details' do
+            allows_hotel_updates
+          end
         end
       end
 

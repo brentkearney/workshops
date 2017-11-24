@@ -41,6 +41,7 @@ class MembershipParametizer
   end
 
   def update_person
+    return if person_data.blank?
     person = Person.find(@membership.person_id)
     person.assign_attributes(person_data)
     return unless person.changed?

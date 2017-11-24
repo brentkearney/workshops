@@ -38,7 +38,7 @@ class MembershipPolicy
     when 'admin', 'super_admin'
       all_fields
     when 'staff'
-      staff_at_location ? all_fields : []
+      staff_at_location ? all_fields - [:org_notes] : []
     when 'member'
       return organizer_fields if organizer?
       return [] unless member_self?

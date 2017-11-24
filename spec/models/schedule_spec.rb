@@ -7,6 +7,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Model validations: Schedule', type: :model do
+  before do
+    Event.destroy_all
+  end
+
   before :each do
     @event = build(:event)
     @schedule = create(:schedule, event: @event,
