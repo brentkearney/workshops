@@ -45,10 +45,19 @@ class MembershipParametizer
     person = Person.find(@membership.person_id)
     person.assign_attributes(person_data)
     return unless person.changed?
-    person_data['updated_by'] = @current_user.name
-    update_gender?
+    data_massage
     form_data['person_attributes'] = person_data
     @membership.sync_remote = true
+  end
+
+  def data_massage
+    person_data['updated_by'] = @current_user.name
+    update_gender?
+    numeric_phd_year?
+  end
+
+  def numeric_phd_year?
+    person_data['phd_year'] = nil unless person_data['phd_year'] =~ /\A[0-9]*\Z/
   end
 
   def update_gender?

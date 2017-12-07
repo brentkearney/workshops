@@ -42,7 +42,7 @@ class MembershipPolicy
     when 'member'
       return organizer_fields if organizer?
       return [] unless member_self?
-      all_fields - [:id, :event_id, :person_id, :share_email, :role, :room,
+      all_fields - [:id, :event_id, :person_id, :role, :room,
                     :attendance, :reviewed, :billing, :special_info,
                     :staff_notes, :org_notes, :own_accommodation, :has_guest,
                     :guest_disclaimer]
@@ -62,7 +62,7 @@ class MembershipPolicy
     [:id, :event_id, :person_id, :share_email, :role, :attendance,
      :arrival_date, :departure_date, :reviewed, :billing, :room,
      :special_info, :staff_notes, :org_notes, :own_accommodation, :has_guest,
-     :guest_disclaimer,
+     :guest_disclaimer, :share_email,
      person_attributes: [:salutation, :firstname, :lastname, :email, :phone,
                          :gender, :affiliation, :department, :title, :url,
                          :academic_status, :research_areas, :biography, :id,
@@ -99,6 +99,10 @@ class MembershipPolicy
 
   def edit_membership?
     self_organizer_staff
+  end
+
+  def delete_membership?
+    staff_and_admins
   end
 
   def edit_role?

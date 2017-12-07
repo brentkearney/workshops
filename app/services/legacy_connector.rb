@@ -94,11 +94,13 @@ class LegacyConnector
   def update_member(membership_id)
     member = Membership.find_by_id(membership_id)
     member.updated_at = member.updated_at
-                               .in_time_zone('Pacific Time (US & Canada)')
-                               .strftime('%Y-%m-%d %H:%M:%S')
-    member.replied_at = member.replied_at
                               .in_time_zone('Pacific Time (US & Canada)')
                               .strftime('%Y-%m-%d %H:%M:%S')
+    unless member.replied_at.nil?
+      member.replied_at = member.replied_at
+                                .in_time_zone('Pacific Time (US & Canada)')
+                                .strftime('%Y-%m-%d %H:%M:%S')
+    end
 
     if member.attendance == 'Confirmed'
       person = member.person

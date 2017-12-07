@@ -40,14 +40,13 @@ describe 'Membership#edit', type: :feature do
     fill_in 'membership_person_attributes_biography', with: 'I did a thing.'
 
     click_button 'Update Member'
-    visit event_membership_path(@event, member)
 
-    expect(page.body).to have_css('div#profile-name', text: 'Samuel Jackson')
-    expect(page.body).to have_css('div#profile-affil',
-                                  text: 'Hollywood, Movies — Actor')
-    expect(page.body).to have_css('div#profile-url', text: 'http://sam.i.am')
-    expect(page.body).to have_css('div#profile-bio', text: 'I did a thing.')
-    expect(page.body).to have_css('div#profile-research', text: 'drama, fame')
+    person = Person.find(member.person_id)
+    expect(person.name).to eq('Samuel Jackson')
+    expect(person.affil_with_title).to eq('Hollywood, Movies — Actor')
+    expect(person.url).to eq('http://sam.i.am')
+    expect(person.biography).to eq('I did a thing.')
+    expect(person.research_areas).to eq('drama, fame')
   end
 
   def allows_personal_info_editing(member)
@@ -60,16 +59,20 @@ describe 'Membership#edit', type: :feature do
     fill_in 'membership_person_attributes_region', with: 'CA'
     fill_in 'membership_person_attributes_postal_code', with: '95014'
     fill_in 'membership_person_attributes_country', with: 'Zimbabwe'
+    fill_in 'membership_person_attributes_emergency_contact', with: 'Mom'
+    fill_in 'membership_person_attributes_emergency_phone', with: '1234'
+    fill_in 'membership_person_attributes_phd_year', with: '1987'
 
     click_button 'Update Member'
-    visit event_membership_path(@event, member)
 
-    expect(page.body).to have_css('div#profile-academic-status',
-                                  text: 'Undergraduate Student')
-    expect(Person.find(member.person.id).gender).to eq('O')
-    expect(page.body).to have_css('div#profile-phone', text: '123-456-7890')
-    expect(page.body).to have_css('div#profile-address',
-      text: "\n      1 Infinity Loop\nCupertino, CA  95014\nZimbabwe\n    ")
+    person = Person.find(member.person_id)
+    expect(person.academic_status).to eq('Undergraduate Student')
+    expect(person.gender).to eq('O')
+    expect(person.phone).to eq('123-456-7890')
+    expect(person.address1).to eq('1 Infinity Loop')
+    expect(person.emergency_contact).to eq('Mom')
+    expect(person.emergency_phone).to eq('1234')
+    expect(person.phd_year).to eq('1987')
   end
 
   def allows_membership_info_editing(member)
@@ -77,10 +80,10 @@ describe 'Membership#edit', type: :feature do
     select 'Undecided', from: 'membership_attendance'
 
     click_button 'Update Member'
-    visit event_membership_path(@event, member)
 
-    expect(page.body).to have_css('div#profile-role', text: 'Organizer')
-    expect(page.body).to have_css('div#profile-attendance', text: 'Undecided')
+    membership = Membership.find(member.id)
+    expect(membership.role).to eq('Organizer')
+    expect(membership.attendance).to eq('Undecided')
 
     visit edit_event_membership_path(@event, member)
     allows_arrival_departure_editing(member)
@@ -238,6 +241,16 @@ describe 'Membership#edit', type: :feature do
     it 'disables role & attendance fields' do
       expect(page.body).not_to have_field 'membership_role'
       expect(page.body).not_to have_field 'membership_attendance'
+    end
+
+    it 'disregards non-numeric Ph.D year data' do
+      @participant.person.phd_year = '1984'
+      @participant.save
+      fill_in :membership_person_attributes_phd_year, with: 'N/A'
+
+      click_button 'Update Member'
+
+      expect(Person.find(@participant.person_id).phd_year).to be_nil
     end
 
     it 'hides organizer notes' do

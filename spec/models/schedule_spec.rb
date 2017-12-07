@@ -9,10 +9,10 @@ require 'rails_helper'
 RSpec.describe 'Model validations: Schedule', type: :model do
   before do
     Event.destroy_all
+    @event = create(:event)
   end
 
   before :each do
-    @event = build(:event)
     @schedule = create(:schedule, event: @event,
       start_time: (@event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
       end_time: (@event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))

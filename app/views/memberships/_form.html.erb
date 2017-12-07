@@ -107,8 +107,8 @@
 			<%= person.label :academic_status, "Academic Status: " %>
 		</div>
 		<div class="col-sm-3">
-			<%= person.select :academic_status, Setting.Site['academic_status'], {},
-					{ class: 'form-control' } %>
+			<%= person.select :academic_status, Setting.Site['academic_status'],
+					{ include_blank: true }, { class: 'form-control', required: true } %>
 		</div>
 		<div class="col-sm-6"></div>
 	</div>

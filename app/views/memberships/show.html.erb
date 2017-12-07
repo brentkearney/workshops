@@ -16,7 +16,14 @@
   	<% end %>
 
     <% if policy(@membership).show_personal_info? %>
-    <div class="row" id="profile-phone"><%= @person.phone %></div>
+    <div class="row" id="profile-phone"><strong>Phone:</strong><%= @person.phone %></div>
+
+    <% unless @person.emergency_contact.blank? %>
+    <div class="row" id="profile-emergency_contact">
+      <strong>Emergency Contact:</strong> <%= @person.emergency_contact +
+        '  (phone: ' + @person.emergency_phone + ')' %>
+    </div>
+    <% end %>
 
     <div class="row" id="profile-address">
       <%= print_address(@person) %>
@@ -24,9 +31,16 @@
     <% end %>
 
     <% if policy(@membership).show_details? %>
-    <div class="row" id="profile-academic-status">
-      <strong>Academic Status:</strong> <%= @person.academic_status %>
-    </div>
+      <% unless @person.academic_status.blank? %>
+      <div class="row" id="profile-academic-status">
+        <strong>Academic Status:</strong> <%= @person.academic_status %>
+      </div>
+      <% end %>
+      <% unless @person.phd_year.blank? %>
+      <div class="row" id="profile-phd_year">
+        <strong>Year of Ph.D.:</strong> <%= @person.phd_year %>
+      </div>
+      <% end %>
     <% end %>
 
     <% unless @person.research_areas.blank? %>
@@ -131,9 +145,11 @@
   <div class="row" id="member-buttons">
   <%= link_to "Back to #{@event.code}", event_memberships_path(@event),
         class: 'btn btn-sm btn-default' %>
-  <% if policy(@membership).allow_edit? %>
+  <% if policy(@membership).edit_membership? %>
     <%= link_to "Edit Membership", edit_event_membership_path(@event, @membership),
           class: 'btn btn-sm btn-default' %>
+  <% end %>
+  <% if policy(@membership).delete_membership? %>
     <%= link_to 'Delete Membership', event_membership_path(@event, @membership),
           method: :delete, class: 'btn btn-sm btn-default',
           data: { confirm: "Are you sure you want to remove #{@person.name} from #{@event.code}?" } %>

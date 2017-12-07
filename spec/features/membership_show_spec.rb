@@ -11,6 +11,10 @@ describe 'Membership#show', type: :feature do
     @event = create(:event_with_members)
     @organizer = @event.memberships.where("role='Contact Organizer'").first
     @participant = @event.memberships.where("role='Participant'").first
+    @participant.person.phd_year = '1992'
+    @participant.person.emergency_contact = 'Mom'
+    @participant.person.emergency_phone = '1234'
+    @participant.save
     @participant_user = create(:user, email: @participant.person.email,
                                       person: @participant.person)
     @non_member_user = create(:user)
@@ -67,6 +71,8 @@ describe 'Membership#show', type: :feature do
     expect(page.body).to have_text(member.person.address1)
     expect(page.body).to have_text(member.person.city)
     expect(page.body).to have_text(member.person.postal_code)
+    expect(page.body).to have_css('div#profile-phd_year')
+    expect(page.body).to have_css('div#profile-emergency_contact')
   end
 
   def hides_personal_info(member)
@@ -180,6 +186,11 @@ describe 'Membership#show', type: :feature do
       does_not_show_hotel_billing(@organizer)
     end
 
+    it 'excludes edit and delete buttons' do
+      expect(page).not_to have_link 'Edit Membership'
+      expect(page).not_to have_link 'Delete Membership'
+    end
+
     it 'denies access to non-confirmed members profiles' do
       nonconfirmed = @event.memberships.where("role='Participant'").last
 
@@ -221,6 +232,11 @@ describe 'Membership#show', type: :feature do
 
     it 'excludes hotel & billing' do
       does_not_show_hotel_billing(@organizer)
+    end
+
+    it 'excludes edit and delete buttons' do
+      expect(page).not_to have_link 'Edit Membership'
+      expect(page).not_to have_link 'Delete Membership'
     end
 
     it 'denies access to non-confirmed members profiles' do
@@ -269,6 +285,11 @@ describe 'Membership#show', type: :feature do
     it 'excludes hotel & billing' do
       does_not_show_hotel_billing(@organizer)
     end
+
+    it 'excludes edit and delete buttons' do
+      expect(page).not_to have_link 'Edit Membership'
+      expect(page).not_to have_link 'Delete Membership'
+    end
   end
 
   context 'As a member of the event viewing their own profile' do
@@ -303,6 +324,23 @@ describe 'Membership#show', type: :feature do
 
     it 'excludes hotel & billing' do
       does_not_show_hotel_billing(@organizer)
+    end
+
+    it 'includes edit button' do
+      expect(page).to have_link 'Edit Membership'
+    end
+
+    it 'excludes delete button' do
+      expect(page).not_to have_link 'Delete Membership'
+    end
+
+    it 'hides academic status if empty' do
+      @participant.person.academic_status = ''
+      @participant.save
+
+      visit event_membership_path(@event, @participant)
+
+      expect(page).not_to have_css('div#profile-academic-status')
     end
   end
 
@@ -341,6 +379,14 @@ describe 'Membership#show', type: :feature do
     it 'excludes hotel & billing' do
       does_not_show_hotel_billing(@organizer)
     end
+
+    it 'includes edit button' do
+      expect(page).to have_link 'Edit Membership'
+    end
+
+    it 'excludes delete button' do
+      expect(page).not_to have_link 'Delete Membership'
+    end
   end
 
   context 'As a staff user at a different location' do
@@ -370,6 +416,11 @@ describe 'Membership#show', type: :feature do
 
     it 'excludes hotel & billing' do
       does_not_show_hotel_billing(@organizer)
+    end
+
+    it 'excludes edit and delete buttons' do
+      expect(page).not_to have_link 'Edit Membership'
+      expect(page).not_to have_link 'Delete Membership'
     end
 
     it 'denies access to non-confirmed members profiles' do
@@ -425,6 +476,11 @@ describe 'Membership#show', type: :feature do
     it 'shows hotel & billing' do
       shows_hotel_billing(@participant)
     end
+
+    it 'includes edit and delete buttons' do
+      expect(page).to have_link 'Edit Membership'
+      expect(page).to have_link 'Delete Membership'
+    end
   end
 
   context 'As an admin user' do
@@ -461,6 +517,11 @@ describe 'Membership#show', type: :feature do
 
     it 'shows hotel & billing' do
       shows_hotel_billing(@participant)
+    end
+
+    it 'includes edit and delete buttons' do
+      expect(page).to have_link 'Edit Membership'
+      expect(page).to have_link 'Delete Membership'
     end
   end
 end
