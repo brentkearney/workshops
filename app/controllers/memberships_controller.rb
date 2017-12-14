@@ -71,8 +71,15 @@ class MembershipsController < ApplicationController
     respond_to do |format|
       if @membership.update(member_params.data)
         format.html do
-          redirect_to event_membership_path(@event, @membership),
-                      notice: 'Membership successfully updated.'
+          if member_params.new_user_email?
+            sign_out @current_user
+            redirect_to sign_in_path, notice: 'Please verify your account by
+              clicking the confirmation link that we sent to your new email
+              address.'.squish
+          else
+            redirect_to event_membership_path(@event, @membership),
+                        notice: 'Membership successfully updated.'
+          end
         end
         format.json do
           render :show, status: :ok,
@@ -93,6 +100,7 @@ class MembershipsController < ApplicationController
   def destroy
     authorize @membership
     @membership.destroy
+
     respond_to do |format|
       format.html do
         redirect_to event_memberships_path(@event),

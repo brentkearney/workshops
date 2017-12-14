@@ -227,6 +227,8 @@
 <% end %>
 
 <% if policy(@membership).edit_dates? %>
+	<%= f.hidden_field :min_date, id: 'min_date', value: @membership.event.start_date %>
+	<%= f.hidden_field :max_date, id: 'max_date', value: @membership.event.end_date %>
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
 			<%= f.label :arrival_date, "Arrival Date:" %>

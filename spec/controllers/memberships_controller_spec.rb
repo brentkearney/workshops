@@ -385,7 +385,7 @@ RSpec.describe MembershipsController, type: :controller do
               { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
                 gender: 'M', affiliation: 'Foo', department: '', title: '',
                 academic_status: 'Professor', phd_year: 1970, id: @person.id,
-                email: 'foo@bar.com', url: '', phone: '123',
+                email: @person.email, url: '', phone: '123',
                 address1: '123 Street', address2: '', address3: '',
                 city: 'City', region: 'Region', postal_code: 'XYZ',
                 country: 'Dandylion', emergency_contact: '',
@@ -485,7 +485,7 @@ RSpec.describe MembershipsController, type: :controller do
         context 'as role: member, updating herself' do
           before do
             @user.role = :member
-            @user.person = @person
+            @user.person = @membership.person
             @user.save
             @membership.role = 'Participant'
             @membership.save
@@ -498,11 +498,22 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'updates membership, redirects with flash message' do
+            @params['membership']['person_attributes'][:email] = @user.email
             patch :update, @params
 
             expect(response).to redirect_to(event_membership_path(@event,
                                                                   @membership))
             expect(flash[:notice]).to eq('Membership successfully updated.')
+          end
+
+          it 'updates user email, signs out with flash message' do
+            params_email = @params['membership']['person_attributes'][:email]
+            expect(@user.email).not_to eq(params_email)
+
+            patch :update, @params
+
+            expect(response).to redirect_to(sign_in_path)
+            expect(flash[:notice]).to include('Please verify')
           end
 
           it 'allows updating person fields' do
@@ -812,21 +823,85 @@ RSpec.describe MembershipsController, type: :controller do
       end
 
       describe '#destroy' do
-        it 'assigns @member' do
-          membership = create(:membership, event: @event)
-
-          delete :destroy, event_id: @event.id, id: membership.id
-
-          expect(assigns(:membership)).to eq(membership)
+        before do
+          @membership = create(:membership, event: @event)
         end
 
-        it 'denies access, redirects with error' do
-          membership = create(:membership, event: @event)
-
-          delete :destroy, event_id: @event.id, id: membership.id
+        def denies_access
+          delete :destroy, event_id: @event.id, id: @membership.id
 
           expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
+        end
+
+        def deletes_membership
+          delete :destroy, event_id: @event.id, id: @membership.id
+
+          expect(response).to redirect_to event_memberships_path(@event)
+          expect(flash[:notice]).to eq('Membership was successfully destroyed.')
+        end
+
+        context 'as role: member' do
+          before do
+            @user.member!
+          end
+
+          it 'assigns @member' do
+            delete :destroy, event_id: @event.id, id: @membership.id
+
+            expect(assigns(:membership)).to eq(@membership)
+          end
+
+          it 'denies access, redirects with error' do
+            denies_access
+          end
+        end
+
+        context 'as role: organizer' do
+          before do
+            organizer = create(:membership, role: 'Organizer', event: @event)
+            @user.role = :member
+            @user.person = organizer.person
+            @user.save
+          end
+
+          it 'denies access, redirects with error' do
+            denies_access
+          end
+        end
+
+        context 'as role: staff, from different location' do
+          before do
+            @user.role = :staff
+            @user.location = 'Elsewhere'
+            @user.save
+          end
+
+          it 'denies access, redirects with error' do
+            denies_access
+          end
+        end
+
+        context 'as role: staff, from same location' do
+          before do
+            @user.role = :staff
+            @user.location = @event.location
+            @user.save
+          end
+
+          it 'deletes membership, redirects with notice' do
+            deletes_membership
+          end
+        end
+
+        context 'as role: admin' do
+          before do
+            @user.admin!
+          end
+
+          it 'deletes membership, redirects with notice' do
+            deletes_membership
+          end
         end
       end
     end

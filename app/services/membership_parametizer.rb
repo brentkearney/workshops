@@ -7,7 +7,7 @@
 # Authorizes and tweaks posted form data
 class MembershipParametizer
   include Pundit
-  attr_accessor :form_data, :current_user, :person_data
+  attr_accessor :form_data, :current_user, :person_data, :user_update
 
   def initialize(membership, form_data, current_user)
     @form_data = form_data
@@ -52,8 +52,17 @@ class MembershipParametizer
 
   def data_massage
     person_data['updated_by'] = @current_user.name
+    update_user_email?
     update_gender?
     numeric_phd_year?
+  end
+
+  def update_user_email?
+    user = User.find_by_person_id(@membership.person_id)
+    return if user.nil? || user.email == person_data['email']
+    @user_update = true if @current_user.person_id == user.person_id
+    user.email = person_data['email']
+    user.save
   end
 
   def numeric_phd_year?
@@ -69,5 +78,9 @@ class MembershipParametizer
   def data
     @membership.update_by_staff = true if policy(@membership).extended_stay?
     form_data
+  end
+
+  def new_user_email?
+    @user_update || false
   end
 end

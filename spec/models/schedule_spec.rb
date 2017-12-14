@@ -8,7 +8,6 @@ require 'rails_helper'
 
 RSpec.describe 'Model validations: Schedule', type: :model do
   before do
-    Event.destroy_all
     @event = create(:event)
   end
 
@@ -106,7 +105,7 @@ RSpec.describe 'Model validations: Schedule', type: :model do
   end
 
   it 'is invalid if the start time is outside of the event\'s dates' do
-    schedule = build(:schedule)
+    schedule = build(:schedule, event: @event)
     schedule.start_time = (schedule.event.start_date - 1.days + 11.hours).to_s(:db)
     expect(schedule).not_to be_valid
     schedule.start_time = (schedule.event.end_date + 1.days + 11.hours).to_s(:db)
@@ -123,7 +122,7 @@ RSpec.describe 'Model validations: Schedule', type: :model do
   end
 
   it 'is invalid if the end time is before the start time' do
-    schedule = build(:schedule)
+    schedule = build(:schedule, event: @event)
     schedule2 = Schedule.new(schedule.attributes.merge(start_time: schedule.end_time + 60.minutes,
       end_time: schedule.end_time + 30.minutes))
     expect(schedule2).not_to be_valid
@@ -131,7 +130,7 @@ RSpec.describe 'Model validations: Schedule', type: :model do
   end
 
   it 'is invalid if the end time is equal to the start time (causes infinite loop!)' do
-    schedule = build(:schedule)
+    schedule = build(:schedule, event: @event)
     schedule2 = Schedule.new(schedule.attributes.merge(start_time: schedule.end_time + 60.minutes, end_time: schedule.end_time + 60.minutes))
     expect(schedule2).not_to be_valid
     expect(schedule2.errors.full_messages).to eq(['End time - must be greater than start time'])

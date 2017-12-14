@@ -216,6 +216,21 @@ describe 'Membership#edit', type: :feature do
       allows_person_editing(@participant)
     end
 
+    it 'changing email signs out user' do
+      @participant.person.email = Faker::Internet.email
+      @participant_user.email = @participant.person.email
+      @participant.save
+      @participant_user.save
+
+      visit edit_event_membership_path(@event, @participant)
+      fill_in 'membership_person_attributes_email', with: 'new@email.com'
+
+      click_button 'Update Member'
+
+      expect(current_path).to eq(sign_in_path)
+      expect(page.body).to have_css('div.alert-notice', text: 'Please verify')
+    end
+
     it 'allows editing of personal info' do
       allows_personal_info_editing(@participant)
     end
