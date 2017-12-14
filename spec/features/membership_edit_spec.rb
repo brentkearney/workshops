@@ -335,6 +335,23 @@ describe 'Membership#edit', type: :feature do
       expect(page.body).to have_css('div#profile-attendance', text: 'Declined')
     end
 
+    it 'does not allow changing Invited status' do
+      expect(@participant.attendance).not_to eq('Not Yet Invited')
+      select = find(:select, 'membership_attendance')
+      expect(select).to have_selector(:option, 'Confirmed', disabled: false)
+      expect(select).to have_selector(:option, 'Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Undecided', disabled: false)
+      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Declined', disabled: false)
+
+      @participant.attendance = 'Not Yet Invited'
+      @participant.save
+
+      visit edit_event_membership_path(@event, @participant)
+
+      expect(page).not_to have_select('membership_attendance')
+    end
+
     it 'disallows changing of travel dates' do
       expect(page.body).not_to have_field 'membership[arrival_date]'
       expect(page.body).not_to have_field 'membership[departure_date]'

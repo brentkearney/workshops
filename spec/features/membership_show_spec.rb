@@ -65,28 +65,27 @@ describe 'Membership#show', type: :feature do
   end
 
   def shows_personal_info(member)
-    expect(page.body).to have_css('div#profile-phone',
-                                      text: member.person.phone)
     expect(page.body).to have_css('div#profile-address')
     expect(page.body).to have_text(member.person.address1)
     expect(page.body).to have_text(member.person.city)
     expect(page.body).to have_text(member.person.postal_code)
     expect(page.body).to have_css('div#profile-phd_year')
     expect(page.body).to have_css('div#profile-emergency_contact')
+    expect(page.body).to have_css('div#profile-academic-status',
+                                  text: member.person.academic_status)
   end
 
   def hides_personal_info(member)
-    expect(page.body).not_to have_css('div#profile-phone',
-                                      text: member.person.phone)
     expect(page.body).not_to have_css('div#profile-address')
     expect(page.body).not_to have_text(member.person.address1)
     expect(page.body).not_to have_text(member.person.city)
     expect(page.body).not_to have_text(member.person.postal_code)
+    expect(page.body).not_to have_css('div#profile-academic-status')
   end
 
   def shows_details(member)
-    expect(page.body).to have_css('div#profile-academic-status',
-                                  text: member.person.academic_status)
+    expect(page.body).to have_css('div#profile-phone',
+                                      text: member.person.phone)
     expect(page.body).to have_css('div.updated-by',
                                   text: member.person.updated_by)
     expect(page.body).to have_css('div.membership-details')

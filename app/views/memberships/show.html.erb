@@ -15,27 +15,29 @@
   	<div class="row" id="profile-url"><%= link_to @person.uri, @person.uri %></div>
   	<% end %>
 
-    <% if policy(@membership).show_personal_info? %>
+    <% if policy(@membership).show_details? && !@person.phone.blank? %>
     <div class="row" id="profile-phone"><strong>Phone:</strong><%= @person.phone %></div>
-
-    <% unless @person.emergency_contact.blank? %>
-    <div class="row" id="profile-emergency_contact">
-      <strong>Emergency Contact:</strong> <%= @person.emergency_contact +
-        '  (phone: ' + @person.emergency_phone + ')' %>
-    </div>
     <% end %>
 
-    <div class="row" id="profile-address">
-      <%= print_address(@person) %>
-    </div>
-    <% end %>
+    <% if policy(@membership).show_personal_info? %>
+      <% unless @person.emergency_contact.blank? %>
+      <div class="row" id="profile-emergency_contact">
+        <strong>Emergency Contact:</strong> <%= @person.emergency_contact +
+          '  (phone: ' + @person.emergency_phone + ')' %>
+      </div>
+      <% end %>
 
-    <% if policy(@membership).show_details? %>
+      <div class="row" id="profile-address">
+        <strong>Address:</strong><br />
+        <%= print_address(@person) %>
+      </div>
+
       <% unless @person.academic_status.blank? %>
       <div class="row" id="profile-academic-status">
         <strong>Academic Status:</strong> <%= @person.academic_status %>
       </div>
       <% end %>
+
       <% unless @person.phd_year.blank? %>
       <div class="row" id="profile-phd_year">
         <strong>Year of Ph.D.:</strong> <%= @person.phd_year %>
@@ -95,7 +97,9 @@
     <% if policy(@membership).organizer_notes? %>
     <div class="row" id="profile-org-notes">
       <strong>Organizer Notes:</strong>
-      <p><%= simple_format(@membership.org_notes) %></p>
+      <div class="member_notes">
+        <%= simple_format(@membership.org_notes) %>
+      </div>
     </div>
     <% end %>
   </div><!-- col-md-3 -->
@@ -130,7 +134,9 @@
     </div>
     <div class="row" id="profile-staff-notes">
       <strong>Staff Notes:</strong>
-      <p><%= simple_format(@membership.staff_notes) %></p>
+      <div class="member_notes">
+        <%= simple_format(@membership.staff_notes) %>
+      </div>
     </div>
 	</div><!-- col-md-4 hotel-billing -->
   <% end %>

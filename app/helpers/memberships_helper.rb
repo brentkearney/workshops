@@ -6,19 +6,28 @@
 
 module MembershipsHelper
   def show_roles(f)
+    disabled_options = []
     if @current_user.is_organizer?(@event)
-      org_roles = ['Contact Organizer', 'Organizer']
-      f.select :role, Membership::ROLES, disabled: org_roles,
-               class: 'form-control'
-    else
-      f.select :role, Membership::ROLES, {}, class: 'form-control'
+      disabled_options = ['Contact Organizer', 'Organizer']
     end
+
+    f.select :role, Membership::ROLES, disabled: disabled_options,
+                                       class: 'form-control'
   end
 
   def show_attendances(f)
     if policy(@membership).edit_attendance?
+      disabled_options = []
+      if @current_user.is_organizer?(@event)
+        if @membership.attendance == 'Not Yet Invited'
+          return @membership.attendance
+        else
+          disabled_options = ['Invited', 'Not Yet Invited']
+        end
+      end
       f.select :attendance, Membership::ATTENDANCE,
-               { include_blank: false }, required: 'true', class: 'form-control'
+               { include_blank: false, disabled: disabled_options },
+               required: 'true', class: 'form-control'
     else
       @membership.attendance
     end
