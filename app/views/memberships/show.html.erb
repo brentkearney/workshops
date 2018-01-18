@@ -2,8 +2,6 @@
 <h4><strong>Event Member:</strong></h4>
 
 <div class="row">
-  <div id="profile-pic" class="col-md-4"><%= profile_pic(@person) %></div>
-
   <div class="col-md-6 profile">
   	<div class="row" id="profile-name"><%= @person.name %></div>
   	<div class="row" id="profile-affil"><%= @person.affil_with_title %></div>
@@ -16,7 +14,7 @@
   	<% end %>
 
     <% if policy(@membership).show_details? && !@person.phone.blank? %>
-    <div class="row" id="profile-phone"><strong>Phone:</strong><%= @person.phone %></div>
+    <div class="row" id="profile-phone"><strong>Phone:</strong> <%= @person.phone %></div>
     <% end %>
 
     <% if policy(@membership).show_personal_info? %>
@@ -63,11 +61,9 @@
     </div>
     <% end %>
   </div><!-- col-md-6 profile -->
-</div><!-- row -->
 
 <% if policy(@membership).show_details? %>
-<div class="row profile membership-details">
-  <div class="col-md-4">
+  <div class="col-md-6 profile membership-details">
     <h3>Membership Details</h3>
     <div class="row" id="profile-role">
       <strong>Role:</strong>
@@ -102,11 +98,13 @@
       </div>
     </div>
     <% end %>
-  </div><!-- col-md-3 -->
+  </div><!-- col-md-6 -->
   <% end %>
+</div><!-- row -->
 
   <% if policy(@membership).hotel_and_billing? %>
-  <div class="col-md-4 hotel-billing">
+<div class="row">
+  <div class="col-md-6 profile hotel-billing">
     <h3>Hotel & Billing</h3>
     <div class="row" id="profile-reviewed">
      <strong>Reviewed:</strong> <%= @membership.reviewed ? 'Yes' : 'No' %>
@@ -138,7 +136,7 @@
         <%= simple_format(@membership.staff_notes) %>
       </div>
     </div>
-	</div><!-- col-md-4 hotel-billing -->
+	</div><!-- col-md-6 hotel-billing -->
   <% end %>
 </div><!-- row -->
 

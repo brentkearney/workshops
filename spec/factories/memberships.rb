@@ -1,6 +1,6 @@
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 
-FactoryGirl.define do
+FactoryBot.define do
   require 'faker'
 
   factory :membership do |f|
@@ -20,6 +20,6 @@ FactoryGirl.define do
     f.special_info { Faker::Lorem.sentence(1) }
     f.staff_notes { Faker::Lorem.sentence(1) }
     f.org_notes { Faker::Lorem.sentence(1) }
-    f.updated_by 'FactoryGirl'
+    f.updated_by 'FactoryBot'
   end
 end

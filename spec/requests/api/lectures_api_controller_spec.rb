@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 require 'rails_helper'
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 
 describe Api::V1::LecturesController do
   context '#update' do

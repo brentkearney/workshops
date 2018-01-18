@@ -1,6 +1,6 @@
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 
-FactoryGirl.define do
+FactoryBot.define do
   sequence(:title) { |n| "A lectures database test (ignore) #{n}" }
 
   factory :lecture do |f|
@@ -13,7 +13,7 @@ FactoryGirl.define do
     f.room 'TCPL 201'
     f.do_not_publish false
     f.abstract { Faker::Lorem.sentence(2) }
-    f.updated_by 'FactoryGirl'
+    f.updated_by 'FactoryBot'
   end
 
 end

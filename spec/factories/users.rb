@@ -1,6 +1,6 @@
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 
-FactoryGirl.define do
+FactoryBot.define do
   require 'faker'
 
   factory :user do |f|

@@ -1,8 +1,8 @@
 # spec/factories/events.rb
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 require 'faker'
 
-FactoryGirl.define do
+FactoryBot.define do
   sequence(:code) do |n|
     n = 1 if n > 998
     DateTime.current.strftime("%y") + 'w5' + n.to_s.rjust(3, '0')
@@ -31,7 +31,7 @@ FactoryGirl.define do
     f.location 'EO'
     f.time_zone 'Mountain Time (US & Canada)'
     f.description { Faker::Lorem.sentence(6) }
-    f.updated_by 'FactoryGirl'
+    f.updated_by 'FactoryBot'
     f.template false
 
     transient do

@@ -8,18 +8,18 @@ require 'rails_helper'
 
 describe 'Email address sharing', :type => :feature do
   before do
-    @event = FactoryGirl.create(:event)
+    @event = FactoryBot.create(:event)
     5.times do
-      person = FactoryGirl.create(:person)
-      membership = FactoryGirl.create(:membership, event: @event, person: person, role: 'Participant')
-      user = FactoryGirl.create(:user, email: person.email, person: person)
+      person = FactoryBot.create(:person)
+      membership = FactoryBot.create(:membership, event: @event, person: person, role: 'Participant')
+      user = FactoryBot.create(:user, email: person.email, person: person)
     end
 
     @member = @event.members.first
     @user = User.find_by_email(@member.email)
     expect(@user).not_to be_nil
 
-    @non_member_user = FactoryGirl.create(:user)
+    @non_member_user = FactoryBot.create(:user)
   end
 
   after(:each) do
@@ -155,10 +155,10 @@ describe 'Email address sharing', :type => :feature do
 
   context 'As an organizer of a different event' do
     before do
-      @new_event = FactoryGirl.create(:event)
-      new_person = FactoryGirl.create(:person)
-      new_membership = FactoryGirl.create(:membership, event: @new_event, person: new_person, role: 'Organizer')
-      new_user = FactoryGirl.create(:user, email: new_person.email, person: new_person)
+      @new_event = FactoryBot.create(:event)
+      new_person = FactoryBot.create(:person)
+      new_membership = FactoryBot.create(:membership, event: @new_event, person: new_person, role: 'Organizer')
+      new_user = FactoryBot.create(:user, email: new_person.email, person: new_person)
       login_as new_user, scope: :user
     end
 

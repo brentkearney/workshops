@@ -27,7 +27,7 @@ module Workshops
     # Serve error pages with Rails
     config.exceptions_app = self.routes
 
-    # Use RSpec & FactoryGirl
+    # Use RSpec & FactoryBot
     config.generators do |g|
       g.test_framework :rspec,
         :fixtures => true,
@@ -36,7 +36,7 @@ module Workshops
         :routing_specs => false,
         :controller_specs => true,
         :request_specs => true
-      g.fixture_replacement :factory_girl, :dir => "spec/factories"
+      g.fixture_replacement :factory_bot, :dir => "spec/factories"
     end
   end
 end

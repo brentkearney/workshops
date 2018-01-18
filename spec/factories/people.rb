@@ -1,8 +1,8 @@
 # spec/factories/people.rb
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 require 'faker'
 
-FactoryGirl.define do
+FactoryBot.define do
   sequence(:firstname) { |n| "#{n}-#{Faker::Name.first_name}" }
   sequence(:lastname) { Faker::Name.last_name }
   sequence(:email) { |n| "person-#{n}@" + Faker::Internet.domain_name }
@@ -26,6 +26,6 @@ FactoryGirl.define do
     f.legacy_id
     f.biography { Faker::Lorem.paragraph }
     f.research_areas { Faker::Lorem.words(4).join(', ') }
-    f.updated_by 'FactoryGirl'
+    f.updated_by 'FactoryBot'
   end
 end

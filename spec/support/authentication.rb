@@ -1,17 +1,17 @@
 
 # Include inside before loop
 def authenticate_user(person = nil, role = 'admin')
-  @person ||= FactoryGirl.create(:person)
-  @user = FactoryGirl.create(:user, person: @person, role: role)
+  @person ||= FactoryBot.create(:person)
+  @user = FactoryBot.create(:user, person: @person, role: role)
   login_as @user, scope: :user
   @user
 end
 
 def authenticate_for_controllers
-  @person = FactoryGirl.create(:person)
-  @user = FactoryGirl.create(:user, person: @person)
-  @event = FactoryGirl.create(:event)
-  @membership = FactoryGirl.create(:membership, event: @event, person: @person, attendance: 'Confirmed')
+  @person = FactoryBot.create(:person)
+  @user = FactoryBot.create(:user, person: @person)
+  @event = FactoryBot.create(:event)
+  @membership = FactoryBot.create(:membership, event: @event, person: @person, attendance: 'Confirmed')
   sign_in @user
 end
 
