@@ -2,7 +2,12 @@
   margin: 8px 0;
 }
 
+.page-header-subtitle h4 {
+    font-size: 1em;
+}
+
 .profile {
+  margin-top: 20px;
   font-size: 1.2em;
 
   .row {
@@ -14,8 +19,16 @@
     font-weight: bold;
     margin-bottom: 0.3em;
   }
+  #profile-phone {
+    margin-top: 1.5em;
+  }
   #profile-address {
     margin-top: 1.5em;
+  }
+  #profile-bio, #profile-special-info p {
+    font-size: 1em;
+    margin-left: 1em;
+    margin-bottom: 1em;
   }
 
   .membership-details {
