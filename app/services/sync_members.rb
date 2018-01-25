@@ -114,7 +114,7 @@ class SyncMembers
   def update_person(remote_person)
     local_person = get_local_person(remote_person)
 
-    if local_person.nil?
+    if local_person.blank?
       local_person = save_person(Person.new(remote_person))
     else
       updated_person = update_record(local_person, remote_person)
@@ -126,12 +126,27 @@ class SyncMembers
     local_person
   end
 
+  def bool_value(value)
+    return true if value == true || value == 1
+    return false
+  end
+
+  def boolean_fields(obj)
+    fields = []
+    obj.attribute_names.each do |field|
+      fields << field if obj.type_for_attribute(field).type == :boolean
+    end
+    fields
+  end
+
   # local record, remote hash
   def update_record(local, remote)
-    updated = false
+    booleans = boolean_fields(local)
+
     remote.each_pair do |k, v|
       next if v.blank?
       v = prepare_value(k, v)
+      v = bool_value(v) if booleans.include?(k)
 
       unless local.send(k).eql? v
         if k.eql? 'email'
@@ -139,10 +154,9 @@ class SyncMembers
         else
           local.send("#{k}=", v)
         end
-        updated = true
       end
     end
-    return local if updated
+    local
   end
 
   def prepare_value(k, v)
@@ -214,7 +228,7 @@ class SyncMembers
 
   def update_membership(remote_member, local_person)
     local_membership = local_members.select do |m|
-      m.person_id.to_i == local_person[:id].to_i
+      m.person_id.to_i == local_person.id unless m.nil?
     end.first
 
     if local_membership.nil?
@@ -224,6 +238,7 @@ class SyncMembers
       save_membership(local_membership)
     else
       updated_member = update_record(local_membership, remote_member)
+      updated_member.person_id = local_person.id
       local_membership = save_membership(updated_member) if updated_member
     end
     local_membership

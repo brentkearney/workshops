@@ -5,6 +5,8 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Event < ActiveRecord::Base
+  attr_accessor :data_import
+
   has_many :memberships, dependent: :destroy
   has_many :members, through: :memberships, source: :person
   has_many :schedules, dependent: :destroy
@@ -69,6 +71,7 @@ class Event < ActiveRecord::Base
   end
 
   def has_long_name
+    return if data_import
     if name && name.length > 68
       if short_name.blank?
         errors.add(:short_name, "- if the name is > 68 characters, a shorter name is required to fit on name tags")
