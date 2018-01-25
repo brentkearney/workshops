@@ -65,6 +65,7 @@ class MembershipsController < ApplicationController
     authorize @membership
     member_params = MembershipParametizer.new(@membership, membership_params,
                                               @current_user)
+    @membership.sync_remote = true
 
     Rails.logger.debug "\n\n*******Parametizer returned: #{member_params.data} **********\n\n"
 

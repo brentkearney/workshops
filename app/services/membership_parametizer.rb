@@ -76,7 +76,7 @@ class MembershipParametizer
   end
 
   def data
-    @membership.update_by_staff = true if policy(@membership).extended_stay?
+    @membership.update_by_staff = true if policy(@membership).staff_update?
     form_data
   end
 
