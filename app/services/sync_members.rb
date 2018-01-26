@@ -146,6 +146,7 @@ class SyncMembers
     remote.each_pair do |k, v|
       next if v.blank?
       v = prepare_value(k, v)
+      next if k == 'updated_at' && local.updated_at.utc == v
       v = bool_value(v) if booleans.include?(k)
 
       unless local.send(k).eql? v
@@ -217,7 +218,9 @@ class SyncMembers
   def save_person(person)
     person.member_import = true
     if person.save
-      Rails.logger.info "\n\n* Saved #{@event.code} person: #{person.name}\n"
+      unless person.previous_changes.empty?
+       Rails.logger.info "\n\n* Saved #{@event.code} person: #{person.name}\n"
+     end
     else
       Rails.logger.error "\n\n" + "* Error saving #{@event.code} person:
         #{person.name}, #{person.errors.full_messages}".squish + "\n"
@@ -248,8 +251,10 @@ class SyncMembers
     membership.person.member_import = true
     membership.update_by_staff = true
     if membership.save
-      Rails.logger.info "\n\n" + "* Saved #{@event.code} membership for
-        #{membership.person.name}".squish + "\n"
+      unless membership.previous_changes.empty?
+        Rails.logger.info "\n\n" + "* Saved #{@event.code} membership for
+          #{membership.person.name}".squish + "\n"
+      end
     else
       Rails.logger.error "\n\n" + "* Error saving #{@event.code} membership for
         #{membership.person.name}:
