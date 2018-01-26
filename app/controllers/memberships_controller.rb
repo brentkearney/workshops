@@ -120,6 +120,7 @@ class MembershipsController < ApplicationController
   end
 
   def map_emails(members)
+    return [] if members.blank?
     members.map { |m| "\"#{m.person.name}\" <#{m.person.email}>" }
   end
 
