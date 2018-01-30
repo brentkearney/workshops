@@ -46,6 +46,8 @@ RSpec.describe InvitationsController, type: :controller do
 
   describe 'POST #create' do
     before do
+      authenticate_for_controllers
+      @user.admin!
       @event = create(:event, future: true)
       @membership = create(:membership, event: @event, attendance: 'Invited')
       @form_params = {'invitation': {
@@ -117,5 +119,53 @@ RSpec.describe InvitationsController, type: :controller do
         expect(invitation).not_to have_received(:send_invite)
       end
     end
+  end
+
+  describe 'GET #resend' do
+    before do
+      authenticate_for_controllers
+      @user.admin!
+      @event = create(:event, future: true)
+      @membership = create(:membership, event: @event, attendance: 'Invited')
+    end
+
+    context 'invalid parameter' do
+      before do
+        get :resend, membership_id: '69 '
+      end
+
+      it 'redirects to root_path' do
+        expect(response).to redirect_to(root_path)
+      end
+
+      it 'assigns error message' do
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    context 'valid parameter' do
+      before do
+        get :resend, membership_id: @membership.id
+      end
+
+      it 'redirects to event_memberships_path' do
+        event = @membership.event
+        expect(response).to redirect_to(event_memberships_path(event))
+      end
+
+      it 'assigns success message' do
+        expect(flash[:success]).to be_present
+      end
+
+      it 'sends invitation' do
+        invitation = spy('invitation')
+        allow(Invitation).to receive(:new).and_return(invitation)
+
+        get :resend, membership_id: @membership.id
+
+        expect(invitation).to have_received(:send_invite)
+      end
+    end
+
   end
 end

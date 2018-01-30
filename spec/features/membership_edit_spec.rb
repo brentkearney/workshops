@@ -275,6 +275,10 @@ describe 'Membership#edit', type: :feature do
     it 'hides hotel & billing fields' do
       disallows_hotel_fields
     end
+
+    it 'has no send invitation link' do
+      expect(page.body).not_to have_link 'Send Invitation'
+    end
   end
 
   context 'As an organizer of the event' do
@@ -335,21 +339,70 @@ describe 'Membership#edit', type: :feature do
       expect(page.body).to have_css('div#profile-attendance', text: 'Declined')
     end
 
-    it 'does not allow changing Invited status' do
-      expect(@participant.attendance).not_to eq('Not Yet Invited')
+    it 'allows changing from Confirmed to Undecided or Declined' do
+      expect(@participant.attendance).to eq('Confirmed')
       select = find(:select, 'membership_attendance')
-      expect(select).to have_selector(:option, 'Confirmed', disabled: false)
+      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
       expect(select).to have_selector(:option, 'Invited', disabled: true)
       expect(select).to have_selector(:option, 'Undecided', disabled: false)
       expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
       expect(select).to have_selector(:option, 'Declined', disabled: false)
+    end
 
+    it 'allows changing from Invited to Declined' do
+      @participant.attendance = 'Invited'
+      @participant.save
+
+      visit edit_event_membership_path(@event, @participant)
+
+      select = find(:select, 'membership_attendance')
+      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
+      expect(select).to have_selector(:option, 'Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Undecided', disabled: true)
+      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Declined', disabled: false)
+    end
+
+    it 'allows changing from Undecided to Declined' do
+      @participant.attendance = 'Undecided'
+      @participant.save
+
+      visit edit_event_membership_path(@event, @participant)
+
+      select = find(:select, 'membership_attendance')
+      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
+      expect(select).to have_selector(:option, 'Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Undecided', disabled: true)
+      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Declined', disabled: false)
+    end
+
+    it 'allows changing from Not Yet Invited to Declined' do
       @participant.attendance = 'Not Yet Invited'
       @participant.save
 
       visit edit_event_membership_path(@event, @participant)
 
-      expect(page).not_to have_select('membership_attendance')
+      select = find(:select, 'membership_attendance')
+      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
+      expect(select).to have_selector(:option, 'Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Undecided', disabled: true)
+      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Declined', disabled: false)
+    end
+
+    it 'disallows changing from Declined' do
+      @participant.attendance = 'Declined'
+      @participant.save
+
+      visit edit_event_membership_path(@event, @participant)
+
+      select = find(:select, 'membership_attendance')
+      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
+      expect(select).to have_selector(:option, 'Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Undecided', disabled: true)
+      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
+      expect(select).to have_selector(:option, 'Declined', disabled: true)
     end
 
     it 'disallows changing of travel dates' do
@@ -363,6 +416,21 @@ describe 'Membership#edit', type: :feature do
 
     it 'hides hotel & billing fields' do
       disallows_hotel_fields
+    end
+
+    it 'has send invitation link' do
+      expect(page.body).to have_link 'Send Invitation'
+    end
+
+    it 'has no send invitation link if role is Backup Participant' do
+      @participant.role = 'Backup Participant'
+      @participant.save
+
+      visit edit_event_membership_path(@event, @participant)
+
+      expect(page.body).not_to have_link 'Send Invitation'
+      @participant.role = 'Participant'
+      @participant.save
     end
   end
 
@@ -425,6 +493,10 @@ describe 'Membership#edit', type: :feature do
     it 'allows editing of billing info' do
       allows_billing_info_editing(@participant)
     end
+
+    it 'has send invitation link' do
+      expect(page.body).to have_link 'Send Invitation'
+    end
   end
 
   context 'As an admin user' do
@@ -463,6 +535,10 @@ describe 'Membership#edit', type: :feature do
 
     it 'allows editing of membership info' do
       allows_membership_info_editing(@participant)
+    end
+
+    it 'has send invitation link' do
+      expect(page.body).to have_link 'Send Invitation'
     end
 
     it 'allows organizer notes' do

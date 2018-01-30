@@ -17,13 +17,15 @@ module MembershipsHelper
 
   def show_attendances(f)
     if policy(@membership).edit_attendance?
-      disabled_options = []
+      disabled_options = Membership::ATTENDANCE
       if @current_user.is_organizer?(@event)
-        if @membership.attendance == 'Not Yet Invited'
-          return @membership.attendance
-        else
-          disabled_options = ['Invited', 'Not Yet Invited']
+        if @membership.attendance =~ /Invited|Undecided/
+          disabled_options -= ['Declined']
+        elsif @membership.attendance == 'Confirmed'
+          disabled_options -= ['Undecided', 'Declined']
         end
+      elsif @current_user.staff? || @current_user.admin?
+        disabled_options = []
       end
       f.select :attendance, Membership::ATTENDANCE,
                { include_blank: false, disabled: disabled_options },

@@ -17,6 +17,11 @@ describe 'Invitation#new', type: :feature do
     visit invitations_new_path
   end
 
+  def expect_email_sent
+    expect(page.body).to have_css('div.alert',
+        text: 'A new invitation has been sent!')
+  end
+
   it 'has a SELECT menu of future events' do
     future_events = Event.future.map(&:code) - [@current_event.code]
     past_events = Event.past.map(&:code)
@@ -60,8 +65,7 @@ describe 'Invitation#new', type: :feature do
       page.fill_in 'invitation[email]', with: member.person.email
       click_button 'Request Invitation'
 
-      expect(page.body).to have_css('div.alert',
-          text: 'A new invitation has been e-mailed to you')
+      expect_email_sent
     end
   end
 
@@ -102,8 +106,7 @@ describe 'Invitation#new', type: :feature do
 
       submit_member_request(@member)
 
-      expect(page.body).to have_css('div.alert',
-        text: 'A new invitation has been e-mailed to you')
+      expect_email_sent
     end
 
     it 'already declined' do
@@ -132,8 +135,7 @@ describe 'Invitation#new', type: :feature do
 
       submit_member_request(@member)
 
-      expect(page.body).to have_css('div.alert',
-          text: 'A new invitation has been e-mailed to you')
+      expect_email_sent
     end
 
     it 'undecided' do
@@ -142,8 +144,7 @@ describe 'Invitation#new', type: :feature do
 
       submit_member_request(@member)
 
-      expect(page.body).to have_css('div.alert',
-          text: 'A new invitation has been e-mailed to you')
+      expect_email_sent
     end
   end
 end

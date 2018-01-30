@@ -49,6 +49,8 @@ Rails.application.routes.draw do
   get '/invitations' => 'invitations#index'
   get '/invitations/new' => 'invitations#new'
   post '/invitations/create' => 'invitations#create'
+  get '/invitations/resend/:membership_id' => 'invitations#resend',
+      as: :invitations_resend
 
   get '/rsvp' => 'rsvp#index'
   get '/rsvp/:otp' => 'rsvp#index', as: :rsvp_otp, constraints: { otp: /[^\/]+/ }
@@ -56,7 +58,7 @@ Rails.application.routes.draw do
   match '/rsvp/no/:otp' => 'rsvp#no', as: :rsvp_no, via: [:get, :post]
   match '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe, via: [:get, :post]
   match '/rsvp/feedback/:membership_id' => 'rsvp#feedback',
-    as: :rsvp_feedback, via: [:get, :post]
+        as: :rsvp_feedback, via: [:get, :post]
 
   # API
   namespace :api do

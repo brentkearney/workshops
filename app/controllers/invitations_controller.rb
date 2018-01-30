@@ -20,18 +20,30 @@ class InvitationsController < ApplicationController
       send_invitation(@invitation.membership)
 
       redirect_to invitations_new_path,
-        success: 'A new invitation has been e-mailed to you!'
+        success: 'A new invitation has been sent!'
     else
       @events = future_events
       render :new
     end
   end
 
+  def resend
+    membership = Membership.find_by_id(membership_param)
+    if membership.nil?
+      redirect_to root_path, error: 'Membership not found.'
+    else
+      send_invitation(membership, current_user.name)
+      redirect_to event_memberships_path(membership.event),
+                  success: "Invitation sent to #{membership.person.name}"
+    end
+  end
+
   private
 
-  def send_invitation(member)
+  def send_invitation(member, invited_by = false)
+    return unless policy(member).edit_attendance?
     Invitation.new(membership: member,
-                   invited_by: member.person.name).send_invite
+                   invited_by: invited_by || member.person.name).send_invite
   end
 
   def future_events
@@ -45,5 +57,8 @@ class InvitationsController < ApplicationController
   def invitation_params
     params.require(:invitation).permit(:event, :email)
   end
-end
 
+  def membership_param
+    params['membership_id'].to_i
+  end
+end
