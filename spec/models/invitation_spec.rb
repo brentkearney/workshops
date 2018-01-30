@@ -47,4 +47,13 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     duration = Invitation.duration_setting
     expect(i.expires.to_date).to eq((event.start_date - duration).to_date)
   end
+
+  it 'updates membership fields when sending invites' do
+    membership = create(:membership, attendance: 'Not Yet Invited')
+    create(:invitation, membership: membership, invited_by: 'Foo').send_invite
+
+    expect(membership.invited_by).to eq('Foo')
+    expect(membership.invited_on).not_to be_nil
+    expect(membership.attendance).to eq('Invited')
+  end
 end

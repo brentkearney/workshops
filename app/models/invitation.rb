@@ -2,8 +2,7 @@ class Invitation < ActiveRecord::Base
   belongs_to :membership
   attr_accessor :organizer_message
 
-  validates :membership, presence: true
-  validates :invited_by, presence: true
+  validates :membership, :invited_by, presence: true
   validates :code, presence: true, length: { is: 50 }
 
   after_initialize :generate_code
@@ -14,7 +13,7 @@ class Invitation < ActiveRecord::Base
   end
 
   def send_invite
-    save
+    update_and_save
     EmailInvitationJob.perform_later(id)
   end
 
@@ -52,13 +51,22 @@ class Invitation < ActiveRecord::Base
   EXPIRES_BEFORE = duration_setting
 
   def update_times
-    self.invited_on = Time.now
+    self.invited_on = DateTime.current
     if self.expires.blank?
       self.expires = self.membership.event.start_date - EXPIRES_BEFORE
     end
   end
 
   private
+
+  def update_and_save
+    membership.sent_invitation = true
+    membership.attendance = 'Invited' if membership.attendance = 'Not Yet Invited'
+    membership.invited_by = invited_by
+    membership.invited_on = DateTime.current
+    membership.save
+    save
+  end
 
   def update_membership_fields(status)
     membership.attendance = status

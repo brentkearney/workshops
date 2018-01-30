@@ -73,6 +73,8 @@
       <%= @membership.attendance %>
     </div>
 
+    <%= show_invited_by? %>
+
     <div class="row" id="profile-arrival">
   	 <strong>Arriving on:</strong>
   	 <%= @membership.arrives %>

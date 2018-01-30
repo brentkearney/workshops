@@ -35,6 +35,21 @@ module MembershipsHelper
     end
   end
 
+  def show_invited_by?
+    invited_by = ''
+    if @membership.attendance == 'Invited'
+      unless @membership.invited_by.blank?
+        invited_by='
+        <div class="row" id="profile-rsvp-invited">
+          Invited by: ' + @membership.invited_by + ' on ' +
+          @membership.invited_on.to_s + '
+        </div>
+        '
+      end
+    end
+    invited_by.html_safe
+  end
+
   def show_email(member)
     column = ''
     if policy(@event).view_email_addresses?
