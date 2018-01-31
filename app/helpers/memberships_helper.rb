@@ -24,12 +24,12 @@ module MembershipsHelper
         elsif @membership.attendance == 'Confirmed'
           disabled_options -= ['Undecided', 'Declined']
         end
-      elsif @current_user.staff? || @current_user.admin?
-        disabled_options = []
+      else
+        disabled_options = [] unless @current_user.member?
       end
       f.select :attendance, Membership::ATTENDANCE,
                { include_blank: false, disabled: disabled_options },
-               required: 'true', class: 'form-control'
+                 required: 'true', class: 'form-control'
     else
       @membership.attendance
     end

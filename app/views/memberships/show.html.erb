@@ -19,7 +19,7 @@
       <% unless @person.emergency_contact.blank? %>
       <div class="row" id="profile-emergency_contact">
         <strong>Emergency Contact:</strong> <%= @person.emergency_contact +
-          '  (phone: ' + @person.emergency_phone + ')' %>
+          '  (' + @person.emergency_phone + ')' %>
       </div>
       <% end %>
 
@@ -62,7 +62,7 @@
 
 <% if policy(@membership).show_details? %>
   <div class="col-md-6 profile membership-details">
-    <h3>Membership Details</h3>
+    <h3><%= @membership.event.code %> Membership Details</h3>
     <div class="row" id="profile-role">
       <strong>Role:</strong>
       <%= @membership.role %>
@@ -119,10 +119,6 @@
     <div class="row" id="profile-room">
       <strong>Hotel Room:</strong>
       <%= @membership.room %>
-    </div>
-    <div class="row" id="profile-stay-id">
-      <strong>Hotel Stay Id:</strong>
-      <%= @membership.stay_id %>
     </div>
     <div class="row" id="profile-has-guest">
       <strong>Has Guest:</strong> <%= @membership.has_guest ? 'Yes' : 'No' %>
