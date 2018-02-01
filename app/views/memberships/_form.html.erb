@@ -249,12 +249,16 @@
 			  <div class="row">
 			    <div class="col-md-3">
 			      <div class="form-group">
+			      	<% if @current_user.member? %>
 			        <div class='input-group date' id='arrival'>
 			        	<%= f.text_field :arrival_date, class: 'form-control', id: 'arrival_date', value: @membership.arrival_date %>
 			          <span class="input-group-addon">
 			            <span class="glyphicon glyphicon-calendar"></span>
 			          </span>
 			        </div>
+			        <% else %>
+			        	<%= f.text_field :arrival_date, class: 'form-control', id: 'arrival_date', value: @membership.arrival_date %>
+			        <% end %>
 			      </div>
 			    </div>
 			  </div>
@@ -274,12 +278,16 @@
 			  <div class="row">
 			    <div class="col-md-3">
 			      <div class="form-group">
+			      	<% if @current_user.member? %>
 			        <div class='input-group date' id='departure'>
 			          <%= f.text_field :departure_date, class: 'form-control', id: 'departure_date', value: @membership.departure_date %>
 			          <span class="input-group-addon">
 			            <span class="glyphicon glyphicon-calendar"></span>
 			          </span>
 			        </div>
+			        <% else %>
+			        	<%= f.text_field :arrival_date, class: 'form-control', id: 'arrival_date', value: @membership.arrival_date %>
+			        <% end %>
 			      </div>
 			    </div>
 			  </div>
