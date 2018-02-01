@@ -11,8 +11,9 @@ module MembershipsHelper
       disabled_options = ['Contact Organizer', 'Organizer']
     end
 
-    f.select :role, Membership::ROLES, disabled: disabled_options,
-                                       class: 'form-control'
+    f.select :role, Membership::ROLES,
+             { include_blank: false, disabled: disabled_options },
+             class: 'form-control'
   end
 
   def show_attendances(f)
