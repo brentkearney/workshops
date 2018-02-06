@@ -4,7 +4,30 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
+# Helpers for memberships
 module MembershipsHelper
+  def date_list
+    start_date = @event.start_date
+    end_date = @event.end_date
+    if policy(@membership).allow_extended_stays?
+      start_date -= 7.days
+      end_date += 7.days
+    end
+    dates = [start_date]
+    dates << dates.last + 1.day while dates.last != end_date
+    dates
+  end
+
+  def selected_date(type = nil)
+    if type == 'arrival'
+      return @membership.arrival_date unless @membership.arrival_date.nil?
+      return @event.start_date
+    else
+      return @membership.departure_date unless @membership.departure_date.nil?
+      return @event.end_date
+    end
+  end
+
   def show_roles(f)
     disabled_options = []
     if @current_user.is_organizer?(@event)

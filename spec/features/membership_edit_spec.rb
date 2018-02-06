@@ -107,17 +107,16 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).to have_css('div#profile-billing', text: 'SOS')
     expect(page.body).to have_css('div#profile-gender', text: 'O')
     expect(page.body).to have_css('div#profile-room', text: 'AB 123')
-    expect(page.body).to have_css('div#profile-stay-id')
     expect(page.body).to have_css('div#profile-has-guest', text: 'Yes')
     expect(page.body).to have_css('div#profile-special-info', text: 'Very.')
     expect(page.body).to have_css('div#profile-staff-notes', text: 'Beware.')
   end
 
   def allows_arrival_departure_editing(member)
-    arrival = (@event.start_date + 1.day).strftime('%Y-%m-%d')
-    fill_in 'arrival_date', with: arrival
-    departure = (@event.end_date - 1.day).strftime('%Y-%m-%d')
-    fill_in 'departure_date', with: departure
+    arrives = (@event.start_date + 1.day).strftime('%Y-%m-%d')
+    select "#{arrives}", from: 'membership_arrival_date'
+    departs = (@event.end_date - 1.day).strftime('%Y-%m-%d')
+    select departs, from: 'membership_departure_date'
 
     click_button 'Update Member'
     visit event_membership_path(@event, member)
@@ -130,9 +129,9 @@ describe 'Membership#edit', type: :feature do
 
   def allows_extended_stays(member)
     arrival = (@event.start_date - 1.day).strftime('%Y-%m-%d')
-    fill_in 'arrival_date', with: arrival
+    select arrival, from: 'membership_arrival_date'
     departure = (@event.end_date + 1.day).strftime('%Y-%m-%d')
-    fill_in 'departure_date', with: departure
+    select departure, from: 'membership_departure_date'
 
     click_button 'Update Member'
 
@@ -240,17 +239,14 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'does not allow travel dates outside of event dates' do
-      arrival = (@event.start_date - 1.day).strftime('%Y-%m-%d')
-      fill_in 'arrival_date', with: arrival
-      departure = (@event.end_date + 1.day).strftime('%Y-%m-%d')
-      fill_in 'departure_date', with: departure
+      legit_dates = [@event.start_date]
+      while legit_dates.last != @event.end_date
+        legit_dates << legit_dates.last + 1.day
+      end
 
-      click_button 'Update Member'
+      legit_dates.map! { |d| d.strftime('%Y-%m-%d') }
 
-      expect(page.body).to include('Arrival date - special permission required
-                                    for early arrival'.squish)
-      expect(page.body).to include('Departure date - special permission required
-                                    for late departure'.squish)
+      expect(page).to have_select 'membership_arrival_date', options: legit_dates
     end
 
     it 'disables role & attendance fields' do
@@ -478,8 +474,8 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'allows editing of travel dates' do
-      expect(page.body).to have_field 'membership[arrival_date]'
-      expect(page.body).to have_field 'membership[departure_date]'
+      expect(page.body).to have_select 'membership[arrival_date]'
+      expect(page.body).to have_select 'membership[departure_date]'
     end
 
     it 'allows changing travel dates to outside of event dates' do

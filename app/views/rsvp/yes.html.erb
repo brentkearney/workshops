@@ -21,16 +21,21 @@
             <h2 class="rsvp-section">Arrival & Departure Dates
             <small>Event dates: <%= @rsvp.event.dates(:long) %></small></h2>
             <p><%= @rsvp.arrival_departure_intro %></p>
+
             <div class="form-group date-picker text-center">
-              <div class="col-md-6">
-                <%= m.label :arrival_date %>
-                <%= m.hidden_field :arrival_date, id: 'arrival_date' %>
-                <div id="arrival"></div>
-              </div>
-              <div class="col-md-6">
-                <%= m.label :departure_date %>
-                <%= m.hidden_field :departure_date, id: 'departure_date' %>
-                <div id="departure"></div>
+              <div class="row">
+                <div class="col-md-2 date-titles">
+                  <h4>Arrival:</h4>
+                </div>
+                <div class="col-md-4">
+                  <%= m.select :arrival_date, @rsvp.date_list, {}, class: "form-control" %>
+                </div>
+                <div class="col-md-2 date-titles">
+                  <h4>Departure:</h4>
+                </div>
+                <div class="col-md-4">
+                  <%= m.select :departure_date, @rsvp.date_list, {}, class: "form-control" %>
+                </div>
               </div>
             </div>
             <div class="row">

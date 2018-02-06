@@ -22,13 +22,18 @@ class InvitationMailer < ApplicationMailer
   @from_email = ENV['DEVISE_EMAIL']
   default from: @from_email
 
+  def email_setting
+    if Setting.Emails.blank? || Setting.Emails["#{@event.location}"].blank? ||
+      Setting.Emails["#{@event.location}"]['rsvp'].blank?
+      return 'workshops@settings-emails-location-rsvp.com'
+    end
+    Setting.Emails["#{@event.location}"]['rsvp']
+  end
+
   def invite(invitation)
     @person = invitation.membership.person
     @event = invitation.membership.event
-
-    unless Setting.Emails.blank?
-      @from_email = Setting.Emails["#{@event.location}"]['rsvp']
-    end
+    @from_email = email_setting
 
     @rsvp_link = Setting.Site['app_url'] + '/rsvp/' + invitation.code
     @org_name = Setting.Locations["#{@event.location}"]['Name']

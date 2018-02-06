@@ -25,6 +25,12 @@ class RsvpForm < ComplexForms
     @membership.save! if @membership.valid?
   end
 
+  def date_list
+    dates = [@event.start_date]
+    dates << dates.last + 1.day while dates.last != @event.end_date
+    dates
+  end
+
   def arrival_departure_intro
     default = "If you plan to arrive after the event starts, or to leave before it ends, please indicate when by clicking the days on the calendars below. If you plan to book your own accommodation instead, please check the box below the calendars."
 

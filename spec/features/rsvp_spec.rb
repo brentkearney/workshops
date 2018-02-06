@@ -307,12 +307,16 @@ describe 'RSVP', type: :feature do
     end
 
     it 'arrival & departure default to event start & end' do
-      Capybara.ignore_hidden_elements = false
-      arrival = page.find(:xpath, "//input[@id='arrival_date']").value
-      departure = page.find(:xpath, "//input[@id='departure_date']").value
+      # Capybara.ignore_hidden_elements = false
+      # arrival = page.find(:xpath, "//input[@id='arrival_date']").value
+      # departure = page.find(:xpath, "//input[@id='departure_date']").value
 
-      expect(arrival).to eq(@event.start_date.strftime("%Y-%m-%d"))
-      expect(departure).to eq(@event.end_date.strftime("%Y-%m-%d"))
+      # expect(arrival).to eq(@event.start_date.strftime("%Y-%m-%d"))
+      # expect(departure).to eq(@event.end_date.strftime("%Y-%m-%d"))
+      expect(page).to have_select('rsvp_membership_arrival_date',
+        selected: @event.start_date.strftime("%Y-%m-%d"))
+      expect(page).to have_select('rsvp_membership_departure_date',
+        selected: @event.end_date.strftime("%Y-%m-%d"))
     end
 
     it 'has guests form' do

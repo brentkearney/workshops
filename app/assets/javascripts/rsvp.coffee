@@ -16,6 +16,7 @@ $(document).on 'turbolinks:load', ->
 
   $('#departure').datetimepicker({
     inline: true,
+    sideBySide: true,
     format: 'YYYY-MM-DD',
     minDate: $('#min_date').val(),
     maxDate: $('#max_date').val(),
