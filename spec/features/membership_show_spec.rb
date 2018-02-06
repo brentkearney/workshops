@@ -123,8 +123,6 @@ describe 'Membership#show', type: :feature do
                                   text: member.person.gender)
     expect(page.body).to have_css('div#profile-room',
                                   text: member.room)
-    expect(page.body).to have_css('div#profile-stay-id',
-                                  text: member.stay_id)
     expect(page.body).to have_css('div#profile-has-guest')
     expect(page.body).to have_css('div#profile-special-info',
                                   text: member.special_info)
