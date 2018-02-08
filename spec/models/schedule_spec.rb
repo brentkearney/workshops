@@ -54,6 +54,20 @@ RSpec.describe 'Model validations: Schedule', type: :model do
     expect(@schedule.errors).to include(:updated_by)
   end
 
+  it 'strips leading and trailing whitespace' do
+    @schedule.name = ' To be or not to be '
+    @schedule.description = 'Yes  '
+    @schedule.save
+    expect(@schedule.name).to eq('To be or not to be')
+    expect(@schedule.description).to eq('Yes')
+  end
+
+  it 'strips HTML tags from the name' do
+    @schedule.name = 'I <em>love</em> ribs'
+    @schedule.save
+    expect(@schedule.name).to eq('I love ribs')
+  end
+
   context 'if times overlap with another scheduled item' do
     before do
       @schedule1 = @schedule

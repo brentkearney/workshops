@@ -9,7 +9,7 @@ class Lecture < ActiveRecord::Base
   belongs_to :person
   has_one :schedule, dependent: :destroy
 
-  before_save :clean_data
+  before_save :clean_data, :strip_html
   after_save :update_legacy_db
   before_destroy :delete_from_legacy_db
 
@@ -23,6 +23,10 @@ class Lecture < ActiveRecord::Base
   include ScheduleHelpers
 
   private
+
+  def strip_html
+    self.title = ActionController::Base.helpers.strip_tags(title)
+  end
 
   def add_error(field, other)
     if room == other.room

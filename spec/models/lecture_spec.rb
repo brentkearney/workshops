@@ -60,6 +60,20 @@ RSpec.describe Lecture, type: :model do
     expect(@lecture.errors).to include(:updated_by)
   end
 
+  it 'strips leading and trailing whitespace' do
+    @lecture.title = ' To be or not to be '
+    @lecture.abstract = 'Yes  '
+    @lecture.save
+    expect(@lecture.title).to eq('To be or not to be')
+    expect(@lecture.abstract).to eq('Yes')
+  end
+
+  it 'strips HTML tags from the title' do
+    @lecture.title = 'I <em>love</em> ribs'
+    @lecture.save
+    expect(@lecture.title).to eq('I love ribs')
+  end
+
   it 'is invalid if the start time is outside of the event\'s dates' do
     expect(@lecture).to be_valid
     @lecture.start_time = (@event.start_date - 2.days).to_time
@@ -138,6 +152,6 @@ RSpec.describe Lecture, type: :model do
       @lecture1.start_time = @lecture1.start_time + 5.minutes
       expect(@lecture1).to be_valid
     end
-  
+
   end
 end

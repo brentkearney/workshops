@@ -11,7 +11,7 @@ class Schedule < ActiveRecord::Base
   attr_accessor :day
   attr_accessor :flash_notice
 
-  before_save :clean_data
+  before_save :clean_data, :strip_html
 
   validates :event, :location, :updated_by, presence: true
   validates_associated :lecture, allow_nil: true
@@ -31,6 +31,10 @@ class Schedule < ActiveRecord::Base
   end
 
   private
+
+  def strip_html
+    self.name = ActionController::Base.helpers.strip_tags(name)
+  end
 
   def overlaps_message(other)
     "\"#{other.name}\" in #{other.location} @ #{other.start_time.strftime('%H:%M')} - #{other.end_time.strftime('%H:%M')}"
