@@ -117,16 +117,31 @@
       <% end %>
 
     </div><!-- panel -->
-  </div><!-- col-md-6 -->
   <% end %>
+
+  <% unless @memberships.empty? %>
+  <div class="row profile">
+    <div class="panel panel-default other-memberships">
+      <div class="panel-heading"><h3><%= @person.dear_name %>'s Other Memberships</h3></div>
+      <ul class="list-group">
+      <% @memberships.each do |m| %>
+        <li class="list-group-item">
+          <%= link_to event_membership_name(m), event_membership_path(m.event, m) %>
+        </li>
+      <% end %>
+      </ul>
+    </div>
+  </div>
+  <% end %>
+  </div><!-- col-md-6 -->
 </div><!-- row -->
 
-  <% if policy(@membership).hotel_and_billing? %>
+<% if policy(@membership).hotel_and_billing? %>
 <div class="row">
   <div class="col-md-6 profile hotel-billing">
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h3>Hotel & Billing Details</h3>
+        <h3><%= @membership.event.code %> Hotel & Billing Details</h3>
       </div>
       <div class="panel-body">
         <div class="row" id="profile-reviewed">
@@ -166,11 +181,6 @@
   <% end %>
 </div><!-- row -->
 
-<% if policy(@membership).show_details? %>
-<div class="row updated-by" id="member-updated-by">
-  <p>Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at %></p>
-</div>
-<% end %>
 
   <div class="row" id="member-buttons">
   <%= link_to "Back to #{@event.code}", event_memberships_path(@event),

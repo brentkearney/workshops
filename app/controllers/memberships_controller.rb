@@ -24,6 +24,8 @@ class MembershipsController < ApplicationController
   def show
     authorize @membership
     @person = @membership.person
+    @memberships = @person.memberships.order('event_id asc').includes(:event)
+    @memberships = @memberships.to_a - [@membership]
   end
 
   # GET /events/:event_id/memberships/new

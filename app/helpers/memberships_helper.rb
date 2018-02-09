@@ -6,6 +6,10 @@
 
 # Helpers for memberships
 module MembershipsHelper
+  def event_membership_name(m)
+    m.event.code + ': ' + m.event.name + ' (' + m.event.date + ')'
+  end
+
   def date_list
     start_date = @event.start_date
     end_date = @event.end_date
