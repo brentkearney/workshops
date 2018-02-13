@@ -15,7 +15,7 @@ FactoryBot.define do
   sequence(:end_date, 1) do |n|
     n = 1 if n > 48
     date = Date.today.beginning_of_year.advance(weeks: 1)
-    date.advance(weeks: n, days: 5) #.beginning_of_week(:friday)
+    date.advance(weeks: n, days: 5)
   end
 
   factory :event do |f|

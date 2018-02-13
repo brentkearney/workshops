@@ -24,8 +24,7 @@ class MembershipsController < ApplicationController
   def show
     authorize @membership
     @person = @membership.person
-    @memberships = @person.memberships.order('event_id asc').includes(:event)
-    @memberships = @memberships.to_a - [@membership]
+    @memberships = other_memberships
   end
 
   # GET /events/:event_id/memberships/new
@@ -69,8 +68,6 @@ class MembershipsController < ApplicationController
                                               @current_user)
     @membership.sync_remote = true
 
-    Rails.logger.debug "\n\n*******Parametizer returned: #{member_params.data} **********\n\n"
-
     respond_to do |format|
       if @membership.update(member_params.data)
         format.html do
@@ -89,7 +86,6 @@ class MembershipsController < ApplicationController
                         location: event_membership_path(@event, @membership)
         end
       else
-        Rails.logger.debug "\n\n*******Errors: #{@membership.errors.messages} **********\n\n"
         format.html { render :edit }
         format.json do
           render json: @membership.errors, status: :unprocessable_entity
@@ -114,6 +110,19 @@ class MembershipsController < ApplicationController
   end
 
   private
+
+  def other_memberships
+    memberships = []
+    @membership.person.memberships.includes(:event)
+               .order('events.start_date desc').each do |m|
+      if m.attendance == 'Not Yet Invited' || m.attendance == 'Declined'
+        memberships << m if policy(m).show_details?
+      else
+        memberships << m
+      end
+    end
+    memberships - [@membership]
+  end
 
   def assign_buttons
     @member_emails = map_emails(@memberships['Confirmed'])

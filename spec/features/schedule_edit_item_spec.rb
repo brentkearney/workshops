@@ -8,6 +8,7 @@ require 'rails_helper'
 
 describe 'Editing a Schedule Item', type: :feature do
   before do
+    Event.destroy_all
     authenticate_user
     @event = create(:event_with_schedule)
   end

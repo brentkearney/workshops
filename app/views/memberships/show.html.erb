@@ -110,18 +110,15 @@
         <% end %>
       </div><!-- panel-body -->
 
-      <% if policy(@membership).show_details? %>
       <div class="panel-footer updated-by">
         Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at %>
       </div>
-      <% end %>
-
     </div><!-- panel -->
   <% end %>
 
   <% unless @memberships.empty? %>
   <div class="row profile">
-    <div class="panel panel-default other-memberships">
+    <div class="panel panel-default" id="other-memberships">
       <div class="panel-heading"><h3><%= @person.dear_name %>'s Other Memberships</h3></div>
       <ul class="list-group">
       <% @memberships.each do |m| %>

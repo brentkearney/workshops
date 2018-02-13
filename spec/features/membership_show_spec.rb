@@ -15,6 +15,10 @@ describe 'Membership#show', type: :feature do
     @participant.person.emergency_contact = 'Mom'
     @participant.person.emergency_phone = '1234'
     @participant.save
+    @other_membership = create(:membership, person: @participant.person)
+    @unconfirmed_membership = create(:membership, attendance: 'Not Yet Invited',
+                                     person: @participant.person)
+
     @participant_user = create(:user, email: @participant.person.email,
                                       person: @participant.person)
     @non_member_user = create(:user)
@@ -24,8 +28,12 @@ describe 'Membership#show', type: :feature do
     Warden.test_reset!
   end
 
+  after do
+    Event.destroy_all
+  end
+
   def shows_basic_info(member)
-    expect(page.body).to have_css('div#profile-name', text: member.person.name)
+    expect(page.body).to have_css('h2#profile-name', text: member.person.name)
     expect(page.body).to have_css('div#profile-affil',
                                   text: member.person.affil_with_title)
     expect(page.body).to have_css('div#profile-url', text: member.person.uri)
@@ -33,7 +41,6 @@ describe 'Membership#show', type: :feature do
                                   text: member.person.biography)
     expect(page.body).to have_css('div#profile-research',
                                   text: member.person.research_areas)
-
   end
 
   def hides_email(member)
@@ -203,6 +210,17 @@ describe 'Membership#show', type: :feature do
       nonconfirmed.save
       denies_access(nonconfirmed)
     end
+
+    it 'shows other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_css('div#other-memberships')
+      expect(page.body).to have_text(@other_membership.event.name)
+    end
+
+    it 'hides unconfirmed other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).not_to have_text(@unconfirmed_membership.event.name)
+    end
   end
 
   context 'As a logged-in user who is not a member of the event' do
@@ -251,12 +269,30 @@ describe 'Membership#show', type: :feature do
       nonconfirmed.save
       denies_access(nonconfirmed)
     end
+
+    it 'shows other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_css('div#other-memberships')
+      expect(page.body).to have_text(@other_membership.event.name)
+    end
+
+    it 'hides unconfirmed other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).not_to have_text(@unconfirmed_membership.event.name)
+    end
   end
 
   context "As a member of the event viewing someone else's profile" do
     before do
       login_as @participant_user, scope: :user
+      @other_membership.person = @organizer.person
+      @other_membership.save
       visit event_membership_path(@event, @organizer)
+    end
+
+    after do
+      @other_membership.person = @participant.person
+      @other_membership.save
     end
 
     it 'shows basic personal info' do
@@ -286,6 +322,17 @@ describe 'Membership#show', type: :feature do
     it 'excludes edit and delete buttons' do
       expect(page).not_to have_link 'Edit Membership'
       expect(page).not_to have_link 'Delete Membership'
+    end
+
+    it 'shows other memberships' do
+      visit event_membership_path(@event, @organizer)
+      expect(page.body).to have_css('div#other-memberships')
+      expect(page.body).to have_text(@other_membership.event.name)
+    end
+
+    it 'hides unconfirmed other memberships' do
+      visit event_membership_path(@event, @organizer)
+      expect(page.body).not_to have_text(@unconfirmed_membership.event.name)
     end
   end
 
@@ -339,6 +386,17 @@ describe 'Membership#show', type: :feature do
 
       expect(page).not_to have_css('div#profile-academic-status')
     end
+
+    it 'shows other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_css('div#other-memberships')
+      expect(page.body).to have_text(@other_membership.event.name)
+    end
+
+    it 'does not hide unconfirmed other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_text(@unconfirmed_membership.event.name)
+    end
   end
 
   context 'As an organizer of the event' do
@@ -374,7 +432,7 @@ describe 'Membership#show', type: :feature do
     end
 
     it 'excludes hotel & billing' do
-      does_not_show_hotel_billing(@organizer)
+      does_not_show_hotel_billing(@participant)
     end
 
     it 'includes edit button' do
@@ -384,6 +442,25 @@ describe 'Membership#show', type: :feature do
     it 'excludes delete button' do
       expect(page).not_to have_link 'Delete Membership'
     end
+
+    it 'shows other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_css('div#other-memberships')
+      expect(page.body).to have_text(@other_membership.event.name)
+    end
+
+    it 'hides unconfirmed other memberships' do
+      visit event_membership_path(@event, @organizer)
+      expect(page.body).not_to have_text(@unconfirmed_membership.event.name)
+    end
+
+    it 'does not hide unconfirmed other memberships of same organizer' do
+      m = create(:membership, event: @unconfirmed_membership.event,
+                              role: 'Organizer', person: @organizer.person)
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_text(@unconfirmed_membership.event.name)
+      m.destroy!
+    end
   end
 
   context 'As a staff user at a different location' do
@@ -392,27 +469,27 @@ describe 'Membership#show', type: :feature do
       @non_member_user.location = 'elsewhere'
       @non_member_user.save
       login_as @non_member_user, scope: :user
-      visit event_membership_path(@event, @organizer)
+      visit event_membership_path(@event, @participant)
     end
 
     it 'shows basic personal info' do
-      shows_basic_info(@organizer)
+      shows_basic_info(@participant)
     end
 
     it 'excludes email' do
-      hides_email(@organizer)
+      hides_email(@participant)
     end
 
     it 'excludes personal info' do
-      hides_personal_info(@organizer)
+      hides_personal_info(@participant)
     end
 
     it 'excludes details' do
-      does_not_show_details(@organizer)
+      does_not_show_details(@participant)
     end
 
     it 'excludes hotel & billing' do
-      does_not_show_hotel_billing(@organizer)
+      does_not_show_hotel_billing(@participant)
     end
 
     it 'excludes edit and delete buttons' do
@@ -434,6 +511,17 @@ describe 'Membership#show', type: :feature do
       nonconfirmed.attendance = 'Not Yet Invited'
       nonconfirmed.save
       denies_access(nonconfirmed)
+    end
+
+    it 'shows other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_css('div#other-memberships')
+      expect(page.body).to have_text(@other_membership.event.name)
+    end
+
+    it 'hides unconfirmed other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).not_to have_text(@unconfirmed_membership.event.name)
     end
   end
 
@@ -478,6 +566,17 @@ describe 'Membership#show', type: :feature do
       expect(page).to have_link 'Edit Membership'
       expect(page).to have_link 'Delete Membership'
     end
+
+    it 'shows other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_css('div#other-memberships')
+      expect(page.body).to have_text(@other_membership.event.name)
+    end
+
+    it 'does not hide unconfirmed other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_text(@unconfirmed_membership.event.name)
+    end
   end
 
   context 'As an admin user' do
@@ -519,6 +618,17 @@ describe 'Membership#show', type: :feature do
     it 'includes edit and delete buttons' do
       expect(page).to have_link 'Edit Membership'
       expect(page).to have_link 'Delete Membership'
+    end
+
+    it 'shows other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_css('div#other-memberships')
+      expect(page.body).to have_text(@other_membership.event.name)
+    end
+
+    it 'does not hide unconfirmed other memberships' do
+      visit event_membership_path(@event, @participant)
+      expect(page.body).to have_text(@unconfirmed_membership.event.name)
     end
   end
 end
