@@ -1,0 +1,10 @@
+
+There was an error saving an RSVP:
+
+Event: <%= @membership.event.code %> (<%= @membership.event.location %>)
+Person: <%= @membership.person.name %> (id: <%= @membership.person.legacy_id %>)
+Error message:
+<%= @error %>
+
+Attempted to save membership:
+<%= @failed_save %>

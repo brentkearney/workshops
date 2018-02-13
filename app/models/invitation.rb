@@ -97,6 +97,11 @@ class Invitation < ActiveRecord::Base
     update_membership_fields(status)
     update_person_fields if status == 'Confirmed'
     membership.sync_remote = true
-    membership.save
+    begin
+      membership.save!
+    rescue ActiveRecord::ActiveRecordError => error
+      args = { 'error' => error.to_s, 'membership' => membership.inspect }
+      EmailFailedRsvpJob.perform_later(membership.id, args)
+    end
   end
 end

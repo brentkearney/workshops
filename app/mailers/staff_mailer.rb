@@ -106,4 +106,15 @@ class StaffMailer < ApplicationMailer
     subject = "[#{@membership.event.code}] #{section} feedback"
     mail(to: feedback_email, subject: subject)
   end
+
+  def rsvp_failed(membership, args:)
+    @membership = membership
+    @error = args[:error]
+    @failed_save = args[:membership]
+
+    to_email = Setting.Emails[event.location]['program_coordinator']
+    cc_email = Setting.Site['sysadmin_email']
+    subject = "[#{@membership.event.code}] Failed RSVP save"
+    mail(to: to_email, cc: cc_email, subject: subject)
+  end
 end

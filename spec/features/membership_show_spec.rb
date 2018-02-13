@@ -30,6 +30,8 @@ describe 'Membership#show', type: :feature do
 
   after do
     Event.destroy_all
+    Membership.destroy_all
+    Person.destroy_all
   end
 
   def shows_basic_info(member)

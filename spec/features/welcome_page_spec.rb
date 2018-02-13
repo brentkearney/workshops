@@ -39,12 +39,15 @@ describe 'Post-login Welcome Page', type: :feature do
 
   context 'As an event participant' do
     before do
-      Event.destroy_all
       @user.member!
       3.times {
-        event = create(:event, future: true)
+        event = create(:event) # => , future: true)
         create(:membership, event: event, person: @user.person, role: 'Participant')
       }
+    end
+
+    after do
+      Event.destroy_all
     end
 
     after(:each) do
@@ -120,12 +123,15 @@ describe 'Post-login Welcome Page', type: :feature do
 
   context 'As an event organizer' do
     before do
-      Event.destroy_all
       @user.member!
       3.times do
-        e = create(:event, future: true)
+        e = create(:event) #, future: true)
         create(:membership, event: e, person: @user.person, role: 'Organizer')
       end
+    end
+
+    after do
+      Event.destroy_all
     end
 
     after(:each) do
