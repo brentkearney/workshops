@@ -40,7 +40,7 @@ module MembershipsHelper
 
     f.select :role, Membership::ROLES,
              { include_blank: false, disabled: disabled_options },
-             class: 'form-control'
+             required: 'true', class: 'form-control'
   end
 
   def show_attendances(f)

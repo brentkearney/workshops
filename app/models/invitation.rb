@@ -74,8 +74,12 @@ class Invitation < ActiveRecord::Base
     membership.updated_by = membership.person.name
   end
 
-  def update_person_fields
-    membership.person.updated_by = membership.person.name
+  def update_person_fields(status)
+    if status == 'Confirmed'
+      membership.person.updated_by = membership.person.name
+    else
+      membership.person.member_import = true
+    end
   end
 
   def email_organizer(status)
@@ -95,13 +99,13 @@ class Invitation < ActiveRecord::Base
     email_organizer(status)
     log_rsvp(status)
     update_membership_fields(status)
-    update_person_fields if status == 'Confirmed'
+    update_person_fields(status)
     membership.sync_remote = true
     begin
       membership.save!
     rescue ActiveRecord::ActiveRecordError => error
-      args = { 'error' => error.to_s, 'membership' => membership.inspect }
-      EmailFailedRsvpJob.perform_later(membership.id, args)
+      params = { 'error' => error.to_s, 'membership' => membership.inspect }
+      EmailFailedRsvpJob.perform_later(membership.id, params)
     end
   end
 end

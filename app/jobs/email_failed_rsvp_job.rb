@@ -8,8 +8,8 @@
 class EmailFailedRsvpJob < ActiveJob::Base
   queue_as :urgent
 
-  def perform(membership_id, args)
+  def perform(membership_id, params)
     membership = Membership.find_by_id(membership_id)
-    StaffMailer.rsvp_failed(membership, args).deliver_now
+    StaffMailer.rsvp_failed(membership, params: params).deliver_now
   end
 end

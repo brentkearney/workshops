@@ -107,10 +107,10 @@ class StaffMailer < ApplicationMailer
     mail(to: feedback_email, subject: subject)
   end
 
-  def rsvp_failed(membership, args:)
+  def rsvp_failed(membership, params:)
     @membership = membership
-    @error = args[:error]
-    @failed_save = args[:membership]
+    @error = params[:error]
+    @failed_save = params[:membership]
 
     to_email = Setting.Emails[event.location]['program_coordinator']
     cc_email = Setting.Site['sysadmin_email']
