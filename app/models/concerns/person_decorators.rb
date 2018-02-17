@@ -40,12 +40,14 @@ module PersonDecorators
   end
 
   def affil
-    affil = String.new(affiliation)
+    affiliation = '' if affiliation.nil?
+    affil = affiliation.to_s
     affil << ", #{department}" unless department.blank?
     affil
   end
 
   def affil_with_title
+    return if affiliation.blank?
     formatted_affil = affil
     if title.blank?
       formatted_affil << " — #{academic_status}" unless academic_status.blank? && academic_status != "Other"
