@@ -390,7 +390,12 @@ describe 'RSVP', type: :feature do
         allow(EmailOrganizerNoticeJob).to receive(:perform_later)
         visit rsvp_yes_path(@invitation.code)
         fill_in "rsvp_organizer_message", with: 'Excited to attend!'
+        fill_in 'rsvp_person_url', with: 'http://foo.com'
         click_button 'Confirm Attendance'
+      end
+
+      it 'saves person data' do
+        expect(Person.find(@membership.person_id).url).to eq('http://foo.com')
       end
 
       it 'changes membership attendance to confirmed' do
