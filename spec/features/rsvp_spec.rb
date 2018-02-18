@@ -183,6 +183,9 @@ describe 'RSVP', type: :feature do
 
     context 'after the "Decline Attendance" button' do
       before do
+        person = @invitation.membership.person
+        person.affiliation = nil
+        person.save
         @args = { 'attendance_was' => 'Invited',
                   'attendance' => 'Declined',
                   'organizer_message' => '' }

@@ -8,7 +8,7 @@ class Membership < ActiveRecord::Base
   attr_accessor :sync_remote, :update_by_staff
 
   belongs_to :event
-  belongs_to :person
+  belongs_to :person, autosave: false
   accepts_nested_attributes_for :person
   has_one :invitation, dependent: :destroy
 

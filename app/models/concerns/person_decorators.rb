@@ -40,10 +40,10 @@ module PersonDecorators
   end
 
   def affil
-    affiliation = '' if affiliation.nil?
-    affil = affiliation.to_s
-    affil << ", #{department}" unless department.blank?
-    affil
+    return '' if affiliation.nil?
+    affil_with_department = String.new(affiliation) # new object necessary here
+    affil_with_department << ", #{department}" unless department.blank?
+    affil_with_department
   end
 
   def affil_with_title
@@ -68,5 +68,4 @@ module PersonDecorators
     end
     uri
   end
-
 end
