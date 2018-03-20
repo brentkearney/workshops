@@ -86,7 +86,7 @@ describe "Adding a Schedule Item", type: :feature do
     page.select '30', from: 'schedule_end_time_5i'
     click_button 'Add New Schedule Item'
 
-    expect(find("div.alert-warning").text).to match(/^Warning: .+overlaps with.+ \"Item One\"/)
+    expect(find("div.alert-warning").text).to match(/.+(overlaps with).+(Item One).+/)
   end
 
   it 'after adding an item, it returns to the Add Item page for the day of the updated item' do

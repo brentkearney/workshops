@@ -100,8 +100,6 @@ class ScheduleController < ApplicationController
     merged_params = ScheduleItem.update(@schedule, schedule_params
                                 .merge(updated_by: current_user.name))
 
-    Rails.logger.debug "\n\nScheduleItem gave us params: #{merged_params}\n\n"
-
     if policy(@schedule).update_staff_item?
       staff_item = schedule_params[:staff_item] || false
       merged_params['staff_item'] = staff_item

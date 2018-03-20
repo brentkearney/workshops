@@ -38,24 +38,17 @@ class Schedule < ActiveRecord::Base
   end
 
   def time_limits
-    Rails.logger.debug '*' * 100 + "\n\n"
-    Rails.logger.debug "Schedule model was given:"
-    Rails.logger.debug "day: #{day}"
-    Rails.logger.debug "start_time: #{start_time}"
-    Rails.logger.debug "end_time: #{end_time}"
-    Rails.logger.debug "earliest: #{earliest}"
-    Rails.logger.debug "latest: #{latest}"
-    Rails.logger.debug '*' * 100 + "\n\n"
-
     if earliest.blank?
       self.earliest = nil
     elsif start_time < earliest
+      time_change_warning('start_time')
       self.start_time = earliest
     end
 
     if latest.blank?
       self.latest = nil
     elsif end_time > latest
+      time_change_warning('end_time')
       self.end_time = latest
     end
 
@@ -64,23 +57,30 @@ class Schedule < ActiveRecord::Base
     self.latest = nil
   end
 
+  def time_change_warning(startend)
+    earlylate = startend == 'start_time' ? 'earliest' : 'latest'
+    msg = "<p>'#{name}' #{startend.humanize} was changed from "
+    msg << "#{send(startend.to_sym).strftime('%H:%M')} to the "
+    msg << "#{earlylate} allowed time, "
+    msg << "#{send(earlylate.to_sym).strftime('%H:%M')}</p>"
+    self.flash_notice = { warning: '' } if flash_notice.blank?
+    flash_notice[:warning] << msg.squish
+  end
+
   def overlaps_message(other)
-    "\"#{other.name}\" in #{other.location} @ #{other.start_time.strftime('%H:%M')} - #{other.end_time.strftime('%H:%M')}"
+    "“#{other.name}” in #{other.location} @
+    #{other.start_time.strftime('%H:%M')} -
+     #{other.end_time.strftime('%H:%M')}".squish
   end
 
-  def add_warning(field, other)
-    if self.flash_notice.blank? || self.flash_notice[:warning].blank?
-      self.flash_notice = {:warning => "<span class=\"warning-header\">\"#{self.name} (#{self.location}) @ #{self.start_time.strftime('%H:%M')} - #{self.end_time.strftime('%H:%M')}\" " +
-          "overlaps with these items: </span>\n<p>" +
-          "#{overlaps_message(other)}" +
-          "</p>\n" }
-    else
-      unless self.flash_notice[:warning].include? overlaps_message(other)
-        self.flash_notice[:warning] = "#{self.flash_notice[:warning]}" #[0...-5]
-        self.flash_notice[:warning] <<  "<p>#{overlaps_message(other)}</p>\n"
-      end
+  def add_overlaps_warning(other)
+    self.flash_notice = { warning: '' } if flash_notice.blank?
+    unless flash_notice[:warning].include? 'overlaps with'
+      msg = "<p>#{name} (#{location}) @ #{start_time.strftime('%H:%M')} - "
+      msg << "#{end_time.strftime('%H:%M')}\" overlaps with these items:</p>\n"
+      flash_notice[:warning] << msg.squish
     end
+    return if flash_notice[:warning].include? overlaps_message(other)
+    flash_notice[:warning] << "#{overlaps_message(other)}<br />\n"
   end
-
 end
-
