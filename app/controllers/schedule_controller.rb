@@ -100,6 +100,8 @@ class ScheduleController < ApplicationController
     merged_params = ScheduleItem.update(@schedule, schedule_params
                                 .merge(updated_by: current_user.name))
 
+    Rails.logger.debug "\n\nScheduleItem gave us params: #{merged_params}\n\n"
+
     if policy(@schedule).update_staff_item?
       staff_item = schedule_params[:staff_item] || false
       merged_params['staff_item'] = staff_item
@@ -184,7 +186,7 @@ class ScheduleController < ApplicationController
 
   def schedule_params
     params.require(:schedule)
-          .permit(:id, :event_id, :start_time, :end_time,
+          .permit(:id, :event_id, :start_time, :end_time, :earliest, :latest,
                   :name, :description, :location, :day, :staff_item,
                   lecture_attributes: [:person_id, :id, :keywords,
                                        :do_not_publish])

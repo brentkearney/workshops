@@ -2,12 +2,13 @@
 
 <%= form_for @schedule, url: {action: "#{@form_action}"}, :html => { :role => "form", :class => "form" } do |f| %>
 <%= f.hidden_field :event_id %>
+<%= time_limits(@schedule) %>
 <input id="day" name="day" type="hidden" value="<%= @day.strftime("%Y-%m-%d") %>" />
 <fieldset>
   <div class="row">
     <div class="col-sm-1"></div>
-    <div class="form-group col-sm-7">
-      <table id="select-times">
+    <div class="form-group col-sm-11">
+      <table id="select-times" border="0">
         <tr>
           <td class="form-group">
             <%= f.label "Scheduling Item on" %>:
@@ -15,6 +16,11 @@
           <td class="form-group select-day">
             <%= f.select :day, @event.days.map {|day| [ day.strftime("%A, %B %e"), day.to_date ]}, {}, { class: 'form-control days' } %>
           </td>
+          <% if policy(@schedule).edit_time_limits? %>
+          <td class="form-group staff-option" colspan="2">
+            <h4>Staff option: set time limits</h4>
+          </td>
+          <% end %>
         </tr>
         <tr>
           <td class="form-group">
@@ -23,6 +29,14 @@
           <td class="form-group select-times">
             <%= f.time_select :start_time, {}, { class: 'form-control' } %>
           </td>
+          <% if policy(@schedule).edit_time_limits? %>
+          <td class="form-group staff-option">
+            <%= f.label :earliest %>:
+          </td>
+          <td class="form-group select-times">
+            <%= f.time_select :earliest, { include_blank: true }, { class: 'form-control' } %>
+          </td>
+          <% end %>
         </tr>
         <tr>
           <td class="form-group">
@@ -31,6 +45,14 @@
           <td class="form-group select-times">
             <%= f.time_select :end_time, {}, { class: 'form-control' } %>
           </td>
+          <% if policy(@schedule).edit_time_limits? %>
+          <td class="form-group staff-option">
+            <%= f.label :latest %>:
+          </td>
+          <td class="form-group select-times">
+            <%= f.time_select :latest, { include_blank: true }, { class: 'form-control' } %>
+          </td>
+          <% end %>
         </tr>
       </table>
     </div>

@@ -33,6 +33,7 @@ class ScheduleItem
 
   def self.update(schedule, params)
     @schedule = schedule
+    Time.zone = @schedule.event.time_zone
     new_day = params.delete :day
 
     if params[:lecture_attributes]
@@ -51,9 +52,26 @@ class ScheduleItem
       new_schedule.updated_at = DateTime.current
     end
 
-    if new_day && @schedule.start_time.to_date != new_day.to_date
-      new_schedule.start_time = new_schedule.start_time.to_time.change({ month: new_day.to_date.month, day: new_day.to_date.mday })
-      new_schedule.end_time = new_schedule.end_time.to_time.change({ month: new_day.to_date.month, day: new_day.to_date.mday })
+    unless new_day.nil?
+      the_date = { year: new_day.to_date.year, month: new_day.to_date.month,
+                   day: new_day.to_date.mday }
+      new_schedule.start_time = new_schedule.start_time.to_time.change(the_date)
+      new_schedule.end_time = new_schedule.end_time.to_time.change(the_date)
+    end
+
+    if params[:'earliest(4i)'] == '' || new_schedule.earliest.nil?
+      new_schedule.earliest = nil
+    else
+      the_date[:hour] = new_schedule.earliest.strftime('%H').to_i
+      the_date[:min] = new_schedule.earliest.strftime('%M').to_i
+      new_schedule.earliest = new_schedule.earliest.to_time.change(the_date)
+    end
+    if params[:'latest(4i)'] == '' || new_schedule.latest.nil?
+      new_schedule.latest = nil
+    else
+      the_date[:hour] = new_schedule.latest.strftime('%H').to_i
+      the_date[:min] = new_schedule.latest.strftime('%M').to_i
+      new_schedule.latest = new_schedule.latest.to_time.change(the_date)
     end
 
     unless lecture_id.nil?
@@ -149,12 +167,12 @@ class ScheduleItem
       }
       @schedule.lecture = Lecture.new(lecture_attributes)
     end
-
   end
 
   def set_default_start_time
     phour, pminute = most_popular_start_time.split(':')
-    start_time = @schedule.start_time.to_time.in_time_zone(@event.time_zone).change({ hour: phour, min: pminute })
+    start_time = @schedule.start_time.to_time.in_time_zone(@event.time_zone)
+                          .change({ hour: phour, min: pminute })
 
     unless @todays_schedule.empty?
       todays_lectures = @todays_schedule.select {|s| s unless s.lecture_id.nil? }

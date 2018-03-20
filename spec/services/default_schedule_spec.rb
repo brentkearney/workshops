@@ -8,17 +8,12 @@ require 'rails_helper'
 
 # DefaultSchedule creates a default schedule template for events that have none
 describe 'DefaultSchedule' do
-  before(:all) do
-    @event = create(:event)
+  before do
+    @event = create(:event, template: false)
     authenticate_user # sets @user & @person
     @user.member!
     @membership = create(:membership, event: @event, person: @person,
                                       role: 'Organizer')
-  end
-
-  after do
-    Lecture.delete_all
-    Schedule.delete_all
   end
 
   it 'accepts event and user objects as a parameter' do
@@ -27,7 +22,7 @@ describe 'DefaultSchedule' do
   end
 
   context 'If there is NO Template Schedule in the database' do
-    before(:all) do
+    before do
       Event.where(template: true).destroy_all
       membership = @event.memberships.first
       expect(membership.role).to eq('Organizer')
@@ -39,7 +34,7 @@ describe 'DefaultSchedule' do
   end
 
   context 'If there is a Template Schedule in the database' do
-    before(:all) do
+    before do
       @tevent = create(:event_with_schedule,
                        code: '15w0001',
                        name: 'Testing Schedule Template event',
@@ -58,13 +53,13 @@ describe 'DefaultSchedule' do
     end
 
     context 'And the user IS an organizer of the event' do
-      before(:all) do
+      before do
         membership = @event.memberships.first
         expect(membership.role).to eq('Organizer')
       end
 
       context 'If the event has at least one schedule item' do
-        before(:all) do
+        before do
           item = build(:schedule, name: 'This one item', event_id: @event.id,
             start_time: (@event.start_date + 2.days).to_time.change({ hour: 9 }),
             end_time: (@event.start_date + 2.days).to_time.change({ hour: 10 })
@@ -131,7 +126,7 @@ describe 'DefaultSchedule' do
     end
 
     context 'And the user is NOT an organizer of the event' do
-      before(:all) do
+      before do
         membership = @event.memberships.first
         expect(membership.role).to eq('Organizer')
         membership.role = 'Participant'

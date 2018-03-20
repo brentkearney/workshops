@@ -8,7 +8,6 @@ require 'rails_helper'
 
 describe 'Editing a Schedule Item', type: :feature do
   before do
-    Event.destroy_all
     authenticate_user
     @event = create(:event_with_schedule)
   end
@@ -27,11 +26,13 @@ describe 'Editing a Schedule Item', type: :feature do
       visit event_schedule_edit_path(@event, item)
 
       expect(page.has_select?('schedule[day]', with_options: @event.days))
-      expect(page.has_select?('Start time'))
-      expect(page.has_select?('End time'))
+      expect(page.has_select?('Start time2'))
+      expect(page).to have_field('schedule_start_time_4i')
+      expect(page).to have_field('schedule_end_time_4i')
       expect(page.has_field?('Title', with: item.name))
       expect(page.has_field?('schedule_description', with: item.description))
       expect(page.has_field?('Location', with: item.location))
+      expect(page).to have_field('schedule_staff_item', checked: false)
     end
 
     it 'clicking an item from the schedule index opens it in the edit form' do
@@ -68,6 +69,17 @@ describe 'Editing a Schedule Item', type: :feature do
       click_button 'Update Schedule'
       expect(find('div.alert-warning').text)
         .to match(/^Warning: .+ overlaps with.+#{first_item.name}/)
+    end
+
+    it 'staff items have time limit selectors' do
+      first_item = @event.schedules.first
+      first_item.staff_item = true
+      first_item.save
+
+      visit event_schedule_edit_path(@event, first_item)
+
+      expect(page).to have_field('schedule_earliest_4i')
+      expect(page).to have_field('schedule_latest_4i')
     end
 
     context 'For a schedule (non-lecture) item' do
@@ -334,6 +346,16 @@ describe 'Editing a Schedule Item', type: :feature do
           visit event_schedule_edit_path(@event, @item)
           expect(page.body).to have_css('input#schedule_staff_item')
         end
+
+        it 'staff items have time limit selectors' do
+          @item.staff_item = true
+          @item.save
+
+          visit event_schedule_edit_path(@event, @item)
+
+          expect(page).to have_field('schedule_earliest_4i')
+          expect(page).to have_field('schedule_latest_4i')
+        end
       end
     end
 
@@ -395,6 +417,31 @@ describe 'Editing a Schedule Item', type: :feature do
           @item.staff_item = true
           @item.save
         end
+
+        it 'does not show time limit selectors' do
+          visit event_schedule_edit_path(@event, @item)
+
+          expect(page).not_to have_field('schedule_earliest_4i')
+          expect(page).not_to have_field('schedule_latest_4i')
+        end
+
+        # it 'disables times outside of time limits' do
+        #   @item.earliest = @item.start_time - 1.hour
+        #   @item.latest = @item.start_time + 1.hour
+        #   @item.save
+
+        #   visit event_schedule_edit_path(@event, @item)
+
+        #   eselect = find(:select, 'schedule_start_time_4i')
+        #   expect(eselect).to have_selector(:option,
+        #                                    @item.earliest.strftime('%H'),
+        #                                    disabled: true)
+        #   lselect = find(:select, 'schedule_end_time_4i')
+        #   expect(lselect).to have_selector(:option,
+        #                                    @item.latest.strftime('%H'),
+        #                                    disabled: true)
+        #   # note: minutes must be disabled via javascript
+        # end
 
         context 'within schedule lock time' do
           before do

@@ -9,11 +9,12 @@ class SyncMembershipJob < ActiveJob::Base
   queue_as :urgent
 
   rescue_from(RuntimeError) do |error|
-    if error.message == 'JSON::ParserError'
-      membership_id = arguments[0]
-      membership = Membership.find_by_id(membership_id)
-      StaffMailer.notify_sysadmin(membership.event, error).deliver_now
-    else
+    membership_id = arguments[0]
+    membership = Membership.find_by_id(membership_id) unless membership_id.nil?
+    event = membership.nil? ? nil : membership.event
+    StaffMailer.notify_sysadmin(event, error).deliver_now
+
+    if error.message != 'JSON::ParserError'
       retry_job wait: 1.minutes, queue: :default
     end
   end

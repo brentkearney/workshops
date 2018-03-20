@@ -8,6 +8,7 @@ require 'rails_helper'
 
 describe 'Membership#show', type: :feature do
   before do
+    Event.destroy_all
     @event = create(:event_with_members)
     @organizer = @event.memberships.where("role='Contact Organizer'").first
     @participant = @event.memberships.where("role='Participant'").first
@@ -30,8 +31,6 @@ describe 'Membership#show', type: :feature do
 
   after do
     Event.destroy_all
-    Membership.destroy_all
-    Person.destroy_all
   end
 
   def shows_basic_info(member)

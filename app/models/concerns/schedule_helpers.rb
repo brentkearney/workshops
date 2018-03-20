@@ -73,7 +73,6 @@ module ScheduleHelpers
   def clean_data
     # remove leading & trailing whitespace
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }
-    true
   end
 
 end

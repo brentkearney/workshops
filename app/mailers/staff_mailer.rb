@@ -50,6 +50,7 @@ class StaffMailer < ApplicationMailer
   end
 
   def notify_sysadmin(event, error)
+    event = Event.find(event) if event.is_a?(Integer)
     to_email = Setting.Site['sysadmin_email']
     subject = if event.nil?
                 'Workshops error!'

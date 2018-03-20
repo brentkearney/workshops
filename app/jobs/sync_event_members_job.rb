@@ -9,6 +9,9 @@ class SyncEventMembersJob < ActiveJob::Base
   queue_as :urgent
 
   rescue_from(RuntimeError) do |error|
+    event_id = arguments[0]
+    StaffMailer.notify_sysadmin(event_id, error).deliver_now
+
     if error.message == 'NoResultsError'
       retry_job wait: 5.minutes, queue: :default
     end
@@ -19,4 +22,3 @@ class SyncEventMembersJob < ActiveJob::Base
     SyncMembers.new(event)
   end
 end
-

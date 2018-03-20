@@ -1,4 +1,36 @@
 $(document).on 'turbolinks:load', ->
+  if $('#earliest_hour').length > 0
+    ehour = parseInt( $('#earliest_hour').val(), 10 )
+    $('#schedule_start_time_4i option:lt(' + ehour + ')').remove()
+    emin = parseInt( $('#earliest_minute').val(), 10 )
+
+    $('#schedule_start_time_4i').click (event) ->
+      selected = $('#schedule_start_time_4i option').filter(':selected').text()
+      if parseInt(selected, 10) is ehour
+        $('#schedule_start_time_5i option:lt(' + emin + ')').remove()
+      else
+        if $('#schedule_start_time_5i option').size() < 60
+          for min in [(emin - 1)..0]
+            min = "0#{min}" if min < 10
+            $('#schedule_start_time_5i').prepend('<option value="' + min + '">' + min + '</option>')
+
+
+  if $('#latest_hour').length > 0
+    lhour = parseInt( $('#latest_hour').val(), 10 )
+    $('#schedule_end_time_4i option:gt(' + lhour + ')').remove()
+    lmin = parseInt( $('#latest_minute').val(), 10 )
+
+    $('#schedule_end_time_4i').click (event) ->
+      selected = $('#schedule_end_time_4i option').filter(':selected').text()
+      if parseInt(selected, 10) is lhour
+        $('#schedule_end_time_5i option:gt(' + lmin + ')').remove()
+      else
+        if $('#schedule_end_time_5i option').size() < 60
+          for min in [(lmin + 1)..59]
+            min = "0#{min}" if min < 10
+            $('#schedule_end_time_5i').append('<option value="' + min + '">' + min + '</option>')
+
+
   $('#print-button').click (event) ->
     print()
 

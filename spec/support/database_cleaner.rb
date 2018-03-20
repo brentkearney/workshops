@@ -1,28 +1,26 @@
 require 'database_cleaner'
+ENV["RAILS_ENV"] ||= 'test'
 
 RSpec.configure do |config|
-  config.before(:each, js: true) do
-    DatabaseCleaner.strategy = :truncation, { except: %w[Setting] }
-  end
-
   config.before(:suite) do
-    DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.clean_with(:deletion)
+    DatabaseCleaner.clean_with(:truncation, pre_count: true, reset_ids: true)
   end
 
-  config.before :each do
-    if Capybara.current_driver == :rack_test
-      DatabaseCleaner.strategy = :transaction
-    else
-      DatabaseCleaner.strategy = :deletion
-    end
+  config.before(:each) do
+    # DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.strategy = :truncation
+  end
 
+  config.before(:each, js: true) do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before(:each) do
     DatabaseCleaner.start
   end
 
-  config.after(:each)  { DatabaseCleaner.clean }
-
-  config.after(:suite) do
-    DatabaseCleaner.clean_with(:deletion)
+  config.after(:each) do
+    DatabaseCleaner.clean
+    ActiveRecord::Base.connection.reset_pk_sequence!('events')
   end
 end

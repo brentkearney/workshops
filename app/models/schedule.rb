@@ -18,6 +18,7 @@ class Schedule < ActiveRecord::Base
   validates :name, presence: true
   validates :start_time, :end_time, presence: true
 
+  validate :time_limits
   validate :ends_after_begins, unless: :missing_data
   validate :times_use_event_timezone, unless: :missing_data
   validate :times_within_event, unless: :missing_data
@@ -27,13 +28,40 @@ class Schedule < ActiveRecord::Base
   include ScheduleHelpers
 
   def day
-    start_time.to_date
+    start_time.to_date unless start_time.nil?
   end
 
   private
 
   def strip_html
     self.name = ActionController::Base.helpers.strip_tags(name)
+  end
+
+  def time_limits
+    Rails.logger.debug '*' * 100 + "\n\n"
+    Rails.logger.debug "Schedule model was given:"
+    Rails.logger.debug "day: #{day}"
+    Rails.logger.debug "start_time: #{start_time}"
+    Rails.logger.debug "end_time: #{end_time}"
+    Rails.logger.debug "earliest: #{earliest}"
+    Rails.logger.debug "latest: #{latest}"
+    Rails.logger.debug '*' * 100 + "\n\n"
+
+    if earliest.blank?
+      self.earliest = nil
+    elsif start_time < earliest
+      self.start_time = earliest
+    end
+
+    if latest.blank?
+      self.latest = nil
+    elsif end_time > latest
+      self.end_time = latest
+    end
+
+    return if staff_item
+    self.earliest = nil
+    self.latest = nil
   end
 
   def overlaps_message(other)

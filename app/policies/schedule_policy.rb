@@ -31,6 +31,10 @@ class SchedulePolicy
     staff_or_admin
   end
 
+  def edit_time_limits?
+    @schedule.staff_item && staff_or_admin
+  end
+
   def create?
     event_organizer || staff_or_admin
   end

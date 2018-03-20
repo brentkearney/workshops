@@ -33,6 +33,7 @@ RSpec.describe ScheduleController, type: :controller do
   after do
     Lecture.delete_all
     Schedule.delete_all
+    Event.destroy_all
   end
 
   describe 'GET #index' do

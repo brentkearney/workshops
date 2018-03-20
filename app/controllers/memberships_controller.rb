@@ -148,7 +148,6 @@ class MembershipsController < ApplicationController
   def membership_params
     @membership = Membership.new(event: @event) if @membership.nil?
     allowed_fields = policy(@membership).allowed_fields?
-    Rails.logger.debug "\n\n************ allowed parameters: #{allowed_fields} **********\n\n"
     params.require(:membership).permit(allowed_fields)
   end
 end

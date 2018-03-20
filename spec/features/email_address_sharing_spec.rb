@@ -8,18 +8,18 @@ require 'rails_helper'
 
 describe 'Email address sharing', :type => :feature do
   before do
-    @event = FactoryBot.create(:event)
+    @event = create(:event)
     5.times do
-      person = FactoryBot.create(:person)
-      membership = FactoryBot.create(:membership, event: @event, person: person, role: 'Participant')
-      user = FactoryBot.create(:user, email: person.email, person: person)
+      person = create(:person)
+      create(:membership, event: @event, person: person, role: 'Participant')
+      create(:user, email: person.email, person: person)
     end
 
     @member = @event.members.first
     @user = User.find_by_email(@member.email)
     expect(@user).not_to be_nil
 
-    @non_member_user = FactoryBot.create(:user)
+    @non_member_user = create(:user)
   end
 
   after(:each) do
@@ -177,7 +177,7 @@ describe 'Email address sharing', :type => :feature do
       @non_member_user.staff!
       login_as @non_member_user, scope: :user
     end
-    
+
     it 'shows member email addresses if staff location matches event location' do
       @non_member_user.location = @event.location
       @non_member_user.save!

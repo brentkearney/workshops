@@ -68,6 +68,26 @@ RSpec.describe 'Model validations: Schedule', type: :model do
     expect(@schedule.name).to eq('I love ribs')
   end
 
+  it 'sets earliest and latest to nil for non-staff items' do
+    @schedule.staff_item = false
+    @schedule.earliest = @schedule.start_time - 1.hour
+    @schedule.latest = @schedule.end_time + 1.hour
+    @schedule.save
+
+    expect(@schedule.earliest).to be_nil
+    expect(@schedule.latest).to be_nil
+  end
+
+  it 'keeps earliest and latest for staff items' do
+    @schedule.staff_item = true
+    @schedule.earliest = @schedule.start_time - 1.hour
+    @schedule.latest = @schedule.end_time + 1.hour
+    @schedule.save
+
+    expect(@schedule.earliest).to eq(@schedule.start_time - 1.hour)
+    expect(@schedule.latest).to eq(@schedule.end_time + 1.hour)
+  end
+
   context 'if times overlap with another scheduled item' do
     before do
       @schedule1 = @schedule

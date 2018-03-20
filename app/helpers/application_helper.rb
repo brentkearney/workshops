@@ -9,6 +9,10 @@ module ApplicationHelper
     image_tag "profile.png", alt: "#{person.name}", id: "profile-pic-#{person.id}", class: "img-responsive img-rounded"
   end
 
+  def user_is_staff?
+    current_user && current_user.is_staff?
+  end
+
   def user_is_organizer?
     current_user && current_user.is_organizer?(@event)
   end

@@ -34,4 +34,16 @@ module ScheduleHelper
     day == @event.days.first && @current_user && @current_user.is_staff? &&
       @event.location == 'BIRS'
   end
+
+  def time_limits(schedule)
+    return unless schedule.staff_item
+    unless schedule.earliest.nil?
+      concat hidden_field_tag 'earliest_hour', schedule.earliest.strftime('%H')
+      concat hidden_field_tag 'earliest_minute', schedule.earliest.strftime('%M')
+    end
+    unless schedule.latest.nil?
+      concat hidden_field_tag 'latest_hour', schedule.latest.strftime('%H')
+      concat hidden_field_tag 'latest_minute', schedule.latest.strftime('%M')
+    end
+  end
 end
