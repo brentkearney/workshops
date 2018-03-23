@@ -169,8 +169,7 @@ class ScheduleController < ApplicationController
   private
 
   def set_lock_time
-    location = @event.location
-    @lock_time = Setting.Locations[location]['lock_staff_schedule'].to_duration
+    @lock_time = GetSetting.schedule_lock_time(@event)
   end
 
   def prefill_lecture_fields

@@ -162,5 +162,15 @@ describe 'Post-login Welcome Page', type: :feature do
 
       membership.destroy!
     end
+
+    it 'clicking the "My Events" link shows links to users events' do
+      sign_in_as @user
+      click_link 'My Events'
+
+      @user.person.memberships.each do |m|
+        expect(page.body).to have_link("#{m.event.code}")
+        expect(page.body).to have_link("#{m.event.name}")
+      end
+    end
   end
 end
