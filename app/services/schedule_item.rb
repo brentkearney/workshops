@@ -33,7 +33,7 @@ class ScheduleItem
 
   def self.update(schedule, params)
     @schedule = schedule
-    Time.zone = @schedule.event.time_zone
+    @event = @schedule.event
     new_day = params.delete :day
 
     if params[:lecture_attributes]
@@ -57,21 +57,25 @@ class ScheduleItem
                    day: new_day.to_date.mday }
       new_schedule.start_time = new_schedule.start_time.to_time.change(the_date)
       new_schedule.end_time = new_schedule.end_time.to_time.change(the_date)
+    end
 
-      if params[:'earliest(4i)'] == '' || new_schedule.earliest.nil?
-        new_schedule.earliest = nil
-      else
-        the_date[:hour] = new_schedule.earliest.strftime('%H').to_i
-        the_date[:min] = new_schedule.earliest.strftime('%M').to_i
-        new_schedule.earliest = new_schedule.earliest.to_time.change(the_date)
-      end
-      if params[:'latest(4i)'] == '' || new_schedule.latest.nil?
-        new_schedule.latest = nil
-      else
-        the_date[:hour] = new_schedule.latest.strftime('%H').to_i
-        the_date[:min] = new_schedule.latest.strftime('%M').to_i
-        new_schedule.latest = new_schedule.latest.to_time.change(the_date)
-      end
+    if params[:'earliest(4i)'] == '' || new_schedule.earliest.nil?
+      new_schedule.earliest = nil
+    else
+      earliest = new_schedule.earliest.in_time_zone(@event.time_zone)
+      the_date[:hour] = earliest.strftime('%H').to_i
+      the_date[:min] = earliest.strftime('%M').to_i
+
+      new_schedule.earliest = new_schedule.start_time.change(the_date)
+    end
+    if params[:'latest(4i)'] == '' || new_schedule.latest.nil?
+      new_schedule.latest = nil
+    else
+      latest = new_schedule.latest.in_time_zone(@event.time_zone)
+      the_date[:hour] = new_schedule.latest.strftime('%H').to_i
+      the_date[:min] = new_schedule.latest.strftime('%M').to_i
+
+      new_schedule.latest = new_schedule.start_time.change(the_date)
     end
 
     unless lecture_id.nil?

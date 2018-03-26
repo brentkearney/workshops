@@ -40,7 +40,7 @@ class Schedule < ActiveRecord::Base
   def time_limits
     if earliest.blank?
       self.earliest = nil
-    elsif start_time < earliest
+    elsif start_time > earliest
       time_change_warning('start_time')
       self.start_time = earliest
     end
