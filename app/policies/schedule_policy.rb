@@ -54,7 +54,7 @@ class SchedulePolicy
 
   def within_lock_staff_schedule
     return true unless @schedule.staff_item
-    Date.current + GetSetting.schedule_lock_time(@event) < @event.start_date
+    Date.current + GetSetting.schedule_lock_time(@event.location) < @event.start_date
   end
 
   def event_organizer

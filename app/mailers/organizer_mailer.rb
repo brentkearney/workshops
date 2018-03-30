@@ -19,11 +19,7 @@
 # SOFTWARE.
 
 class OrganizerMailer < ApplicationMailer
-  app_email = Setting.Site['application_email'] unless Setting.Site.blank?
-  if Setting.Site.blank? || app_email.nil?
-    app_email = ENV['DEVISE_EMAIL']
-  end
-
+  app_email = GetSetting.site_email('application_email')
   default from: app_email
 
   def rsvp_notice(membership, args)
@@ -34,12 +30,7 @@ class OrganizerMailer < ApplicationMailer
     @member = membership.person
     @event = membership.event
     @organizer = @event.organizer
-    @membership_url = Setting.Site['app_url'] + "/events/#{@event.code}/membership"
-
-    @organization = 'Staff'
-    unless Setting.Locations["#{membership.event.location}"].nil?
-      @organization = Setting.Locations["#{membership.event.location}"]['Name']
-    end
+    @organization = GetSetting.org_name(@event.location)
 
     email = '"' + @organizer.name + '" <' + @organizer.email + '>'
     subject = '[' + @event.code + '] Membership invitation reply'

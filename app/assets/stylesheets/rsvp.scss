@@ -64,10 +64,12 @@ label {
 
   .date-titles {
     text-align: right;
+    color: $secondary-text-color;
   }
 
   .date-picker {
     overflow: hidden;
+    margin-left: 30px;
     label {
       font-size: 1.2em;
       text-decoration: underline;
@@ -78,6 +80,10 @@ label {
   }
   .checkbox {
     margin: 10px;
+  }
+  #accommodation_buttons {
+    text-align: center;
+    margin-top: 20px;
   }
   .inline-checkbox {
     margin-left: 10px;

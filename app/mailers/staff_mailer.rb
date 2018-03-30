@@ -20,30 +20,22 @@
 
 # Notification messages to Staff
 class StaffMailer < ApplicationMailer
-  app_email = Setting.Site['application_email'] unless Setting.Site.blank?
-  app_email = ENV['DEVISE_EMAIL'] if app_email.nil?
-
+  app_email = GetSetting.site_email('application_email')
   default from: app_email
-
-  def missing_email_settings(event)
-    Setting.Emails.blank? || Setting.Emails[event.location].blank? ||
-      Setting.Emails[event.location]['schedule_staff'].blank?
-  end
 
   def schedule_change(args)
     @event = Event.find_by_code(args[:event_code])
-    return if missing_email_settings(@event)
+    to_email = GetSetting.email(@event.location, 'schedule_staff')
     @change_notice = args[:message]
 
-    mail(to: Setting.Emails[@event.location]['schedule_staff'],
-         subject: "[#{@event.code}] Schedule change notice!")
+    mail(to: to_email, subject: "[#{@event.code}] Schedule change notice!")
   end
 
   def event_sync(event, error_messages)
     @event = event
     @error_messages = error_messages
-    to_email = Setting.Emails[event.location]['program_coordinator']
-    cc_email = Setting.Site['sysadmin_email']
+    to_email = GetSetting.email(@event.location, 'program_coordinator')
+    cc_email = GetSetting.site_email('sysadmin_email')
     subject = "!! #{event.code} (#{event.location}) Data errors !!"
 
     mail(to: to_email, cc: cc_email, subject: subject)
@@ -51,7 +43,7 @@ class StaffMailer < ApplicationMailer
 
   def notify_sysadmin(event, error)
     event = Event.find(event) if event.is_a?(Integer)
-    to_email = Setting.Site['sysadmin_email']
+    to_email = GetSetting.site_email('sysadmin_email')
     subject = if event.nil?
                 'Workshops error!'
               else
@@ -68,7 +60,7 @@ class StaffMailer < ApplicationMailer
     @event_url = event.url
     @workshops_url = event_url(event)
 
-    to_email = Setting.Emails[event.location]['event_updates']
+    to_email = GetSetting.email(event.location, 'event_updates')
     subject = "[#{event.code}] Event updated!"
 
     mail(to: to_email, subject: subject)
@@ -80,15 +72,14 @@ class StaffMailer < ApplicationMailer
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"
     @workshops_url = event_url(event)
 
-    to_email = Setting.Emails[event.location]['name_tags']
+    to_email = GetSetting.email(event.location, 'name_tags')
     subject = "[#{event.code}] Name tag change notice!"
 
     mail(to: to_email, subject: subject)
   end
 
   def confirmation_notice(membership, msg, to)
-    staff_email = Setting.Emails[membership.event.location][to]
-    return if staff_email.blank?
+    staff_email = GetSetting.email(membership.event.location, to)
     @membership = membership
     @person = membership.person
     @event = membership.event
@@ -99,7 +90,7 @@ class StaffMailer < ApplicationMailer
   end
 
   def site_feedback(section:, membership:, message:)
-    feedback_email = Setting.Site['webmaster_email']
+    feedback_email = GetSetting.site_email('webmaster_email')
     return if feedback_email.blank?
     @membership = membership
     @message = message
@@ -110,11 +101,12 @@ class StaffMailer < ApplicationMailer
 
   def rsvp_failed(membership, args:)
     @membership = membership
+    location = membership.location
     @error_messages = args['error']
     @failed_save = args['membership']
 
-    to_email = Setting.Emails[@membership.event.location]['program_coordinator']
-    cc_email = Setting.Site['sysadmin_email']
+    to_email = GetSetting.email(location, 'program_coordinator')
+    cc_email = GetSetting.site_email('sysadmin_email')
     subject = "[#{@membership.event.code}] Failed RSVP save"
     mail(to: to_email, cc: cc_email, subject: subject)
   end

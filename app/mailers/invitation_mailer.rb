@@ -19,25 +19,14 @@
 # SOFTWARE.
 
 class InvitationMailer < ApplicationMailer
-  @from_email = ENV['DEVISE_EMAIL']
-  default from: @from_email
-
-  def email_setting
-    if Setting.Emails.blank? || Setting.Emails["#{@event.location}"].blank? ||
-      Setting.Emails["#{@event.location}"]['rsvp'].blank?
-      return 'workshops@settings-emails-location-rsvp.com'
-    end
-    Setting.Emails["#{@event.location}"]['rsvp']
-  end
-
   def invite(invitation)
     @person = invitation.membership.person
     @event = invitation.membership.event
-    @from_email = email_setting
+    @from_email = GetSetting.rsvp_email(@event.location)
 
-    @rsvp_link = Setting.Site['app_url'] + '/rsvp/' + invitation.code
-    @org_name = Setting.Locations["#{@event.location}"]['Name']
-    @event_url = Setting.Site['events_url'] + @event.code
+    @rsvp_link = GetSetting.site_setting('app_url') + '/rsvp/' + invitation.code
+    @org_name = GetSetting.org_name(@event.location)
+    @event_url = GetSetting.site_setting('events_url') + '/' + @event.code
     subject = "[#{@event.code}] Your invitation to \"#{@event.name}\""
 
     mail(to: @person.email,

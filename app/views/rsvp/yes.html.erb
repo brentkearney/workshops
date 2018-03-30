@@ -24,7 +24,7 @@
 
             <div class="form-group date-picker text-center">
               <div class="row">
-                <div class="col-md-2 date-titles">
+                <div class="col-md-1 date-titles">
                   <h4>Arrival:</h4>
                 </div>
                 <div class="col-md-4">
@@ -38,16 +38,24 @@
                 </div>
               </div>
             </div>
+
             <div class="row">
-              <div class="col-md-12 form-inline">
-                <div class="form-group">
-                  <table border="0" cellpadding="20" cellspacing="20" width="100%">
-                  <tr><td width="5">
-                  <%= m.check_box :own_accommodation, { class: "form-control checkbox" }, true %>
-                  </td><td>
-                  <%= m.label :own_accommodation, 'I will book my own accommodation elsewhere' %>
-                  </td></tr>
-                  </table>
+              <div class="col-md-12">
+                <h2 class="rsvp-section midpage">Accommodation</h2>
+                <p><%= @rsvp.accommodation_intro %></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group" id="accommodation_buttons">
+                  <label class="radio-inline">
+                    <%= m.radio_button :own_accommodation, 'false', checked: 'checked' %>
+                    Book free accommodation for me
+                  </label> &nbsp;&nbsp;
+                  <label class="radio-inline">
+                    <%= m.radio_button :own_accommodation, 'true' %>
+                    I will arrange and pay for my own accommodation
+                  </label>
                 </div>
               </div>
             </div>

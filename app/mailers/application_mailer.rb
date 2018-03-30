@@ -19,10 +19,6 @@
 # SOFTWARE.
 
 class ApplicationMailer < ActionMailer::Base
-  app_email = Setting.Site['application_email'] unless Setting.Site.blank?
-  if Setting.Site.blank? || app_email.nil?
-    app_email = ENV['DEVISE_EMAIL']
-  end
-  default from: app_email
+  default from: GetSetting.site_email('application_email')
   layout 'mailer'
 end

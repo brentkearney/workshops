@@ -19,21 +19,14 @@
 # SOFTWARE.
 
 class ParticipantMailer < ApplicationMailer
-  @from_email = ENV['DEVISE_EMAIL']
+  @from_email = GetSetting.site_email('application_email')
   default from: @from_email
 
   def rsvp_confirmation(membership)
     @person = membership.person
     @event = membership.event
-
-    unless Setting.Emails.blank?
-      @from_email = Setting.Emails[@event.location]['rsvp']
-    end
-
-    @organization = 'Staff'
-    unless Setting.Locations["#{membership.event.location}"].nil?
-      @organization = Setting.Locations["#{membership.event.location}"]['Name']
-    end
+    @from_email = GetSetting.email(@event.location, 'rsvp')
+    @organization = GetSetting.org_name(@event.location)
 
     # PDF attachment in lib/assets/rsvp/[location]
     pdf_path = Rails.root.join('lib', 'assets', 'rsvp', "#{@event.location}")
@@ -57,6 +50,11 @@ class ParticipantMailer < ApplicationMailer
            template_path: "participant_mailer/rsvp/#{@event.location}",
            template_name: @event.event_type,
            'Importance': 'High', 'X-Priority': 1)
+    else
+      error_msg = { problem: 'Participant RSVP confirmation not sent.',
+                    cause: 'Email template file missing.',
+                    template: mail_template }
+      StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
     end
   end
 end

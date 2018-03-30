@@ -169,7 +169,7 @@ class ScheduleController < ApplicationController
   private
 
   def set_lock_time
-    @lock_time = GetSetting.schedule_lock_time(@event)
+    @lock_time = GetSetting.schedule_lock_time(@event.location)
   end
 
   def prefill_lecture_fields
