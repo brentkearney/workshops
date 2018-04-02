@@ -1,19 +1,20 @@
 # See: https://github.com/phusion/passenger-docker
 # Latest image versions: https://github.com/phusion/passenger-docker/blob/master/Changelog.md
-FROM phusion/passenger-full:0.9.24
+FROM phusion/passenger-ruby25:0.9.29
 
 ENV HOME /root
 
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
 
-RUN apt-get update -qq && apt-get install --yes pkg-config apt-utils \
-  build-essential cmake automake && apt-get upgrade --fix-missing --yes \
-  --allow-remove-essential -o Dpkg::Options::="--force-confold"
-RUN apt-get install --yes tzdata udev locales curl git gnupg ca-certificates \
-  zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev libxslt-dev \
-  libxslt1-dev libqtwebkit4 libqt4-dev xvfb gnupg libpq-dev nodejs wget \
-  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get update -qq && apt-get dist-upgrade --yes && \
+  apt-get install --yes pkg-config apt-utils build-essential cmake automake\
+  && apt-get upgrade --fix-missing --yes --allow-remove-essential \
+  -o Dpkg::Options::="--force-confold"
+  RUN apt-get install --yes tzdata udev locales curl git gnupg ca-certificates \
+    gnupg libpq-dev nodejs wget \
+    && apt-get clean && apt-get autoremove --yes && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
   apt-key add -
 
@@ -23,19 +24,19 @@ ENV LANG en_CA.utf8
 ENV LANGUAGE en_CA:en
 ENV LC_ALL en_CA.utf8
 
-# Use Ruby 2.4.1
-RUN /usr/local/rvm/bin/rvm remove jruby-9.1.2.0
-RUN /usr/local/rvm/bin/rvm remove ruby-2.0.0-p648
-RUN /usr/local/rvm/bin/rvm remove ruby-2.1.9
-RUN /usr/local/rvm/bin/rvm remove ruby-2.2.5
-RUN /usr/local/rvm/bin/rvm remove ruby-2.3.3
-RUN bash -lc 'rvm --default use ruby-2.4.1'
+# Use Ruby 2.5.1
+RUN /usr/local/rvm/bin/rvm remove ruby-2.5.0
+RUN /usr/local/rvm/bin/rvm install "ruby-2.5.1"
+RUN bash -lc 'rvm --default use ruby-2.5.1'
 RUN /usr/local/rvm/bin/rvm all do gem regenerate_binstubs
 RUN /usr/local/rvm/bin/rvm reload && /usr/local/rvm/bin/rvm repair all
-RUN /usr/local/rvm/bin/rvm wrapper 2.4.1 --no-prefix --all
+RUN /usr/local/rvm/bin/rvm wrapper 2.5.1 --no-prefix --all
 
-RUN echo 'export PATH=$PATH:/usr/local/rvm/bin:./bin:/usr/local/rvm/rubies/ruby-2.4.1/bin:/usr/local/rvm/gems/ruby-2.4.1/bin' > ~/.bashrc
+# Local machine uses 999 for docker user
+RUN /usr/sbin/usermod -u 999 app
 
+#ADD rails-env.conf /etc/nginx/main.d/rails-env.conf
+#RUN chmod 644 /etc/nginx/main.d/rails-env.conf
 ENV APP_HOME /home/app/workshops
 ADD . $APP_HOME
 WORKDIR $APP_HOME

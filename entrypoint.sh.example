@@ -1,5 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 set -e
+
+echo
+echo "Welcome to OS:"
+uname -v
+cat /etc/issue
 
 echo
 echo "Setting system timezone..."
@@ -11,31 +16,33 @@ rm /etc/timezone
 rm /etc/localtime
 dpkg-reconfigure --frontend noninteractive tzdata
 
-# First-time run only: setup RVM + 2.4.1
-# echo
-# echo "Create gemset..."
-# bash -lc 'rvm --default use ruby-2.4.1'
-# gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-# /usr/bin/curl -sSL https://get.rvm.io | bash -s stable
-# /usr/local/rvm/bin/rvm gemset create ruby-2.4.1
-# /usr/local/rvm/bin/rvm 2.4.1@ruby-2.4.1
-# /usr/local/rvm/bin/rvm reload
+# First-time run only
+echo
+echo "Create gemset..."
+gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+/usr/bin/curl -sSL https://get.rvm.io | bash -s stable
+# /usr/local/rvm/bin/rvm gemset create ruby-2.5.1
+/usr/local/rvm/bin/rvm gemset use ruby-2.5.1@global
+# /usr/local/rvm/bin/rvm 2.5.1@ruby-2.5.1
+/usr/local/rvm/bin/rvm cleanup all
+/usr/local/rvm/bin/rvm reload
 
 echo
 echo "Installing latest bundler..."
-/usr/local/rvm/bin/rvm-exec 2.4.1 gem install bundler
-/usr/local/rvm/bin/rvm-exec 2.4.1 gem install rubygems-bundler
+/usr/local/rvm/bin/rvm-exec 2.5.1 gem install bundlera
+/usr/local/rvm/bin/rvm-exec 2.5.1 gem install rubygems-bundler
+
+echo
+echo "Bundle update rails..."
+RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.1 bundle update rails
 
 echo
 echo "Bundle install..."
-RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.4.1 bundle install
+RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.1 bundle install
 
-# Remove after first run
-echo
-echo "Setting up database..."
-rake db:setup RAILS_ENV=development
-rake db:setup RAILS_ENV=test
-rake db:setup RAILS_ENV=production
+# echo
+# echo "Bundle update..."
+# RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.1 bundle update
 
 echo
 echo "Running migrations..."
@@ -43,33 +50,31 @@ rake db:migrate RAILS_ENV=development
 rake db:migrate RAILS_ENV=test
 rake db:migrate RAILS_ENV=production
 
-echo
-echo "Adding default settings..."
-rake ws:init_settings
+# # Default settings
+# rake ws:init_settings
 
-echo
-echo "Creating admins..."
-if [ -e lib/tasks/birs.rake ]; then
-  rake birs:create_admins RAILS_ENV=development
-else
-  rake ws:create_admins RAILS_ENV=development
-fi
+# echo
+# echo "Creating admins..."
+# if [ -e lib/tasks/birs.rake ]; then
+#   rake birs:create_admin RAILS_ENV=development
+# else
+#   rake ws:create_admins RAILS_ENV=development
+# fi
+
 
 echo
 echo "Chowning..."
 chown -R app:app /usr/local/rvm/gems
 if [ ! -e /home/app/workshops/tmp ]; then
-  mkdir /home/app/workshops/tmp
-  mkdir -p /home/app/workshops/vendor/cache
+ mkdir /home/app/workshops/tmp
+ mkdir -p /home/app/workshops/vendor/cache
 fi
 chown -R app:app /home/app/workshops
 
 # echo
 # echo "Compiling Assets..."
-# chown -R app /home/app/workshops/tmp
 # su - app -c "cd /home/app/workshops; RAILS_ENV=production SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
 
-# Settings in Passengerfile.json
 echo
 echo "Starting web server..."
 bundle exec passenger start
