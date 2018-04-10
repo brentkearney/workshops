@@ -88,6 +88,9 @@ Rails.application.configure do
     enable_starttls_auto: ENV['EMAIL_STARTTLS']
   }
 
+  # Send via SparkPost
+  config.action_mailer.delivery_method = :sparkpost
+
   ## Log mail to separate file / loglevel, to avoid printing binary attachments
   config.action_mailer.logger = ActiveSupport::Logger.new("log/mailer.log")
   config.action_mailer.logger.level = ActiveSupport::Logger::Severity::INFO

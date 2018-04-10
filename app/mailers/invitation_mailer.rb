@@ -20,7 +20,8 @@
 
 class InvitationMailer < ApplicationMailer
   def invite(invitation)
-    @person = invitation.membership.person
+    # @person = invitation.membership.person
+    @person = Person.find_by_email('brentk@birs.ca')
     @event = invitation.membership.event
     @from_email = GetSetting.rsvp_email(@event.location)
 
@@ -29,11 +30,28 @@ class InvitationMailer < ApplicationMailer
     @event_url = GetSetting.site_setting('events_url') + '/' + @event.code
     subject = "[#{@event.code}] Your invitation to \"#{@event.name}\""
 
+    sub_data = {
+        person_name: "#{@person.dear_name}",
+        event_code: "#{@event.code}",
+        event_name: "#{@event.name}",
+        event_dates: "#{@event.dates(:long)}",
+        event_url: "#{@event_url}",
+        org_name: "#{@org_name}",
+        rsvp_link: "#{@rsvp_link}"
+    }
+
+    data = {
+        template_id: 'participant-invitation',
+        substitution_data: sub_data
+    }
+
     mail(to: @person.email,
          from: @from_email,
          bcc: @from_email,
          subject: subject,
-         Importance: 'High', 'X-Priority': 1)
+         sparkpost_data: data) do |format|
+      format.text { render text: "" }
+    end
   end
 
 end
