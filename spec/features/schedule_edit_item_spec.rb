@@ -68,7 +68,7 @@ describe 'Editing a Schedule Item', type: :feature do
 
       click_button 'Update Schedule'
       expect(find('div.alert-warning').text)
-        .to match(/^Warning: .+ overlaps with.+#{first_item.name}/)
+        .to match(/^Warning:\n#{last_item.name}.+overlaps with.+\n.#{first_item.name}.+/)
     end
 
     it 'staff items have time limit selectors' do
@@ -229,7 +229,7 @@ describe 'Editing a Schedule Item', type: :feature do
       visit event_schedule_edit_path(@event, @item)
       expect(page).to have_css('div.alert.alert-error')
       expect(page.body).to have_text('Only staff and event organizers may modify
-        the schedule')
+        the schedule'.squish)
     end
 
     def allows_editing

@@ -41,12 +41,13 @@ RSpec.describe InvitationMailer, type: :mailer do
       expect(@sent_message.to).to include(@invitation.membership.person.email)
     end
 
-    it "message body includes participant's name" do
-      expect(@sent_message.body).to have_text(@invitation.membership.person.dear_name)
-    end
+    #
+    # it "message body includes participant's name" do
+    #   expect(@sent_message.body).to have_text(@invitation.membership.person.dear_name)
+    # end
 
-    it 'message body includes the invitation code' do
-      expect(@sent_message.body).to have_text(@invitation.code)
-    end
+    # it 'message body includes the invitation code' do
+    #   expect(@sent_message.body).to have_text(@invitation.code)
+    # end
   end
 end

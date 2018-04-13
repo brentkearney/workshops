@@ -112,7 +112,7 @@ describe 'RSVP', type: :feature do
       visit rsvp_otp_path(@invitation.code)
 
       expect(page).to have_text("The event's organizers have not yet
-        invited you")
+        invited you".squish)
     end
 
     it 'participant already declined' do

@@ -8,19 +8,17 @@ module PersonDecorators
   extend ActiveSupport::Concern
 
   def name
-    unless lastname.blank? || firstname.blank?
-      firstname + ' ' + lastname
-    else
-      'N/A'
-    end
+    return '' if lastname.blank? || firstname.blank?
+    firstname + ' ' + lastname
   end
 
   def lname
-    unless lastname.blank? || firstname.blank?
-      lastname + ', ' + firstname
-    else
-      'N/A'
-    end
+    return '' if lastname.blank? || firstname.blank?
+    lastname + ', ' + firstname
+  end
+
+  def full_email
+    %("#{name}" <#{email}>)
   end
 
   def dear_name
@@ -28,7 +26,7 @@ module PersonDecorators
       if academic_status == 'Professor'
         'Prof. ' + lastname
       else
-        self.name
+        name
       end
     else
       salutation + ' ' + lastname
@@ -36,7 +34,7 @@ module PersonDecorators
   end
 
   def him
-    self.gender == 'M' ? 'him' : 'her'
+    gender == 'M' ? 'him' : 'her'
   end
 
   def affil
@@ -46,11 +44,15 @@ module PersonDecorators
     affil_with_department
   end
 
+  def no_status
+    academic_status.blank? || academic_status == 'Other'
+  end
+
   def affil_with_title
-    return if affiliation.blank?
+    return '' if affiliation.blank?
     formatted_affil = affil
     if title.blank?
-      formatted_affil << " — #{academic_status}" unless academic_status.blank? && academic_status != "Other"
+      formatted_affil << " — #{academic_status}" unless no_status
     else
       formatted_affil << " — #{title}"
     end
