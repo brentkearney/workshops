@@ -41,7 +41,7 @@ class InvitationsController < ApplicationController
   private
 
   def send_invitation(member, invited_by = false)
-    return unless policy(member).edit_attendance?
+    (invited_by = @current_user.name if @current_user) unless invited_by
     Invitation.new(membership: member,
                    invited_by: invited_by || member.person.name).send_invite
   end

@@ -404,8 +404,8 @@ describe 'Editing a Schedule Item', type: :feature do
           click_button 'Update Schedule'
 
           expect(page.body).to have_text('successfully updated')
-          expect(ActionMailer::Base.deliveries.count).to eq(1)
-          message = ActionMailer::Base.deliveries.first.body
+          expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).not_to eq 0
+          message = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last
           expect(message).to have_text(original_name)
           expect(message).to have_text('Current event: new name')
           expect(message).to have_text("Updated by: #{@user.person.name}")

@@ -65,5 +65,5 @@ RSpec.describe OrganizerMailer, type: :mailer do
     # it 'message body includes given message' do
     #   expect(@sent_message.body).to have_text('Foo bar')
     # end
-  end
+  # end
 end

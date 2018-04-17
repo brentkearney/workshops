@@ -19,13 +19,9 @@
 # SOFTWARE.
 
 class ParticipantMailer < ApplicationMailer
-  @from_email = GetSetting.site_email('application_email')
-  default from: @from_email
-
   def rsvp_confirmation(membership)
     @person = membership.person
     @event = membership.event
-    @from_email = GetSetting.email(@event.location, 'rsvp')
     @organization = GetSetting.org_name(@event.location)
 
     # PDF attachment in lib/assets/rsvp/[location]
@@ -38,18 +34,23 @@ class ParticipantMailer < ApplicationMailer
       }
     end
 
+    from_email = GetSetting.email(@event.location, 'rsvp')
+    subject = "[#{@event.code}] Thank you for accepting our invitation"
+    to_email = '"' + @person.name + '" <' + @person.email + '>'
+    if Rails.env.development?
+      to_email = GetSetting.site_email('webmaster_email')
+    end
+
     template_path = Rails.root.join('app', 'views', 'participant_mailer',
                       'rsvp', "#{@event.location}")
     mail_template = "#{template_path}/#{@event.event_type}.text.erb"
     if File.exist?(mail_template)
-      email = '"' + @person.name + '" <' + @person.email + '>'
-      subject = "[#{@event.code}] Thank you for accepting our invitation"
-      mail(to: email,
-           from: @from_email,
+      mail(to: to_email,
+           from: from_email,
            subject: subject,
+           delivery_method: :sparkpost,
            template_path: "participant_mailer/rsvp/#{@event.location}",
-           template_name: @event.event_type,
-           'Importance': 'High', 'X-Priority': 1)
+           template_name: @event.event_type)
     else
       error_msg = { problem: 'Participant RSVP confirmation not sent.',
                     cause: 'Email template file missing.',

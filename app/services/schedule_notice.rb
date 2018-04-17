@@ -130,7 +130,6 @@ class ScheduleNotice
   end
 
   def invoke_mailer(message: '')
-    StaffMailer.schedule_change(event_code: event.code,
-                                message: message).deliver_now
+    EmailStaffScheduleNoticeJob.perform_later(event.id, message)
   end
 end

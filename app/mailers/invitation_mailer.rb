@@ -22,9 +22,6 @@ class InvitationMailer < ApplicationMailer
   def invite(invitation)
     person = invitation.membership.person
     event = invitation.membership.event
-    from_email = GetSetting.rsvp_email(event.location)
-    bcc_email = GetSetting.rsvp_email(event.location)
-    subject = "[#{event.code}] Workshop Invitation: #{event.name}"
 
     rsvp_link = GetSetting.app_url + '/rsvp/' + invitation.code
     organizers = ''
@@ -32,6 +29,14 @@ class InvitationMailer < ApplicationMailer
       organizers << org.name + ' (' + org.affiliation + '), '
     end
     organizers.gsub!(/, $/, '')
+
+    from_email = GetSetting.rsvp_email(event.location)
+    subject = "[#{event.code}] Workshop Invitation: #{event.name}"
+    bcc_email = GetSetting.rsvp_email(event.location)
+    to_email = '"' + person.name + '" <' + person.email + '>'
+    if Rails.env.development?
+      to_email = GetSetting.site_email('webmaster_email')
+    end
 
     sub_data = {
       person_name: "#{person.dear_name}",
@@ -48,9 +53,8 @@ class InvitationMailer < ApplicationMailer
       substitution_data: sub_data
     }
 
-    mail(to: person.email,
+    mail(to: to_email,
          from: from_email,
-         bcc: bcc_email,
          subject: subject,
          delivery_method: :sparkpost,
          sparkpost_data: data) do |format|

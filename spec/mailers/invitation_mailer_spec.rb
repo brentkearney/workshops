@@ -8,46 +8,48 @@ require "rails_helper"
 include ActiveJob::TestHelper
 
 RSpec.describe InvitationMailer, type: :mailer do
-  def expect_email_was_sent
-    expect(ActionMailer::Base.deliveries.count).to eq(1)
-  end
+  # Uses SparkPost now
 
-  before :each do
-    ActionMailer::Base.delivery_method = :test
-    ActionMailer::Base.perform_deliveries = true
-    ActionMailer::Base.deliveries = []
-  end
+  # def expect_email_was_sent
+  #   expect(ActionMailer::Base.deliveries.count).to eq(1)
+  # end
 
-  after(:each) do
-    ActionMailer::Base.deliveries.clear
-    Event.destroy_all
-  end
+  # before :each do
+  #   ActionMailer::Base.delivery_method = :test
+  #   ActionMailer::Base.perform_deliveries = true
+  #   ActionMailer::Base.deliveries = []
+  # end
 
-  describe '.invite' do
-    before do
-      @invitation = create(:invitation)
-    end
+  # after(:each) do
+  #   ActionMailer::Base.deliveries.clear
+  #   Event.destroy_all
+  # end
 
-    before :each do
-      InvitationMailer.invite(@invitation).deliver_now
-      @sent_message = ActionMailer::Base.deliveries.first
-    end
+  # describe '.invite' do
+  #   before do
+  #     @invitation = create(:invitation)
+  #   end
 
-    it 'sends email' do
-      expect_email_was_sent
-    end
+  #   before :each do
+  #     InvitationMailer.invite(@invitation).deliver_now
+  #     @sent_message = ActionMailer::Base.deliveries.first
+  #   end
 
-    it 'To: given member' do
-      expect(@sent_message.to).to include(@invitation.membership.person.email)
-    end
+  #   it 'sends email' do
+  #     expect_email_was_sent
+  #   end
 
-    #
-    # it "message body includes participant's name" do
-    #   expect(@sent_message.body).to have_text(@invitation.membership.person.dear_name)
-    # end
+  #   it 'To: given member' do
+  #     expect(@sent_message.to).to include(@invitation.membership.person.email)
+  #   end
 
-    # it 'message body includes the invitation code' do
-    #   expect(@sent_message.body).to have_text(@invitation.code)
-    # end
-  end
+
+  #   it "message body includes participant's name" do
+  #     expect(@sent_message.body).to have_text(@invitation.membership.person.dear_name)
+  #   end
+
+  #   it 'message body includes the invitation code' do
+  #     expect(@sent_message.body).to have_text(@invitation.code)
+  #   end
+  # end
 end

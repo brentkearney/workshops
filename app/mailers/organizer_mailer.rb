@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# Email notices for the workshop organizer
 class OrganizerMailer < ApplicationMailer
   def rsvp_notice(membership, args)
     old_attendance = args['attendance_was'] || 'Invited'
@@ -37,8 +38,12 @@ class OrganizerMailer < ApplicationMailer
 
     from_email = GetSetting.site_email('application_email')
     reply_to = GetSetting.rsvp_email(event.location)
-    email = '"' + organizer.name + '" <' + organizer.email + '>'
     subject = '[' + event.code + '] Membership invitation reply'
+
+    to_email = '"' + organizer.name + '" <' + organizer.email + '>'
+    if Rails.env.development?
+      to_email = GetSetting.site_email('webmaster_email')
+    end
 
     sub_data = {
       person_name: "#{organizer.dear_name}",
@@ -59,7 +64,8 @@ class OrganizerMailer < ApplicationMailer
       substitution_data: sub_data
     }
 
-    mail(to: email,
+    # to: email,
+    mail(to: to_email,
          from: from_email,
          subject: subject,
          return_path: reply_to,

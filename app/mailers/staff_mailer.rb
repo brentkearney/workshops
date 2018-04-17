@@ -24,7 +24,7 @@ class StaffMailer < ApplicationMailer
   default from: app_email
 
   def schedule_change(args)
-    @event = Event.find_by_code(args[:event_code])
+    @event = Event.find_by_id(args[:event_id])
     to_email = GetSetting.email(@event.location, 'schedule_staff')
     @change_notice = args[:message]
 
