@@ -7,6 +7,12 @@
 require 'rails_helper'
 
 RSpec.describe InvitationsController, type: :controller do
+  before do
+    @past = create(:event, past: true)
+    @current = create(:event, current: true)
+    @future = create(:event, future: true)
+  end
+
   describe 'GET #index' do
     it 'redirects to #new' do
       get :index
@@ -15,12 +21,6 @@ RSpec.describe InvitationsController, type: :controller do
   end
 
   describe 'GET #new' do
-    before do
-      @past = create(:event, past: true)
-      @current = create(:event, current: true)
-      @future = create(:event, future: true)
-    end
-
     before :each do
       get :new
     end
@@ -48,7 +48,8 @@ RSpec.describe InvitationsController, type: :controller do
     before do
       authenticate_for_controllers
       @user.admin!
-      @event = create(:event, future: true)
+      @event = @future
+      @event.memberships.destroy_all
       @membership = create(:membership, event: @event, attendance: 'Invited')
       @form_params = {'invitation': {
           'event': @event.code,
@@ -125,7 +126,8 @@ RSpec.describe InvitationsController, type: :controller do
     before do
       authenticate_for_controllers
       @user.admin!
-      @event = create(:event, future: true)
+      @event = @future
+      @event.memberships.destroy_all
       @membership = create(:membership, event: @event, attendance: 'Invited')
     end
 

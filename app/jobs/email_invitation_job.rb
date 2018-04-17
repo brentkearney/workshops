@@ -4,7 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# Initiates StaffMailer to confirm RSVPs
+# Initiates InvitationMailer to invite participants
 class EmailInvitationJob < ActiveJob::Base
   queue_as :urgent
 

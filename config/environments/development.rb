@@ -15,7 +15,7 @@ Rails.application.configure do
 
   ## SMTP Settings
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.perform_deliveries = false
+  config.action_mailer.perform_deliveries = true # testing SparkPost (temp)
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

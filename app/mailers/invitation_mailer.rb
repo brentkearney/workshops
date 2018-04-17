@@ -19,42 +19,40 @@
 # SOFTWARE.
 
 class InvitationMailer < ApplicationMailer
-  self.delivery_method = :sparkpost if Rails.env.production?
-
   def invite(invitation)
-    @person = invitation.membership.person
-    @event = invitation.membership.event
-    @from_email = GetSetting.rsvp_email(@event.location)
-    @bcc_email = GetSetting.rsvp_email(@event.location)
-    @bcc_email = ''
-    @subject = "[#{@event.code}] Workshop Invitation: #{@event.name}"
+    person = invitation.membership.person
+    event = invitation.membership.event
+    from_email = GetSetting.rsvp_email(event.location)
+    bcc_email = GetSetting.rsvp_email(event.location)
+    subject = "[#{event.code}] Workshop Invitation: #{event.name}"
 
-    @rsvp_link = GetSetting.app_url + '/rsvp/' + invitation.code
-    @organizers = ''
-    @event.organizers.each do |org|
-      @organizers << org.name + ' (' + org.affiliation + '), '
+    rsvp_link = GetSetting.app_url + '/rsvp/' + invitation.code
+    organizers = ''
+    event.organizers.each do |org|
+      organizers << org.name + ' (' + org.affiliation + '), '
     end
-    @organizers.gsub!(/, $/, '')
+    organizers.gsub!(/, $/, '')
 
     sub_data = {
-      person_name: "#{@person.dear_name}",
-      event_code: "#{@event.code}",
-      event_name: "#{@event.name}",
-      event_dates: "#{@event.dates(:long)}",
-      event_url: "#{@event.url}",
-      organizers: "#{@organizers}",
-      rsvp_link: "#{@rsvp_link}"
+      person_name: "#{person.dear_name}",
+      event_code: "#{event.code}",
+      event_name: "#{event.name}",
+      event_dates: "#{event.dates(:long)}",
+      event_url: "#{event.url}",
+      organizers: "#{organizers}",
+      rsvp_link: "#{rsvp_link}"
     }
 
     data = {
-      template_id: "#{@event.location.downcase}-participant-invitation",
+      template_id: "#{event.location.downcase}-participant-invitation",
       substitution_data: sub_data
     }
 
-    mail(to: @person.email,
-         from: @from_email,
-         bcc: @bcc_email,
-         subject: @subject,
+    mail(to: person.email,
+         from: from_email,
+         bcc: bcc_email,
+         subject: subject,
+         delivery_method: :sparkpost,
          sparkpost_data: data) do |format|
       format.text { render text: '' }
     end

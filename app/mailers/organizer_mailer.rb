@@ -19,21 +19,53 @@
 # SOFTWARE.
 
 class OrganizerMailer < ApplicationMailer
-  app_email = GetSetting.site_email('application_email')
-  default from: app_email
-
   def rsvp_notice(membership, args)
-    @old_attendance = args['attendance_was'] || 'Invited'
-    @new_attendance = args['attendance'] || 'Invited'
-    @message_to_organizer = args['organizer_message'] || ''
+    old_attendance = args['attendance_was'] || 'Invited'
+    new_attendance = args['attendance'] || 'Invited'
+    if old_attendance == new_attendance
+      @attendance_msg = "Attendance status is: #{new_attendance}."
+    else
+      @attendance_msg = %(Changed attendance status from: "#{old_attendance}"
+        to "#{new_attendance}".).squish
+    end
+    message_to_organizer = args['organizer_message'] || ''
 
-    @member = membership.person
-    @event = membership.event
-    @organizer = @event.organizer
-    @organization = GetSetting.org_name(@event.location)
+    member = membership.person
+    event = membership.event
+    organizer = event.organizer
+    organization = GetSetting.org_name(event.location)
 
-    email = '"' + @organizer.name + '" <' + @organizer.email + '>'
-    subject = '[' + @event.code + '] Membership invitation reply'
-    mail(to: email, subject: subject, 'Importance': 'High', 'X-Priority': 1)
+    from_email = GetSetting.site_email('application_email')
+    reply_to = GetSetting.rsvp_email(event.location)
+    email = '"' + organizer.name + '" <' + organizer.email + '>'
+    subject = '[' + event.code + '] Membership invitation reply'
+
+    sub_data = {
+      person_name: "#{organizer.dear_name}",
+      event_code: "#{event.code}",
+      event_name: "#{event.name}",
+      event_dates: "#{event.dates(:long)}",
+      member_name: "#{member.name}",
+      member_firstname: "#{member.firstname}",
+      member_email: "#{member.email}",
+      member_affiliation: "#{member.affiliation}",
+      attendance_msg: "#{@attendance_msg}",
+      message_to_organizer: "#{message_to_organizer}",
+      organization: "#{organization}"
+    }
+
+    data = {
+      template_id: 'rsvp-notice',
+      substitution_data: sub_data
+    }
+
+    mail(to: email,
+         from: from_email,
+         subject: subject,
+         return_path: reply_to,
+         delivery_method: :sparkpost,
+         sparkpost_data: data) do |format|
+      format.text { render text: '' }
+    end
   end
 end
