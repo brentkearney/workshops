@@ -37,7 +37,7 @@ class ParticipantMailer < ApplicationMailer
     from_email = GetSetting.email(@event.location, 'rsvp')
     subject = "[#{@event.code}] Thank you for accepting our invitation"
     to_email = '"' + @person.name + '" <' + @person.email + '>'
-    if Rails.env.development?
+    if Rails.env.development? || request.original_url =~ /staging/
       to_email = GetSetting.site_email('webmaster_email')
     end
 
@@ -54,7 +54,9 @@ class ParticipantMailer < ApplicationMailer
     else
       error_msg = { problem: 'Participant RSVP confirmation not sent.',
                     cause: 'Email template file missing.',
-                    template: mail_template }
+                    template: mail_template,
+                    person: @person,
+                    membership: membership }
       StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
     end
   end

@@ -34,7 +34,7 @@ class InvitationMailer < ApplicationMailer
     subject = "[#{event.code}] Workshop Invitation: #{event.name}"
     bcc_email = GetSetting.rsvp_email(event.location)
     to_email = '"' + person.name + '" <' + person.email + '>'
-    if Rails.env.development?
+    if Rails.env.development? || request.original_url =~ /staging/
       to_email = GetSetting.site_email('webmaster_email')
     end
 

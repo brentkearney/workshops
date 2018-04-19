@@ -41,7 +41,7 @@ class OrganizerMailer < ApplicationMailer
     subject = '[' + event.code + '] Membership invitation reply'
 
     to_email = '"' + organizer.name + '" <' + organizer.email + '>'
-    if Rails.env.development?
+    if Rails.env.development? || request.original_url =~ /staging/
       to_email = GetSetting.site_email('webmaster_email')
     end
 

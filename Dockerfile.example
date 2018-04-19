@@ -1,6 +1,6 @@
 # See: https://github.com/phusion/passenger-docker
 # Latest image versions: https://github.com/phusion/passenger-docker/blob/master/Changelog.md
-FROM phusion/passenger-ruby25:0.9.29
+FROM phusion/passenger-ruby25:0.9.30
 
 ENV HOME /root
 
@@ -23,14 +23,6 @@ RUN locale-gen en_CA.utf8
 ENV LANG en_CA.utf8
 ENV LANGUAGE en_CA:en
 ENV LC_ALL en_CA.utf8
-
-# Use Ruby 2.5.1
-RUN /usr/local/rvm/bin/rvm remove ruby-2.5.0
-RUN /usr/local/rvm/bin/rvm install "ruby-2.5.1"
-RUN bash -lc 'rvm --default use ruby-2.5.1'
-RUN /usr/local/rvm/bin/rvm all do gem regenerate_binstubs
-RUN /usr/local/rvm/bin/rvm reload && /usr/local/rvm/bin/rvm repair all
-RUN /usr/local/rvm/bin/rvm wrapper 2.5.1 --no-prefix --all
 
 # Local machine uses 999 for docker user
 RUN /usr/sbin/usermod -u 999 app

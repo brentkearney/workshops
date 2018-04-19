@@ -101,7 +101,7 @@ class StaffMailer < ApplicationMailer
 
   def rsvp_failed(membership, args:)
     @membership = membership
-    location = membership.location
+    location = membership.event.location
     @error_messages = args['error']
     @failed_save = args['membership']
 
