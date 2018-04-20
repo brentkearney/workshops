@@ -7,11 +7,10 @@
   <div class="row">
     <div class='col-md-12'>
         <p class='lead text-center'>You have been invited to the
-        <%= @invitation.membership.event.event_type %>,
-        "<%= @invitation.membership.event.name %>", on
-        <%= @invitation.membership.event.dates(:long) %>.
+        <%= @event.event_type %>, <%= @event.code %>:
+        "<%= @event.name %>", on
+        <%= @event.dates(:long) %>.
         Will you attend?</p>
-        <p class='text-center'>(You can add a message to your reply on the next page.)</p>
     </div>
   </div>
   <div class="jumbotron">
@@ -27,6 +26,11 @@
       <div class='col-md-4'>
         <a href="<%= rsvp_no_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-danger">No</a>
       </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class='col-md-12'>
+      <p class='text-center'>(You can add a message to your reply on the next page.)</p>
     </div>
   </div>
 </div>

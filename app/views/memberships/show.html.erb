@@ -151,10 +151,16 @@
         <div class="row" id="profile-gender">
           <strong>Gender:</strong> <%= @person.gender %>
         </div>
-        <div class="row" id="profile-room">
-          <strong>Hotel Room:</strong>
-          <%= @membership.room %>
-        </div>
+        <% if @membership.own_accommodation %>
+          <div class="row" id="profile-gender">
+            <strong>Own Accommodation:</strong> Yes
+          </div>
+        <% else %>
+          <div class="row" id="profile-room">
+            <strong>Hotel Room:</strong>
+            <%= @membership.room %>
+          </div>
+        <% end %>
         <div class="row" id="profile-has-guest">
           <strong>Has Guest:</strong> <%= @membership.has_guest ? 'Yes' : 'No' %>
         </div>

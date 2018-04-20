@@ -37,6 +37,10 @@ class InvitationChecker
     @otp.length < 50 ? @otp.ljust(50, '-') : @otp
   end
 
+  def event
+    invitation.is_a?(Invitation) ? invitation.event : nil
+  end
+
   def check_legacy_database
     invitation = nil
     response = LegacyConnector.new.check_rsvp(@otp)

@@ -9,7 +9,9 @@ class RsvpController < ApplicationController
   before_filter :after_selection, only: %i[yes no maybe]
 
   # GET /rsvp/:otp
-  def index; end
+  def index
+    @event = @invitation.event
+  end
 
   # GET /rsvp/yes/:otp
   # POST /rsvp/yes/:otp

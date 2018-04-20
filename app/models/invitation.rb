@@ -21,6 +21,14 @@ class Invitation < ActiveRecord::Base
     expires.strftime("%B %-d, %Y")
   end
 
+  def event
+    membership.event
+  end
+
+  def person
+    membership.person
+  end
+
   def accept
     update_membership('Confirmed')
     EmailParticipantConfirmationJob.perform_later(membership.id)
