@@ -8,6 +8,8 @@ require "rails_helper"
 include ActiveJob::TestHelper
 
 RSpec.describe InvitationMailer, type: :mailer do
+  # Uses SparkPost now
+
   def expect_email_was_sent
     expect(ActionMailer::Base.deliveries.count).to eq(1)
   end
@@ -30,23 +32,32 @@ RSpec.describe InvitationMailer, type: :mailer do
 
     before :each do
       InvitationMailer.invite(@invitation).deliver_now
-      @sent_message = ActionMailer::Base.deliveries.first
+      @sparkpost_data = ActionMailer::Base.deliveries.last.sparkpost_data
     end
 
     it 'sends email' do
       expect_email_was_sent
     end
 
-    it 'To: given member' do
-      expect(@sent_message.to).to include(@invitation.membership.person.email)
+    it 'To: given member, subject: event_code' do
+      header = ActionMailer::Base.deliveries.last
+      expect(header.to).to include(@invitation.membership.person.email)
+      expect(header.subject).to include(@invitation.membership.event.code)
     end
 
     it "message body includes participant's name" do
-      expect(@sent_message.body).to have_text(@invitation.membership.person.dear_name)
+      recipient = @sparkpost_data[:substitution_data][:person_name]
+      expect(recipient).to have_text(@invitation.membership.person.dear_name)
     end
 
     it 'message body includes the invitation code' do
-      expect(@sent_message.body).to have_text(@invitation.code)
+      rsvp_link = @sparkpost_data[:substitution_data][:rsvp_link]
+      expect(rsvp_link).to have_text(@invitation.code)
+    end
+
+    it 'message body contains event name' do
+      event_code = @sparkpost_data[:substitution_data][:event_name]
+      expect(event_code).to eq(@invitation.membership.event.name)
     end
   end
 end

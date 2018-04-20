@@ -86,7 +86,7 @@ describe "Adding a Schedule Item", type: :feature do
     page.select '30', from: 'schedule_end_time_5i'
     click_button 'Add New Schedule Item'
 
-    expect(find("div.alert-warning").text).to match(/.+(overlaps with).+(Item One).+/)
+    expect(find("div.alert-warning").text).to match(/^Warning:\nItem Two.+overlaps with these items:\n.+Item One.+/)
   end
 
   it 'after adding an item, it returns to the Add Item page for the day of the updated item' do
@@ -103,7 +103,7 @@ describe "Adding a Schedule Item", type: :feature do
   it 'notifies staff of changes to current event schedules' do
     allow_any_instance_of(Schedule).to receive(:notify_staff?)
       .and_return(true)
-    ActionMailer::Base.deliveries.clear
+    allow(EmailStaffScheduleNoticeJob).to receive(:perform_later)
 
     click_link "Add an item on #{@weekday}"
     page.fill_in 'schedule_name', with: 'New item for test schedule'
@@ -111,7 +111,7 @@ describe "Adding a Schedule Item", type: :feature do
     click_button 'Add New Schedule Item'
 
     expect(page.body).to have_text('was successfully scheduled')
-    expect(ActionMailer::Base.deliveries.count).to eq(1)
+    expect(EmailStaffScheduleNoticeJob).to have_received(:perform_later)
   end
 
   context 'Is authorized only for admin users (above), and staff and organizers of the event' do

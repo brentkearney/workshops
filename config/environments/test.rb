@@ -46,5 +46,5 @@ Rails.application.configure do
   # Access session variables via rack_session_access gem
   #config.middleware.use RackSessionAccess::Middleware
 
-  config.action_mailer.default_url_options = { host: 'http://localhost:3000' }
+  config.action_mailer.default_url_options = { host: 'http://localhost' }
 end

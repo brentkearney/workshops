@@ -118,13 +118,21 @@ module EventDecorators
   end
 
   def organizer
-    membership = self.memberships.where(role: 'Contact Organizer').first
+    membership = memberships.where(role: 'Contact Organizer').first
     if membership.blank?
       organizer = Person.new(email: '')
     else
       organizer = membership.person
     end
     organizer
+  end
+
+  def organizers
+    orgs = []
+    memberships.where("role LIKE '%Organizer%'").each do |org|
+      orgs << org.person
+    end
+    orgs
   end
 
   def schedule_on(day)
@@ -148,7 +156,9 @@ module EventDecorators
   end
 
   def url
-    Setting.Site['events_url'] + self.code
+    event_url = GetSetting.events_url
+    event_url << '/' if event_url[-1] != '/'
+    event_url + code
   end
 
   def options_list

@@ -19,30 +19,33 @@ describe 'Event Show Page', type: :feature do
   end
 
   def shows_partial_details
-    expect(page.body).to have_css('h4.event-details', text: "Event Details")
-    expect(page.body).to have_text(@event.code)
-    expect(page.body).to have_text(@event.name)
-    expect(page.body).to have_text(@event.location)
-    expect(page.body).to have_text(@event.time_zone)
-    expect(page.body).to have_text(@event.arrival_date)
-    expect(page.body).to have_text(@event.departure_date)
-    expect(page.body).to have_text(@event.event_type)
-    expect(page.body).to have_link(@event.url)
-    expect(page.body).to have_text(@event.description)
+    body = page.body.squish
+    expect(body).to have_css('h4.event-details', text: "Event Details")
+    expect(body).to have_text(@event.code)
+    expect(body).to have_text(@event.name)
+    expect(body).to have_text(@event.location)
+    expect(body).to have_text(@event.time_zone)
+    expect(body).to have_text(@event.arrival_date)
+    expect(body).to have_text(@event.departure_date)
+    expect(body).to have_text(@event.event_type)
+    expect(body).to have_link(@event.url)
+    expect(body).to have_text(@event.description)
   end
 
   def shows_full_details
     shows_partial_details
-    expect(page.body).to have_text(@event.short_name)
-    expect(page.body).to have_text("Door Access Code: #{@event.door_code}")
-    expect(page.body).to have_text("Max participants: #{@event.max_participants}")
-    expect(page.body).to have_text(@event.booking_code)
+    body = page.body.squish
+    expect(body).to have_text(@event.short_name)
+    expect(body).to have_text("Door Access Code: #{@event.door_code}")
+    expect(body).to have_text("Max participants: #{@event.max_participants}")
+    expect(body).to have_text(@event.booking_code)
   end
 
   def hides_some_details
-    expect(page.body).not_to have_text("Door Access Code: #{@event.door_code}")
-    expect(page.body).not_to have_text(@event.booking_code)
-    expect(page.body).not_to have_text("Max participants: #{@event.max_participants}")
+    body = page.body.squish
+    expect(body).not_to have_text("Door Access Code: #{@event.door_code}")
+    expect(body).not_to have_text(@event.booking_code)
+    expect(body).not_to have_text("Max participants: #{@event.max_participants}")
   end
 
   def has_no_edit_button

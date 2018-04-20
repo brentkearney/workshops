@@ -63,12 +63,12 @@ class SyncMembers
   def fix_remote_fields(remote_member)
     unless remote_member['Person']['email'].blank?
       remote_member['Person']['email'] =
-        remote_member['Person']['email'].downcase
+        remote_member['Person']['email'].downcase.strip
     end
 
     unless remote_member['Person']['cc_email'].blank?
       remote_member['Person']['cc_email'] =
-        remote_member['Person']['cc_email'].downcase
+        remote_member['Person']['cc_email'].downcase.strip
     end
 
     if remote_member['Person']['updated_by'].blank?
@@ -81,7 +81,7 @@ class SyncMembers
 
     if remote_member['Person']['updated_at'].blank? ||
        remote_member['Person']['updated_at'] == '0000-00-00 00:00:00'
-      remote_member['Person']['updated_at'] = Time.now
+      remote_member['Person']['updated_at'] = DateTime.current
     else
       remote_member['Person']['updated_at'] =
         Time.at(remote_member['Person']['updated_at'])
@@ -90,7 +90,7 @@ class SyncMembers
 
     if remote_member['Membership']['updated_at'].blank? ||
        remote_member['Membership']['updated_at'] == '0000-00-00 00:00:00'
-      remote_member['Membership']['updated_at'] = Time.now
+      remote_member['Membership']['updated_at'] = DateTime.current
     else
       remote_member['Membership']['updated_at'] =
         Time.at(remote_member['Membership']['updated_at'])
@@ -167,7 +167,7 @@ class SyncMembers
       v = DateTime.parse(v.to_s) unless v.nil?
     end
     v = v.utc if v && k.to_s.include?('_at')
-    v.strip! if v.respond_to? :strip!
+    v = v.strip if v.respond_to? :strip
     v
   end
 

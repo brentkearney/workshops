@@ -80,6 +80,26 @@ class GetSetting
     Setting.RSVP[location]['privacy_notice']
   end
 
+  def self.code_pattern
+    pattern = site_setting('code_pattern')
+    return '.+' if pattern == 'code_pattern not set'
+    pattern
+  end
+
+  def self.events_url
+    fallback = 'http://' + ENV['APPLICATION_HOST'] + '/events/'
+    url = site_setting('events_url')
+    return fallback if url == 'events_url not set'
+    url
+  end
+
+  def self.app_url
+    fallback = 'http://' + ENV['APPLICATION_HOST']
+    url = site_setting('app_url')
+    return fallback if url == 'app_url not set'
+    url
+  end
+
   # Emails set in Settings.Site
   def self.site_email(email_setting)
     email = site_setting(email_setting)

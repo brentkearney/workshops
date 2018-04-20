@@ -68,7 +68,7 @@ describe 'Editing a Schedule Item', type: :feature do
 
       click_button 'Update Schedule'
       expect(find('div.alert-warning').text)
-        .to match(/^Warning: .+ overlaps with.+#{first_item.name}/)
+        .to match(/^Warning:\n#{last_item.name}.+overlaps with.+\n.#{first_item.name}.+/)
     end
 
     it 'staff items have time limit selectors' do
@@ -229,7 +229,7 @@ describe 'Editing a Schedule Item', type: :feature do
       visit event_schedule_edit_path(@event, @item)
       expect(page).to have_css('div.alert.alert-error')
       expect(page.body).to have_text('Only staff and event organizers may modify
-        the schedule')
+        the schedule'.squish)
     end
 
     def allows_editing
@@ -404,8 +404,8 @@ describe 'Editing a Schedule Item', type: :feature do
           click_button 'Update Schedule'
 
           expect(page.body).to have_text('successfully updated')
-          expect(ActionMailer::Base.deliveries.count).to eq(1)
-          message = ActionMailer::Base.deliveries.first.body
+          expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).not_to eq 0
+          message = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last
           expect(message).to have_text(original_name)
           expect(message).to have_text('Current event: new name')
           expect(message).to have_text("Updated by: #{@user.person.name}")

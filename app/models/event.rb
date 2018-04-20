@@ -20,13 +20,10 @@ class Event < ActiveRecord::Base
   validates :event_type, presence: true, if: :check_event_type
   validate :starts_before_ends
   validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.zones_map.keys
-  unless Setting.Site.blank?
-    validates :code, uniqueness: true, format: {
-      with: /#{Setting.Site['code_pattern']}/,
-      message: "- invalid code format. Must match:
-              #{Setting.Site['code_pattern']}"
-    }
-  end
+  validates :code, uniqueness: true, format: {
+    with: /#{GetSetting.code_pattern}/,
+    message: "- invalid code format. Must match: #{GetSetting.code_pattern}"
+  }
 
   # app/models/concerns/event_decorators.rb
   include EventDecorators

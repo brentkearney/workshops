@@ -11,6 +11,9 @@ RSpec.describe EventsController, type: :controller do
     Schedule.delete_all
     Membership.delete_all
     Event.delete_all
+    @past_event = create(:event, past: true)
+    @event = create(:event, current: true)
+    @future_event = create(:event, future: true)
   end
 
   describe '#index' do
@@ -21,20 +24,21 @@ RSpec.describe EventsController, type: :controller do
     end
 
     it 'assigns @events to all events' do
-      event = create(:event)
-
       get :index
 
-      expect(assigns(:events)).to match_array(event)
+      expect(assigns(:events)).to eq([@past_event, @event, @future_event])
     end
 
     def excludes_template_events_test
-      event1 = create(:event, template: false)
-      create(:event, template: true)
+      @future_event.template = true
+      @future_event.save
 
       get :index
 
-      expect(assigns(:events)).to match_array(event1)
+      expect(assigns(:events)).to eq([@past_event, @event])
+
+      @future_event.template = false
+      @future_event.save
     end
 
     context 'as an unauthenticated user' do
@@ -65,34 +69,49 @@ RSpec.describe EventsController, type: :controller do
       context 'staff' do
         before do
           user.staff!
+          user.location = 'F00'
+          user.save
         end
 
         it "@events includes only events at the user's location" do
-          event1 = create(:event, location: user.location)
-          event2 = create(:event, location: 'elsewhere')
+          org_loc = @event.location
+          @event.location = user.location
+          @event.save
 
           get :index
 
-          expect(assigns(:events)).to match_array(event1)
+          expect(assigns(:events)).to match_array(@event)
+
+          @event.location = org_loc
+          @event.save
         end
 
         it "@events includes template events" do
-          event1 = create(:event, template: false, location: user.location)
-          event2 = create(:event, template: true, location: user.location)
+          org_loc = @event.location
+          @event.location = user.location
+          @event.template = true
+          @event.save
 
           get :index
 
-          expect(assigns(:events)).to match_array([event1, event2])
+          expect(assigns(:events)).to match_array(@event)
+
+          @event.location = org_loc
+          @event.template = false
+          @event.save
         end
 
         it "@events excludes template events that are not at user's location" do
-          event1 = create(:event, template: false, location: user.location)
-          event2 = create(:event, template: true, location: user.location)
-          event3 = create(:event, template: true, location: 'elsewhere')
+          @event.template = true
+          @event.save
+          expect(@event.location).not_to eq(user.location)
 
           get :index
 
-          expect(assigns(:events)).to match_array([event1, event2])
+          expect(assigns(:events)).to be_empty
+
+          @event.template = false
+          @event.save
         end
       end
 
@@ -102,14 +121,24 @@ RSpec.describe EventsController, type: :controller do
         end
 
         it '@events includes all events including templates' do
-          event1 = create(:event, template: false, location: user.location)
-          event2 = create(:event, template: true, location: user.location)
-          event3 = create(:event, template: true, location: 'elsewhere')
-          event4 = create(:event, template: false, location: 'elsewhere')
+          org_loc = @past_event.location
+          @past_event.location = 'elsewhere'
+          @past_event.save
+          @event.template = true
+          @event.save
+          org_loc2 = @future_event.location
+          @future_event.save
 
           get :index
 
-          expect(assigns(:events)).to match_array([event1, event2, event3, event4])
+          expect(assigns(:events)).to match_array([@past_event, @event, @future_event])
+
+          @past_event.location = org_loc
+          @past_event.save
+          @future_event.location = org_loc2
+          @future_event.save
+          @event.template = false
+          @event.save
         end
       end
     end
@@ -140,40 +169,38 @@ RSpec.describe EventsController, type: :controller do
       end
 
       it "assigns @events to user's events" do
-        event = create(:event)
-        create(:membership, person: person, event: event)
+        create(:membership, person: person, event: @event)
 
         get :my_events
 
-        expect(assigns(:events)).to match_array(event)
+        expect(assigns(:events)).to match_array(@event)
       end
 
       it "@events excludes events that the user is not a member of" do
-        event1 = create(:event)
-        event2 = create(:event)
-        event3 = create(:event)
-        create(:membership, person: person, event: event1)
+        create(:membership, person: person, event: @future_event)
 
         get :my_events
 
-        expect(assigns(:events)).to match_array(event1)
+        expect(assigns(:events)).to eq([@future_event])
       end
 
       it '@events only includes events with appropriate attendance status' do
-        event1 = create(:event)
-        event2 = create(:event)
-        event3 = create(:event)
-        event4 = create(:event)
-        event5 = create(:event)
-        create(:membership, person: person, event: event1, attendance: 'Invited')
-        create(:membership, person: person, event: event2, attendance: 'Confirmed')
-        create(:membership, person: person, event: event3, attendance: 'Undecided')
-        create(:membership, person: person, event: event4, attendance: 'Declined')
-        create(:membership, person: person, event: event5, attendance: 'Not Yet Invited')
+        m1 = create(:membership, person: person, event: @past_event, attendance: 'Invited')
+        m2 = create(:membership, person: person, event: @event, attendance: 'Confirmed')
+        m3 = create(:membership, person: person, event: @future_event, attendance: 'Undecided')
 
         get :my_events
 
-        expect(assigns(:events)).to match_array([event1, event2, event3])
+        expect(assigns(:events)).to eq([@past_event, @event, @future_event])
+
+        m2.attendance = 'Declined'
+        m2.save
+        m3.attendance = 'Not Yet Invited'
+        m3.save
+
+        get :my_events
+
+        expect(assigns(:events)).to eq([@past_event])
       end
     end
 
@@ -193,26 +220,37 @@ RSpec.describe EventsController, type: :controller do
     end
 
     it 'assigns @events only with events from the past' do
-      past_event = create(:event, past: true)
-      current_event = create(:event, current: true)
-      future_event = create(:event, future: true)
-
       get :past
 
-      expect(assigns(:events)).to match_array([past_event])
+      expect(assigns(:events)).to match_array([@past_event])
     end
 
     context 'with user roles' do
       let(:person) { build(:person) }
-      let(:user) { build(:user, person: person) }
+      let(:user) { build(:user, person: person, location: 'FOO') }
 
       before do
         allow(request.env['warden']).to receive(:authenticate!).and_return(user)
         allow(controller).to receive(:current_user).and_return(user)
 
-        @event1 = create(:event, past: true, location: user.location)
-        @event2 = create(:event, location: 'elsewhere', start_date: @event1.start_date - 1.week,
-                         end_date: @event1.end_date - 1.week)
+        @org_loc = @past_event.location
+        @past_event.location = user.location
+        @past_event.save
+
+        @org_start = @event.start_date
+        @org_end = @event.end_date
+        @event.start_date = @past_event.start_date - 1.week
+        @event.end_date = @past_event.end_date - 1.week
+        @event.save
+      end
+
+      after do
+        @past_event.location = @org_loc
+        @past_event.save
+
+        @event.start_date = @org_start
+        @event.end_date = @org_end
+        @event.save
       end
 
       it "members: @events includes all past events" do
@@ -220,7 +258,7 @@ RSpec.describe EventsController, type: :controller do
 
         get :past
 
-        expect(assigns(:events)).to match_array([@event1, @event2])
+        expect(assigns(:events)).to eq([@past_event, @event])
       end
 
       it "staff: @events includes only events at the user's location" do
@@ -228,7 +266,7 @@ RSpec.describe EventsController, type: :controller do
 
         get :past
 
-        expect(assigns(:events)).to match_array([@event1])
+        expect(assigns(:events)).to match_array(@past_event)
       end
 
       it "admin: @events includes all past events" do
@@ -236,7 +274,7 @@ RSpec.describe EventsController, type: :controller do
 
         get :past
 
-        expect(assigns(:events)).to match_array([@event1, @event2])
+        expect(assigns(:events)).to eq([@past_event, @event])
       end
 
       it "super_admin: @events includes all past events" do
@@ -244,7 +282,7 @@ RSpec.describe EventsController, type: :controller do
 
         get :past
 
-        expect(assigns(:events)).to match_array([@event1, @event2])
+        expect(assigns(:events)).to eq([@past_event, @event])
       end
     end
   end
@@ -263,27 +301,18 @@ RSpec.describe EventsController, type: :controller do
     end
 
     it 'assigns @events only with the current event and future events' do
-      past_event = create(:event, past: true)
-      current_event = create(:event, current: true)
-      future_event = create(:event, future: true)
-
       get :future
 
-      expect(assigns(:events)).to match_array([current_event, future_event])
+      expect(assigns(:events)).to match_array([@event, @future_event])
     end
 
     context 'with user roles' do
       let(:person) { build(:person) }
-      let(:user) { build(:user, person: person) }
+      let(:user) { build(:user, person: person, location: 'BAR') }
 
       before do
         allow(request.env['warden']).to receive(:authenticate!).and_return(user)
         allow(controller).to receive(:current_user).and_return(user)
-
-        @event1 = create(:event, location: user.location, start_date: Date.today.next_week(:sunday),
-                         end_date: Date.today.next_week(:sunday) + 5.days)
-        @event2 = create(:event, location: 'elsewhere', start_date: @event1.start_date - 1.week,
-                         end_date: @event1.end_date - 1.week)
       end
 
       it "members: @events includes all future events" do
@@ -291,15 +320,21 @@ RSpec.describe EventsController, type: :controller do
 
         get :future
 
-        expect(assigns(:events)).to match_array([@event1, @event2])
+        expect(assigns(:events)).to match_array([@event, @future_event])
       end
 
       it "staff: @events includes only events at the user's location" do
         user.staff!
+        org_loc = @event.location
+        @event.location = user.location
+        @event.save
 
         get :future
 
-        expect(assigns(:events)).to match_array([@event1])
+        expect(assigns(:events)).to match_array([@event])
+
+        @event.location = org_loc
+        @event.save
       end
 
       it "admin: @events includes all future events" do
@@ -307,7 +342,7 @@ RSpec.describe EventsController, type: :controller do
 
         get :future
 
-        expect(assigns(:events)).to match_array([@event1, @event2])
+        expect(assigns(:events)).to match_array([@event, @future_event])
       end
 
       it "super_admin: @events includes all future events" do
@@ -315,41 +350,39 @@ RSpec.describe EventsController, type: :controller do
 
         get :future
 
-        expect(assigns(:events)).to match_array([@event1, @event2])
+        expect(assigns(:events)).to match_array([@event, @future_event])
       end
     end
   end
 
   describe '#year' do
-    let(:year) { Date.today.strftime("%Y") }
+    let(:year) { Date.today.strftime('%Y') }
 
     it 'responds with success code' do
-      get :year, { year: year }
+      get :year, year: year
 
       expect(response).to be_success
     end
 
     it 'renders :index' do
-      get :year, { year: year }
+      get :year, year: year
 
       expect(response).to render_template(:index)
     end
 
-    it "assigns @events to events of [year]" do
-      this_year = Date.parse("#{year}-09-01").next_week(:sunday)
-      event1 = create(:event, start_date: this_year, end_date: this_year + 5.days)
-      last_year = Date.parse("#{year.to_i - 1}-09-01").next_week(:sunday)
-      event2 = create(:event, start_date: last_year, end_date: last_year + 5.days)
+    it 'assigns @events to events of [year]' do
+      year = @future_event.start_date.strftime('%Y')
+      expect(@event.start_date.strftime('%Y')).not_to eq(year)
+      expect(@past_event.start_date.strftime('%Y')).not_to eq(year)
 
-      get :year, { year: year }
+      get :year, year: year
 
-      expect(assigns(:events)).to eq([event1])
+      expect(assigns(:events)).to eq([@future_event])
     end
 
     it 'redirects to events_path given an invalid year' do
-      %w(2015foo bar2013 wookie 1 12 123).each do |badyear|
-
-        get :year, { year: badyear }
+      %w[2015foo bar2013 wookie 1 12 123].each do |badyear|
+        get :year, year: badyear
 
         expect(response).to redirect_to(events_path)
       end
@@ -362,37 +395,42 @@ RSpec.describe EventsController, type: :controller do
         let(:location) { loc }
 
         it 'responds with success code' do
-          get :location, { location: location }
+          get :location, location: location
 
           expect(response).to be_success
         end
 
         it 'renders :index' do
-          get :location, { location: location }
+          get :location, location: location
 
           expect(response).to render_template(:index)
         end
 
-        it %Q(assigns @events to events at #{loc} location) do
-          event1 = create(:event, location: "#{loc}")
-          event2 = create(:event, location: 'Elsewhere')
+        it %(assigns @events to events at #{loc} location) do
+          org_loc = @future_event.location
+          @future_event.location = 'ELSE'
+          @future_event.save
 
-          get :location, { location: location }
+          get :location, location: location
 
-          expect(assigns(:events)).to eq([event1])
+          expect(assigns(:events)).to eq([@past_event, @event])
+
+          @future_event.location = org_loc
+          @future_event.save
         end
       end
     end
 
     it 'given an invalid location, it uses the first configured location' do
       legit_location = Setting.Locations.keys.first
-      event1 = create(:event, location: "#{legit_location}")
+      expect(@past_event.location).to eq(legit_location)
+      expect(@event.location).to eq(legit_location)
+      expect(@future_event.location).to eq(legit_location)
 
-      %w(random-place 7th-level-of-hell at-the-pub).each do |place|
+      %w[random-place another-place somewhere].each do |place|
+        get :location, location: place
 
-        get :location, { location: place }
-
-        expect(assigns(:events)).to eq([event1])
+        expect(assigns(:events)).to eq([@past_event, @event, @future_event])
         expect(response).to render_template(:index)
       end
     end
@@ -404,41 +442,59 @@ RSpec.describe EventsController, type: :controller do
         let(:kind) { type.parameterize }
 
         it 'responds with success code' do
-          get :kind, { kind: kind }
+          get :kind, kind: kind
 
           expect(response).to be_success
         end
 
         it 'renders :index' do
-          get :kind, { kind: kind }
+          get :kind, kind: kind
 
           expect(response).to render_template(:index)
         end
 
-        it %Q(assigns @events to events of type #{type}) do
-          event1 = create(:event, event_type: "#{type}")
+        it %(assigns @events to events of type #{type}) do
+          org_type = @event.event_type
+          @event.event_type = type
+          @event.save
+
           another_type = type
           until another_type != type
             another_type = Setting.Site['event_types'].sample
           end
-          event2 = create(:event, event_type: "#{another_type}")
 
-          get :kind, { kind: kind }
+          org_type2 = @future_event.event_type
+          @future_event.event_type = another_type
+          @future_event.save
+          org_type3 = @past_event.event_type
+          @past_event.event_type = another_type
+          @past_event.save
 
-          expect(assigns(:events)).to eq([event1])
+          get :kind, kind: kind
+
+          expect(assigns(:events)).to eq([@event])
+
+          @event.event_type = org_type
+          @event.save
+          @future_event.event_type = org_type2
+          @future_event.save
+          @past_event.event_type = org_type3
+          @past_event.save
         end
       end
     end
 
     it 'given an invalid event type, it assumes the first configured type' do
       legit_type = Setting.Site['event_types'].first
-      event1 = create(:event, location: "#{legit_type}")
+      expect(@past_event.event_type).to eq(legit_type)
+      expect(@event.event_type).to eq(legit_type)
+      expect(@future_event.event_type).to eq(legit_type)
 
       %w(lynch-mob circus funeral).each do |invalid_type|
 
-        get :kind, { kind: invalid_type }
+        get :kind, kind: invalid_type
 
-        expect(assigns(:events)).to eq([event1])
+        expect(assigns(:events)).to eq([@past_event, @event, @future_event])
         expect(response).to render_template(:index)
       end
     end

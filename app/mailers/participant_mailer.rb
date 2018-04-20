@@ -19,13 +19,11 @@
 # SOFTWARE.
 
 class ParticipantMailer < ApplicationMailer
-  @from_email = GetSetting.site_email('application_email')
-  default from: @from_email
+  self.delivery_method = :sparkpost if Rails.env.production?
 
   def rsvp_confirmation(membership)
     @person = membership.person
     @event = membership.event
-    @from_email = GetSetting.email(@event.location, 'rsvp')
     @organization = GetSetting.org_name(@event.location)
 
     # PDF attachment in lib/assets/rsvp/[location]
@@ -38,22 +36,28 @@ class ParticipantMailer < ApplicationMailer
       }
     end
 
+    from_email = GetSetting.email(@event.location, 'rsvp')
+    subject = "[#{@event.code}] Thank you for accepting our invitation"
+    to_email = '"' + @person.name + '" <' + @person.email + '>'
+    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
+      to_email = GetSetting.site_email('webmaster_email')
+    end
+
     template_path = Rails.root.join('app', 'views', 'participant_mailer',
                       'rsvp', "#{@event.location}")
     mail_template = "#{template_path}/#{@event.event_type}.text.erb"
     if File.exist?(mail_template)
-      email = '"' + @person.name + '" <' + @person.email + '>'
-      subject = "[#{@event.code}] Thank you for accepting our invitation"
-      mail(to: email,
-           from: @from_email,
+      mail(to: to_email,
+           from: from_email,
            subject: subject,
            template_path: "participant_mailer/rsvp/#{@event.location}",
-           template_name: @event.event_type,
-           'Importance': 'High', 'X-Priority': 1)
+           template_name: @event.event_type)
     else
       error_msg = { problem: 'Participant RSVP confirmation not sent.',
                     cause: 'Email template file missing.',
-                    template: mail_template }
+                    template: mail_template,
+                    person: @person,
+                    membership: membership }
       StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
     end
   end

@@ -19,21 +19,47 @@
 # SOFTWARE.
 
 class InvitationMailer < ApplicationMailer
+  self.delivery_method = :sparkpost if Rails.env.production?
+
   def invite(invitation)
-    @person = invitation.membership.person
-    @event = invitation.membership.event
-    @from_email = GetSetting.rsvp_email(@event.location)
+    person = invitation.membership.person
+    event = invitation.membership.event
 
-    @rsvp_link = GetSetting.site_setting('app_url') + '/rsvp/' + invitation.code
-    @org_name = GetSetting.org_name(@event.location)
-    @event_url = GetSetting.site_setting('events_url') + '/' + @event.code
-    subject = "[#{@event.code}] Your invitation to \"#{@event.name}\""
+    rsvp_link = GetSetting.app_url + '/rsvp/' + invitation.code
+    organizers = ''
+    event.organizers.each do |org|
+      organizers << org.name + ' (' + org.affiliation + '), '
+    end
+    organizers.gsub!(/, $/, '')
 
-    mail(to: @person.email,
-         from: @from_email,
-         bcc: @from_email,
+    from_email = GetSetting.rsvp_email(event.location)
+    subject = "[#{event.code}] Workshop Invitation: #{event.name}"
+    bcc_email = GetSetting.rsvp_email(event.location)
+    to_email = '"' + person.name + '" <' + person.email + '>'
+    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
+      to_email = GetSetting.site_email('webmaster_email')
+    end
+
+    sub_data = {
+      person_name: "#{person.dear_name}",
+      event_code: "#{event.code}",
+      event_name: "#{event.name}",
+      event_dates: "#{event.dates(:long)}",
+      event_url: "#{event.url}",
+      organizers: "#{organizers}",
+      rsvp_link: "#{rsvp_link}"
+    }
+
+    data = {
+      template_id: "#{event.location.downcase}-participant-invitation",
+      substitution_data: sub_data
+    }
+
+    mail(to: to_email,
+         from: from_email,
          subject: subject,
-         Importance: 'High', 'X-Priority': 1)
+         sparkpost_data: data) do |format|
+      format.text { render text: '' }
+    end
   end
-
 end

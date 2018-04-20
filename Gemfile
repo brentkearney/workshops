@@ -26,6 +26,7 @@ gem 'pundit'
 gem 'sucker_punch'
 gem 'passenger'
 gem 'rails-settings-cached'
+gem 'sparkpost_rails'
 
 group :development, :test do
   gem 'byebug'

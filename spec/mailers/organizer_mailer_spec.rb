@@ -37,28 +37,35 @@ RSpec.describe OrganizerMailer, type: :mailer do
                'attendance' => 'Confirmed',
                'organizer_message' => 'Foo bar' }
       OrganizerMailer.rsvp_notice(@participant, args).deliver_now
-      @sent_message = ActionMailer::Base.deliveries.first
+      @header = ActionMailer::Base.deliveries.first
+      @sparkpost_data = ActionMailer::Base.deliveries.last.sparkpost_data
     end
 
     it 'sends email' do
       expect_email_was_sent
     end
 
-    it 'To: given organizer' do
-      expect(@sent_message.to).to include(@organizer.person.email)
+    it 'To: given organizer, Subject: event_code' do
+      expect(@header.to).to include(@organizer.person.email)
+      expect(@header.subject).to include(@organizer.event.code)
     end
 
-    it "message body includes participant's name" do
-      expect(@sent_message.body).to have_text(@participant.person.name)
+    it "message body includes participant's name & email" do
+      recipient = @sparkpost_data[:substitution_data][:member_name]
+      email = @sparkpost_data[:substitution_data][:member_email]
+      expect(recipient).to eq(@participant.person.name)
+      expect(email).to eq(@participant.person.email)
     end
 
     it "message body includes participant's current and previous status" do
-      expect(@sent_message.body).to have_text(@participant.attendance_was)
-      expect(@sent_message.body).to have_text(@participant.attendance)
+      msg = @sparkpost_data[:substitution_data][:attendance_msg]
+      expect(msg).to have_text(@participant.attendance_was)
+      expect(msg).to have_text(@participant.attendance)
     end
 
-    it 'message body includes given message' do
-      expect(@sent_message.body).to have_text('Foo bar')
+    it 'message body includes message to organizer' do
+      msg = @sparkpost_data[:substitution_data][:message_to_organizer]
+      expect(msg).to eq('Foo bar')
     end
   end
 end
