@@ -19,6 +19,8 @@
 # SOFTWARE.
 
 class ParticipantMailer < ApplicationMailer
+  self.delivery_method = :sparkpost if Rails.env.production?
+
   def rsvp_confirmation(membership)
     @person = membership.person
     @event = membership.event
@@ -37,7 +39,7 @@ class ParticipantMailer < ApplicationMailer
     from_email = GetSetting.email(@event.location, 'rsvp')
     subject = "[#{@event.code}] Thank you for accepting our invitation"
     to_email = '"' + @person.name + '" <' + @person.email + '>'
-    if Rails.env.development? || request.original_url =~ /staging/
+    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
       to_email = GetSetting.site_email('webmaster_email')
     end
 
@@ -48,7 +50,6 @@ class ParticipantMailer < ApplicationMailer
       mail(to: to_email,
            from: from_email,
            subject: subject,
-           delivery_method: :sparkpost,
            template_path: "participant_mailer/rsvp/#{@event.location}",
            template_name: @event.event_type)
     else

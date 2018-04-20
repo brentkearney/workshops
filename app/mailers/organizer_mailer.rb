@@ -20,6 +20,8 @@
 
 # Email notices for the workshop organizer
 class OrganizerMailer < ApplicationMailer
+  self.delivery_method = :sparkpost if Rails.env.production?
+
   def rsvp_notice(membership, args)
     old_attendance = args['attendance_was'] || 'Invited'
     new_attendance = args['attendance'] || 'Invited'
@@ -41,7 +43,7 @@ class OrganizerMailer < ApplicationMailer
     subject = '[' + event.code + '] Membership invitation reply'
 
     to_email = '"' + organizer.name + '" <' + organizer.email + '>'
-    if Rails.env.development? || request.original_url =~ /staging/
+    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
       to_email = GetSetting.site_email('webmaster_email')
     end
 
@@ -69,7 +71,6 @@ class OrganizerMailer < ApplicationMailer
          from: from_email,
          subject: subject,
          return_path: reply_to,
-         delivery_method: :sparkpost,
          sparkpost_data: data) do |format|
       format.text { render text: '' }
     end

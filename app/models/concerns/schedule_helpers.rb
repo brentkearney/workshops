@@ -74,5 +74,4 @@ module ScheduleHelpers
     # remove leading & trailing whitespace
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }
   end
-
 end

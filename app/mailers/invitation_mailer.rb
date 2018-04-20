@@ -19,6 +19,8 @@
 # SOFTWARE.
 
 class InvitationMailer < ApplicationMailer
+  self.delivery_method = :sparkpost if Rails.env.production?
+
   def invite(invitation)
     person = invitation.membership.person
     event = invitation.membership.event
@@ -34,7 +36,7 @@ class InvitationMailer < ApplicationMailer
     subject = "[#{event.code}] Workshop Invitation: #{event.name}"
     bcc_email = GetSetting.rsvp_email(event.location)
     to_email = '"' + person.name + '" <' + person.email + '>'
-    if Rails.env.development? || request.original_url =~ /staging/
+    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
       to_email = GetSetting.site_email('webmaster_email')
     end
 
@@ -56,7 +58,6 @@ class InvitationMailer < ApplicationMailer
     mail(to: to_email,
          from: from_email,
          subject: subject,
-         delivery_method: :sparkpost,
          sparkpost_data: data) do |format|
       format.text { render text: '' }
     end

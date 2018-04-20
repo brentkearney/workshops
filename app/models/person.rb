@@ -43,7 +43,7 @@ class Person < ActiveRecord::Base
   end
 
   def downcase_email
-    self.email = email.downcase.strip! if email.present?
-    self.cc_email.downcase.strip! if cc_email.present?
+    self.email = email.downcase.strip if email.present?
+    self.cc_email.downcase.strip if cc_email.present?
   end
 end
