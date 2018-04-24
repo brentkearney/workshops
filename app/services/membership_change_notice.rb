@@ -26,20 +26,12 @@ class MembershipChangeNotice
       changed.include?('departure_date')
   end
 
-  def invalid_lead_time_setting
-    Setting.Emails.blank? || Setting.Emails[event.location].blank? ||
-      Setting.Emails[event.location]['confirmation_lead'].blank? ||
-      Setting.Emails[event.location]['confirmation_lead'] !~ /\A\d+\.\w+$/
-  end
-
   def confirmation_lead_time
-    return 6.months if invalid_lead_time_setting
-    parts = Setting.Emails[event.location]['confirmation_lead'].split('.')
-    parts.first.to_i.send(parts.last)
+    GetSetting.confirmation_lead_time(event.location)
   end
 
   def valid_change?
-    event.is_upcoming? && membership.updated_by != 'Workshops importer' &&
+    event.upcoming? && membership.updated_by != 'Workshops importer' &&
       changed_fields?
   end
 

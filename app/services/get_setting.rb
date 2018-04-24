@@ -100,6 +100,22 @@ class GetSetting
     url
   end
 
+  def self.confirmation_lead_time(location)
+    return 2.weeks if no_setting("Emails['#{location}']['confirmation_lead']")
+    parts = Setting.Emails[location]['confirmation_lead'].split('.')
+    parts.first.to_i.send(parts.last)
+  end
+
+  def self.location_address(location)
+    return '' if no_setting("Locations['#{location}']['Address']")
+    Setting.Locations[location]['Address']
+  end
+
+  def self.location_country(location)
+    return 'Unknown' if no_setting("Locations['#{location}']['Country']")
+    Setting.Locations[location]['Country']
+  end
+
   # Emails set in Settings.Site
   def self.site_email(email_setting)
     email = site_setting(email_setting)

@@ -106,17 +106,17 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(e.departure_date).to match(/^\w+,\ \w+\ \d+,\ \d{4}$/)
   end
 
-  context '.is_current?' do
+  context '.current?' do
     it 'false if current time is outside event dates' do
       e = build(:event, future: true)
 
-      expect(e.is_current?).to be_falsey
+      expect(e.current?).to be_falsey
     end
 
     it 'true if current time is inside event dates' do
       e = build(:event, current: true)
 
-      expect(e.is_current?).to be_truthy
+      expect(e.current?).to be_truthy
     end
   end
 
@@ -299,7 +299,7 @@ RSpec.describe "Model validations: Event ", type: :model do
       expect(e.num_attendance('Not Yet Invited')).to eq(2)
     end
 
-    it '.has_attendance returns true if there are any members for a given
+    it '.attendance? returns true if there are any members for a given
       attendence status' do
       e = @event
       e.memberships.destroy_all
@@ -312,10 +312,10 @@ RSpec.describe "Model validations: Event ", type: :model do
         create(:membership, event: e, person: p, attendance: 'Declined')
       end
 
-      expect(e.has_attendance('Not Yet Invited')).to be_truthy
-      expect(e.has_attendance('Invited')).to be_falsey
-      expect(e.has_attendance('Declined')).to be_truthy
-      expect(e.has_attendance('Undecided')).to be_falsey
+      expect(e.attendance?('Not Yet Invited')).to be_truthy
+      expect(e.attendance?('Invited')).to be_falsey
+      expect(e.attendance?('Declined')).to be_truthy
+      expect(e.attendance?('Undecided')).to be_falsey
     end
   end
 end

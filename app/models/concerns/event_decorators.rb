@@ -46,11 +46,11 @@ module EventDecorators
   end
 
   def num_attendance(status)
-    self.attendance(status).size
+    attendance(status).size
   end
 
-  def has_attendance(status)
-    self.num_attendance(status) > 0
+  def attendance?(status)
+    num_attendance(status) > 0
   end
 
   def member_info(person)
@@ -66,65 +66,40 @@ module EventDecorators
     start = Date.parse(start_date.to_s)
     finish = Date.parse(end_date.to_s)
 
-    if format == :long
-      ld = start.strftime("%B %-d")
-    else
-      ld = start.strftime("%b %-d")
-    end
-
-    ld += " - "
+    d = format == :long ? start.strftime('%B %-d') : start.strftime('%b %-d')
+    d += ' - '
 
     if start.mon == finish.mon
-      if format == :long
-        ld += finish.strftime("%-d, %Y")
-      else
-        ld += finish.strftime("%-d")
-      end
+      d += format == :long ? finish.strftime('%-d, %Y') : finish.strftime('%-d')
     else
-      if format == :long
-        ld += finish.strftime("%B %-d, %Y")
-      else
-        ld += finish.strftime("%b %-d")
-      end
+      d += format == :long ? finish.strftime('%B %-d, %Y') : finish.strftime('%b %-d')
     end
+    d
   end
 
   def arrival_date
-    start_date.strftime("%A, %B %-d, %Y")
+    start_date.strftime('%A, %B %-d, %Y')
   end
 
   def departure_date
-    end_date.strftime("%A, %B %-d, %Y")
+    end_date.strftime('%A, %B %-d, %Y')
   end
 
   def date
-    start_date.strftime("%Y-%m-%d")
+    start_date.strftime('%Y-%m-%d')
   end
 
   def address
-    if Setting.Locations && Setting.Locations[self.location]
-      Setting.Locations[self.location]['Address']
-    else
-      ''
-    end
+    GetSetting.location_address(location)
   end
 
   def country
-    if Setting.Locations && Setting.Locations[self.location]
-      Setting.Locations[self.location]['Country']
-    else
-      'Unknown'
-    end
+    GetSetting.location_country(location)
   end
 
   def organizer
     membership = memberships.where(role: 'Contact Organizer').first
-    if membership.blank?
-      organizer = Person.new(email: '')
-    else
-      organizer = membership.person
-    end
-    organizer
+    membership.blank? ? Person.new(email: '') : membership.person
   end
 
   def organizers
@@ -136,22 +111,24 @@ module EventDecorators
   end
 
   def schedule_on(day)
-    schedules.select {|s| s.start_time.to_date == day.to_date }.sort_by(&:start_time)
+    schedules.select { |s| s.start_time.to_date == day.to_date }
+             .sort_by(&:start_time)
   end
 
   def confirmed
-    people = Array.new
+    people = []
     memberships.where(attendance: 'Confirmed').each do |m|
       people << m.person
     end
-    people.sort_by {|p| p.lastname.downcase}
+    people.sort_by { |p| p.lastname.downcase }
   end
 
-  def is_current?
-    Time.current >= start_date.to_time && Time.current <= end_date.to_time.change({ hour: 23, min: 59})
+  def current?
+    Time.current >= start_date.to_time && Time.current <=
+      end_date.to_time.change(hour: 23, min: 59)
   end
 
-  def is_upcoming?
+  def upcoming?
     Time.current <= start_date.to_time
   end
 

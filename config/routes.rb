@@ -3,15 +3,16 @@ Rails.application.routes.draw do
 
   # Devise (login/logout)
   devise_for :users, path_names: { sign_up: 'register', sign_in: 'sign_in' },
-             :controllers => { :registrations => 'registrations',
-                               :sessions => 'sessions',
-                               :confirmations => 'confirmations'}
+                     controllers: { registrations: 'registrations',
+                                    sessions: 'sessions',
+                                    confirmations: 'confirmations' }
 
   devise_scope :user do
     get 'sign_in' => 'devise/sessions#new'
     get 'register' => 'devise/registrations#new'
     delete 'sign_out' => 'devise/sessions#destroy'
     get 'confirmation/sent' => 'confirmations#sent'
+    patch 'users/confirmation' => 'confirmations#create'
   end
 
   # Post-login welcome page
