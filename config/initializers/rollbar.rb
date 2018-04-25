@@ -11,7 +11,7 @@ if defined? Rollbar
     end
 
     # Disable for staging server
-    if request.original_url =~ /staging/
+    if ENV['APPLICATION_HOST'] && ENV['APPLICATION_HOST'].include?('staging')
         config.enabled = false
     end
 

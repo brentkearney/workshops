@@ -33,7 +33,9 @@ class SyncMembers
     remote_members.each do |rm|
       remote_member = fix_remote_fields(rm)
       local_person = update_person(remote_member['Person'])
-      update_membership(remote_member['Membership'], local_person)
+      if local_person.valid?
+        update_membership(remote_member['Membership'], local_person)
+      end
     end
 
     prune_members
@@ -111,6 +113,11 @@ class SyncMembers
     remote_member
   end
 
+  def get_local_person(remote_person)
+    Person.find_by(legacy_id: remote_person['legacy_id'].to_i) ||
+      Person.find_by(email: remote_person['email'])
+  end
+
   def update_person(remote_person)
     local_person = get_local_person(remote_person)
 
@@ -176,9 +183,9 @@ class SyncMembers
     if other_person.nil?
       local_person.email = new_email
     else
-      # email is the same, so update_record will skip that field
-      updated_other = update_record(other_person, remote_person_hash)
-      other_person = updated_other if updated_other
+      # local_person has the same legacy_id as remote, but different email.
+      # other_person has same email as remote, so update & replace local_person
+      other_person = update_record(other_person, remote_person_hash)
       replace_person(local_person, other_person)
       local_person = other_person
     end
@@ -188,13 +195,13 @@ class SyncMembers
   def replace_person(person, replacement)
     person.memberships.each do |m|
       unless replacement.events.include?(m.event)
-        m.person = replacement
+        m.person_id = replacement.id
         m.save
       end
     end
 
     Lecture.where(person: person).each do |l|
-      l.person = replacement
+      l.person_id = replacement.id
       l.save
     end
 
@@ -210,17 +217,12 @@ class SyncMembers
     person.destroy
   end
 
-  def get_local_person(remote_person)
-    Person.where(legacy_id: remote_person['legacy_id'].to_i).first ||
-      Person.find_by(email: remote_person['email'])
-  end
-
   def save_person(person)
     person.member_import = true
     if person.save
       unless person.previous_changes.empty?
-       Rails.logger.info "\n\n* Saved #{@event.code} person: #{person.name}\n"
-     end
+        Rails.logger.info "\n\n* Saved #{@event.code} person: #{person.name}\n"
+      end
     else
       Rails.logger.error "\n\n" + "* Error saving #{@event.code} person:
         #{person.name}, #{person.errors.full_messages}".squish + "\n"
@@ -230,14 +232,15 @@ class SyncMembers
   end
 
   def update_membership(remote_member, local_person)
-    local_membership = local_members.select do |m|
-      m.person_id.to_i == local_person.id unless m.nil?
+    return if local_person.blank?
+    local_membership = @local_members.select do |membership|
+      membership.person_id == local_person.id unless membership.nil?
     end.first
 
     if local_membership.nil?
       local_membership = Membership.new(remote_member)
-      local_membership.event = event
-      local_membership.person = local_person
+      local_membership.event_id = @event.id
+      local_membership.person_id = local_person.id
       save_membership(local_membership)
     else
       updated_member = update_record(local_membership, remote_member)

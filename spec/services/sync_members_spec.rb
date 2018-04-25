@@ -8,16 +8,16 @@ require 'rails_helper'
 
 describe "SyncMembers" do
   before do
-    Event.destroy_all
+    @event = create(:event)
+    @eventm = create(:event_with_members)
   end
 
   it '.initialize' do
-    event = create(:event_with_members)
     expect(LegacyConnector).to receive(:new).and_return(FakeLegacyConnector.new)
 
-    sm = SyncMembers.new(event)
+    sm = SyncMembers.new(@eventm)
 
-    expect(sm.event).to eq(event)
+    expect(sm.event).to eq(@eventm)
     expect(sm.remote_members).not_to be_empty
     expect(sm.sync_errors).to be_a(ErrorReport)
   end
@@ -25,22 +25,20 @@ describe "SyncMembers" do
   describe '.get_remote_members' do
     context 'with no remote members' do
       it 'sends a message to ErrorReport and raises an error message' do
-        new_event = create(:event)
         lc = FakeLegacyConnector.new
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
-        expect_any_instance_of(ErrorReport).to receive(:add).with(lc, "Unable to retrieve any remote members for #{new_event.code}")
-        expect { @sm = SyncMembers.new(new_event) }.to raise_error('NoResultsError')
+        expect_any_instance_of(ErrorReport).to receive(:add).with(lc, "Unable to retrieve any remote members for #{@event.code}")
+        expect { @sm = SyncMembers.new(@event) }.to raise_error('NoResultsError')
       end
 
       it 'sends email to staff' do
-        new_event = create(:event)
         lc = FakeLegacyConnector.new
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         expect {
           expect{
-            SyncMembers.new(new_event)
+            SyncMembers.new(@event)
           }.to change { ActionMailer::Base.deliveries.count }.by(1)
         }.to raise_error('NoResultsError')
       end
@@ -48,10 +46,9 @@ describe "SyncMembers" do
 
     context 'with remote members' do
       it 'returns the remote members' do
-        new_event = create(:event_with_members)
         expect(LegacyConnector).to receive(:new).and_return(FakeLegacyConnector.new)
 
-        sm = SyncMembers.new(new_event)
+        sm = SyncMembers.new(@eventm)
 
         expect(sm.remote_members).not_to be_empty
       end
@@ -60,14 +57,12 @@ describe "SyncMembers" do
 
   describe '.fix_remote_fields' do
     it 'fills in blank fields, sets Backup Participant attendance to "Not Yet Invited"' do
-      membership = create(:membership)
-      event = membership.event
       lc = FakeLegacyConnector.new
-      allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_changed_fields(event))
+      allow(lc).to receive(:get_members).with(@eventm).and_return(lc.get_members_with_changed_fields(@eventm))
       expect(LegacyConnector).to receive(:new).and_return(lc)
 
-      SyncMembers.new(event)
-      member = Event.find(event.id).memberships.last
+      SyncMembers.new(@eventm)
+      member = Event.find(@eventm.id).memberships.last
 
       expect(member.person.updated_by).to eq('Workshops importer')
       expect(member.person.updated_at).not_to be_nil
@@ -80,16 +75,15 @@ describe "SyncMembers" do
 
   describe '.update_person' do
     def test_update(local_person:, fields:)
-      event = create(:event)
-      membership = create(:membership, event: event, person: local_person)
+      membership = create(:membership, event: @eventm, person: local_person)
       lc = FakeLegacyConnector.new
-      allow(lc).to receive(:get_members).with(event)
-        .and_return(lc.get_members_with_person(e: event,
+      allow(lc).to receive(:get_members).with(@eventm)
+        .and_return(lc.get_members_with_person(e: @eventm,
                                                m: membership,
                                                changed_fields: fields))
       expect(LegacyConnector).to receive(:new).and_return(lc)
 
-      SyncMembers.new(event)
+      SyncMembers.new(@eventm)
 
       lp = Person.find(local_person.id)
 
@@ -126,40 +120,35 @@ describe "SyncMembers" do
 
     context 'without a local person' do
       it 'creates a new person record' do
-        event = create(:event)
-        setup_remote(event, nil, lastname: 'Remoteperson')
+        setup_remote(@eventm, nil, lastname: 'Remoteperson')
 
-        SyncMembers.new(event)
+        SyncMembers.new(@eventm)
 
-        lp = Event.find(event.id).members.last
+        lp = Event.find(@eventm.id).members.last
         expect(lp.lastname).to eq('Remoteperson')
       end
     end
 
     context 'Email & legacy_id updates' do
-      before do
-        @event = create(:event)
-      end
-
       context 'member of event has matching legacy_id but different email' do
         it "updates the member's email address" do
-          member = create(:membership, event: @event)
-          setup_remote(@event, member, email: 'new@email.com')
+          member = @eventm.memberships.last
+          setup_remote(@eventm, member, email: 'new@email.com')
 
-          SyncMembers.new(@event)
+          SyncMembers.new(@eventm)
 
           expect(Membership.find(member.id).person.email).to eq('new@email.com')
         end
       end
 
-      context 'member of another event has matching email, different legacy_id' do
+      context 'member of a remote event has matching email, different legacy_id' do
         before do
           @person1 = create(:person, email: 'sam@jones.net', legacy_id: 111)
-          @membership1 = create(:membership, person: @person1)
-          @event1 = @membership1.event
+          @membership1 = create(:membership, person: @person1, event: @eventm)
 
           @person2 = create(:person, email: 'fred@smith.com', legacy_id: 222)
           @membership2 = create(:membership, person: @person2, event: @event)
+
           @lecture = create(:lecture, person: @person2, event: @event)
           create(:user, person: @person2, email: @person2.email)
 
@@ -168,11 +157,15 @@ describe "SyncMembers" do
           SyncMembers.new(@event)
         end
 
+        after do
+          @event.memberships.destroy_all
+        end
+
         it 'consolidates event memberships into one person record' do
           expect { Person.find(@person2.id) }
             .to raise_exception(ActiveRecord::RecordNotFound)
           updated_person = Person.find(@person1.id)
-          expect(updated_person.events).to match_array([@event, @event1])
+          expect(updated_person.events).to match_array([@event, @eventm])
           expect(updated_person.legacy_id).to eq(222)
         end
 
@@ -222,58 +215,53 @@ describe "SyncMembers" do
   describe '.save_person' do
     context 'valid person' do
       it 'saves the Person and logs a message' do
-        event = create(:event)
         person = build(:person, firstname: 'New', lastname: 'McPerson')
-        membership = create(:membership, event: event, person: person)
+        membership = create(:membership, event: @eventm, person: person)
         lc = FakeLegacyConnector.new
         fields = { lastname: 'McPerson' }
-        allow(lc).to receive(:get_members).with(event)
-          .and_return(lc.get_members_with_person(e: event,
+        allow(lc).to receive(:get_members).with(@eventm)
+          .and_return(lc.get_members_with_person(e: @eventm,
                                                  m: membership,
                                                  changed_fields: fields))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         expect(Rails.logger).to receive(:info).with("\n\n" + "* Saved
-          #{event.code} person: New McPerson".squish + "\n")
+          #{@eventm.code} person: New McPerson".squish + "\n")
         expect(Rails.logger).to receive(:info).with("\n\n" + "* Saved
-          #{event.code} membership for New McPerson".squish + "\n")
+          #{@eventm.code} membership for New McPerson".squish + "\n")
 
-        SyncMembers.new(event)
+        SyncMembers.new(@eventm)
 
-        lp = Event.find(event.id).members.last
+        lp = Event.find(@eventm.id).members.last
         expect(lp.name).to eq('New McPerson')
       end
     end
 
     context 'invalid person' do
       it 'does not save the Person, logs a message, and adds record to ErrorReport' do
-        event = create(:event)
         person = build(:person, firstname: 'New', lastname: 'McPerson', email: '')
-        membership = build(:membership, event: event, person: person)
+        membership = build(:membership, event: @event, person: person)
 
         lc = FakeLegacyConnector.new
         fields = { lastname: 'McPerson' }
-        allow(lc).to receive(:get_members).with(event)
-          .and_return(lc.get_members_with_person(e: event, m: membership,
+        allow(lc).to receive(:get_members).with(@event)
+          .and_return(lc.get_members_with_person(e: @event, m: membership,
                                                  changed_fields: fields))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         sync_errors = ErrorReport.new('SyncMembers', @event)
         expect(ErrorReport).to receive(:new).and_return(sync_errors)
 
-
         person.valid?
         membership.valid?
         expect(Rails.logger).to receive(:error).with("\n\n" + "* Error saving
-          #{event.code} person: #{person.name},
+          #{@event.code} person: #{person.name},
           #{person.errors.full_messages}".squish + "\n")
-        expect(Rails.logger).to receive(:error).with("\n\n" + "* Error saving
-          #{event.code} membership for #{membership.person.name}:
-          #{membership.errors.full_messages}".squish + "\n")
-        expect(sync_errors).to receive(:add).twice.with(anything)
-        SyncMembers.new(event)
+        expect(sync_errors).to receive(:add).once.with(anything)
+        SyncMembers.new(@event)
 
-        expect(Event.find(event.id).members.last).to be_nil
+        expect(Event.find(@event.id).members.last).to be_nil
+        @event.memberships.destroy_all
       end
     end
   end
@@ -281,11 +269,14 @@ describe "SyncMembers" do
   describe '.save_membership' do
     context 'valid membership' do
       before do
-        @event = create(:event)
         @person = create(:person, lastname: 'Smith')
         @membership = build(:membership, person: @person, event: @event,
                                         staff_notes: 'Hi there!')
         @lc = FakeLegacyConnector.new
+      end
+
+      after do
+        @event.memberships.destroy_all
       end
 
       it 'saves the Membership and logs a message' do
@@ -334,28 +325,27 @@ describe "SyncMembers" do
     context 'invalid membership' do
       it 'does not save the Membership, logs a message,
         and adds record to ErrorReport' do
-        event = create(:event)
         person = create(:person, lastname: 'Smith')
         membership = build(:membership, person: person,
-                                        event: event,
+                                        event: @event,
                                         arrival_date: '1973-01-01')
 
         lc = FakeLegacyConnector.new
         fields = { lastname: 'Smith' }
-        allow(lc).to receive(:get_members).with(event)
-          .and_return(lc.get_members_with_person(e: event, m: membership,
+        allow(lc).to receive(:get_members).with(@event)
+          .and_return(lc.get_members_with_person(e: @event, m: membership,
                                                  changed_fields: fields))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
-        sync_errors = ErrorReport.new('SyncMembers', event)
+        sync_errors = ErrorReport.new('SyncMembers', @event)
         expect(ErrorReport).to receive(:new).and_return(sync_errors)
 
         membership.valid?
         expect(Rails.logger).to receive(:error)
         expect(sync_errors).to receive(:add).with(anything)
-        SyncMembers.new(event)
+        SyncMembers.new(@event)
 
-        expect(Event.find(event.id).memberships.last).to be_nil
+        expect(Event.find(@event.id).memberships.last).to be_nil
       end
     end
   end
@@ -363,21 +353,21 @@ describe "SyncMembers" do
   describe '.update_membership' do
     context 'without a local membership' do
       it 'creates a new membership' do
-        event = create(:event)
         person = create(:person)
         lc = FakeLegacyConnector.new
-        allow(lc).to receive(:get_members).with(event).and_return(lc.get_members_with_new_membership(e: event, p: person))
+        allow(lc).to receive(:get_members).with(@event).and_return(lc.get_members_with_new_membership(e: @event, p: person))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
-        SyncMembers.new(event)
+        SyncMembers.new(@event)
 
-        expect(Event.find(event.id).members.last).to eq(person)
+        expect(Event.find(@event.id).members.last).to eq(person)
+        @event.memberships.destroy_all
       end
     end
 
     context 'with a local membership' do
       it 'updates the local membership' do
-        membership = create(:membership)
+        membership = @eventm.memberships.last
         lc = FakeLegacyConnector.new
         allow(lc).to receive(:get_members).with(membership.event).and_return(lc.get_members_with_changed_membership(m: membership, sn: 'Hi'))
         expect(LegacyConnector).to receive(:new).and_return(lc)
@@ -391,16 +381,15 @@ describe "SyncMembers" do
 
   describe '.prune_members' do
     before do
-      @event = create(:event_with_members)
       allow(LegacyConnector).to receive(:new).and_return(FakeLegacyConnector.new)
-      @sm = SyncMembers.new(@event)
+      @sm = SyncMembers.new(@eventm)
     end
 
     it 'removes local members that are not in remote memberships' do
-      new_member = create(:membership, event: @event)
+      new_member = create(:membership, event: @eventm)
       @sm.prune_members
 
-      expect(Event.find(@event.id).memberships).not_to include(new_member)
+      expect(Event.find(@eventm.id).memberships).not_to include(new_member)
     end
   end
 end

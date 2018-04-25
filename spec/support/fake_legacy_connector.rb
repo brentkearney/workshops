@@ -97,7 +97,7 @@ class FakeLegacyConnector
   def get_members_with_person(e: event, m: membership, changed_fields:)
     if m.nil?
       person_attributes = { lastname: 'Person', firstname: 'New',
-                            email: 'newperson@new9000234.ca', gender: 'F',
+                            email: 'newperson@newperson.ca', gender: 'F',
                             affiliation: 'New Affil',
                             legacy_id: 1234 }
       person = Person.new(person_attributes)
