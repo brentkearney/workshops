@@ -11,7 +11,8 @@ class GetSetting
     not_set = "#{setting_string} not set"
     return not_set if settings_hash.blank?
     return not_set unless settings_hash.key? setting_string
-    Setting.Site[setting_string]
+    setting = Setting.Site[setting_string]
+    setting.blank? ? not_set : setting
   end
 
   def self.no_setting(setting_string)
@@ -102,7 +103,9 @@ class GetSetting
 
   def self.confirmation_lead_time(location)
     return 2.weeks if no_setting("Emails['#{location}']['confirmation_lead']")
-    parts = Setting.Emails[location]['confirmation_lead'].split('.')
+    lead_time = Setting.Emails[location]['confirmation_lead']
+    return 2.weeks if lead_time.blank?
+    parts = lead_time.split('.')
     parts.first.to_i.send(parts.last)
   end
 
