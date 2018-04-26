@@ -12,6 +12,7 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
   def index
+    SyncEventMembersJob.perform_later(@event.id) if policy(@event).sync?
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
 

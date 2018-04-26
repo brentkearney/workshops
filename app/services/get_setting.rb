@@ -21,6 +21,7 @@ class GetSetting
     return true if settings_hash.blank?
     return true unless settings_hash.key? parts[1] # i.e. ['BIRS']
     return true unless settings_hash[parts[1]].key? parts[2] # 'lock_staff...
+    return true if Setting.send(setting_string).blank?
   end
 
   def self.schedule_lock_time(location)

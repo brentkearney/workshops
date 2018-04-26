@@ -318,8 +318,7 @@ RSpec.describe ScheduleController, type: :controller do
         @membership = create(:membership, role: 'Organizer', event: @s_event,
           person: @person)
         @s_schedule = create(:schedule, staff_item: true, event: @s_event)
-        @lock_time = Setting.Locations[@s_event.location]['lock_staff_schedule']
-                            .to_duration
+        @lock_time = GetSetting.schedule_lock_time(@s_event.location)
       end
 
       context 'as an organizer outside of locked time' do

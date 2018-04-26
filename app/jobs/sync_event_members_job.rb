@@ -18,7 +18,6 @@ class SyncEventMembersJob < ActiveJob::Base
   end
 
   def perform(event_id)
-    event = Event.find_by_id(event_id)
-    SyncMembers.new(event)
+    SyncMembers.new(Event.find_by_id(event_id))
   end
 end

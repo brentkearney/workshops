@@ -90,7 +90,7 @@ Rails.application.configure do
 
   ## Log mail to separate file / loglevel, to avoid printing binary attachments
   config.action_mailer.logger = ActiveSupport::Logger.new("log/mailer.log")
-  config.action_mailer.logger.level = ActiveSupport::Logger::Severity::INFO
+  config.action_mailer.logger.level = ActiveSupport::Logger::Severity::DEBUG
 
   # Devise should always use SSL
   config.to_prepare { Devise::SessionsController.force_ssl }

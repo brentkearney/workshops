@@ -12,6 +12,7 @@ describe 'Membership#show', type: :feature do
     @event = create(:event_with_members)
     @organizer = @event.memberships.where("role='Contact Organizer'").first
     @participant = @event.memberships.where("role='Participant'").first
+    @participant.own_accommodation = false
     @participant.person.phd_year = '1992'
     @participant.person.emergency_contact = 'Mom'
     @participant.person.emergency_phone = '1234'
@@ -563,6 +564,21 @@ describe 'Membership#show', type: :feature do
       shows_hotel_billing(@participant)
     end
 
+    it 'hides room and shows own accommodation if true' do
+      @participant.own_accommodation = true
+      @participant.save
+
+      visit event_membership_path(@event, @participant)
+
+      expect(page.body).not_to have_css('div#profile-room',
+                                        text: @participant.room)
+      expect(page.body).to have_css('div#profile-ownaccommodation',
+                                    text: 'Own Accommodation')
+
+      @participant.own_accommodation = false
+      @participant.save
+    end
+
     it 'includes edit and delete buttons' do
       expect(page).to have_link 'Edit Membership'
       expect(page).to have_link 'Delete Membership'
@@ -614,6 +630,21 @@ describe 'Membership#show', type: :feature do
 
     it 'shows hotel & billing' do
       shows_hotel_billing(@participant)
+    end
+
+    it 'hides room and shows own accommodation if true' do
+      @participant.own_accommodation = true
+      @participant.save
+
+      visit event_membership_path(@event, @participant)
+
+      expect(page.body).not_to have_css('div#profile-room',
+                                        text: @participant.room)
+      expect(page.body).to have_css('div#profile-ownaccommodation',
+                                    text: 'Own Accommodation')
+
+      @participant.own_accommodation = false
+      @participant.save
     end
 
     it 'includes edit and delete buttons' do

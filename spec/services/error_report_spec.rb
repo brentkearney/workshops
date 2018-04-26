@@ -70,7 +70,7 @@ describe "ErrorReport" do
         @er.send_report
 
         expect(ActionMailer::Base.deliveries.count).to eq(1)
-        to_email = Setting.Site['sysadmin_email']
+        to_email = GetSetting.site_email('sysadmin_email')
         expect(ActionMailer::Base.deliveries.first.to).to include(to_email)
       end
 
@@ -83,7 +83,7 @@ describe "ErrorReport" do
         @er.send_report
 
         expect(ActionMailer::Base.deliveries.count).to eq(1)
-        to_email = Setting.Emails[@event.location.to_s]['program_coordinator']
+        to_email = GetSetting.email(@event.location, 'program_coordinator')
         expect(ActionMailer::Base.deliveries.first.to).to include(to_email)
       end
 

@@ -39,7 +39,7 @@ RSpec.describe ParticipantMailer, type: :mailer do
     end
 
     it 'From: Setting.Emails["rsvp"]' do
-      from_address = Setting.Emails[@membership.event.location.to_s]['rsvp']
+      from_address = GetSetting.email(@membership.event.location, 'rsvp')
       expect(@sent_message.from).to include(from_address)
     end
 

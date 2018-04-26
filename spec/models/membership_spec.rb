@@ -173,9 +173,9 @@ RSpec.describe 'Model validations: Membership', type: :model do
   end
 
   it 'sends staff notice if event date is inside "confirmation_lead" time' do
-    lead_time = Setting.Emails[@event.location]['confirmation_lead'].to_duration
+    lead_time = GetSetting.confirmation_lead_time(@event.location)
 
-    new_start = Date.current + lead_time - 2.weeks
+    new_start = Date.current + lead_time - 1.day
     @event.start_date = new_start
     @event.end_date = new_start + 5.days
     @event.save
@@ -192,7 +192,7 @@ RSpec.describe 'Model validations: Membership', type: :model do
 
   it 'skips staff notice if event date is outside "confirmation_lead" time,
     but still sends notice to program_coordinator' do
-    lead_time = Setting.Emails[@event.location]['confirmation_lead'].to_duration
+    lead_time = GetSetting.confirmation_lead_time(@event.location)
 
     new_start = Date.current + lead_time + 1.week
     @event.start_date = new_start
@@ -210,7 +210,7 @@ RSpec.describe 'Model validations: Membership', type: :model do
   end
 
   it 'skips staff notice to program_coordinator if updated_by is not member' do
-    lead_time = Setting.Emails[@event.location]['confirmation_lead'].to_duration
+    lead_time = GetSetting.confirmation_lead_time(@event.location)
 
     new_start = Date.current + lead_time + 1.week
     @event.start_date = new_start

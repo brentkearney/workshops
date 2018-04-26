@@ -9,7 +9,7 @@ include ActiveJob::TestHelper
 
 RSpec.describe StaffMailer, type: :mailer do
   before do
-    @sysadmin_email = Setting.Site['sysadmin_email']
+    @sysadmin_email = GetSetting.site_email('sysadmin_email')
     expect(@sysadmin_email).not_to be_nil
     @event = create(:event, code: '15w6661')
     ActionMailer::Base.delivery_method = :test
@@ -32,7 +32,7 @@ RSpec.describe StaffMailer, type: :mailer do
       StaffMailer.event_sync(@event, @sync_errors).deliver_now
 
       expect_email_was_sent
-      pc = Setting.Emails[@event.location]['program_coordinator']
+      pc = GetSetting.email(@event.location, 'program_coordinator')
       expect(ActionMailer::Base.deliveries.first.to).to include(pc)
       expect(ActionMailer::Base.deliveries.first.cc).to include(@sysadmin_email)
     end
@@ -67,7 +67,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: schedule_staff' do
-      schedule_staff = Setting.Emails[@event.location]['schedule_staff']
+      schedule_staff = GetSetting.email(@event.location, 'schedule_staff')
       mailto = ActionMailer::Base.deliveries.first.to
       expect(mailto).to eq(schedule_staff.split(', '))
     end
@@ -87,7 +87,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: nametag_updates' do
-      name_tags = Setting.Emails[event.location.to_s]['name_tags']
+      name_tags = GetSetting.email(@event.location, 'name_tags')
       expect(ActionMailer::Base.deliveries.first.to).to match_array(name_tags)
     end
   end
@@ -106,7 +106,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: event_updates' do
-      event_updates = Setting.Emails[event.location.to_s]['event_updates']
+      event_updates = GetSetting.email(@event.location, 'event_updates')
       mailto = ActionMailer::Base.deliveries.first.to
       expect(mailto).to eq(event_updates.split(', '))
     end
@@ -127,7 +127,7 @@ RSpec.describe StaffMailer, type: :mailer do
     end
 
     it 'To: confirmation_notices' do
-      recipient = Setting.Emails[@event.location.to_s]['confirmation_notices']
+      recipient = GetSetting.email(@event.location, 'confirmation_notices')
       expect(ActionMailer::Base.deliveries.first.to).to match_array(recipient)
     end
   end

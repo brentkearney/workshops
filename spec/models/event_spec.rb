@@ -212,10 +212,11 @@ RSpec.describe "Model validations: Event ", type: :model do
       expect(event.year).to eq(event.start_date.strftime('%Y'))
     end
 
-    it '.country from Setting.Locations' do
-      country = Setting.Locations.first.second['Country']
+    it '.country from Setting.Locations[country]' do
+      location = Setting.Locations.keys[0]
+      country = GetSetting.location_country(location)
 
-      event = build(:event, location: Setting.Locations.keys[0])
+      event = build(:event, location: location)
 
       expect(event.country).to eq(country)
     end
