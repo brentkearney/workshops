@@ -67,6 +67,7 @@ Rails.application.routes.draw do
       patch 'lectures' => 'lectures#update'
       put 'lectures' => 'lectures#update'
       post 'events' => 'events#create'
+      post 'events/sync' => 'events#sync'
     end
   end
 end

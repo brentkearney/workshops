@@ -8,12 +8,15 @@ require 'rails_helper'
 require 'factory_bot_rails'
 
 describe Api::V1::EventsController do
+  before do
+    @key = Setting.Site['EVENTS_API_KEY']
+  end
+
   context '#update' do
     before do
       @event = build(:event)
-      key = Setting.Site['EVENTS_API_KEY']
       @payload = {
-          api_key: key,
+          api_key: @key,
           event_id: @event.code,
           event: @event.as_json
       }
@@ -70,6 +73,36 @@ describe Api::V1::EventsController do
 
       @payload.delete(:event)
       post "/api/v1/events.json", @payload.to_json
+      expect(response).to be_bad_request
+    end
+  end
+
+  context '#sync' do
+    before do
+      @event = create(:event_with_members)
+      @payload = {
+          api_key: @key,
+          event_id: @event.code,
+          event: ''
+      }
+    end
+
+    it 'queues an ActiveJob job to sync events in the background' do
+    expect { post "/api/v1/events/sync.json", @payload.to_json }
+      .to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(1)
+    end
+
+    it 'sends given event_id to SyncEventMembersJob' do
+      allow(SyncEventMembersJob).to receive(:perform_later)
+
+      post "/api/v1/events/sync.json", @payload.to_json
+
+      expect(SyncEventMembersJob).to have_received(:perform_later).with(@event.id)
+    end
+
+    it 'given invalid event_id, it fails' do
+      @payload['event_id'] = 'foo'
+      post "/api/v1/events/sync.json", @payload.to_json
       expect(response).to be_bad_request
     end
   end

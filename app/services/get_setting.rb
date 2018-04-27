@@ -19,9 +19,11 @@ class GetSetting
     parts = setting_string.scan(/\w+/)
     settings_hash = Setting.send(parts[0]) # i.e. Locations
     return true if settings_hash.blank?
-    return true unless settings_hash.key? parts[1] # i.e. ['BIRS']
-    return true unless settings_hash[parts[1]].key? parts[2] # 'lock_staff...
-    return true if Setting.send(setting_string).blank?
+    location = parts[1]
+    return true unless settings_hash.key? location # i.e. ['BIRS']
+    field = parts[2]
+    return true unless settings_hash[location].key? field # i.e. 'Country'
+    return true if settings_hash[location][field].blank?
   end
 
   def self.schedule_lock_time(location)

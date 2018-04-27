@@ -11,7 +11,7 @@ class Api::V1::EventsController < Api::V1::BaseController
 
   # POST /api/v1/events/1.json
   def create
-    go_away && return unless valid_parameters? && event_does_not_exist?
+    go_away && return unless valid_create_parameters? && event_does_not_exist?
     event = Event.new
     event.assign_attributes(@json['event'])
 
@@ -21,6 +21,18 @@ class Api::V1::EventsController < Api::V1::BaseController
       else
         format.json { render json: event.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  # POST /api/v1/events/sync/1.json
+  def sync
+    event = Event.find_by_code(@json['event_id']) if @json['event_id']
+    go_away && return if event.nil?
+
+    SyncEventMembersJob.perform_later(event.id)
+
+    respond_to do |format|
+      format.json { render nothing: true, status: :success }
     end
   end
 
@@ -47,7 +59,7 @@ class Api::V1::EventsController < Api::V1::BaseController
     render nothing: true, status: :bad_request
   end
 
-  def valid_parameters?
+  def valid_create_parameters?
     @json['event_id'] && @json.key?('event') &&
       @json['event'].is_a?(Hash) && !@json['event'].empty? &&
       @json['event_id'] == @json['event']['code']

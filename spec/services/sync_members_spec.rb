@@ -46,7 +46,8 @@ describe "SyncMembers" do
 
     context 'with remote members' do
       it 'returns the remote members' do
-        expect(LegacyConnector).to receive(:new).and_return(FakeLegacyConnector.new)
+        lc = FakeLegacyConnector.new
+        expect(LegacyConnector).to receive(:new).and_return(lc)
 
         sm = SyncMembers.new(@eventm)
 

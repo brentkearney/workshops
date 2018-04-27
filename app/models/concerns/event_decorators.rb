@@ -90,11 +90,11 @@ module EventDecorators
   end
 
   def address
-    GetSetting.location_address(location)
+    GetSetting.location_address(self.location)
   end
 
   def country
-    GetSetting.location_country(location)
+    GetSetting.location_country(self.location)
   end
 
   def organizer

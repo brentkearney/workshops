@@ -53,7 +53,7 @@ class SyncMembers
     lc = LegacyConnector.new
     remote_members = lc.get_members(event)
 
-    if remote_members.empty?
+    if remote_members.nil? || remote_members.blank?
       sync_errors.add(lc,
                       "Unable to retrieve any remote members for #{event.code}")
       sync_errors.send_report
