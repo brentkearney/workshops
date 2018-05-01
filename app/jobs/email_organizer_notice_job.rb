@@ -14,7 +14,7 @@ class EmailOrganizerNoticeJob < ActiveJob::Base
     person = membership.person
     event = membership.event
     msg = { error: "Error sending RSVP notice to #{event.code} Organizer for
-                   #{person.name} RSVP".squish,
+                   #{person.name}".squish,
             exception: exception }
     StaffMailer.notify_sysadmin(nil, msg).deliver_now
   end

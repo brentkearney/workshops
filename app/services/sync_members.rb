@@ -25,6 +25,7 @@ class SyncMembers
     @event = event
     @sync_errors = ErrorReport.new(self.class, @event)
     @remote_members = retrieve_remote_members
+    prune_members
     @local_members = @event.memberships.includes(:person)
     sync_memberships
   end
@@ -38,7 +39,6 @@ class SyncMembers
       end
     end
 
-    prune_members
     sync_errors.send_report
   end
 
