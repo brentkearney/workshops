@@ -25,21 +25,50 @@ class SyncMembers
     @event = event
     @sync_errors = ErrorReport.new(self.class, @event)
     @remote_members = retrieve_remote_members
-    prune_members
     @local_members = @event.memberships.includes(:person)
     sync_memberships
+    prune_members
+    sync_errors.send_report
   end
 
   def sync_memberships
     remote_members.each do |rm|
       remote_member = fix_remote_fields(rm)
-      local_person = update_person(remote_member['Person'])
-      if local_person.valid?
-        update_membership(remote_member['Membership'], local_person)
+      local_member = find_local_membership(remote_member)
+
+      if local_member.nil?
+        create_new_membership(remote_member)
+      else
+        membership = update_record(local_member, remote_member['Membership'])
+        person = update_record(local_member.person, remote_member['Person'])
+        save_membership(membership)
       end
     end
+  end
 
-    sync_errors.send_report
+  def create_new_membership(remote_member)
+    local_person = find_and_update_person(remote_member['Person'])
+    if local_person.valid?
+      if @local_members.select { |m| m.person_id == local_person.id }.blank?
+        membership = Membership.new(remote_member['Membership'])
+        membership.person_id = local_person.id
+        membership.event_id = @event.id
+        save_membership(membership)
+      end
+    end
+  end
+
+  def find_local_membership(remote_member)
+    local_membership = @local_members.select do |membership|
+      membership.person.legacy_id == remote_member['Person']['legacy_id']
+    end.first
+
+    if local_membership.nil?
+      local_membership = @local_members.select do |membership|
+        membership.person.email == remote_member['Person']['email']
+      end.first
+    end
+    local_membership
   end
 
   def prune_members
@@ -118,17 +147,14 @@ class SyncMembers
       Person.find_by(email: remote_person['email'])
   end
 
-  def update_person(remote_person)
+  def find_and_update_person(remote_person)
     local_person = get_local_person(remote_person)
 
     if local_person.blank?
       local_person = save_person(Person.new(remote_person))
     else
-      updated_person = update_record(local_person, remote_person)
-      if updated_person
-        local_person = updated_person
-        save_person(local_person)
-      end
+      local_person = update_record(local_person, remote_person)
+      save_person(local_person)
     end
     local_person
   end
@@ -158,7 +184,7 @@ class SyncMembers
 
       unless local.send(k).eql? v
         if k.eql? 'email'
-          local = update_email(local, remote, v)
+          local = update_email(local, remote)
         else
           local.send("#{k}=", v)
         end
@@ -178,43 +204,41 @@ class SyncMembers
     v
   end
 
-  def update_email(local_person, remote_person_hash, new_email)
-    other_person = Person.find_by_email(new_email)
-    if other_person.nil?
-      local_person.email = new_email
-    else
+  def update_email(local_person, remote_person_hash)
+    other_person = Person.find_by_email(remote_person_hash['email'])
+    unless other_person.nil? || other_person.id == local_person.id
       # local_person has the same legacy_id as remote, but different email.
-      # other_person has same email as remote, so update & replace local_person
-      other_person = update_record(other_person, remote_person_hash)
-      replace_person(local_person, other_person)
-      local_person = other_person
+      # other_person has same email as remote, but is not a member of this event
+      # and has different legacy_id. Merge data and destroy other_person:
+      replace_person(replace: other_person, replace_with: local_person)
     end
+    local_person.email = remote_person_hash['email']
     local_person
   end
 
-  def replace_person(person, replacement)
-    person.memberships.each do |m|
-      unless replacement.events.include?(m.event)
-        m.person_id = replacement.id
-        m.save
+  def replace_person(replace: other_person, replace_with: person)
+    replace.memberships.each do |m|
+      if replace_with.memberships.select { |rm| rm.event_id == m.id }.blank?
+        m.person = replace_with
+        m.save!
       end
     end
 
-    Lecture.where(person: person).each do |l|
-      l.person_id = replacement.id
+    Lecture.where(person_id: replace.id).each do |l|
+      l.person_id = replace_with.id
       l.save
     end
 
-    user_account = User.where(person_id: person.id).first
+    user_account = User.where(person_id: replace.id).first
     unless user_account.nil?
-      user_account.person_id = replacement.id
-      user_account.email = replacement.email
+      user_account.person_id = replace_with.id
+      user_account.email = replace_with.email
       user_account.skip_reconfirmation!
       user_account.save
     end
 
     # there can be only one!
-    person.destroy
+    Person.find(replace.id).destroy
   end
 
   def save_person(person)
@@ -231,35 +255,16 @@ class SyncMembers
     person
   end
 
-  def update_membership(remote_member, local_person)
-    return if local_person.blank?
-    local_membership = @local_members.select do |membership|
-      membership.person_id == local_person.id unless membership.nil?
-    end.first
-
-    if local_membership.nil?
-      local_membership = Membership.new(remote_member)
-      local_membership.event_id = @event.id
-      local_membership.person_id = local_person.id
-      save_membership(local_membership)
-    else
-      updated_member = update_record(local_membership, remote_member)
-      updated_member.person_id = local_person.id
-      local_membership = save_membership(updated_member) if updated_member
-    end
-    local_membership
-  end
-
   def save_membership(membership)
     membership.person.member_import = true
     membership.update_by_staff = true
     if membership.save
       unless membership.previous_changes.empty?
-        Rails.logger.info "\n\n" + "* Saved #{@event.code} membership for
+        Rails.logger.info "\n\n" + "* Saved #{membership.event.code} membership for
           #{membership.person.name}".squish + "\n"
       end
     else
-      Rails.logger.error "\n\n" + "* Error saving #{@event.code} membership for
+      Rails.logger.error "\n\n" + "* Error saving #{membership.event.code} membership for
         #{membership.person.name}:
         #{membership.errors.full_messages}".squish + "\n"
       sync_errors.add(membership)

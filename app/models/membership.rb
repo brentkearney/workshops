@@ -131,6 +131,7 @@ class Membership < ActiveRecord::Base
   def update_counter_cache
     event.confirmed_count = Membership.where("attendance='Confirmed'
       AND event_id=?", event.id).count
+    event.data_import = true
     event.save
   end
 

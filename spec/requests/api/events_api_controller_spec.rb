@@ -9,10 +9,10 @@ require 'factory_bot_rails'
 
 describe Api::V1::EventsController do
   before do
-    @key = Setting.Site['EVENTS_API_KEY']
+    @key = GetSetting.site_setting('EVENTS_API_KEY')
   end
 
-  context '#update' do
+  context '#create' do
     before do
       @event = build(:event)
       @payload = {

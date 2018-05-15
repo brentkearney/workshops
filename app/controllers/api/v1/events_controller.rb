@@ -26,7 +26,8 @@ class Api::V1::EventsController < Api::V1::BaseController
 
   # POST /api/v1/events/sync/1.json
   def sync
-    event = Event.find_by_code(@json['event_id']) if @json['event_id']
+    go_away && return unless valid_event_id?
+    event = Event.find_by_code(@json['event_id'])
     go_away && return if event.nil?
 
     SyncEventMembersJob.perform_later(event.id)
@@ -59,8 +60,13 @@ class Api::V1::EventsController < Api::V1::BaseController
     render nothing: true, status: :bad_request
   end
 
+  def valid_event_id?
+    return false if @json['event_id'].nil?
+    @json['event_id'] =~ /#{GetSetting.code_pattern}/
+  end
+
   def valid_create_parameters?
-    @json['event_id'] && @json.key?('event') &&
+    valid_event_id? && @json.key?('event') &&
       @json['event'].is_a?(Hash) && !@json['event'].empty? &&
       @json['event_id'] == @json['event']['code']
   end
