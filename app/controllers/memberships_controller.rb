@@ -12,7 +12,7 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
   def index
-    SyncEventMembersJob.perform_later(@event.id) if policy(@event).sync?
+    SyncMembers.new(@event) if policy(@event).sync?
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
 
@@ -127,13 +127,17 @@ class MembershipsController < ApplicationController
 
   def assign_buttons
     @member_emails = map_emails(@memberships['Confirmed'])
-    organizers = @memberships.values[0].select { |m| m.role =~ /Organizer/ }
+    organizers = @memberships.values[0].nil? ? '' : select_organizers
     @organizer_emails = map_emails(organizers)
   end
 
   def map_emails(members)
     return [] if members.blank?
     members.map { |m| "\"#{m.person.name}\" <#{m.person.email}>" }
+  end
+
+  def select_organizers
+    @memberships.values[0].select { |m| m.role =~ /Organizer/ }
   end
 
   def set_membership

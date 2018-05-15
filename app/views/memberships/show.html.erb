@@ -4,6 +4,9 @@
     <div class="panel panel-default">
       <div class="panel-heading">
   	    <h2 id="profile-name"><%= @person.name %></h2>
+        <% if @current_user && @current_user.is_admin? %>
+        <small>person id: <%= @person.id %>, legacy id: <%= @person.legacy_id %>, membership id: <%= @membership.id %></small>
+        <% end %>
       </div>
       <div class="panel-body">
       	<div class="row" id="profile-affil"><%= @person.affil_with_title %></div>

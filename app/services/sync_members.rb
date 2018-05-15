@@ -26,8 +26,8 @@ class SyncMembers
     @sync_errors = ErrorReport.new(self.class, @event)
     @remote_members = retrieve_remote_members
     @local_members = @event.memberships.includes(:person)
-    sync_memberships
     prune_members
+    sync_memberships
     sync_errors.send_report
   end
 
@@ -49,7 +49,7 @@ class SyncMembers
   def create_new_membership(remote_member)
     local_person = find_and_update_person(remote_member['Person'])
     if local_person.valid?
-      if @local_members.select { |m| m.person_id == local_person.id }.blank?
+      if local_members.select { |m| m.person_id == local_person.id }.blank?
         membership = Membership.new(remote_member['Membership'])
         membership.person_id = local_person.id
         membership.event_id = @event.id
@@ -59,12 +59,12 @@ class SyncMembers
   end
 
   def find_local_membership(remote_member)
-    local_membership = @local_members.select do |membership|
+    local_membership = local_members.select do |membership|
       membership.person.legacy_id == remote_member['Person']['legacy_id']
     end.first
 
     if local_membership.nil?
-      local_membership = @local_members.select do |membership|
+      local_membership = local_members.select do |membership|
         membership.person.email == remote_member['Person']['email']
       end.first
     end
@@ -73,8 +73,11 @@ class SyncMembers
 
   def prune_members
     remote_ids = remote_members.map { |m| m['Person']['legacy_id'].to_i }
+    remote_emails = remote_members.map { |m| m['Person']['email'] }
+
     Event.find(@event.id).memberships.includes(:person).each do |m|
-      m.destroy unless remote_ids.include?(m.person.legacy_id)
+      m.destroy unless remote_ids.include?(m.person.legacy_id) ||
+        remote_emails.include?(m.person.email)
     end
   end
 
@@ -225,13 +228,13 @@ class SyncMembers
     end
 
     Lecture.where(person_id: replace.id).each do |l|
-      l.person_id = replace_with.id
+      l.person = replace_with
       l.save
     end
 
     user_account = User.where(person_id: replace.id).first
     unless user_account.nil?
-      user_account.person_id = replace_with.id
+      user_account.person = replace_with
       user_account.email = replace_with.email
       user_account.skip_reconfirmation!
       user_account.save
