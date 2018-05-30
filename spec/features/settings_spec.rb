@@ -11,6 +11,10 @@ describe 'Settings page', type: :feature do
     load "#{Rails.root}/spec/support/settings.rb"
   end
 
+  after do
+    load "#{Rails.root}/spec/support/settings.rb"
+  end
+
   def find_sub_tabs(section)
     Setting.find_by_var('Locations').value.keys.each do |tab|
       visit edit_setting_path(section)
@@ -136,6 +140,10 @@ describe 'Settings page', type: :feature do
         expect(page).to have_text('Setting has been updated')
         setting = Setting.find_by_var('Site')
         expect(setting.value['event_types'].class).to eq(Array)
+
+        visit edit_setting_path('Site')
+        fill_in 'setting[Site][event_types]', with: "['5 Day Workshop', '2 Day Workshop', 'Research in Teams', 'Focussed Research Group', 'Summer School', 'Public Lecture']"
+        click_button 'Update Settings'
       end
 
       it 'can add new fields' do

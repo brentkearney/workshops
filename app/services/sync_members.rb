@@ -28,6 +28,7 @@ class SyncMembers
     @local_members = @event.memberships.includes(:person)
     prune_members
     sync_memberships
+    check_max_participants
     sync_errors.send_report
   end
 
@@ -79,6 +80,18 @@ class SyncMembers
       m.destroy unless remote_ids.include?(m.person.legacy_id) ||
         remote_emails.include?(m.person.email)
     end
+  end
+
+  def check_max_participants
+    membership = @event.memberships.first
+    unless membership.nil?
+      membership.sync_remote = false
+      membership.send(:check_max_participants)
+      if membership.errors
+        msg = membership.errors.full_messages
+        sync_errors.add(@event, "#{@event.code} is overbooked!\n\n#{msg}")
+     end
+   end
   end
 
   def retrieve_remote_members
@@ -260,7 +273,7 @@ class SyncMembers
 
   def save_membership(membership)
     membership.person.member_import = true
-    membership.update_by_staff = true
+    membership.sync_remote = true
     if membership.save
       unless membership.previous_changes.empty?
         Rails.logger.info "\n\n" + "* Saved #{membership.event.code} membership for

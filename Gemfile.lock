@@ -53,7 +53,7 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    bcrypt (3.1.11)
+    bcrypt (3.1.12)
     bcrypt_pbkdf (1.0.0)
     bootstrap-sass (3.3.7)
       autoprefixer-rails (>= 5.2.1)
@@ -126,7 +126,7 @@ GEM
       railties (>= 3.0.0)
     faker (1.8.7)
       i18n (>= 0.7)
-    faraday (0.15.1)
+    faraday (0.15.2)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.23)
     flay (2.12.0)
@@ -184,7 +184,7 @@ GEM
     octokit (4.9.0)
       sawyer (~> 0.8.0, >= 0.5.3)
     orm_adapter (0.5.0)
-    paper_trail (9.0.1)
+    paper_trail (9.1.0)
       activerecord (>= 4.2, < 5.3)
       request_store (~> 1.1)
     parallel (1.12.1)
@@ -277,7 +277,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rollbar (2.15.6)
+    rollbar (2.16.0)
       multi_json
     rspec-core (3.7.1)
       rspec-support (~> 3.7.0)
@@ -339,7 +339,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sshkit (1.16.0)
+    sshkit (1.16.1)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     sucker_punch (2.0.4)
@@ -431,4 +431,4 @@ DEPENDENCIES
   web-console
 
 BUNDLED WITH
-   1.16.1
+   1.16.2

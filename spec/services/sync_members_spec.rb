@@ -74,6 +74,12 @@ describe "SyncMembers" do
     end
   end
 
+  describe '.check_max_participants' do
+    it 'checks whether the event has too many participants' do
+
+    end
+  end
+
   describe '.update_person' do
     def test_update(local_person:, fields:)
       membership = create(:membership, event: @eventm, person: local_person)

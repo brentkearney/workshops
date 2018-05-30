@@ -74,6 +74,7 @@ class Membership < ActiveRecord::Base
 
   # max_participants - (invited + confirmed participants)
   def check_max_participants
+    return if sync_remote
     return if attendance == 'Declined' || attendance == 'Not Yet Invited'
     return if event_id.nil?
     invited = event.num_invited_participants.to_i
@@ -95,7 +96,7 @@ class Membership < ActiveRecord::Base
                    '- arrival date must be within 30 days of the event.')
       end
 
-      return if update_by_staff
+      return if update_by_staff || sync_remote
       if arrival_date.to_date < w.start_date.to_date
         errors.add(:arrival_date,
                    '- special permission required for early arrival.')
@@ -108,7 +109,7 @@ class Membership < ActiveRecord::Base
                    '- departure date must be after the beginning of the event.')
       end
 
-      return if update_by_staff
+      return if update_by_staff || sync_remote
       if departure_date.to_date > w.end_date.to_date
         errors.add(:departure_date,
                    '- special permission required for late departure.')
