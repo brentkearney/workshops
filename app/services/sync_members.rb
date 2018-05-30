@@ -83,15 +83,10 @@ class SyncMembers
   end
 
   def check_max_participants
-    membership = @event.memberships.first
-    unless membership.nil?
-      membership.sync_remote = false
-      membership.send(:check_max_participants)
-      if membership.errors
-        msg = membership.errors.full_messages
-        sync_errors.add(@event, "#{@event.code} is overbooked!\n\n#{msg}")
-     end
-   end
+    if @event.max_participants - @event.num_participants.to_i < 0
+      counts = 'Totals:...'
+      sync_errors.add(@event, "#{@event.code} is overbooked!\n\n#{counts}")
+    end
   end
 
   def retrieve_remote_members

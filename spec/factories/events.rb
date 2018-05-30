@@ -3,6 +3,14 @@ require 'factory_bot_rails'
 require 'faker'
 
 FactoryBot.define do
+  sequence(:code) do |x|
+    yrw5 = DateTime.current.strftime("%y") + 'w5'
+    code = yrw5 + Random.rand(999).to_s.rjust(3, '0')
+    while Event.where(code: code).exists?
+      code = yrw5 + Random.rand(999).to_s.rjust(3, '0')
+    end
+    code
+  end
   sequence(:start_date, 1) do |n|
     n = 1 if n > 48 # avoid going years into the future
     date = Date.today.beginning_of_year.advance(weeks: 1)
@@ -15,7 +23,7 @@ FactoryBot.define do
   end
 
   factory :event do |f|
-    f.code { DateTime.current.strftime("%y") + 'w5' + rand(999).to_s.rjust(3, '0') }
+    f.code
     f.name { Faker::Lorem.sentence(4) }
     f.short_name { Faker::Lorem.sentence(1) }
     f.booking_code 'Booking'
