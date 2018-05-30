@@ -83,8 +83,26 @@ class SyncMembers
   end
 
   def check_max_participants
-    if @event.max_participants - @event.num_participants.to_i < 0
-      counts = 'Totals:...'
+    confirmed = 0
+    invited = 0
+    undecided = 0
+    nyninvited = 0
+    declined = 0
+    Event.find(@event.id).memberships.each do |membership|
+      confirmed += 1 if membership.attendance == 'Confirmed'
+      invited += 1 if membership.attendance == 'Invited'
+      undecided += 1 if membership.attendance == 'Undecided'
+      nyninvited += 1 if membership.attendance == 'Not Yet Invited'
+      declined += 1 if membership.attendance == 'Declined'
+    end
+
+    if @event.max_participants - confirmed - invited - undecided < 0
+      counts = "#{@event.code} Membership Totals:\n"
+      counts += "Confirmed participants: #{confirmed}\n"
+      counts += "Invited participants: #{invited}\n"
+      counts += "Undecided participants: #{undecided}\n"
+      counts += "Not Yet Invited participants: #{nyninvited}\n"
+      counts += "Declined participants: #{declined}\n"
       sync_errors.add(@event, "#{@event.code} is overbooked!\n\n#{counts}")
     end
   end

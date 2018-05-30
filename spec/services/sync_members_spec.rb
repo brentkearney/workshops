@@ -74,12 +74,6 @@ describe "SyncMembers" do
     end
   end
 
-  describe '.check_max_participants' do
-    it 'checks whether the event has too many participants' do
-
-    end
-  end
-
   describe '.update_person' do
     def test_update(local_person:, fields:)
       membership = create(:membership, event: @eventm, person: local_person)
@@ -318,9 +312,6 @@ describe "SyncMembers" do
                                                  changed_fields: fields))
         expect(LegacyConnector).to receive(:new).and_return(@lc)
 
-        # sync_errors = ErrorReport.new('SyncMembers', @event)
-        # expect(ErrorReport).to receive(:new).and_return(sync_errors)
-        # expect(sync_errors).to receive(:add).with(anything)
         SyncMembers.new(@event)
 
         saved_member = Event.find(@event.id).memberships.last
@@ -398,6 +389,31 @@ describe "SyncMembers" do
       @sm.prune_members
 
       expect(Event.find(@eventm.id).memberships).not_to include(new_member)
+    end
+  end
+
+  describe '.check_max_participants' do
+    it 'checks whether the event has too many participants, sends report' do
+      lc = FakeLegacyConnector.new
+      allow(lc).to receive(:get_members).with(@event)
+        .and_return(lc.exceed_max_participants(@event, 5))
+      expect(LegacyConnector).to receive(:new).and_return(lc)
+
+      sync_errors = ErrorReport.new('SyncMembers', @event)
+      expect(ErrorReport).to receive(:new).and_return(sync_errors)
+
+      # from sync_members.rb:100
+      counts = "#{@event.code} Membership Totals:\n"
+      counts += "Confirmed participants: #{@event.max_participants + 5}\n"
+      counts += "Invited participants: 0\n"
+      counts += "Undecided participants: 0\n"
+      counts += "Not Yet Invited participants: 0\n"
+      counts += "Declined participants: 0\n"
+      message = "#{@event.code} is overbooked!\n\n#{counts}"
+
+      expect(sync_errors).to receive(:add).with(@event, message)
+      expect(sync_errors).to receive(:send_report)
+      SyncMembers.new(@event)
     end
   end
 end

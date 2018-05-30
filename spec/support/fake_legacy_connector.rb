@@ -52,7 +52,7 @@ class FakeLegacyConnector
     # Change the existing members and return them
     event.memberships.each do |m|
       remote_members << {
-          'Workshop' => '#{event.code}',
+          'Workshop' => "#{event.code}",
           'Person' => {
               'lastname' => m.person.lastname, 'firstname' => m.person.firstname,
               'email' => m.person.email, 'cc_email' => nil,
@@ -180,6 +180,23 @@ class FakeLegacyConnector
         'billing' => 'OK', 'updated_at' => Time.now
       }
     }]
+  end
+
+  def exceed_max_participants(event, extras)
+    require 'factory_bot_rails'
+    remote_members = []
+    (event.max_participants + extras).times do
+      membership = FactoryBot.build(:membership, event: event)
+      membership.person.updated_by = 'FakeLegacyConnector'
+      membership.updated_by = 'FakeLegacyConnector'
+      membership.attendance = 'Confirmed'
+      remote_members << {
+          'Workshop' => "#{event.code}",
+          'Person' => membership.person.attributes,
+          'Membership' => membership.attributes
+      }
+    end
+    remote_members
   end
 
   def get_person(legacy_id)
