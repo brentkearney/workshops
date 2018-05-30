@@ -88,8 +88,15 @@ class ErrorReport
               end
             end
           end
-
         end
+
+        if errors.has_key?('Event')
+          error_messages = errors['Event'].first.message.to_s
+          membership_url = GetSetting.app_url + '/events/'
+            + @event.code + '/memberships'
+          error_messages << "\n" + membership_url
+        end
+
         unless error_messages.blank?
           StaffMailer.event_sync(@event, error_messages).deliver_now
         end

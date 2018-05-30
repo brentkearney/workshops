@@ -96,14 +96,18 @@ class SyncMembers
       declined += 1 if membership.attendance == 'Declined'
     end
 
-    if @event.max_participants - confirmed - invited - undecided < 0
-      counts = "#{@event.code} Membership Totals:\n"
-      counts += "Confirmed participants: #{confirmed}\n"
-      counts += "Invited participants: #{invited}\n"
-      counts += "Undecided participants: #{undecided}\n"
-      counts += "Not Yet Invited participants: #{nyninvited}\n"
-      counts += "Declined participants: #{declined}\n"
-      sync_errors.add(@event, "#{@event.code} is overbooked!\n\n#{counts}")
+    total_invited = confirmed + invited + undecided
+    if @event.max_participants - total_invited < 0
+      msg = "Membership Totals:\n"
+      msg += "Confirmed participants: #{confirmed}\n"
+      msg += "Invited participants: #{invited}\n"
+      msg += "Undecided participants: #{undecided}\n"
+      msg += "Not Yet Invited participants: #{nyninvited}\n"
+      msg += "Declined participants: #{declined}\n\n"
+      msg += "Total invited: #{total_invited}\n"
+      msg += "#{@event.code} Maximum allowed: #{@event.max_participants}\n"
+
+      sync_errors.add(@event, "#{@event.code} is overbooked!\n\n#{msg}")
     end
   end
 

@@ -393,6 +393,10 @@ describe "SyncMembers" do
   end
 
   describe '.check_max_participants' do
+    before do
+      Person.destroy_all
+    end
+
     it 'checks whether the event has too many participants, sends report' do
       lc = FakeLegacyConnector.new
       allow(lc).to receive(:get_members).with(@event)
@@ -403,13 +407,16 @@ describe "SyncMembers" do
       expect(ErrorReport).to receive(:new).and_return(sync_errors)
 
       # from sync_members.rb:100
-      counts = "#{@event.code} Membership Totals:\n"
-      counts += "Confirmed participants: #{@event.max_participants + 5}\n"
-      counts += "Invited participants: 0\n"
-      counts += "Undecided participants: 0\n"
-      counts += "Not Yet Invited participants: 0\n"
-      counts += "Declined participants: 0\n"
-      message = "#{@event.code} is overbooked!\n\n#{counts}"
+      total_invited = @event.max_participants + 5
+      msg = "Membership Totals:\n"
+      msg += "Confirmed participants: #{total_invited}\n"
+      msg += "Invited participants: 0\n"
+      msg += "Undecided participants: 0\n"
+      msg += "Not Yet Invited participants: 0\n"
+      msg += "Declined participants: 0\n\n"
+      msg += "Total invited: #{total_invited}\n"
+      msg += "#{@event.code} Maximum allowed: #{@event.max_participants}\n"
+      message = "#{@event.code} is overbooked!\n\n#{msg}"
 
       expect(sync_errors).to receive(:add).with(@event, message)
       expect(sync_errors).to receive(:send_report)
