@@ -290,7 +290,7 @@ class SyncMembers
 
   def save_membership(membership)
     membership.person.member_import = true
-    membership.sync_remote = true
+    membership.sync_memberships = true
     if membership.save
       unless membership.previous_changes.empty?
         Rails.logger.info "\n\n" + "* Saved #{membership.event.code} membership for

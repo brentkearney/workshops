@@ -67,8 +67,6 @@ class MembershipsController < ApplicationController
     authorize @membership
     member_params = MembershipParametizer.new(@membership, membership_params,
                                               @current_user)
-    @membership.sync_remote = true
-
     respond_to do |format|
       if @membership.update(member_params.data)
         format.html do

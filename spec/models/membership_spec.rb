@@ -238,12 +238,12 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
   end
 
-  it 'syncs with legacy db if sync_remote flag is set' do
+  it 'syncs with legacy db if update_remote flag is set' do
     allow(SyncMembershipJob).to receive(:perform_later)
     @membership.attendance = 'Confirmed'
     @membership.save
 
-    @membership.sync_remote = true
+    @membership.update_remote = true
     @membership.attendance = 'Declined'
     @membership.save
 

@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Membership < ActiveRecord::Base
-  attr_accessor :sync_remote, :update_by_staff
+  attr_accessor :sync_memberships, :update_by_staff, :update_remote
 
   belongs_to :event
   belongs_to :person
@@ -74,7 +74,7 @@ class Membership < ActiveRecord::Base
 
   # max_participants - (invited + confirmed participants)
   def check_max_participants
-    return if sync_remote
+    return if sync_memberships
     return if attendance == 'Declined' || attendance == 'Not Yet Invited'
     return if event_id.nil?
     invited = event.num_invited_participants.to_i
@@ -96,7 +96,7 @@ class Membership < ActiveRecord::Base
                    '- arrival date must be within 30 days of the event.')
       end
 
-      return if update_by_staff || sync_remote
+      return if update_by_staff || sync_memberships
       if arrival_date.to_date < w.start_date.to_date
         errors.add(:arrival_date,
                    '- special permission required for early arrival.')
@@ -109,7 +109,7 @@ class Membership < ActiveRecord::Base
                    '- departure date must be after the beginning of the event.')
       end
 
-      return if update_by_staff || sync_remote
+      return if update_by_staff || sync_memberships
       if departure_date.to_date > w.end_date.to_date
         errors.add(:departure_date,
                    '- special permission required for late departure.')
@@ -137,7 +137,9 @@ class Membership < ActiveRecord::Base
   end
 
   def sync_with_legacy
-    SyncMembershipJob.perform_later(id) if sync_remote
+    unless sync_memberships
+      SyncMembershipJob.perform_later(id) if update_remote
+    end
   end
 
   def notify_staff

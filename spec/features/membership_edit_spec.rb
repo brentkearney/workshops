@@ -93,6 +93,7 @@ describe 'Membership#edit', type: :feature do
     expect(page).to have_field('membership_reviewed', checked: false)
     check 'membership_reviewed'
     fill_in 'membership_billing', with: 'SOS'
+    uncheck 'membership_own_accommodation'
     fill_in 'membership_room', with: 'AB 123'
     expect(page).to have_field('membership_has_guest', checked: false)
     check 'membership_has_guest'
@@ -492,6 +493,16 @@ describe 'Membership#edit', type: :feature do
 
     it 'has send invitation link' do
       expect(page.body).to have_link 'Send Invitation'
+    end
+
+    it 'updates legacy database with changes' do
+      lc = FakeLegacyConnector.new
+      allow(SyncMembershipJob).to receive(:perform_later)
+
+      fill_in :membership_staff_notes, with: 'Testing notes'
+      click_button 'Update Member'
+      expect(SyncMembershipJob).to have_received(:perform_later)
+        .with(@participant.id)
     end
   end
 

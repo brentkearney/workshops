@@ -108,7 +108,7 @@ class Invitation < ActiveRecord::Base
     log_rsvp(status)
     update_membership_fields(status)
     update_person_fields(status)
-    membership.sync_remote = true
+    membership.update_remote = true
     begin
       membership.save!
     rescue ActiveRecord::RecordInvalid => error

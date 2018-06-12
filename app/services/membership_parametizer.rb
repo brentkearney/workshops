@@ -25,7 +25,7 @@ class MembershipParametizer
     if db_member.changed?
       form_data['updated_by'] = @current_user.name
       update_role?(db_member)
-      @membership.sync_remote = true
+      @membership.update_remote = true
     end
   end
 
@@ -47,7 +47,7 @@ class MembershipParametizer
     return unless person.changed?
     data_massage
     form_data['person_attributes'] = person_data
-    @membership.sync_remote = true
+    @membership.update_remote = true
   end
 
   def data_massage
