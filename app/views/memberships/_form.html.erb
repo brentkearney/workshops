@@ -62,6 +62,13 @@
 				<%= f.check_box 'share_email', class: "form-control" %>
 				<%= f.label(:share_email, "Allow confirmed members of #{@event.code} to see this e-mail address") %>
 			</div>
+			<div class="col-sm-3">
+				&nbsp;
+			</div>
+			<div class="col-sm-9 share_email">
+				<%= f.check_box 'share_email_hotel', class: "form-control" %>
+				<%= f.label(:share_email_hotel, "Share e-email with hotel") %>
+			</div>
 		</div>
 	</div>
 

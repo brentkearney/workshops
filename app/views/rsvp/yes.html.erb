@@ -159,6 +159,12 @@
                     <p>Allow other members of this event to see your e-mail address</p>
                   <% end %>
                 </div>
+                <div class="form-inline inline-checkbox">
+                  <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
+                    <%= m.check_box :share_email_hotel, { class: "form-control checkbox" }, false %>
+                    <p>Share your e-mail address with the hotel, for quality feedback and marketing.</p>
+                  <% end %>
+                </div>
               </div>
               <div class="form-group">
                 <%= p.label :url, 'Website (URL) - use "http://..."' %>

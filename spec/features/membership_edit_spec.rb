@@ -32,6 +32,7 @@ describe 'Membership#edit', type: :feature do
     fill_in 'membership_person_attributes_lastname', with: 'Jackson'
     fill_in 'membership_person_attributes_email', with: 'sam@jackson.edu'
     uncheck 'membership_share_email'
+    check 'membership_share_email_hotel'
     fill_in 'membership_person_attributes_url', with: 'http://sam.i.am'
     fill_in 'membership_person_attributes_affiliation', with: 'Hollywood'
     fill_in 'membership_person_attributes_department', with: 'Movies'
@@ -496,7 +497,6 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'updates legacy database with changes' do
-      lc = FakeLegacyConnector.new
       allow(SyncMembershipJob).to receive(:perform_later)
 
       fill_in :membership_staff_notes, with: 'Testing notes'
