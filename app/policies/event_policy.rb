@@ -22,13 +22,16 @@ class EventPolicy
     end
   end
 
-  # Only staff can see template events, at their location
+  # Only staff can see template events at their location
   class Scope < Struct.new(:current_user, :model)
     def resolve
-      if current_user && current_user.is_admin?
-        model.all.order(:start_date)
-      elsif current_user && current_user.staff?
-        model.where(location: current_user.location).order(:start_date)
+      if current_user && (current_user.staff? || current_user.admin?)
+        return model.all.order(:start_date) if current_user.is_admin?
+
+        location = current_user.location
+        model.where
+             .not('(template = ? AND location != ?)', true, location)
+             .order(:start_date)
       else
         model.where(template: false).order(:start_date)
       end

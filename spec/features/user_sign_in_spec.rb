@@ -112,7 +112,7 @@ describe 'SignIn', type: :feature do
     expect(current_path).to eq(welcome_path)
   end
 
-  it 'Forwards users with no current events to My Events' do
+  it 'Forwards users with no current events to Future Events' do
     @user.member!
     @user.person.memberships.destroy_all
     event = create(:event, past: true)
@@ -123,7 +123,7 @@ describe 'SignIn', type: :feature do
     fill_in_form
 
     expect(page.body).to have_text('Signed in successfully')
-    expect(current_path).to eq(my_events_path)
+    expect(current_path).to eq(events_future_path)
   end
 end
 

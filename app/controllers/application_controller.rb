@@ -53,7 +53,8 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#{policy_name}.#{exception.query}",
                           scope: 'pundit', default: :default
 
-        redirect_to (request.referrer || my_events_path)
+        redirect_to request.referrer and return unless request.referrer.nil?
+        redirect_to my_events_path and return
       end
       format.json { head 403 }
     end

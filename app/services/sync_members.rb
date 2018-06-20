@@ -276,7 +276,7 @@ class SyncMembers
 
   def save_person(person)
     person.member_import = true
-    if person.save
+    if person.valid? && person.save
       unless person.previous_changes.empty?
         Rails.logger.info "\n\n* Saved #{@event.code} person: #{person.name}\n"
       end

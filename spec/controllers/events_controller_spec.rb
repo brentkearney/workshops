@@ -16,6 +16,7 @@ RSpec.describe EventsController, type: :controller do
     @future_event = create(:event, future: true)
   end
 
+
   describe '#index' do
     it 'responds with success code' do
       get :index
@@ -73,20 +74,13 @@ RSpec.describe EventsController, type: :controller do
           user.save
         end
 
-        it "@events includes only events at the user's location" do
-          org_loc = @event.location
-          @event.location = user.location
-          @event.save
-
+        it "@events includes all events" do
           get :index
 
-          expect(assigns(:events)).to match_array(@event)
-
-          @event.location = org_loc
-          @event.save
+          expect(assigns(:events)).to eq([@past_event, @event, @future_event])
         end
 
-        it "@events includes template events" do
+        it "@events includes template events at user's location" do
           org_loc = @event.location
           @event.location = user.location
           @event.template = true
@@ -94,7 +88,7 @@ RSpec.describe EventsController, type: :controller do
 
           get :index
 
-          expect(assigns(:events)).to match_array(@event)
+          expect(assigns(:events)).to include(@event)
 
           @event.location = org_loc
           @event.template = false
@@ -108,7 +102,7 @@ RSpec.describe EventsController, type: :controller do
 
           get :index
 
-          expect(assigns(:events)).to be_empty
+          expect(assigns(:events)).not_to include(@event)
 
           @event.template = false
           @event.save
@@ -261,12 +255,12 @@ RSpec.describe EventsController, type: :controller do
         expect(assigns(:events)).to eq([@past_event, @event])
       end
 
-      it "staff: @events includes only events at the user's location" do
+      it "staff: @events includes all past events" do
         user.staff!
 
         get :past
 
-        expect(assigns(:events)).to match_array(@past_event)
+        expect(assigns(:events)).to eq([@past_event, @event])
       end
 
       it "admin: @events includes all past events" do
@@ -323,18 +317,12 @@ RSpec.describe EventsController, type: :controller do
         expect(assigns(:events)).to match_array([@event, @future_event])
       end
 
-      it "staff: @events includes only events at the user's location" do
-        user.staff!
-        org_loc = @event.location
-        @event.location = user.location
-        @event.save
+      it "staff: @events includes all future events" do
+        user.member!
 
         get :future
 
-        expect(assigns(:events)).to match_array([@event])
-
-        @event.location = org_loc
-        @event.save
+        expect(assigns(:events)).to match_array([@event, @future_event])
       end
 
       it "admin: @events includes all future events" do

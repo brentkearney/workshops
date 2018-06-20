@@ -59,12 +59,12 @@ RSpec.describe WelcomeController, type: :controller do
           expect(assigns(:memberships)).to match_array([@membership])
         end
 
-        it 'redirects to my_events_path if user has no memberships' do
+        it 'redirects to events_future_path if user has no memberships' do
           person.memberships.delete_all
 
           get :index
 
-          expect(response).to redirect_to(my_events_path)
+          expect(response).to redirect_to(events_future_path)
         end
 
         it 'excludes past events from memberships list' do
@@ -176,12 +176,14 @@ RSpec.describe WelcomeController, type: :controller do
       end
 
       context ':staff' do
-          it 'redirects to future events' do
-            user.staff!
+          it 'redirects to future events at user location' do
+            user.role = :staff
+            user.location = 'EO'
+            user.save
 
             get :index
 
-            expect(response).to redirect_to(events_future_path)
+            expect(response).to redirect_to(events_future_path(user.location))
           end
       end
 

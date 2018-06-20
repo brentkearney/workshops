@@ -19,10 +19,10 @@ class EventsController < ApplicationController
     @events = policy_scope(Event)
   end
 
-  # Get /events/mine
+  # Get /events/my_events
   def my_events
     @events = current_user.person.events.order(:start_date)
-    render :index
+    render :index unless performed?
   end
 
   # GET /events/past
@@ -30,7 +30,7 @@ class EventsController < ApplicationController
   def past
     @events = policy_scope(Event).past.reverse_order
     remove_locations
-    render :index
+    render :index unless performed?
   end
 
   # GET /events/future(/location/:location)
@@ -38,7 +38,7 @@ class EventsController < ApplicationController
   def future
     @events = policy_scope(Event).future
     remove_locations
-    render :index
+    render :index unless performed?
   end
 
   # GET /events/year/:year
@@ -48,7 +48,7 @@ class EventsController < ApplicationController
     if year =~ /^\d{4}$/
       @events = policy_scope(Event).year(year)
       remove_locations
-      render :index
+      render :index unless performed?
     else
       redirect_to events_path
     end
@@ -62,7 +62,7 @@ class EventsController < ApplicationController
       location = Setting.Locations.keys.first
     end
     @events = Event.location(location).order(:start_date)
-    render :index
+    render :index unless performed?
   end
 
   # GET /events/kind/:kind
@@ -77,7 +77,7 @@ class EventsController < ApplicationController
     end
 
     @events = policy_scope(Event).kind(kind)
-    render :index
+    render :index unless performed?
   end
 
   # GET /events/1
