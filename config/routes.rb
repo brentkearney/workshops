@@ -71,6 +71,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Maillists
+  post "/maillist" => "griddler/emails#create"
+
   # Broken Android icon requests
   get '/android-icon-192x192.png', to: redirect('/icons/android-icon-192x192.png')
   get '/android-icon-144x144.png', to: redirect('/icons/android-icon-144x144.png')
