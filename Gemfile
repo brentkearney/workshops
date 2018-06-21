@@ -34,6 +34,7 @@ group :development, :test do
   gem 'spring'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+  gem 'ed25519'
 end
 
 group :test do
