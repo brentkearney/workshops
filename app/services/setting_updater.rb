@@ -120,8 +120,11 @@ class SettingUpdater
   def create_empty_setting(section_settings)
     empty_fields = {}
     unless section_settings.keys.empty?
-      section_settings[section_settings.keys.first].each do |key, value|
-        empty_fields[key] = ''
+      section = section_settings[section_settings.keys.first]
+      unless section.blank?
+        section.each do |key, value|
+          empty_fields[key] = ''
+        end
       end
     end
     empty_fields

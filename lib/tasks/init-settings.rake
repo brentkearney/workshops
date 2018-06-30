@@ -49,7 +49,8 @@ namespace :ws do
         'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'],
         'rsvp_expiry' => '2.weeks',
         'LECTURES_API_KEY' => 'Example-ChangeMe',
-        'EVENTS_API_KEY' => 'Example-ChangeMe'
+        'EVENTS_API_KEY' => 'Example-ChangeMe',
+        'SPARKPOST_AUTH_TOKEN' => 'Example-ChangeMe'
       }
     end
 
