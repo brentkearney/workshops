@@ -31,4 +31,8 @@ class Griddler::WsEmailsController < Griddler::EmailsController
   def unavailable
     render nothing: true, status: :service_unavailable
   end
+
+  def is_ok
+    render nothing: true, status: :ok
+  end
 end
