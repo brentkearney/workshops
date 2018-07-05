@@ -1,17 +1,18 @@
-class Griddler::EmailsController < ActionController::Base
+class Griddler::WsEmailsController < Griddler::EmailsController
   skip_before_filter :verify_authenticity_token
   protect_from_forgery with: :null_session
   before_filter :parse_request, :authenticate_user_from_token!
   respond_to :json
 
+  private
   def authenticate_user_from_token!
     @authenticated = false
-    unauthorized && return if @json['auth_token'].blank?
+    unauthorized && return if @auth_token.blank?
 
-    local_auth = Setting.Site['SPARKPOST_AUTH_TOKEN']
+    local_auth = GetSetting.site_setting('SPARKPOST_AUTH_TOKEN')
     unavailable && return if local_auth.blank?
 
-    if Devise.secure_compare(local_auth, @json['auth_token'])
+    if Devise.secure_compare(local_auth, @auth_token)
       @authenticated = true
     else
       unauthorized
@@ -20,6 +21,7 @@ class Griddler::EmailsController < ActionController::Base
 
   def parse_request
     @json = JSON.parse(request.body.read)
+    @auth_token = request.headers['HTTP_X_MESSAGESYSTEMS_WEBHOOK_TOKEN']
   end
 
   def unauthorized
