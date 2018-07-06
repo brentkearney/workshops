@@ -7,7 +7,7 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   def incoming
     if params['_json'][0]['msys'].empty? || params['_json'][0]['msys']['message_event'] != nil
       msg = "Received POST on Workshops /maillist interface:\n\n #{params.inspect}"
-      StaffMailer.notify_sysadmin(nil, msg).deliver_now
+      StaffMailer.incoming_mail_event(msg).deliver_now
       is_ok
     else
       create && return

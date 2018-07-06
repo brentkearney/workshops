@@ -110,4 +110,11 @@ class StaffMailer < ApplicationMailer
     subject = "[#{@membership.event.code}] Failed RSVP save"
     mail(to: to_email, cc: cc_email, subject: subject)
   end
+
+  def incoming_mail_event(message)
+    to_email = GetSetting.site_email('sysadmin_email')
+    subject = 'Workshops: incoming message event notice'
+    @message = message
+    mail(to: to_email, subject: subject, template_name: 'notify_sysadmin')
+  end
 end
