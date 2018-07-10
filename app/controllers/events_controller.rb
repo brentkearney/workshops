@@ -87,7 +87,8 @@ class EventsController < ApplicationController
       authorize(@event) # only staff see template events
       @organizers = []
       @members = []
-      @event.memberships.order('role asc').includes(:person).each do |member|
+      @event.memberships.order('role asc')
+            .includes(:person).order('people.lastname').each do |member|
         if member.role =~ /Organizer/
           @organizers << @event.member_info(member.person)
         end
