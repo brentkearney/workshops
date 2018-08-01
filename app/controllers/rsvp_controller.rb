@@ -46,8 +46,7 @@ class RsvpController < ApplicationController
       unless message.blank?
         EmailSiteFeedbackJob.perform_later('RSVP', membership.id, message)
       end
-      redirect_to event_memberships_path(membership.event),
-        success: 'Thanks for the feedback!'
+      redirect_to membership.event.url, success: 'Thanks for the feedback!'
     end
   end
 

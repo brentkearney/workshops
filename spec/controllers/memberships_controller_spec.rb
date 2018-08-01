@@ -15,24 +15,19 @@ RSpec.describe MembershipsController, type: :controller do
     end
 
     describe '#index' do
-      it 'responds with success code' do
+      it 'redirects to login screen' do
         get :index, event_id: @event.id
 
-        expect(response).to be_success
-      end
-
-      it 'assigns @memberships to event members' do
-        get :index, event_id: @event.id
-
-        expect(assigns(:memberships)).to eq('Confirmed' => [@membership])
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
     describe '#show' do
-      it 'assigns @membership' do
+      it 'redirects to login screen' do
         get :show, event_id: @event.id, id: @membership.id
 
-        expect(assigns(:membership)).to eq(@membership)
+        # expect(assigns(:membership)).to eq(@membership)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 

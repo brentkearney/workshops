@@ -175,7 +175,7 @@ RSpec.describe RsvpController, type: :controller do
     it 'forwards to event membership page' do
       post :feedback, { membership_id: @membership.id, feedback_message: 'Hi' }
 
-      expect(response).to redirect_to(event_memberships_path(@membership.event))
+      expect(response).to redirect_to(@membership.event.url)
     end
   end
 end
