@@ -116,7 +116,7 @@
             <p><%= @rsvp.personal_info_intro %></p>
               <div class="form-group">
                 <%= p.label :salutation %>
-                <%= p.select :salutation, Setting.Site['salutations'], { include_blank: 'Please select' }, class: "form-control", autocomplete: "honorific-prefix" %>
+                <%= p.select :salutation, GetSetting.site_setting('salutations'), { include_blank: 'Please select' }, class: "form-control", autocomplete: "honorific-prefix" %>
               </div>
               <div class="form-group">
                 <%= p.label :firstname, class: "mandatory" %>
@@ -144,7 +144,7 @@
               </div>
               <div class="form-group">
                 <%= p.label :academic_status, class: "mandatory" %>
-                <%= p.select :academic_status, Setting.Site['academic_status'], { include_blank: 'Please select' }, class: "form-control" %>
+                <%= p.select :academic_status, GetSetting.site_setting('academic_status'), { include_blank: 'Please select' }, class: "form-control" %>
               </div>
               <div class="form-group">
                 <%= p.label :phd_year, 'Year of first Ph.D.' %>
@@ -212,8 +212,35 @@
                 <%= p.label :research_areas %>
                 <%= p.text_field :research_areas, class: "form-control", placeholder: 'An optional comma-separated list of your areas of research (tags)' %>
               </div>
+          </div><! -- col-md-12 -->
+        </div><!-- row -->
+        <div class="row" id="canadian-grants">
+          <div class="col-md-12">
+            <h2 class="rsvp-section midpage">Canadian Research Grants</h2>
+            <p>The Canadian Natural Sciences and Engineering Research Council (NSERC) is now asking institutions who apply for grants to <em>prove</em> that they are <em>interdisciplinary</em>. NSERC's grants are critical to the survival of BIRS, so we ask that, if you hold an NSERC, CIHR or SSHRC grant, to please select the Evaluation Group that your grant belongs to, from the form below.
+            </p>
+            <p><strong>If you do not hold an NSERC, CIHR or SSHRC grant</strong>, please do not select anything.</p>
+            <h4>NSERC Evaluation Groups:</h4>
+            <div class='form-group'>
+              <select class="form-control" name="rsvp[person][grant_id]" id="rsvp_person_grant_id">
+                <option value="">Select the NSERC Evaluation Group for your grant (if applicable)</option>
+                <option value="1501">1501 - Genes, Cells and Molecules</option>
+                <option value="1502">1502 - Biological Systems and Functions</option>
+                <option value="1503">1503 - Evolution and Ecology</option>
+                <option value="1504">1504 - Chemistry</option>
+                <option value="1505">1505 - Physics</option>
+                <option value="1506">1506 - Geosciences</option>
+                <option value="1507">1507 - Computer Science</option>
+                <option value="1508">1508 - Mathematics and Statistics</option>
+                <option value="1509">1509 - Civil, Industrial and Systems Engineering</option>
+                <option value="1510">1510 - Electrical and Computer Engineering</option>
+                <option value="1511">1511 - Materials and Chemical Engineering</option>
+                <option value="1512">1512 - Mechanical Engineering</option>
+              </select>
+            </div>
+            <p>A comprehensive table of the Research Topics under each Evaluation Group can be found <a href="http://www.nserc-crsng.gc.ca/Professors-Professeurs/Grants-Subs/DGPList-PSDListe_eng.asp" target="_new">here</a>. Thank you.</p>
           </div>
-        </div>
+        </div><!-- row id="canadian-grants" -->
         <% end %>
 
         <% unless @rsvp.membership.role == 'Contact Organizer' %>

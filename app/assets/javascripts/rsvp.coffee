@@ -30,4 +30,13 @@ $(document).on 'turbolinks:load', ->
     $('#departure_date').val(e.date.format('YYYY-MM-DD'));
 
   $('#rsvp_membership_has_guest').change ->
-    $('#guest_disclaimer').toggleClass('mandatory')
+    $('#guest_disclaimer').toggleClass('mandatory');
+
+  if $('#rsvp_person_country').val().toLowerCase() != 'canada'
+    $('#canadian-grants').hide();
+
+  $('#rsvp_person_country').change ->
+    if $('#rsvp_person_country').val().toLowerCase() == 'canada'
+      $('#canadian-grants').show();
+    else
+      $('#canadian-grants').hide();
