@@ -86,3 +86,10 @@ h3#membership, h3#hotel {
     margin: 0.5em;
   }
 }
+
+@media print {
+    .no-print { display:none }
+    a[href]:after {
+      content: none !important;
+    }
+}
