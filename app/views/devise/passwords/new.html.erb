@@ -1,7 +1,7 @@
 <div class="authform">
   <%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :post, :role => 'form'}) do |f| %>
-      <h3>Forgot your password?</h3>
-      <p>We'll send you a password reset link.</p>
+      <h3>Password Reset</h3>
+      <p>Enter your email address:</p>
       <%= devise_error_messages! %>
       <div class="well well-sm ">
         <%= f.label :email %>
@@ -11,4 +11,9 @@
       <%= f.submit 'Reset Password', :class => 'button right' %>
       </div>
   <% end %>
+</div>
+<div class="row">
+  <div class="col-lg-4">
+    <p class="sign-in-links">Are you sure you registered an account here?<br>If not, <%= link_to 'Sign-up here', new_registration_path(resource_name), class: 'right' %>.</p>
+  </div>
 </div>

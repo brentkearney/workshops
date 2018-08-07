@@ -19,8 +19,10 @@
       </div>
       <%= f.submit 'Sign up', :class => 'button right' %>
   <% end %>
-  <p>Have you already signed up here? <%= link_to 'Click here to sign in', sign_in_path %></p>
 </div>
-
-
+<div class="row">
+  <div class="col-lg-4">
+    <p class="sign-in-links">Have you already setup this account?<br><%= link_to 'Click here to sign-in', sign_in_path %>.</p>
+  </div>
+</div>
 
