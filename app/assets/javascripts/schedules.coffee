@@ -1,4 +1,7 @@
 $(document).on 'turbolinks:load', ->
+  if (!($(".schedules").length > 0))
+    return;
+
   if $('#earliest_hour').length > 0
     ehour = parseInt( $('#earliest_hour').val(), 10 )
     $('#schedule_start_time_4i option:lt(' + ehour + ')').remove()

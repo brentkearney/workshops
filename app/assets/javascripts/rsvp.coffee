@@ -1,4 +1,7 @@
 $(document).on 'turbolinks:load', ->
+  if (!($(".rsvp").length > 0))
+    return;
+
   arrival_date = $('#arrival_date').val()
   arrival_date or= $('#min_date').val()
 
