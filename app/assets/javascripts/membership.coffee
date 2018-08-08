@@ -1,4 +1,6 @@
 $(document).on 'turbolinks:load', ->
+  return unless $('.memberships').length > 0
+
   arrival_date = $('#arrival_date').val()
   arrival_date or= $('#min_date').val()
 

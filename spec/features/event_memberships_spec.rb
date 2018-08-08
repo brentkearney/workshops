@@ -69,8 +69,8 @@ describe 'Event Membership Page', type: :feature do
       visit event_memberships_path(@event)
     end
 
-    it 'shows a list of confirmed participants' do
-      shows_confirmed_members
+    it 'does not show a list of confirmed participants' do
+      does_not_list_members
     end
 
     it 'does not show member email addresses' do
@@ -81,10 +81,6 @@ describe 'Event Membership Page', type: :feature do
 
     it 'hides email buttons' do
       hides_email_buttons
-    end
-
-    it "has links to Confirmed participants' profiles" do
-      links_to_confirmed_member_profiles
     end
   end
 

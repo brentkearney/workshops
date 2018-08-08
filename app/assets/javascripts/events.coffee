@@ -1,4 +1,6 @@
 $(document).on 'turbolinks:load', ->
+  return unless $('.events').length > 0
+
   if $("body.events.edit").length > 0
     $('#start_date').datetimepicker({
       format: 'YYYY-MM-DD'

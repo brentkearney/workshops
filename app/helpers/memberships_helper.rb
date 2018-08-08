@@ -63,6 +63,10 @@ module MembershipsHelper
     end
   end
 
+  def print_section?(section)
+    return ' no-print' unless section == 'Confirmed'
+  end
+
   def show_invited_by?
     invited_by = ''
     if @membership.attendance == 'Invited'
@@ -82,20 +86,20 @@ module MembershipsHelper
     column = ''
     if policy(@event).view_email_addresses?
       if member.shares_email?
-        column = '<td class="hidden-md hidden-lg rowlink-skip" align="middle">' +
+        column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
           mail_to(member.person.email, '<span class="glyphicon glyphicon-envelope"></span>'.html_safe, :title => "#{member.person.email}", subject: "[#{@event.code}] ") +
-          '</td><td class="hidden-xs hidden-sm rowlink-skip">' +
+          '</td><td class="hidden-xs hidden-sm rowlink-skip no-print">' +
           mail_to(member.person.email, member.person.email, subject: "[#{@event.code}] ") +
           '</td>'
       else
         if policy(@event).use_email_addresses?
-          column = '<td class="hidden-md hidden-lg rowlink-skip" align="middle">' +
+          column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
             mail_to(member.person.email, '<span class="glyphicon glyphicon-lock"></span>'.html_safe, :title => "E-mail not shared with other members", subject: "[#{@event.code}] ") +
-            '</td><td class="hidden-xs hidden-sm rowlink-skip">' +
+            '</td><td class="hidden-xs hidden-sm rowlink-skip no-print">' +
             mail_to(member.person.email, '[not shared]', :title => "E-mail not shared with other members", subject: "[#{@event.code}] ") +
             '</td>'
         else
-          column = '<td class="hidden-md hidden-lg rowlink-skip" align="middle">' +
+          column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
             '<a title="E-mail not shared" class="glyphicon glyphicon-lock"></a></td>' +
             '<td class="hidden-xs hidden-sm rowlink-skip">[not shared]</td>'
         end

@@ -21,6 +21,10 @@ label {
   margin-top: 5px;
 }
 
+#unique-notice {
+  font-size: 0.9em;
+}
+
 #invitation-error {
   h3 {
     margin-top: 0;
@@ -109,6 +113,17 @@ label {
     td {
       padding-left: 8px;
     }
+  }
+}
+
+#canadian-grants {
+  h4 {
+    color: $grey-heading;
+  }
+  p {
+    font-size: 1.2em;
+    line-height: 1.5em;
+    margin-left: 15px;
   }
 }
 

@@ -5,12 +5,15 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RsvpController < ApplicationController
-  before_filter :set_invitation, except: [:feedback]
+  before_filter :set_invitation, except: [:canadian_grants, :feedback]
   before_filter :after_selection, only: %i[yes no maybe]
 
   # GET /rsvp/:otp
   def index
-    @event = @invitation.event
+    unless @invitation.event.nil?
+      @inv_event = @invitation.event
+      @pc_email = GetSetting.email(@inv_event.location, 'program_coordinator')
+    end
   end
 
   # GET /rsvp/yes/:otp
@@ -40,24 +43,28 @@ class RsvpController < ApplicationController
   # GET /rsvp/feedback
   # POST /rsvp/feedback
   def feedback
-    if request.post?
-      membership = Membership.find_by_id(feedback_params[:membership_id])
-      message = feedback_params[:feedback_message]
-      unless message.blank?
-        EmailSiteFeedbackJob.perform_later('RSVP', membership.id, message)
-      end
-      redirect_to event_memberships_path(membership.event),
-        success: 'Thanks for the feedback!'
+    return unless request.post?
+    membership = Membership.find_by_id(feedback_params[:membership_id])
+    message = feedback_params[:feedback_message]
+    unless message.blank?
+      EmailSiteFeedbackJob.perform_later('RSVP', membership.id, message)
     end
+    redirect_to post_feedback_url(membership),
+                success: 'Thanks for the feedback!'
   end
 
   private
+
+  def post_feedback_url(membership)
+    return membership.event.url if Rails.env.production?
+    event_memberships_path(membership.event_id)
+  end
 
   def set_organizer_message
     if params[:rsvp].blank?
       @organizer_message = ''
     else
-      @organizer_message =  message_params['organizer_message']
+      @organizer_message = message_params['organizer_message']
     end
   end
 
@@ -69,9 +76,11 @@ class RsvpController < ApplicationController
 
   def update_and_redirect(rsvp:)
     @invitation.organizer_message = @organizer_message
+    membership = @invitation.membership
     @invitation.send(rsvp)
-    redirect_to rsvp_feedback_path(@invitation.membership_id), success: 'Your
-      attendance status was successfully updated. Thanks for your reply!'.squish
+
+    redirect_to rsvp_feedback_path(membership.id), success: 'Your attendance
+      status was successfully updated. Thanks for your reply!'.squish
   end
 
   def set_invitation
@@ -107,12 +116,12 @@ class RsvpController < ApplicationController
     params.require(:rsvp).permit(
       membership: [:arrival_date, :departure_date,
         :own_accommodation, :has_guest, :guest_disclaimer, :special_info,
-        :share_email],
+        :share_email, :share_email_hotel],
       person: [:salutation, :firstname, :lastname, :gender,
         :affiliation, :department, :title, :academic_status, :phd_year, :email,
         :url, :phone, :address1, :address2, :address3, :city, :region,
         :postal_code, :country, :emergency_contact, :emergency_phone,
-        :biography, :research_areas],
+        :biography, :research_areas, :grant_id],
     )
   end
 end

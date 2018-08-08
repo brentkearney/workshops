@@ -452,15 +452,6 @@ describe 'RSVP', type: :feature do
         .with('RSVP', @invitation.membership.id, 'Testing feedback form')
     end
 
-    it 'forwards to event membership page, with flash message' do
-      fill_in_feedback_from('Test')
-
-      url = event_memberships_path(@invitation.membership.event)
-      expect(current_path).to eq(url)
-      expect(page.body).to have_css('div.alert.alert-success.flash',
-        text: 'Thanks for the feedback!')
-    end
-
     it 'does not send email if no text is entered' do
       fill_in_feedback_from('')
       expect(EmailSiteFeedbackJob).not_to have_received(:perform_later)

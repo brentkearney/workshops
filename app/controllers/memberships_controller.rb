@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class MembershipsController < ApplicationController
-  before_filter :authenticate_user!, except: [:index, :show]
+  before_filter :authenticate_user!
   before_action :set_event, :set_user
   before_action :set_membership, only: [:show, :edit, :update, :destroy, :invite]
 

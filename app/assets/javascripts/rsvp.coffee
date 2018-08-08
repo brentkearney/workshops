@@ -1,4 +1,6 @@
 $(document).on 'turbolinks:load', ->
+  return unless $('.rsvp').length > 0
+
   arrival_date = $('#arrival_date').val()
   arrival_date or= $('#min_date').val()
 
@@ -30,4 +32,13 @@ $(document).on 'turbolinks:load', ->
     $('#departure_date').val(e.date.format('YYYY-MM-DD'));
 
   $('#rsvp_membership_has_guest').change ->
-    $('#guest_disclaimer').toggleClass('mandatory')
+    $('#guest_disclaimer').toggleClass('mandatory');
+
+  if $('#rsvp_person_country').val().toLowerCase() != 'canada'
+    $('#canadian-grants').hide();
+
+  $('#rsvp_person_country').change ->
+    if $('#rsvp_person_country').val().toLowerCase() == 'canada'
+      $('#canadian-grants').show();
+    else
+      $('#canadian-grants').hide();

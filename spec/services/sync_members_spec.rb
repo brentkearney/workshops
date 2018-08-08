@@ -390,6 +390,14 @@ describe "SyncMembers" do
 
       expect(Event.find(@eventm.id).memberships).not_to include(new_member)
     end
+
+    it 'removes associated Invitations' do
+      new_member = create(:membership, event: @eventm)
+      invite = create(:invitation, membership: new_member)
+
+      @sm.prune_members
+      expect(Invitation.find_by_id(invite.id)).to be_nil
+    end
   end
 
   describe '.check_max_participants' do

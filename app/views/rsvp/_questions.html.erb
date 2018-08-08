@@ -7,10 +7,15 @@
   <div class="row">
     <div class='col-md-12'>
         <p class='lead text-center'>You have been invited to the
-        <%= @event.event_type %>, <%= @event.code %>:
-        "<%= @event.name %>", on
-        <%= @event.dates(:long) %>.
+        <%= @inv_event.event_type %>, <%= @inv_event.code %>:
+        "<%= @inv_event.name %>", on
+        <%= @inv_event.dates(:long) %>.
         Will you attend?</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class='col-md-12'>
+      <p id="unique-notice">Note: if you are <strong>not</strong> <%= @invitation.membership.person.name %>, then please do not proceed. Invitation links are specific to each individual. To request your own invitation link, <%= link_to('go here', invitations_new_path) %>, or contact the Program Coordinator at <a href="mailto:<%= @pc_email %>?subject=[<%= @inv_event.code %>] invitation request"><%= @pc_email %></a>.</p>
     </div>
   </div>
   <div class="jumbotron">

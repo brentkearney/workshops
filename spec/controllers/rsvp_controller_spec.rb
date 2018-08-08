@@ -163,7 +163,6 @@ RSpec.describe RsvpController, type: :controller do
     end
   end
 
-
   describe 'GET #feedback' do
     it 'renders feedback template' do
       get :feedback, { membership_id: @membership.id }
@@ -172,10 +171,20 @@ RSpec.describe RsvpController, type: :controller do
   end
 
   describe 'POST #feedback' do
-    it 'forwards to event membership page' do
+    it 'forwards to event memberships page' do
       post :feedback, { membership_id: @membership.id, feedback_message: 'Hi' }
 
-      expect(response).to redirect_to(event_memberships_path(@membership.event))
+      expect(response).to redirect_to(event_memberships_path(@membership.event_id))
+    end
+  end
+
+  describe 'POST #feedback in production mode' do
+    before { allow(Rails.env).to receive(:production?).and_return(true) }
+
+    it 'forwards to event home page' do
+      post :feedback, { membership_id: @membership.id, feedback_message: 'Hi' }
+
+      expect(response).to redirect_to(@membership.event.url)
     end
   end
 end
