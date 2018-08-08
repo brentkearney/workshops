@@ -1,6 +1,5 @@
 $(document).on 'turbolinks:load', ->
-  if (!($(".events").length > 0))
-    return;
+  return unless $('.events').length > 0
 
   if $("body.events.edit").length > 0
     $('#start_date').datetimepicker({

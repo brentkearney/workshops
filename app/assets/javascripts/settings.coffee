@@ -1,6 +1,5 @@
 $(document).on 'turbolinks:load', ->
-  if (!($(".settings").length > 0))
-    return;
+  return unless ($(".settings").length > 0)
 
   $('.nav-tabs a').click (e) ->
     $('div.tab-pane').removeClass('active')

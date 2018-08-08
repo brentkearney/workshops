@@ -1,6 +1,5 @@
 $(document).on 'turbolinks:load', ->
-  if (!($(".schedules").length > 0))
-    return;
+  return unless $('.schedule').length > 0
 
   if $('#earliest_hour').length > 0
     ehour = parseInt( $('#earliest_hour').val(), 10 )
