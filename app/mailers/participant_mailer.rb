@@ -19,8 +19,6 @@
 # SOFTWARE.
 
 class ParticipantMailer < ApplicationMailer
-  self.delivery_method = :sparkpost if Rails.env.production?
-
   def rsvp_confirmation(membership)
     @person = membership.person
     @event = membership.event

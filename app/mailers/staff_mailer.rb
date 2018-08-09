@@ -22,6 +22,7 @@
 class StaffMailer < ApplicationMailer
   app_email = GetSetting.site_email('application_email')
   default from: app_email
+  self.delivery_method = :smtp
 
   def schedule_change(args)
     @event = Event.find_by_id(args[:event_id])

@@ -81,7 +81,7 @@ Rails.application.configure do
 
   ## SMTP Settings
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.delivery_method = :sparkpost
   config.action_mailer.smtp_settings = {
     address:              ENV['EMAIL_SERVER'],
     port:                 ENV['EMAIL_PORT'],
