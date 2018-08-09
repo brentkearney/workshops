@@ -19,39 +19,42 @@
 # SOFTWARE.
 
 class WsDeviseMailer < Devise::Mailer
-  # include Devise::Mailers::Helpers
+  include Devise::Mailers::Helpers
   default template_path: 'devise/mailer' # to make sure that your mailer uses the devise views
-
   self.delivery_method = :sparkpost #if Rails.env.production?
-  @@webmaster = GetSetting.site_email('application_email')
 
   def confirmation_instructions(record, token, opts={})
-    opts[:from] = @@webmaster
-    opts[:reply_to] = @@webmaster
+    webmaster = GetSetting.site_email('application_email')
+    opts[:from] = webmaster
+    opts[:reply_to] = webmaster
     super
   end
 
   def reset_password_instructions(record, token, opts={})
-    opts[:from] = @@webmaster
-    opts[:reply_to] = @@webmaster
+    webmaster = GetSetting.site_email('application_email')
+    opts[:from] = webmaster
+    opts[:reply_to] = webmaster
     super
   end
 
   def unlock_instructions(record, token, opts={})
-    opts[:from] = @@webmaster
-    opts[:reply_to] = @@webmaster
+    webmaster = GetSetting.site_email('application_email')
+    opts[:from] = webmaster
+    opts[:reply_to] = webmaster
     super
   end
 
   def email_changed(record, opts={})
-    opts[:from] = @@webmaster
-    opts[:reply_to] = @@webmaster
+    webmaster = GetSetting.site_email('application_email')
+    opts[:from] = webmaster
+    opts[:reply_to] = webmaster
     super
   end
 
   def password_change(record, opts={})
-    opts[:from] = @@webmaster
-    opts[:reply_to] = @@webmaster
+    webmaster = GetSetting.site_email('application_email')
+    opts[:from] = webmaster
+    opts[:reply_to] = webmaster
     super
   end
 end
