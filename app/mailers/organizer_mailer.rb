@@ -20,8 +20,6 @@
 
 # Email notices for the workshop organizer
 class OrganizerMailer < ApplicationMailer
-  self.delivery_method = :sparkpost if Rails.env.production?
-
   def rsvp_notice(membership, args)
     old_attendance = args['attendance_was'] || 'Invited'
     new_attendance = args['attendance'] || 'Invited'

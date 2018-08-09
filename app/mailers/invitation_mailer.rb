@@ -19,8 +19,6 @@
 # SOFTWARE.
 
 class InvitationMailer < ApplicationMailer
-  self.delivery_method = :sparkpost if Rails.env.production?
-
   def invite(invitation)
     person = invitation.membership.person
     event = invitation.membership.event
