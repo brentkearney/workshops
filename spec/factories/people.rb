@@ -11,14 +11,14 @@ FactoryBot.define do
   factory :person do |f|
     f.firstname
     f.lastname
-    f.salutation 'Prof.'
-    f.gender %w[M F].sample
+    f.salutation { 'Prof.' }
+    f.gender { %w[M F].sample }
     f.email
     f.url { Faker::Internet.url }
     f.phone { Faker::PhoneNumber.phone_number }
     f.affiliation { Faker::University.name }
     f.department { Faker::Commerce.department }
-    f.academic_status 'Professor'
+    f.academic_status { 'Professor' }
     f.address1 { Faker::Address.street_address }
     f.city { Faker::Address.city }
     f.postal_code { Faker::Address.postcode }
@@ -26,6 +26,6 @@ FactoryBot.define do
     f.legacy_id
     f.biography { Faker::Lorem.paragraph }
     f.research_areas { Faker::Lorem.words(4).join(', ') }
-    f.updated_by 'FactoryBot'
+    f.updated_by { 'FactoryBot' }
   end
 end

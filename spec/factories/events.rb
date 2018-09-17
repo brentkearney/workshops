@@ -26,22 +26,22 @@ FactoryBot.define do
     f.code
     f.name { Faker::Lorem.sentence(4) }
     f.short_name { Faker::Lorem.sentence(1) }
-    f.booking_code 'Booking'
-    f.door_code 1234
+    f.booking_code { 'Booking' }
+    f.door_code { 1234 }
     f.start_date
     f.end_date
-    f.event_type '5 Day Workshop'
-    f.max_participants 42
-    f.location 'EO'
-    f.time_zone 'Mountain Time (US & Canada)'
+    f.event_type { '5 Day Workshop' }
+    f.max_participants { 42 }
+    f.location { 'EO' }
+    f.time_zone { 'Mountain Time (US & Canada)' }
     f.description { Faker::Lorem.sentence(6) }
-    f.updated_by 'FactoryBot'
-    f.template false
+    f.updated_by { 'FactoryBot' }
+    f.template { false }
 
     transient do
-      past    false
-      future  false
-      current false
+      past    { false }
+      future  { false }
+      current { false }
     end
 
     after(:build) do |event, evaluator|
