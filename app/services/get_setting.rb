@@ -122,6 +122,10 @@ class GetSetting
     Setting.Locations[location]['Country']
   end
 
+  def self.default_location
+    Setting.Locations.first.first
+  end
+
   # Emails set in Settings.Site
   def self.site_email(email_setting)
     email = site_setting(email_setting)

@@ -1,7 +1,7 @@
 class Griddler::AuthenticationController < Griddler::EmailsController
   skip_before_filter :verify_authenticity_token, raise: false
-  before_action :authenticate
   protect_from_forgery with: :null_session
+  before_action :authenticate
   respond_to :json
 
   def incoming

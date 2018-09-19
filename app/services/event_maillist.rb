@@ -4,15 +4,23 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# class to receive Griddler::Email object, for workshop mail lists
-class Maillists
+# Receives event code & Griddler:Email object, distribute to confirmed members
+class EventMaillist
   def initialize(email)
     @email = email
+    @event = Event.find(@email.to)
   end
 
-  def process
+  def send
+    recipients = ''
+    @event.confirmed.each do |person|
+      recipients << %Q("#{person.name}" <#{person.email}>, )
+    end
+    recipients.chomp!(', ')
+
     Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-    Rails.logger.debug "EmailProcessor received: #{@email.inspect}"
+    Rails.logger.debug "EventMaillist would send message '#{@email.subject}' to these recipients:\n"
+    Rails.logger.debug "#{recipents}"
     Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
   end
 end
