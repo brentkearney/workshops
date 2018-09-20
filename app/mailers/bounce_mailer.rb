@@ -21,10 +21,10 @@
 # Email bounces back to senders who sent to the wrong email address
 class BounceMailer < ApplicationMailer
   def invalid_event_code(params)
-    @sent_to = params['to']
-    to_email = params['from']
-    subject = 'Bounce notice: ' + params['subject']
-    @body = params['body']
+    @sent_to = params[:to]
+    to_email = params[:from]
+    subject = 'Bounce notice: ' + params[:subject]
+    @email_body = params[:body]
 
     from_email = GetSetting.site_email('webmaster_email')
     @help_email = from_email

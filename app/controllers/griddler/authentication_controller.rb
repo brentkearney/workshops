@@ -5,16 +5,12 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   respond_to :json
 
   def incoming
-    if params['_json'][0]['msys'] != nil
-      msg = "Received POST on Workshops /maillist interface:\n\n #{params.inspect}"
-      StaffMailer.incoming_mail_event(msg).deliver_now
-      is_ok
-    else
-      create && return
-    end
+    Rails.logger.debug "\n\nGriddler::AuthenticationController: authentication checks out!\n\n"
+    create && return
   end
 
   private
+
   def unauthorized
     render nothing: true, status: :unauthorized and return
   end
@@ -28,6 +24,7 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   end
 
   protected
+
   def authenticate
     verify_sparkpost_token || unauthorized
   end

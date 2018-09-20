@@ -253,7 +253,7 @@ class FakeLegacyConnector
   end
 
   def check_rsvp(otp)
-
+    { 'event_code' => Event.last.code }
   end
 
   # successful OTP validation

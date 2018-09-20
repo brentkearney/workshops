@@ -11,16 +11,24 @@ class EmailProcessor
   end
 
   def process
-    EventMaillist.send(@email) if valid_email?
+    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
+    Rails.logger.debug "EmailProcessor received email: '#{@email.subject}'.\n"
+
+    EventMaillist.new(@email).send_message if valid_email?
+    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
   end
 
 
   private
 
   def valid_email?
-    return true if @email.to =~ /#{GetSetting.code_pattern}/ &&
-      Event.find_by_code(@email.to) != nil
+    Rails.logger.debug "... testing validity of #{@email.to}..."
+    recipient = @email.to[0][:token]
+    Rails.logger.debug "Recipient is: #{recipient}"
+    return true if recipient =~ /#{GetSetting.code_pattern}/ &&
+      Event.find_by_code(recipient) != nil
 
+    Rails.logger.debug "NOT VALID! Sending bounce..."
     send_bounce
     return false
   end
@@ -30,9 +38,12 @@ class EmailProcessor
   end
 
   def bad_email_params
+    Rails.logger.debug "bad_email_params():"
+    Rails.logger.debug "to: #{@email.to[0][:token]}"
+    Rails.logger.debug "from: #{@email.from[:full]}"
     {
-      to: @email.headers['To'],
-      from: @email.from,
+      to: @email.to[0][:email],
+      from: @email.from[:full],
       subject: @email.subject,
       body: @email.body
     }

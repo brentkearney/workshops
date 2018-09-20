@@ -44,7 +44,6 @@ class InvitationChecker
   def check_legacy_database
     invitation = nil
     response = LegacyConnector.new.check_rsvp(@otp)
-    Rails.logger.debug "\nLegacy response: #{response.inspect}\n"
 
     @errors.add(:Invitation, response['denied']) if response['denied']
     @errors.add(:Event, 'No event associated') if response['event_code'].blank?

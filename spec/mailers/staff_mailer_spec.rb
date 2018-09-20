@@ -12,6 +12,7 @@ RSpec.describe StaffMailer, type: :mailer do
     @sysadmin_email = GetSetting.site_email('sysadmin_email')
     expect(@sysadmin_email).not_to be_nil
     @event = create(:event, code: '15w6661')
+
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.deliveries.clear

@@ -8,11 +8,11 @@
 class EventMaillist
   def initialize(email)
     @email = email
-    @event = Event.find(@email.to)
+    @event = Event.find(@email.to[0][:token])
   end
 
-  def send
-    recipients = ''
+  def send_message
+    recipients = []
     @event.confirmed.each do |person|
       recipients << %Q("#{person.name}" <#{person.email}>, )
     end
@@ -20,7 +20,12 @@ class EventMaillist
 
     Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
     Rails.logger.debug "EventMaillist would send message '#{@email.subject}' to these recipients:\n"
-    Rails.logger.debug "#{recipents}"
+    Rails.logger.debug "#{recipients}"
     Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
+
+    # Send array of recipients to Sparkpost:
+    # https://developers.sparkpost.com/api/recipient-lists/#header-recipient-object
+    # ... and with names:
+    # https://github.com/the-refinery/sparkpost_rails/blob/master/README.md#recipient-specific-data
   end
 end

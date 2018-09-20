@@ -173,6 +173,7 @@ describe 'RSVP', type: :feature do
     end
 
     it 'presents a "message to the organizer" form' do
+      visit rsvp_otp_path(@invitation.code)
       click_link 'No'
       expect(current_path).to eq(rsvp_no_path(@invitation.code))
 
