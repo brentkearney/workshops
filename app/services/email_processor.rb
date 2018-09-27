@@ -45,7 +45,8 @@ class EmailProcessor
       to: @email.to[0][:email],
       from: @email.from[:full],
       subject: @email.subject,
-      body: @email.body
+      body: @email.body,
+      date: @email.headers['Date']
     }
   end
 end

@@ -12,3 +12,7 @@ SparkPostRails.configure do |c|
   # c.html_content_only = false                     # default: false
   # c.subaccount = nil                              # default: nil
 end
+
+ActionMailer::DeliveryJob.rescue_from(SparkPostRails::DeliveryException) do |exception|
+  StaffMailer.notify_sysadmin(nil, exception)
+end

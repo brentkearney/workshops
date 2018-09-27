@@ -5,18 +5,19 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   respond_to :json
 
   def incoming
-    Rails.logger.debug "\n\nGriddler::AuthenticationController: authentication checks out!\n\n"
-    create && return
+    create and return if valid_email_format
+    bad_request
   end
 
   private
 
   def unauthorized
+    Rails.logger.debug "\n\nGriddler::AuthenticationController: authorization failed [#{posted_token}].\n\n"
     render nothing: true, status: :unauthorized and return
   end
 
-  def unavailable
-    render nothing: true, status: :service_unavailable and return
+  def bad_request
+    render nothing: true, status: :bad_request and return
   end
 
   def is_ok
@@ -25,15 +26,35 @@ class Griddler::AuthenticationController < Griddler::EmailsController
 
   protected
 
+  def valid_email_format
+    if params.key?('_json') && params['_json'].kind_of?(Array)
+      if params['_json'][0].key?('msys')
+        if params['_json'][0]['msys'].key?('relay_message')
+          return true
+        else
+          return false
+        end
+      else
+        return false
+      end
+    else
+      return false
+    end
+  end
+
   def authenticate
     verify_sparkpost_token || unauthorized
   end
 
   def verify_sparkpost_token
-    request.headers["X-MessageSystems-Webhook-Token"] == valid_token?
+    posted_token == valid_token
   end
 
-  def valid_token?
+  def posted_token
+    request.headers["X-MessageSystems-Webhook-Token"]
+  end
+
+  def valid_token
     GetSetting.site_setting('SPARKPOST_AUTH_TOKEN')
   end
 end

@@ -1,8 +1,12 @@
-Your message (below) was NOT delivered, because "<%= @sent_to %>" is an invalid address.
+Your message (below) was NOT delivered, because "<%= @email_to %>" is an invalid address.
 
-If you need help, please send a message to <%= @help_email %>.
+If you need help, please send a message to <%= @webmaster %>.
 
 ------------------------ Your message below ------------------------
 
-<%= @email_body %>
+From: <%= @email_from %>
+To: <%= @email_to %>
+Date: <%= @email_date %>
+Subject: <%= @email_subject %>
 
+<%= @email_body %>

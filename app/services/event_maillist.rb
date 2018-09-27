@@ -14,18 +14,19 @@ class EventMaillist
   def send_message
     recipients = []
     @event.confirmed.each do |person|
-      recipients << %Q("#{person.name}" <#{person.email}>, )
+      to_email = person.email
+      if ENV['APPLICATION_HOST'].include?('staging')
+        to_email = GetSetting.site_email('webmaster_email')
+      end
+      recipients << { address: { email: to_email, name: "#{person.name}" } }
     end
-    recipients.chomp!(', ')
 
-    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-    Rails.logger.debug "EventMaillist would send message '#{@email.subject}' to these recipients:\n"
-    Rails.logger.debug "#{recipients}"
-    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-
-    # Send array of recipients to Sparkpost:
-    # https://developers.sparkpost.com/api/recipient-lists/#header-recipient-object
-    # ... and with names:
-    # https://github.com/the-refinery/sparkpost_rails/blob/master/README.md#recipient-specific-data
+    message = {
+      from: @email.from[:full],
+      subject: @email.subject,
+      body: @email.body,
+      date: @email.headers['Date']
+    }
+    MaillistMailer.workshop_maillist(message, recipients)
   end
 end

@@ -18,17 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Email bounces back to senders who sent to the wrong email address
-class BounceMailer < ApplicationMailer
-  def invalid_event_code(params)
-    @email_to = params[:to]
-    @email_from = params[:from]
-    @email_subject = params[:subject]
-    @email_body = params[:body]
-    @email_date = params[:date]
+# Sends mail to workshop participants, like a maillist
+class MaillistMailer < ApplicationMailer
+  def workshop_maillist(message, recipients)
+    from = message[:from]
+    subject = message[:subject]
+    body = message[:body]
 
-    @webmaster = GetSetting.site_email('webmaster_email')
-    subject = "Bounce notice: #{@email_subject}"
-    mail(to: @email_from, from: @webmaster, subject: subject)
+    mail(to: recipients, from: from, subject: subject)
   end
 end
