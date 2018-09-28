@@ -4,7 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# Receives event code & Griddler:Email object, distribute to confirmed members
+# Receives Griddler:Email object, distributes message to confirmed members
 class EventMaillist
   def initialize(email)
     @email = email

@@ -37,9 +37,8 @@ class Griddler::AuthenticationController < Griddler::EmailsController
       else
         return false
       end
-    else
-      return false
     end
+    false
   end
 
   def authenticate
