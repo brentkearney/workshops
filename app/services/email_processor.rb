@@ -17,7 +17,7 @@ class EmailProcessor
   def process
     validate_recipient
     validate_sender
-    EventMaillist.new(@email).send_message if valid_email
+    EventMaillist.new(@email, @event).send_message if valid_email
   end
 
   private
@@ -41,7 +41,8 @@ class EmailProcessor
 
     if person.blank? || @event.confirmed.include?(person).blank?
       @valid_email = false
-      EmailFromNonmemberBounceJob.perform_later(email_params)
+      params = email_params.merge(event_code: @event.code)
+      EmailFromNonmemberBounceJob.perform_later(params)
     else
       @valid_email = true
     end

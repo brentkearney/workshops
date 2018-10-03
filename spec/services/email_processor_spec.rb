@@ -14,7 +14,7 @@ describe 'EmailProcessor' do
     from: 'Webmaster <webmaster@example.net>',
     subject: 'Testing email processing',
     text: 'A Test Message.',
-    Date: DateTime.current
+    Date: "Tue, 25 Sep 2018 16:17:17 -0600"
   }
   end
 
@@ -123,7 +123,7 @@ describe 'EmailProcessor' do
       allow(EventMaillist).to receive(:new).and_return(maillist)
 
       EmailProcessor.new(email).process
-      expect(EventMaillist).to have_received(:new).with(email)
+      expect(EventMaillist).to have_received(:new).with(email, @event)
     end
   end
 end
