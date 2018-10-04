@@ -27,6 +27,7 @@ class EventMaillist
       body: @email.body,
       date: @email.headers['Date']
     }
-    MaillistMailer.workshop_maillist(message, recipients)
+    resp = MaillistMailer.workshop_maillist(message, recipients).deliver_now!
+    StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
   end
 end

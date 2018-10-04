@@ -37,7 +37,9 @@ describe 'EventMaillist' do
     end
 
     it 'sends email and formatted recipients to MaillistMailer' do
-      allow(MaillistMailer).to receive(:workshop_maillist)
+      mailer = double('MaillistMailer')
+      allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
+      expect(mailer).to receive(:deliver_now!)
       recipients = [{ address: { email: @member.person.email, name: "#{@member.person.name}" } }]
       message = {
         from: params[:from],

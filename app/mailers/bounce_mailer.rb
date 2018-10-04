@@ -38,7 +38,7 @@ class BounceMailer < ApplicationMailer
     mail(to: @email_from, from: @webmaster, subject: @subject)
   end
 
-  def non_member
+  def non_member(params)
     email_fields(params)
     @event_code = params[:event_code]
     mail(to: @email_from, from: @webmaster, subject: @subject)

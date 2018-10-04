@@ -25,6 +25,6 @@ class MaillistMailer < ApplicationMailer
     subject = message[:subject]
     body = message[:body]
 
-    mail(to: recipients, from: from, subject: subject)
+    mail(to: recipients, from: from, subject: subject, body: body)
   end
 end
