@@ -26,17 +26,12 @@ RSpec.describe MaillistMailer, type: :mailer do
   describe '.workshop_maillist' do
     before do
       @msg = {
-        from: '"Random Sender" <random@example.com>',
-        subject: 'Test subject',
+        from: '"Workshops" <workshops@example.com>',
+        subject: '[19w5020] Test subject',
         body: 'This is a test message.',
-        date: 'Tue, 25 Sep 2018 16:17:17 -0600'
       }
-      @recipients = [
-        { address: { email: 'one@test.ca', name: "Test User" } },
-        { address: { email: 'two@test.ca', name: "Test User2" } },
-        { address: { email: 'three@test.ca', name: "Test User3" } }
-      ]
-      @resp = MaillistMailer.workshop_maillist(@msg, @recipients).deliver_now
+      @recipient = %Q("Test User" <testuser@example.com>)
+      @resp = MaillistMailer.workshop_maillist(@msg, @recipient).deliver_now
       @sent_message = ActionMailer::Base.deliveries.first
     end
 
@@ -48,17 +43,13 @@ RSpec.describe MaillistMailer, type: :mailer do
       expect(@resp.class).to eq(Mail::Message)
     end
 
-    it 'From: is the sender' do
+    it 'From: is the specified from address' do
       from_email = Mail::Address.new(@msg[:from])
       expect(@sent_message.from).to eq([from_email.address])
     end
 
-    it 'To: is the recipient list' do
-      recip_string = ''
-      @recipients.each do |r|
-        recip_string << r.to_s + ', '
-      end
-      expect(@sent_message.to).to eq(recip_string.gsub!(/,\ \z/, ''))
+    it 'To: is the given recipient' do
+      expect(@sent_message.to).to eq(@sent_message.to_addrs)
     end
 
     it 'Message body is the passed-in body (no template)' do

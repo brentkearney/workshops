@@ -12,22 +12,30 @@ class EventMaillist
   end
 
   def send_message
-    recipients = []
-    @event.confirmed.each do |person|
-      to_email = person.email
-      if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
-        to_email = GetSetting.site_email('webmaster_email')
-      end
-      recipients << { address: { email: to_email, name: "#{person.name}" } }
-    end
+    subject = @email.subject
+    subject = "[#{@event.code}] #{subject}" unless subject.include?(@event.code)
+
+    body = @email.body
+    prelude = '-' * 75 + "\n"
+    prelude << "Message from #{@email.from[:full]} to the #{@event.code} workshop on #{@email.headers['Date']}:"
+    prelude << "\n" + '-' * 75 + "\n\n"
+    body = prelude + body
 
     message = {
-      from: @email.from[:full],
+      from: @email.to[0][:email],
       subject: @email.subject,
-      body: @email.body,
-      date: @email.headers['Date']
+      body: body
     }
-    resp = MaillistMailer.workshop_maillist(message, recipients).deliver_now!
-    StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
+
+    @event.confirmed.each do |person|
+      recipient = %Q("#{person.name}" <#{person.email}>)
+      if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
+        recipient = GetSetting.site_email('webmaster_email')
+      end
+      resp = MaillistMailer.workshop_maillist(message, recipient).deliver_now!
+      if !resp.nil? && resp['total_rejected_recipients'] != 0
+        StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
+      end
+    end
   end
 end

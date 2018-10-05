@@ -20,11 +20,11 @@
 
 # Sends mail to workshop participants, like a maillist
 class MaillistMailer < ApplicationMailer
-  def workshop_maillist(message, recipients)
+  def workshop_maillist(message, recipient)
     from = message[:from]
     subject = message[:subject]
     body = message[:body]
 
-    mail(to: recipients, from: from, subject: subject, body: body)
+    mail(to: recipient, from: from, subject: subject, body: body)
   end
 end

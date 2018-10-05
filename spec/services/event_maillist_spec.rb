@@ -10,7 +10,7 @@ require 'rails_helper'
 describe 'EventMaillist' do
   let(:params) do
   {
-    to: ['some-identifier@example.com'],
+    to: ['event_code@example.com'],
     from: 'Webmaster <webmaster@example.net>',
     subject: 'Testing email processing',
     text: 'A Test Message.',
@@ -22,7 +22,9 @@ describe 'EventMaillist' do
 
   before do
     @event = create(:event)
-    @member = create(:membership, event: @event, attendance: 'Confirmed')
+    2.times do
+      create(:membership, event: @event, attendance: 'Confirmed')
+    end
   end
 
   it '.initialize' do
@@ -36,19 +38,16 @@ describe 'EventMaillist' do
       @maillist = EventMaillist.new(subject, @event)
     end
 
-    it 'sends email and formatted recipients to MaillistMailer' do
+    it 'sends email to MaillistMailer' do
       mailer = double('MaillistMailer')
       allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
-      expect(mailer).to receive(:deliver_now!)
-      recipients = [{ address: { email: @member.person.email, name: "#{@member.person.name}" } }]
-      message = {
-        from: params[:from],
-        subject: params[:subject],
-        body: params[:text],
-        date: params[:date]
-      }
+      num_participants = @event.confirmed.count
+      expect(mailer).to receive(:deliver_now!).exactly(num_participants).times
+
       @maillist.send_message
-      expect(MaillistMailer).to have_received(:workshop_maillist).with(message, recipients)
+
+      expect(MaillistMailer).to have_received(:workshop_maillist)
+                                  .exactly(num_participants).times
     end
   end
 end
