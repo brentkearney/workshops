@@ -22,11 +22,13 @@ class EmailParser
   end
 
   def prepare_text(text_body)
-    unless text_body.blank?
-      @first_word = text_body.match(/\A.+\b/)
-      prelude = '-' * 70 + "\n"
-      prelude << "Message from #{@email.from[:full]} to the #{@event_code} workshop on #{@email.headers['Date']}:"
-      prelude << "\n" + '-' * 70 + "\n\n"
+    prelude = '-' * 70 + "\n"
+    prelude << "Message from #{@email.from[:full]} to the #{@event_code} workshop on #{@email.headers['Date']}:"
+    prelude << "\n" + '-' * 70 + "\n\n"
+
+    if text_body.blank?
+      @text_body = prelude
+    else
       @text_body = prelude + text_body
     end
     @text_body
@@ -37,7 +39,13 @@ class EmailParser
       prelude = "<hr width=\"100%\" />\n"
       prelude << "<p>Message from #{@email.from[:full]} to the #{@event_code} workshop on #{@email.headers['Date']}:</p>\n"
       prelude << "<hr width=\"100%\" />\n\n"
-      @html_body = html_body.gsub(/<body(.+)">#{@first_word}/, "<body\\1\">#{prelude}#{@first_word}")
+
+      p = html_body.split('<body')
+      before_body = p[0]
+      inside_body = p[1].split('>')[0]
+      after_body = p[1]
+      after_body.slice!("#{inside_body}>")
+      @html_body = before_body + '<body' + inside_body + '>' + prelude + after_body
     end
     @html_body
   end
