@@ -38,7 +38,7 @@ describe 'EventMaillist' do
       @maillist = EventMaillist.new(subject, @event)
     end
 
-    it 'sends email to MaillistMailer' do
+    it 'sends one email per confirmed participant to MaillistMailer' do
       mailer = double('MaillistMailer')
       allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
       num_participants = @event.confirmed.count

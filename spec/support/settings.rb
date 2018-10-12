@@ -24,6 +24,7 @@ if Setting.find_by(var: 'Site').blank?
     'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor', 'Ph.D. Student', 'Masters Student', 'Undergraduate Student', 'K-12 Teacher', 'K-12 Student', 'Other'],
     'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'],
     'rsvp_expiry' => '1.month',
+    'email_domain' => 'workshops.example.com',
     'LECTURES_API_KEY' => '0123456789',
     'EVENTS_API_KEY' => '0123456789',
     'SPARKPOST_AUTH_TOKEN' => '1234'

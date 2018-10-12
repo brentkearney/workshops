@@ -29,6 +29,11 @@ RSpec.describe MaillistMailer, type: :mailer do
         from: '"Workshops" <workshops@example.com>',
         subject: '[19w5020] Test subject',
         body: 'This is a test message.',
+        email_parts: {
+          text_body: 'This is a test message.',
+          html_body: '',
+          inline_attachments: {}
+        }
       }
       @recipient = %Q("Test User" <testuser@example.com>)
       @resp = MaillistMailer.workshop_maillist(@msg, @recipient).deliver_now
@@ -43,9 +48,10 @@ RSpec.describe MaillistMailer, type: :mailer do
       expect(@resp.class).to eq(Mail::Message)
     end
 
-    it 'From: is the specified from address' do
-      from_email = Mail::Address.new(@msg[:from])
-      expect(@sent_message.from).to eq([from_email.address])
+    it 'From: is a no-reply address with email_domain' do
+      from_email = 'no-reply@' + GetSetting.site_setting('email_domain')
+      email_obj = Mail::Address.new(from_email)
+      expect(@sent_message.from).to eq([email_obj.address])
     end
 
     it 'To: is the given recipient' do

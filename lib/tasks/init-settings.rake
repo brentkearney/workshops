@@ -48,6 +48,7 @@ namespace :ws do
                               "Undergraduate Student", "K-12 Teacher", "K-12 Student", "Other"],
         'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'],
         'rsvp_expiry' => '2.weeks',
+        'email_domain' => 'workshops.example.com',
         'LECTURES_API_KEY' => 'Example-ChangeMe',
         'EVENTS_API_KEY' => 'Example-ChangeMe',
         'SPARKPOST_AUTH_TOKEN' => 'Example-ChangeMe'

@@ -14,17 +14,13 @@ class EventMaillist
   def send_message
     subject = @email.subject
     subject = "[#{@event.code}] #{subject}" unless subject.include?(@event.code)
-
-    body = @email.body
-    prelude = '-' * 75 + "\n"
-    prelude << "Message from #{@email.from[:full]} to the #{@event.code} workshop on #{@email.headers['Date']}:"
-    prelude << "\n" + '-' * 75 + "\n\n"
-    body = prelude + body
+    email_parts = EmailParser.new(@email, @event.code).parse
 
     message = {
       from: @email.to[0][:email],
       subject: @email.subject,
-      body: body
+      email_parts: email_parts,
+      attachments: @email.attachments,
     }
 
     @event.confirmed.each do |person|

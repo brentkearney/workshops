@@ -21,10 +21,34 @@
 # Sends mail to workshop participants, like a maillist
 class MaillistMailer < ApplicationMailer
   def workshop_maillist(message, recipient)
-    from = message[:from]
+    from = 'no-reply@' + GetSetting.site_setting('email_domain')
     subject = message[:subject]
-    body = message[:body]
+    email_parts = message[:email_parts]
+    text_body = email_parts[:text_body]
+    html_body = email_parts[:html_body]
+    inline_attachments = email_parts[:inline_attachments]
 
-    mail(to: recipient, from: from, subject: subject, body: body)
+    unless message[:attachments].blank?
+      message[:attachments].each do |ad|
+        file = ad.original_filename
+        if inline_attachments[file] != nil
+          attachments.inline[file] = {
+            mime_type: ad.content_type,
+            content: File.read(ad.tempfile)
+          }
+          attachments.inline[file].header['content-id'] = inline_attachments[file]
+        else
+          attachments[file] = {
+            mime_type: ad.content_type,
+            content: File.read(ad.tempfile)
+          }
+        end
+      end
+    end
+
+    mail(to: recipient, from: from, subject: subject) do |format|
+      format.html { render html: html_body.html_safe } unless html_body.blank?
+      format.text { render text: text_body }
+    end
   end
 end
