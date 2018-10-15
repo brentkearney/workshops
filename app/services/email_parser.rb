@@ -53,7 +53,7 @@ class EmailParser
   # Get filename:content-id mapping of inline attachments
   def prepare_inline(params)
     @inline_attachments = {}
-    return @inline_attachments if params['_json'].nil?
+    return @inline_attachments if params['_json'].blank?
     raw_email = params['_json'][0]['msys']['relay_message']['content']['email_rfc822']
     if raw_email =~ /Content-Disposition: inline/
       filename = ''

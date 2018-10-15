@@ -12,25 +12,34 @@ class EmailProcessor
     @email = email
     @valid_email = false
     @event = nil
+    @group = 'Confirmed'
   end
 
   def process
     validate_recipient
     validate_sender
-    EventMaillist.new(@email, @event).send_message if valid_email
+    EventMaillist.new(@email, @event, @group).send_message if valid_email
   end
 
   private
 
   def validate_recipient
-    to = @email.to[0][:token]
+    recipient = @email.to[0][:token]
+    recipient, members = recipient.split('-') if recipient =~ /-/
 
-    if to =~ /#{GetSetting.code_pattern}/
-      @event = Event.find_by_code(to)
+    if recipient =~ /#{GetSetting.code_pattern}/
+      @event = Event.find_by_code(recipient)
       @valid_email = true unless @event.blank?
     end
+    member_group(members) unless members.blank?
 
     EmailInvalidCodeBounceJob.perform_later(email_params) unless @valid_email
+  end
+
+  def member_group(members)
+    Membership::ATTENDANCE.each do |status|
+      @group = status if members.titleize == status
+    end
   end
 
   def validate_sender

@@ -6,9 +6,10 @@
 
 # Receives Griddler:Email object, distributes message to confirmed members
 class EventMaillist
-  def initialize(email, event)
+  def initialize(email, event, group)
     @email = email
     @event = event
+    @group = group
   end
 
   def send_message
@@ -23,8 +24,8 @@ class EventMaillist
       attachments: @email.attachments,
     }
 
-    @event.confirmed.each do |person|
-      recipient = %Q("#{person.name}" <#{person.email}>)
+    @event.attendance(@group).each do |m|
+      recipient = %Q("#{m.person.name}" <#{m.person.email}>)
       if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
         recipient = GetSetting.site_email('webmaster_email')
       end
