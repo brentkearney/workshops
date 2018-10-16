@@ -24,19 +24,21 @@ class EmailProcessor
   private
 
   def validate_recipient
-    recipient = @email.to[0][:token]
-    recipient, members = recipient.split('-') if recipient =~ /-/
+    @email.to.each do |to_email|
+      recipient = to_email[:token]
+      recipient, members = recipient.split('-') if recipient =~ /-/
 
-    if recipient =~ /#{GetSetting.code_pattern}/
-      @event = Event.find_by_code(recipient)
-      @valid_email = true unless @event.blank?
+      if recipient =~ /#{GetSetting.code_pattern}/
+        @event = Event.find_by_code(recipient)
+        @valid_email = true unless @event.blank?
+      end
+      member_group(members) unless members.blank?
     end
-    member_group(members) unless members.blank?
-
     EmailInvalidCodeBounceJob.perform_later(email_params) unless @valid_email
   end
 
   def member_group(members)
+    @group = 'orgs' and return if members == 'orgs' || members == 'organizers'
     Membership::ATTENDANCE.each do |status|
       @group = status if members.titleize == status
     end
@@ -48,13 +50,17 @@ class EmailProcessor
     send_report and return unless EmailValidator.valid?(from_email)
     person = Person.find_by_email(from_email)
 
-    if person.blank? || @event.confirmed.include?(person).blank?
+    if person.blank? || allowed_people.include?(person) == false
       @valid_email = false
       params = email_params.merge(event_code: @event.code)
       EmailFromNonmemberBounceJob.perform_later(params)
     else
       @valid_email = true
     end
+  end
+
+  def allowed_people
+    @event.confirmed + @event.organizers + @event.staff
   end
 
   def send_report

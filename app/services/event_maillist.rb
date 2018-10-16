@@ -10,6 +10,9 @@ class EventMaillist
     @email = email
     @event = event
     @group = group
+    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
+    Rails.logger.debug "@email.to: #{@email.to.inspect}\n\n"
+    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
   end
 
   def send_message
@@ -24,15 +27,39 @@ class EventMaillist
       attachments: @email.attachments,
     }
 
-    @event.attendance(@group).each do |m|
-      recipient = %Q("#{m.person.name}" <#{m.person.email}>)
-      if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
-        recipient = GetSetting.site_email('webmaster_email')
-      end
-      resp = MaillistMailer.workshop_maillist(message, recipient).deliver_now!
-      if !resp.nil? && resp['total_rejected_recipients'] != 0
-        StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
-      end
+    if @group == 'orgs' || @group == 'organizers'
+      send_to_orgs(message)
+    else
+      send_to_attendance_group(message)
+    end
+  end
+
+  def send_to_orgs(message)
+    @event.organizers.each do |member|
+      email_member(member, message)
+    end
+  end
+
+  def send_to_attendance_group(message)
+    @event.attendance(@group).each do |member|
+      email_member(member, message)
+    end
+  end
+
+  def email_member(member, message)
+    if member.is_a?(Membership)
+      recipient = %Q("#{member.person.name}" <#{member.person.email}>)
+    else
+      recipient = %Q("#{member.name}" <#{member.email}>)
+    end
+    if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
+      recipient = GetSetting.site_email('webmaster_email')
+    end
+
+    resp = MaillistMailer.workshop_maillist(message, recipient).deliver_now!
+
+    if !resp.nil? && resp['total_rejected_recipients'] != 0
+      StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
     end
   end
 end

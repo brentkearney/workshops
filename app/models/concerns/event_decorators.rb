@@ -103,11 +103,13 @@ module EventDecorators
   end
 
   def organizers
-    orgs = []
-    memberships.where("role LIKE '%Organizer%'").each do |org|
-      orgs << org.person
-    end
-    orgs
+    memberships.where("role LIKE '%Organizer%'").map {|m| m.person }
+  end
+
+  def staff
+    staff = User.where(role: 1, location: self.location).map {|s| s.person }
+    admins = User.where('role > 1').map {|a| a.person }
+    staff + admins
   end
 
   def schedule_on(day)
@@ -116,10 +118,7 @@ module EventDecorators
   end
 
   def confirmed
-    people = []
-    memberships.where(attendance: 'Confirmed').each do |m|
-      people << m.person
-    end
+    people = memberships.where(attendance: 'Confirmed').map {|m| m.person }
     people.sort_by { |p| p.lastname.downcase }
   end
 

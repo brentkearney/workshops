@@ -22,11 +22,10 @@ describe 'EventMaillist' do
 
   before do
     @event = create(:event)
-    @event.memberships.destroy_all
+    @status = 'Undecided'
     2.times do
-      create(:membership, event: @event, attendance: 'Maybe')
+      create(:membership, event: @event, attendance: @status, role: 'Participant')
     end
-    @status = 'Maybe'
   end
 
   it '.initialize' do
@@ -35,21 +34,39 @@ describe 'EventMaillist' do
 
   context '.send_message' do
     before do
-      domain = GetSetting.site_setting('app_url').gsub(/^.+\/\//, '')
-      params[:to] = [@event.code + '@' + domain]
+      @domain = GetSetting.site_setting('app_url').gsub(/^.+\/\//, '')
+      params[:to] = [@event.code + '@' + @domain]
       @maillist = EventMaillist.new(subject, @event, @status)
+      @mailer = double('MaillistMailer')
+      allow(MaillistMailer).to receive(:workshop_maillist).and_return(@mailer)
     end
 
     it 'sends one email per participant of specified status' do
-      mailer = double('MaillistMailer')
-      allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
-      num_participants = @event.attendance('Maybe').count
-      expect(mailer).to receive(:deliver_now!).exactly(num_participants).times
+      num_participants = @event.attendance('Undecided').count
+      expect(num_participants).to be > 0
+      expect(@mailer).to receive(:deliver_now!).exactly(num_participants).times
 
       @maillist.send_message
 
       expect(MaillistMailer).to have_received(:workshop_maillist)
                                   .exactly(num_participants).times
+    end
+
+    it 'sends to organizers if -orgs is specified' do
+      member = @event.memberships.first
+      member.role = 'Organizer'
+      member.save
+      expect(@event.organizers.count).to eq(1)
+
+      maillist = EventMaillist.new(subject, @event, 'orgs')
+      mailer = double('MaillistMailer')
+      allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
+      expect(mailer).to receive(:deliver_now!).exactly(1).times
+
+      maillist.send_message
+
+      expect(MaillistMailer).to have_received(:workshop_maillist)
+                                  .exactly(1).times
     end
   end
 end
