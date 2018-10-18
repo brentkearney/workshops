@@ -25,6 +25,7 @@ class BounceMailer < ApplicationMailer
 
   def email_fields(params)
     @email_to = params[:to]
+    @email_to = params[:to].join(', ') if params[:to].is_a?(Array)
     @email_from = params[:from]
     @email_subject = params[:subject]
     @email_body = params[:body]

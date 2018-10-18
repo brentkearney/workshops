@@ -10,57 +10,67 @@ class EmailProcessor
 
   def initialize(email)
     @email = email
-    @valid_email = false
-    @event = nil
-    @group = 'Confirmed'
   end
 
   def process
-    validate_recipient
-    validate_sender
-    EventMaillist.new(@email, @event, @group).send_message if valid_email
+    extract_recipients.each do |list_params|
+      EventMaillist.new(@email, list_params).send_message
+    end
   end
 
   private
 
-  def validate_recipient
-    @email.to.each do |to_email|
-      recipient = to_email[:token]
-      recipient, members = recipient.split('-') if recipient =~ /-/
+  def extract_recipients
+    maillists = []
+    invalid_sender = false
+    recipients = @email.to + @email.cc
 
-      if recipient =~ /#{GetSetting.code_pattern}/
-        @event = Event.find_by_code(recipient)
-        @valid_email = true unless @event.blank?
+    recipients.each do |recipient|
+      to_email = recipient[:email]
+      code = recipient[:token]
+      group = 'Confirmed'
+      code, group = code.split('-') if code =~ /-/
+
+      if code =~ /#{GetSetting.code_pattern}/
+        event = Event.find(code)
+        unless event.blank?
+          if valid_sender?(event, to_email)
+            maillists << {
+              event: event,
+              group: member_group(group),
+              destination: to_email
+            }
+          else
+            invalid_sender = true
+          end
+        end
       end
-      member_group(members) unless members.blank?
     end
-    EmailInvalidCodeBounceJob.perform_later(email_params) unless @valid_email
+    if maillists.empty? && !invalid_sender
+      EmailInvalidCodeBounceJob.perform_later(email_params)
+    end
+    maillists
   end
 
-  def member_group(members)
-    @group = 'orgs' and return if members == 'orgs' || members == 'organizers'
+  def member_group(group)
+    return 'orgs' if group == 'orgs' || group == 'organizers'
     Membership::ATTENDANCE.each do |status|
-      @group = status if members.titleize == status
+      return status if group.titleize == status
     end
   end
 
-  def validate_sender
-    return if @event.blank?
+  def valid_sender?(event, to_email)
     from_email = @email.from[:email]
-    send_report and return unless EmailValidator.valid?(from_email)
+    send_report and return false unless EmailValidator.valid?(from_email)
     person = Person.find_by_email(from_email)
-
-    if person.blank? || allowed_people.include?(person) == false
-      @valid_email = false
-      params = email_params.merge(event_code: @event.code)
-      EmailFromNonmemberBounceJob.perform_later(params)
-    else
-      @valid_email = true
-    end
+    return true if person && allowed_people(event).include?(person)
+    params = email_params.merge(event_code: event.code, to: to_email)
+    EmailFromNonmemberBounceJob.perform_later(params)
+    return false
   end
 
-  def allowed_people
-    @event.confirmed + @event.organizers + @event.staff
+  def allowed_people(event)
+    event.confirmed + event.organizers + event.staff
   end
 
   def send_report
@@ -72,9 +82,13 @@ class EmailProcessor
     StaffMailer.notify_sysadmin(@event, msg).deliver_now
   end
 
+  def email_recipients
+    @email.to.map {|e| e[:email] } + @email.cc.map {|e| e[:email] }
+  end
+
   def email_params
     {
-      to: @email.to[0][:email],
+      to: email_recipients,
       from: @email.from[:full],
       subject: @email.subject,
       body: @email.body,

@@ -6,19 +6,17 @@
 
 # Receives Griddler:Email object, distributes message to confirmed members
 class EventMaillist
-  def initialize(email, event, group)
+  def initialize(email, mailist_params)
     @email = email
-    @event = event
-    @group = group
-    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
-    Rails.logger.debug "@email.to: #{@email.to.inspect}\n\n"
-    Rails.logger.debug "\n\n" + '*' * 100 + "\n\n"
+    @event = mailist_params[:event]
+    @group = mailist_params[:group]
+    @destination = mailist_params[:destination]
   end
 
   def send_message
     subject = @email.subject
     subject = "[#{@event.code}] #{subject}" unless subject.include?(@event.code)
-    email_parts = EmailParser.new(@email, @event.code).parse
+    email_parts = EmailParser.new(@email, @destination).parse
 
     message = {
       from: @email.to[0][:email],

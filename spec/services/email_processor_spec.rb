@@ -20,32 +20,30 @@ describe 'EmailProcessor' do
 
   subject { Griddler::Email.new(params) }
 
-  before do
-    @event = create(:event)
-    @person = create(:person)
-    @membership = create(:membership, event: @event)
-  end
+  let(:event) { create(:event) }
+  let(:person) { create(:person) }
+  let(:membership) { create(:membership, event: event) }
 
   it '.initialize' do
     expect(EmailProcessor.new(subject).class).to eq(EmailProcessor)
   end
 
   context 'validates recipient' do
-    it 'sends bounce email if recipient is not an event code' do
+    it 'sends bounce email if no recipients are event codes' do
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(Griddler::Email.new(params)).process
       expect(EmailInvalidCodeBounceJob).to have_received(:perform_later)
     end
 
-    it 'sends bounce email if valid event code does not find an event' do
+    it 'sends bounce email if valid code format does not find an event' do
       params[:to] = ["03w5000@example.com"]
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(Griddler::Email.new(params)).process
       expect(EmailInvalidCodeBounceJob).to have_received(:perform_later)
     end
 
-    it 'does not bounce email if recipient event code is a real event' do
-      params[:to] = ["#{@event.code}@example.com"]
+    it 'does not send invalid code bounce if recipient event code is valid' do
+      params[:to] = ["#{event.code}@example.com"]
       email = Griddler::Email.new(params)
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
@@ -53,7 +51,22 @@ describe 'EmailProcessor' do
     end
 
     it 'does not bounce email if at least one of multiple recipients is valid' do
-      params[:to] = ['any@example.com', 'thing@example.com', "#{@event.code}@example.com"]
+      params[:to] = ['any@example.com', 'thing@example.com', "#{event.code}@example.com"]
+      email = Griddler::Email.new(params)
+      allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
+      EmailProcessor.new(email).process
+      expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
+    end
+
+    it 'bounces email if none of multiple recipients is valid' do
+      params[:to] = ['any@example.com', 'thing@example.com', 'foo@bar.com']
+      allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
+      EmailProcessor.new(Griddler::Email.new(params)).process
+      expect(EmailInvalidCodeBounceJob).to have_received(:perform_later)
+    end
+
+    it 'does not bounce email if valid address is in the Cc: field' do
+      params.merge!(cc: ["#{event.code}@example.com", 'foo@bar.com'])
       email = Griddler::Email.new(params)
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
@@ -63,7 +76,7 @@ describe 'EmailProcessor' do
 
   context 'validates sender' do
     before do
-      params[:to] = ["#{@event.code}@example.com"]
+      params[:to] = ["#{event.code}@example.com"]
     end
 
     it 'sends bounce email if sender has no Person record' do
@@ -74,7 +87,7 @@ describe 'EmailProcessor' do
     end
 
     it 'sends bounce email if sender is not an event member' do
-      params[:from] = "#{@person.name} <#{@person.email}>"
+      params[:from] = "#{person.name} <#{person.email}>"
       email = Griddler::Email.new(params)
       allow(EmailFromNonmemberBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
@@ -82,9 +95,9 @@ describe 'EmailProcessor' do
     end
 
     it 'sends bounce email if sender is a non-confirmed member of event' do
-      @membership.person = @person
-      @membership.attendance = 'Not Yet Invited'
-      @membership.save
+      membership.person = person
+      membership.attendance = 'Not Yet Invited'
+      membership.save
 
       email = Griddler::Email.new(params)
       allow(EmailFromNonmemberBounceJob).to receive(:perform_later)
@@ -93,10 +106,10 @@ describe 'EmailProcessor' do
     end
 
     it 'does not bounce email if sender is a confirmed member of the event' do
-      params[:from] = "#{@person.name} <#{@person.email}>"
-      @membership.person = @person
-      @membership.attendance = 'Confirmed'
-      @membership.save
+      params[:from] = "#{person.name} <#{person.email}>"
+      membership.person = person
+      membership.attendance = 'Confirmed'
+      membership.save
 
       email = Griddler::Email.new(params)
       allow(EmailFromNonmemberBounceJob).to receive(:perform_later)
@@ -105,11 +118,11 @@ describe 'EmailProcessor' do
     end
 
     it 'does not bounce email if sender is an organizer' do
-      params[:from] = "#{@person.name} <#{@person.email}>"
-      @membership.person = @person
-      @membership.attendance = 'Declined'
-      @membership.role = 'Organizer'
-      @membership.save
+      params[:from] = "#{person.name} <#{person.email}>"
+      membership.person = person
+      membership.attendance = 'Declined'
+      membership.role = 'Organizer'
+      membership.save
 
       email = Griddler::Email.new(params)
       allow(EmailFromNonmemberBounceJob).to receive(:perform_later)
@@ -117,9 +130,9 @@ describe 'EmailProcessor' do
       expect(EmailFromNonmemberBounceJob).not_to have_received(:perform_later)
     end
 
-    it 'does not bounce email if sender is a staff user for @event.location' do
+    it 'does not bounce email if sender is a staff user for event.location' do
       staff_person = create(:person)
-      create(:user, person: staff_person, role: 'staff', location: @event.location)
+      create(:user, person: staff_person, role: 'staff', location: event.location)
       params[:from] = %Q("#{staff_person.name}" <#{staff_person.email}>)
 
       email = Griddler::Email.new(params)
@@ -169,39 +182,86 @@ describe 'EmailProcessor' do
   context '.process delivers email to maillist' do
     before do
       maillist = double('EventMaillist')
-      expect(maillist).to receive(:send_message)
+      expect(maillist).to receive(:send_message).at_least(:once)
       allow(EventMaillist).to receive(:new).and_return(maillist)
 
-      @membership.person = @person
-      @membership.attendance = 'Confirmed'
-      @membership.save
-      params[:from] = "#{@person.name} <#{@person.email}>"
+      membership.person = person
+      membership.attendance = 'Confirmed'
+      membership.save
+      params[:from] = "#{person.name} <#{person.email}>"
     end
 
     it 'invokes EventMaillist if sender and recipient are valid' do
-      params[:to] = ["#{@event.code}@example.com"]
+      params[:to] = ["#{event.code}@example.com"]
       email = Griddler::Email.new(params)
+      list_params = {
+        event: event,
+        group: 'Confirmed',
+        destination: params[:to].first
+      }
 
       EmailProcessor.new(email).process
-      expect(EventMaillist).to have_received(:new).with(email, @event, 'Confirmed')
+      expect(EventMaillist).to have_received(:new).with(email, list_params)
     end
 
     it 'passes attendance status from recipient email to EventMaillist' do
-      params[:to] = ["#{@event.code}-not_yet_invited@example.com"]
+      params[:to] = ["#{event.code}-not_yet_invited@example.com"]
       email = Griddler::Email.new(params)
+      list_params = {
+        event: event,
+        group: 'Not Yet Invited',
+        destination: params[:to].first
+      }
 
       EmailProcessor.new(email).process
-      expect(EventMaillist).to have_received(:new).with(email, @event, 'Not Yet Invited')
+      expect(EventMaillist).to have_received(:new).with(email, list_params)
     end
 
     it 'passes "orgs" from recipient email to EventMaillist' do
-      params[:to] = ["#{@event.code}-orgs@example.com"]
+      params[:to] = ["#{event.code}-orgs@example.com"]
+      email = Griddler::Email.new(params)
+      list_params = {
+        event: event,
+        destination: params[:to].first,
+        group: 'orgs'
+      }
+
+      EmailProcessor.new(email).process
+      expect(EventMaillist).to have_received(:new).with(email, list_params)
+    end
+
+    it 'invokes EventMaillist once for each event in the To: field' do
+      event2 = create(:event)
+      create(:membership, event: event2, person: person)
+      params[:to] = ["#{event.code}@example.com", "#{event2.code}@example.com"]
       email = Griddler::Email.new(params)
 
       EmailProcessor.new(email).process
-      expect(EventMaillist).to have_received(:new).with(email, @event, 'orgs')
+      expect(EventMaillist).to have_received(:new).exactly(2).times
     end
-    it 'invokes EventMaillist once for each event in the To: field'
-    it 'invokes EventMaillist once for each event in the Cc: field'
+
+    it 'invokes EventMaillist once for each event in the Cc: field' do
+      event2 = create(:event)
+      create(:membership, event: event2, person: person)
+      params[:to] = ['myfriend@example.com']
+      params[:cc] = ["#{event.code}@example.com", "#{event2.code}@example.com"]
+      email = Griddler::Email.new(params)
+
+      EmailProcessor.new(email).process
+      expect(EventMaillist).to have_received(:new).exactly(2).times
+    end
+
+    it 'invokes EventMaillist once and EmailFromNonmemberBounceJob once if
+      sender is confirmed for one event in To: but not another' do
+      event2 = create(:event)
+      params[:to] = ["#{event.code}@example.com", "#{event2.code}@example.com"]
+      email = Griddler::Email.new(params)
+      allow(EmailFromNonmemberBounceJob).to receive(:perform_later)
+
+      EmailProcessor.new(email).process
+
+      expect(EventMaillist).to have_received(:new).exactly(1).times
+      expect(EmailFromNonmemberBounceJob).to have_received(:perform_later).exactly(1).times
+    end
   end
 end

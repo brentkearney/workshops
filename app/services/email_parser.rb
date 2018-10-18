@@ -8,9 +8,9 @@
 class EmailParser
   attr_accessor :text_body, :html_body, :inline_attachments
 
-  def initialize(email, event_code)
+  def initialize(email, list_name)
     @email = email
-    @event_code = event_code
+    @list_name = list_name
   end
 
   def parse
@@ -23,7 +23,7 @@ class EmailParser
 
   def prepare_text(text_body)
     prelude = '-' * 70 + "\n"
-    prelude << "Message from #{@email.from[:full]} to the #{@event_code} workshop on #{@email.headers['Date']}:"
+    prelude << "Message from #{@email.from[:full]} to #{@list_name} on #{@email.headers['Date']}:"
     prelude << "\n" + '-' * 70 + "\n\n"
 
     if text_body.blank?
@@ -37,7 +37,7 @@ class EmailParser
   def prepare_html(html_body)
     unless html_body.blank?
       prelude = "<hr width=\"100%\" />\n"
-      prelude << "<p>Message from #{@email.from[:full]} to the #{@event_code} workshop on #{@email.headers['Date']}:</p>\n"
+      prelude << "<p>Message from #{@email.from[:full]} to #{@list_name} on #{@email.headers['Date']}:</p>\n"
       prelude << "<hr width=\"100%\" />\n\n"
 
       p = html_body.split('<body')

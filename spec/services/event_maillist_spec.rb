@@ -20,29 +20,38 @@ describe 'EventMaillist' do
 
   subject { Griddler::Email.new(params) }
 
+  let(:event) { create(:event) }
+  let(:status) { 'Undecided' }
+  let(:list_params) do
+  {
+    email: subject,
+    event: event,
+    group: status,
+    destination: params[:to].first,
+  }
+  end
+
   before do
-    @event = create(:event)
-    @status = 'Undecided'
     2.times do
-      create(:membership, event: @event, attendance: @status, role: 'Participant')
+      create(:membership, event: event, attendance: status, role: 'Participant')
     end
   end
 
   it '.initialize' do
-    expect(EventMaillist.new(subject, @event, @status).class).to eq(EventMaillist)
+    expect(EventMaillist.new(subject, list_params).class).to eq(EventMaillist)
   end
 
   context '.send_message' do
     before do
       @domain = GetSetting.site_setting('app_url').gsub(/^.+\/\//, '')
-      params[:to] = [@event.code + '@' + @domain]
-      @maillist = EventMaillist.new(subject, @event, @status)
+      params[:to] = [event.code + '@' + @domain]
+      @maillist = EventMaillist.new(subject, list_params)
       @mailer = double('MaillistMailer')
       allow(MaillistMailer).to receive(:workshop_maillist).and_return(@mailer)
     end
 
     it 'sends one email per participant of specified status' do
-      num_participants = @event.attendance('Undecided').count
+      num_participants = event.attendance(status).count
       expect(num_participants).to be > 0
       expect(@mailer).to receive(:deliver_now!).exactly(num_participants).times
 
@@ -53,12 +62,13 @@ describe 'EventMaillist' do
     end
 
     it 'sends to organizers if -orgs is specified' do
-      member = @event.memberships.first
+      member = event.memberships.first
       member.role = 'Organizer'
       member.save
-      expect(@event.organizers.count).to eq(1)
+      expect(event.organizers.count).to eq(1)
+      list_params[:group] = 'orgs'
 
-      maillist = EventMaillist.new(subject, @event, 'orgs')
+      maillist = EventMaillist.new(subject, list_params)
       mailer = double('MaillistMailer')
       allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
       expect(mailer).to receive(:deliver_now!).exactly(1).times

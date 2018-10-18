@@ -18,12 +18,12 @@ describe 'EmailParser' do
   }
   end
 
-  let(:prelude) { "Message from #{params[:from]} to the 18w6660 workshop" }
+  let(:prelude) { "Message from #{params[:from]} to 18w6660@example.com" }
 
   subject { Griddler::Email.new(params) }
 
   before do
-    @ep = EmailParser.new(subject, '18w6660')
+    @ep = EmailParser.new(subject, '18w6660@example.com')
   end
 
   it 'accepts a Griddler::Email object' do
@@ -50,7 +50,7 @@ describe 'EmailParser' do
   it 'empty text_body returns just the prelude' do
     new_params = params
     new_params[:text] = ''
-    ep = EmailParser.new(Griddler::Email.new(new_params), '18w6660')
+    ep = EmailParser.new(Griddler::Email.new(new_params), '18w6660@example.com')
     text_body = ep.parse[:text_body]
     expect(text_body).to include(prelude)
   end
