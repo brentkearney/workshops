@@ -230,6 +230,19 @@ describe 'EmailProcessor' do
       expect(EventMaillist).to have_received(:new).with(email, list_params)
     end
 
+    it 'passes "all" from recipient email to EventMaillist' do
+      params[:to] = ["#{event.code}-all@example.com"]
+      email = Griddler::Email.new(params)
+      list_params = {
+        event: event,
+        destination: params[:to].first,
+        group: 'all'
+      }
+
+      EmailProcessor.new(email).process
+      expect(EventMaillist).to have_received(:new).with(email, list_params)
+    end
+
     it 'invokes EventMaillist once for each event in the To: field' do
       event2 = create(:event)
       create(:membership, event: event2, person: person)

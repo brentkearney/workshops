@@ -54,6 +54,7 @@ class EmailProcessor
 
   def member_group(group)
     return 'orgs' if group == 'orgs' || group == 'organizers'
+    return 'all' if group == 'all'
     Membership::ATTENDANCE.each do |status|
       return status if group.titleize == status
     end

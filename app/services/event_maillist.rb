@@ -28,6 +28,8 @@ class EventMaillist
 
     if @group == 'orgs' || @group == 'organizers'
       send_to_orgs(message)
+    elsif @group == 'all'
+      send_to_all(message)
     else
       send_to_attendance_group(message)
     end
@@ -35,6 +37,12 @@ class EventMaillist
 
   def send_to_orgs(message)
     @event.organizers.each do |member|
+      email_member(member, message)
+    end
+  end
+
+  def send_to_all(message)
+    @event.members.each do |member|
       email_member(member, message)
     end
   end

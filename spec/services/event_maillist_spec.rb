@@ -61,7 +61,7 @@ describe 'EventMaillist' do
                                   .exactly(num_participants).times
     end
 
-    it 'sends to organizers if -orgs is specified' do
+    it 'sends to organizers if "orgs" group is specified' do
       member = event.memberships.first
       member.role = 'Organizer'
       member.save
@@ -77,6 +77,23 @@ describe 'EventMaillist' do
 
       expect(MaillistMailer).to have_received(:workshop_maillist)
                                   .exactly(1).times
+    end
+
+    it 'sends to all members if "all" group is specified' do
+      event2 = create(:event_with_members)
+      num_members = event2.memberships.count
+      list_params[:event] = event2
+      list_params[:group] = 'all'
+
+      maillist = EventMaillist.new(subject, list_params)
+      mailer = double('MaillistMailer')
+      allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
+      expect(mailer).to receive(:deliver_now!).exactly(num_members).times
+
+      maillist.send_message
+
+      expect(MaillistMailer).to have_received(:workshop_maillist)
+                                  .exactly(num_members).times
     end
   end
 end
