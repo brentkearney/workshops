@@ -36,16 +36,20 @@ class EmailParser
 
   def prepare_html(html_body)
     unless html_body.blank?
-      prelude = "<hr width=\"100%\" />\n"
+      prelude = "\n<hr width=\"100%\" />\n"
       prelude << "<p>Message from #{@email.from[:full]} to #{@list_name} on #{@email.headers['Date']}:</p>\n"
       prelude << "<hr width=\"100%\" />\n\n"
 
-      p = html_body.split('<body')
-      before_body = p[0]
-      inside_body = p[1].split('>')[0]
-      after_body = p[1]
-      after_body.slice!("#{inside_body}>")
-      @html_body = before_body + '<body' + inside_body + '>' + prelude + after_body
+      if html_body.include?('<body')
+        p = html_body.split('<body')
+        before_body = p[0]
+        inside_body = p[1].split('>')[0]
+        after_body = p[1]
+        after_body.slice!("#{inside_body}>")
+        @html_body = before_body + '<body' + inside_body + '>' + prelude + after_body
+      else
+        @html_body = "<html><body>" + prelude + html_body + "\n</body></html>"
+      end
     end
     @html_body
   end

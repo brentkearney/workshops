@@ -61,5 +61,16 @@ describe 'EmailParser' do
     expect(html_body).to include(prelude)
   end
 
+  it 'handles html with no <body> tags' do
+    np = params
+    np[:html] = '<div dir=\"ltr\">Just a test<div><br></div></div>'
+    email = Griddler::Email.new(np)
+    ep = EmailParser.new(email, '18w6660@example.com')
+    html_body = ep.parse[:html_body]
+
+    expect(html_body).to include('Just a test')
+    expect(html_body).to include(prelude)
+  end
+
   it ':inline_attachments maps filenames:content-ids'
 end
