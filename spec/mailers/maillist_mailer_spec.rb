@@ -26,6 +26,7 @@ RSpec.describe MaillistMailer, type: :mailer do
   describe '.workshop_maillist' do
     before do
       @msg = {
+        location: 'EO',
         from: '"Workshops" <workshops@example.com>',
         subject: '[19w5020] Test subject',
         body: 'This is a test message.',
@@ -48,8 +49,9 @@ RSpec.describe MaillistMailer, type: :mailer do
       expect(@resp.class).to eq(Mail::Message)
     end
 
-    it 'From: is a no-reply address with email_domain' do
-      from_email = 'no-reply@' + GetSetting.site_setting('email_domain')
+    it 'From: is specified in Settings:Email:maillist_from' do
+      location = @msg[:location]
+      from_email = GetSetting.email(location, 'maillist_from')
       email_obj = Mail::Address.new(from_email)
       expect(@sent_message.from).to eq([email_obj.address])
     end

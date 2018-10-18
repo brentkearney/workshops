@@ -21,7 +21,8 @@
 # Sends mail to workshop participants, like a maillist
 class MaillistMailer < ApplicationMailer
   def workshop_maillist(message, recipient)
-    from = 'no-reply@' + GetSetting.site_setting('email_domain')
+    location = message[:location]
+    from = GetSetting.email(location, 'maillist_from')
     subject = message[:subject]
     email_parts = message[:email_parts]
     text_body = email_parts[:text_body]

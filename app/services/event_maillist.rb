@@ -19,6 +19,7 @@ class EventMaillist
     email_parts = EmailParser.new(@email, @destination).parse
 
     message = {
+      location: @event.location,
       from: @email.to[0][:email],
       subject: @email.subject,
       email_parts: email_parts,
