@@ -79,21 +79,24 @@ describe 'EventMaillist' do
                                   .exactly(1).times
     end
 
-    it 'sends to all members if "all" group is specified' do
+    it '"all" group sends to Confirmed, Invited, and Decided members' do
       event2 = create(:event_with_members)
-      num_members = event2.memberships.count
+      member_count = event2.attendance('Confirmed').count +
+        event2.attendance('Invited').count +
+        event2.attendance('Decided').count
+
       list_params[:event] = event2
       list_params[:group] = 'all'
 
       maillist = EventMaillist.new(subject, list_params)
       mailer = double('MaillistMailer')
       allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
-      expect(mailer).to receive(:deliver_now!).exactly(num_members).times
+      expect(mailer).to receive(:deliver_now!).exactly(member_count).times
 
       maillist.send_message
 
       expect(MaillistMailer).to have_received(:workshop_maillist)
-                                  .exactly(num_members).times
+                                  .exactly(member_count).times
     end
   end
 end

@@ -42,8 +42,9 @@ class EventMaillist
   end
 
   def send_to_all(message)
-    @event.members.each do |member|
-      email_member(member, message)
+    ['Confirmed', 'Invited', 'Undecided'].each do |status|
+      @group = status
+      send_to_attendance_group(message)
     end
   end
 
