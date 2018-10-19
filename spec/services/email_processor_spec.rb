@@ -23,6 +23,7 @@ describe 'EmailProcessor' do
   let(:event) { create(:event) }
   let(:person) { create(:person) }
   let(:membership) { create(:membership, event: event) }
+  let(:organizer) { create(:membership, event: event, role: 'Contact Organizer') }
 
   it '.initialize' do
     expect(EmailProcessor.new(subject).class).to eq(EmailProcessor)
@@ -117,12 +118,35 @@ describe 'EmailProcessor' do
       expect(EmailFromNonmemberBounceJob).not_to have_received(:perform_later)
     end
 
-    it 'does not bounce email if sender is an organizer' do
+    it 'sends bounce email if non-organizer sends to unauthorized sub-group' do
       params[:from] = "#{person.name} <#{person.email}>"
       membership.person = person
-      membership.attendance = 'Declined'
-      membership.role = 'Organizer'
+      membership.attendance = 'Confirmed'
       membership.save
+      params[:to] = ["#{event.code}-declined@example.com"]
+      email = Griddler::Email.new(params)
+      allow(UnauthorizedSubgroupBounceJob).to receive(:perform_later)
+      EmailProcessor.new(email).process
+      expect(UnauthorizedSubgroupBounceJob).to have_received(:perform_later)
+    end
+
+    it 'does not bounce email if non-organizer sends to authorized sub-group' do
+      params[:from] = "#{person.name} <#{person.email}>"
+      membership.person = person
+      membership.attendance = 'Confirmed'
+      membership.save
+      params[:to] = ["#{event.code}-all@example.com"]
+      email = Griddler::Email.new(params)
+      allow(UnauthorizedSubgroupBounceJob).to receive(:perform_later)
+      EmailProcessor.new(email).process
+      expect(UnauthorizedSubgroupBounceJob).not_to have_received(:perform_later)
+    end
+
+    it 'does not bounce email if sender is an organizer, even if Declined' do
+      member = organizer
+      params[:from] = "#{member.person.name} <#{member.person.email}>"
+      member.attendance = 'Declined'
+      member.save
 
       email = Griddler::Email.new(params)
       allow(EmailFromNonmemberBounceJob).to receive(:perform_later)
@@ -173,10 +197,6 @@ describe 'EmailProcessor' do
       EmailProcessor.new(email).process
       expect(StaffMailer).to have_received(:notify_sysadmin)
     end
-
-    it 'allows organizers to send mail, regardless of attendance status' do
-
-    end
   end
 
   context '.process delivers email to maillist' do
@@ -206,6 +226,7 @@ describe 'EmailProcessor' do
 
     it 'passes attendance status from recipient email to EventMaillist' do
       params[:to] = ["#{event.code}-not_yet_invited@example.com"]
+      params[:from] = organizer.person.email
       email = Griddler::Email.new(params)
       list_params = {
         event: event,

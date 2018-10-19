@@ -44,4 +44,10 @@ class BounceMailer < ApplicationMailer
     @event_code = params[:event_code]
     mail(to: @email_from, from: @webmaster, subject: @subject)
   end
+
+  def unauthorized_subgroup(params)
+    email_fields(params)
+    @event_code = params[:event_code]
+    mail(to: @email_from, from: @webmaster, subject: @subject)
+  end
 end

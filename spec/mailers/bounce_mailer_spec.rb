@@ -18,6 +18,8 @@ RSpec.describe BounceMailer, type: :mailer do
   }
   end
 
+  let(:event) { create(:event) }
+
   def expect_email_was_sent
     expect(ActionMailer::Base.deliveries.count).to eq(1)
   end
@@ -60,8 +62,7 @@ RSpec.describe BounceMailer, type: :mailer do
 
   describe '.non_member' do
     before do
-      @event = create(:event)
-      maillist = @event.code + '@example.com'
+      maillist = event.code + '@example.com'
       BounceMailer.non_member(params.merge(to: maillist)).deliver_now
       @sent_message = ActionMailer::Base.deliveries.first
     end
@@ -86,7 +87,39 @@ RSpec.describe BounceMailer, type: :mailer do
     end
 
     it 'Body contains reference to event code' do
-      expect(@sent_message.body).to include(@event.code)
+      expect(@sent_message.body).to include(event.code)
+    end
+  end
+
+  describe '.unauthorized_subgroup' do
+    before do
+      params[:to] = event.code + '-declined@example.com'
+      params[:event_code] = event.code
+      BounceMailer.unauthorized_subgroup(params).deliver_now
+      @sent_message = ActionMailer::Base.deliveries.first
+    end
+
+    it 'sends email' do
+      expect_email_was_sent
+    end
+
+    it 'From: webmaster_email' do
+      from_address = GetSetting.site_email('webmaster_email')
+      expect(@sent_message.from).to include(from_address)
+    end
+
+    it 'To: sender of message' do
+      from_email = Mail::Address.new(params[:from])
+      expect(@sent_message.to).to eq([from_email.address])
+    end
+
+    it 'Subject: Bounce notice + original subject' do
+      subject = 'Bounce notice: ' + params[:subject]
+      expect(@sent_message.subject).to eq(subject)
+    end
+
+    it 'Body contains reference to event code' do
+      expect(@sent_message.body).to include(event.code)
     end
   end
 end

@@ -79,11 +79,11 @@ describe 'EventMaillist' do
                                   .exactly(1).times
     end
 
-    it '"all" group sends to Confirmed, Invited, and Decided members' do
+    it '"all" group sends to Confirmed, Invited, and Undecided members' do
       event2 = create(:event_with_members)
       member_count = event2.attendance('Confirmed').count +
         event2.attendance('Invited').count +
-        event2.attendance('Decided').count
+        event2.attendance('Undecided').count
 
       list_params[:event] = event2
       list_params[:group] = 'all'

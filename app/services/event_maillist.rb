@@ -20,7 +20,7 @@ class EventMaillist
 
     message = {
       location: @event.location,
-      from: @email.to[0][:email],
+      from: @email.to[0][:full],
       subject: @email.subject,
       email_parts: email_parts,
       attachments: @email.attachments,
@@ -55,11 +55,12 @@ class EventMaillist
   end
 
   def email_member(member, message)
-    if member.is_a?(Membership)
-      recipient = %Q("#{member.person.name}" <#{member.person.email}>)
-    else
+    if member.is_a?(Person)
       recipient = %Q("#{member.name}" <#{member.email}>)
+    else
+      recipient = %Q("#{member.person.name}" <#{member.person.email}>)
     end
+
     if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
       recipient = GetSetting.site_email('webmaster_email')
     end

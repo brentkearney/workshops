@@ -20,6 +20,7 @@ class EmailProcessor
 
   private
 
+  # assembles valid maillists from To: and Cc: fields
   def extract_recipients
     maillists = []
     invalid_sender = false
@@ -34,7 +35,7 @@ class EmailProcessor
       if code =~ /#{GetSetting.code_pattern}/
         event = Event.find(code)
         unless event.blank?
-          if valid_sender?(event, to_email)
+          if valid_sender?(event, to_email, group)
             maillists << {
               event: event,
               group: member_group(group),
@@ -53,25 +54,38 @@ class EmailProcessor
   end
 
   def member_group(group)
-    return 'orgs' if group == 'orgs' || group == 'organizers'
-    return 'all' if group == 'all'
+    return 'orgs' if group.downcase == 'orgs' || group.downcase == 'organizers'
+    return 'all' if group.downcase == 'all'
     Membership::ATTENDANCE.each do |status|
       return status if group.titleize == status
     end
   end
 
-  def valid_sender?(event, to_email)
+  def valid_sender?(event, to_email, group)
     from_email = @email.from[:email]
     send_report and return false unless EmailValidator.valid?(from_email)
     person = Person.find_by_email(from_email)
-    return true if person && allowed_people(event).include?(person)
+
+    return true if organizers_and_staff(event).include?(person)
+
     params = email_params.merge(event_code: event.code, to: to_email)
-    EmailFromNonmemberBounceJob.perform_later(params)
+    unless event.confirmed.include?(person)
+      EmailFromNonmemberBounceJob.perform_later(params)
+      return false
+    end
+
+    return true if allowed_group?(group)
+    UnauthorizedSubgroupBounceJob.perform_later(params)
     return false
   end
 
-  def allowed_people(event)
-    event.confirmed + event.organizers + event.staff
+  # groups that Confirmed participants (non-organizers) may send to
+  def allowed_group?(group)
+    %w(confirmed all orgs organizers).include?(group.downcase)
+  end
+
+  def organizers_and_staff(event)
+    event.organizers + event.staff
   end
 
   def send_report
