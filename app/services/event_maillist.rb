@@ -49,8 +49,15 @@ class EventMaillist
   end
 
   def send_to_attendance_group(message)
-    @event.attendance(@group).each do |member|
-      email_member(member, message)
+    if @group == 'Not Yet Invited'
+      members = @event.attendance(@group) - @event.role('Backup Participant')
+      members.each do |member|
+        email_member(member, message)
+      end
+    else
+      @event.attendance(@group).each do |member|
+        email_member(member, message)
+      end
     end
   end
 

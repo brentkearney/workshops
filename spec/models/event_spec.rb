@@ -273,6 +273,19 @@ RSpec.describe "Model validations: Event ", type: :model do
       end
     end
 
+    it '.role returns a collection of members with specified role' do
+      event = create(:event_with_members)
+
+      %w(Participant Organizer Observer).each do |role|
+        members = event.role(role)
+        expect(members).not_to be_empty
+        members.each do |member|
+          expect(member.class).to eq(Membership)
+          expect(member.role).to eq(role)
+        end
+      end
+    end
+
     it '.num_attendance returns the number of members for a given attendance
       status' do
       e = @event

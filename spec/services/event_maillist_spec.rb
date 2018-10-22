@@ -50,7 +50,7 @@ describe 'EventMaillist' do
       allow(MaillistMailer).to receive(:workshop_maillist).and_return(@mailer)
     end
 
-    it 'sends one email per participant of specified status' do
+    it 'sends one email per participant of specified attendance status' do
       num_participants = event.attendance(status).count
       expect(num_participants).to be > 0
       expect(@mailer).to receive(:deliver_now!).exactly(num_participants).times
@@ -59,6 +59,30 @@ describe 'EventMaillist' do
 
       expect(MaillistMailer).to have_received(:workshop_maillist)
                                   .exactly(num_participants).times
+    end
+
+    it 'excludes Backup Participants from Not Yet Invited group' do
+      expect(event.memberships.count).to eq(2)
+      event.memberships.each do |member|
+        member.attendance = 'Not Yet Invited'
+        member.save
+      end
+      member = event.memberships.last
+      member.role = 'Backup Participant'
+      member.save
+
+      params[:to] = ["#{event.code}-not_yet_invited@#{@domain}"]
+      list_params[:group] = 'Not Yet Invited'
+
+      maillist = EventMaillist.new(subject, list_params)
+      mailer = double('MaillistMailer')
+      allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
+      expect(mailer).to receive(:deliver_now!).exactly(1).times
+
+      maillist.send_message
+
+      expect(MaillistMailer).to have_received(:workshop_maillist)
+                                  .exactly(1).times
     end
 
     it 'sends to organizers if "orgs" group is specified' do

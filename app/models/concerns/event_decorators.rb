@@ -45,6 +45,10 @@ module EventDecorators
     sorted_members
   end
 
+  def role(role = 'Participant', order = 'lastname')
+    memberships.joins(:person).where('role = ?', role).order(order)
+  end
+
   def num_attendance(status)
     attendance(status).size
   end
