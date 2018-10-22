@@ -18,7 +18,7 @@ describe 'EmailParser' do
   }
   end
 
-  let(:prelude) { "Message from #{params[:from]} to 18w6660@example.com" }
+  let(:prelude) { "From #{params[:from]} to 18w6660@example.com" }
 
   subject { Griddler::Email.new(params) }
 

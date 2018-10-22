@@ -22,8 +22,7 @@ class EmailParser
   end
 
   def prepare_text(text_body)
-    prelude = '-' * 70 + "\n"
-    prelude << "Message from #{@email.from[:full]} to #{@list_name} on #{@email.headers['Date']}:"
+    prelude = "From #{@email.from[:full]} to #{@list_name} on #{@email.headers['Date']}:"
     prelude << "\n" + '-' * 70 + "\n\n"
 
     if text_body.blank?
@@ -36,8 +35,7 @@ class EmailParser
 
   def prepare_html(html_body)
     unless html_body.blank?
-      prelude = "\n<hr width=\"100%\" />\n"
-      prelude << "<p>Message from #{@email.from[:full]} to #{@list_name} on #{@email.headers['Date']}:</p>\n"
+      prelude = "<p>From #{@email.from[:full]} to #{@list_name} on #{@email.headers['Date']}:</p>\n"
       prelude << "<hr width=\"100%\" />\n\n"
 
       if html_body.include?('<body')
