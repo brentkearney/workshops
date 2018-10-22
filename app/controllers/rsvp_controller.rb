@@ -13,6 +13,7 @@ class RsvpController < ApplicationController
     unless @invitation.event.nil?
       @inv_event = @invitation.event
       @pc_email = GetSetting.email(@inv_event.location, 'program_coordinator')
+      SyncEventMembersJob.perform_later(@invitation.membership.event_id)
     end
   end
 

@@ -19,6 +19,7 @@ describe 'RSVP', type: :feature do
     @membership = create(:membership, event: @event, person: @person,
                          attendance: 'Invited')
     @invitation = create(:invitation, membership: @membership)
+    allow(SyncEventMembersJob).to receive(:perform_later).with(@event.id)
   end
 
   before do
@@ -30,6 +31,10 @@ describe 'RSVP', type: :feature do
 
   before :each do
     visit rsvp_otp_path(@invitation.code)
+  end
+
+  it 'syncs event membership data' do
+    expect(SyncEventMembersJob).to have_received(:perform_later).with(@event.id)
   end
 
   it 'welcomes the user' do
@@ -364,6 +369,21 @@ describe 'RSVP', type: :feature do
       expect(page.body).to have_text("firstname can't be blank")
       expect(page).to have_css('textarea#rsvp_organizer_message',
         text: 'Hi Org!')
+    end
+
+    it 'persists staff attributes from before RSVP' do
+      @membership.staff_notes = 'Test note'
+      @membership.room = 'Room 6'
+      @membership.stay_id = 'ABC123'
+      @membership.save
+
+      fill_in 'rsvp_organizer_message', with: 'Hi Org!'
+      click_button 'Confirm Attendance'
+
+      updated_membership = Membership.find(@membership.id)
+      expect(updated_membership.staff_notes).to eq('Test note')
+      expect(updated_membership.room).to eq('Room 6')
+      expect(updated_membership.stay_id).to eq('ABC123')
     end
 
     it 'skips the "message to organizer" form if the user is the organizer' do
