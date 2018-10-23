@@ -149,17 +149,65 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@event.confirmed_count).to eq(counter_cache - 1)
   end
 
-  it 'notifies staff if attendance changes to or from confirmed' do
+  context 'Staff notifications upon participant-updated fields' do
+
+    def expect_confirmation_notice
+      expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).not_to eq 0
+      recipient = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last
+      expect(recipient).to eq('confirmation_notices')
+    end
+
+    before do
+      @event.start_date = Date.current + 1.day
+      @event.end_date = @event.start_date + 5.days
+      @event.save
+      @membership.attendance = 'Confirmed'
+      @membership.has_guest = false
+      @membership.own_accommodation = false
+      @membership.special_info = 'None.'
+      @membership.updated_by = @membership.person.name
+      @membership.save
+    end
+
+    it 'notifies staff if attendance changes to or from confirmed' do
+      @membership.attendance = 'Not Yet Invited'
+      @membership.save
+      expect_confirmation_notice
+    end
+
+    it 'notifies staff if has_guest is changed' do
+      @membership.has_guest = true
+      @membership.save
+      expect_confirmation_notice
+    end
+
+    it 'notifies staff if own_accommodation is changed' do
+      @membership.own_accommodation = true
+      @membership.save
+      expect_confirmation_notice
+    end
+
+    it 'notifies staff if special_info is changed' do
+      @membership.special_info = 'I only eat meat.'
+      @membership.save
+      expect_confirmation_notice
+    end
+  end
+
+  it 'includes before and after updated_by fields in change notice' do
     @event.start_date = Date.current + 1.day
     @event.end_date = @event.start_date + 5.days
     @event.save
-    expect(@membership.attendance).to eq('Confirmed')
-    @membership.attendance = 'Not Yet Invited'
+    @membership.attendance = 'Confirmed'
+    @membership.updated_by = 'Workshops importer'
     @membership.save
 
-    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).not_to eq 0
-    recipient = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last
-    expect(recipient).to eq('confirmation_notices')
+    @membership.attendance = 'Declined'
+    @membership.updated_by = @membership.person.name
+    @membership.save
+    message = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].second
+    expect(message).to include('was "Workshops importer"')
+    expect(message).to include(%Q[is now "#{@membership.person.name}"])
   end
 
   it 'skips attendance notification if .changed_fields? is untrue' do

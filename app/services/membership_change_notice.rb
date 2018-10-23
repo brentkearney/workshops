@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Banff International Research Station.
+# Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
@@ -15,15 +15,19 @@ class MembershipChangeNotice
   end
 
   def run
-    notify_coordinator
-    notify_staff
+    if valid_change?
+      notify_coordinator
+      notify_staff
+    end
   end
+
+  NOTIFY_FIELDS = %w(attendance arrival_date departure_date special_info
+                     has_guest own_accommodation updated_by)
 
   private
 
   def changed_fields?
-    changed.include?('attendance') || changed.include?('arrival_date') ||
-      changed.include?('departure_date')
+    !(NOTIFY_FIELDS & changed).empty?
   end
 
   def confirmation_lead_time
@@ -31,8 +35,8 @@ class MembershipChangeNotice
   end
 
   def valid_change?
-    event.upcoming? && membership.updated_by != 'Workshops importer' &&
-      changed_fields?
+    changed_fields? && event.upcoming? &&
+      membership.updated_by != 'Workshops importer'
   end
 
   def within_lead_time?
@@ -44,47 +48,25 @@ class MembershipChangeNotice
   end
 
   def notify_coordinator
-    return unless valid_change?
     send_notice(to: 'program_coordinator') if changed_by_member?
   end
 
   def notify_staff
-    return unless valid_change? && within_lead_time?
+    return unless within_lead_time?
     send_notice(to: 'confirmation_notices')
   end
 
-  def arrival_date_change_message(msg)
-    if changed.include?('arrival_date')
-      msg << "\n" unless msg.empty?
-      msg << "Arrival date was #{membership.arrival_date_was} and is now
-        #{membership.arrival_date}.".squish
-    end
-    msg
-  end
-
-  def departure_date_change_message(msg)
-    if changed.include?('departure_date')
-      msg << "\n" unless msg.empty?
-      msg << "Departure date was #{membership.departure_date_was} and is now
-        #{membership.departure_date}.".squish
-    end
-    msg
-  end
-
-  def attendance_change_message
-    msg = ''
-    if changed.include?('attendance')
-      was = membership.attendance_was || 'unset'
-      msg = "Attendance was #{was} and is now
-        #{membership.attendance}.".squish
-    end
-    msg
-  end
-
   def build_change_message
-    msg = attendance_change_message
-    msg = arrival_date_change_message(msg)
-    departure_date_change_message(msg)
+    msg = ''
+    NOTIFY_FIELDS.each do |field|
+      if changed.include?(field)
+        msg << "\n\n" unless msg.empty?
+        field_was = field + '_was'
+        msg << %Q[#{field.titleize} was "#{membership.send(field_was)}" and is now
+          "#{membership.send(field)}".].squish
+      end
+    end
+    msg
   end
 
   def send_notice(to:)
