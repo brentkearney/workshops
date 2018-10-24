@@ -5,6 +5,28 @@
 # See the COPYRIGHT file for details and exceptions.
 
 module ApplicationHelper
+
+  def page_title
+    return 'Future Events' if request.path == events_future_path
+    return 'Past Events' if request.path == events_past_path
+    if request.path =~ /(future|past)\/location\/(\w+)\z/
+      return %Q(#{@tense} #{@location} Events)
+    end
+    return %Q(#{@year} Events) if request.path =~ /events\/year\/(\d{4})/
+    if request.path =~ /year\/(\d{4})\/location/
+      return %Q(#{@year} #{@location} Events)
+    end
+    if request.path =~ /events\/(\w+)\/schedule/
+      return %Q(#{@event.code} Schedule)
+    end
+    if request.path =~ /events\/(\w+)\/memberships/
+      return %Q(#{@event.code} Members)
+    end
+    return %Q(#{@event.code}: #{@event.name}) if @event
+    Setting.Site[:title]
+  end
+
+
   def profile_pic(person)
     image_tag "profile.png", alt: "#{person.name}", id: "profile-pic-#{person.id}", class: "img-responsive img-rounded"
   end

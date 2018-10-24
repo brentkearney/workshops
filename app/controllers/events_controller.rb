@@ -25,9 +25,10 @@ class EventsController < ApplicationController
     render :index unless performed?
   end
 
-  # GET /events/past
-  # GET /events/past.json
+  # GET /events/past(/location/:location)
+  # GET /events/past.json(/location/:location).json
   def past
+    @tense = 'Past'
     @events = policy_scope(Event).past.reverse_order
     remove_locations
     render :index unless performed?
@@ -36,6 +37,7 @@ class EventsController < ApplicationController
   # GET /events/future(/location/:location)
   # GET /events/future(/location/:location).json
   def future
+    @tense = 'Future'
     @events = policy_scope(Event).future
     remove_locations
     render :index unless performed?
@@ -44,9 +46,9 @@ class EventsController < ApplicationController
   # GET /events/year/:year
   # GET /events/year/:year.json
   def year
-    year = params[:year]
-    if year =~ /^\d{4}$/
-      @events = policy_scope(Event).year(year)
+    @year = params[:year]
+    if @year =~ /^\d{4}$/
+      @events = policy_scope(Event).year(@year)
       remove_locations
       render :index unless performed?
     else
@@ -57,11 +59,11 @@ class EventsController < ApplicationController
   # GET /events/location/:location
   # GET /events/location/:location.json
   def location
-    location = params[:location]
-    unless Setting.Locations.keys.include?(location)
-      location = Setting.Locations.keys.first
+    @location = params[:location]
+    unless Setting.Locations.keys.include?(@location)
+      @location = Setting.Locations.keys.first
     end
-    @events = Event.location(location).order(:start_date)
+    @events = Event.location(@location).order(:start_date)
     render :index unless performed?
   end
 
@@ -200,7 +202,7 @@ class EventsController < ApplicationController
   end
 
   def remove_locations
-    location = location_params['location']
-    @events = @events.select {|e| e.location == location} unless location.blank?
+    @location = location_params['location']
+    @events = @events.select {|e| e.location == @location} unless @location.blank?
   end
 end
