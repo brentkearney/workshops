@@ -29,6 +29,8 @@ gem 'rails-settings-cached'
 gem 'sparkpost_rails'
 gem 'griddler-sparkpost'
 gem 'ed25519'
+gem 'wicked_pdf'
+gem 'wkhtmltopdf-binary'
 
 group :development, :test do
   gem 'byebug'

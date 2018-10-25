@@ -385,6 +385,8 @@ GEM
       activemodel (>= 4.2)
       debug_inspector
       railties (>= 4.2)
+    wicked_pdf (1.1.0)
+    wkhtmltopdf-binary (0.12.4)
     xpath (3.1.0)
       nokogiri (~> 1.8)
 
@@ -443,6 +445,8 @@ DEPENDENCIES
   turbolinks
   uglifier
   web-console
+  wicked_pdf
+  wkhtmltopdf-binary
 
 BUNDLED WITH
-   1.16.3
+   1.17.1

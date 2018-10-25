@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Banff International Research Station
+# Copyright (c) 2018 Banff International Research Station
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,44 +20,59 @@
 
 class InvitationMailer < ApplicationMailer
   def invite(invitation)
-    person = invitation.membership.person
-    event = invitation.membership.event
+    @person = invitation.membership.person
+    @event = invitation.membership.event
 
-    rsvp_link = GetSetting.app_url + '/rsvp/' + invitation.code
-    organizers = ''
-    event.organizers.each do |org|
-      organizers << org.name + ' (' + org.affiliation + '), '
+    @rsvp_url = GetSetting.app_url + '/rsvp/' + invitation.code
+    @organizers = ''
+    @event.organizers.each do |org|
+      @organizers << org.name + ' (' + org.affiliation + '), '
     end
-    organizers.gsub!(/, $/, '')
+    @organizers.gsub!(/, $/, '')
 
-    from_email = GetSetting.rsvp_email(event.location)
-    subject = "[#{event.code}] Workshop Invitation: #{event.name}"
-    bcc_email = GetSetting.rsvp_email(event.location)
-    to_email = '"' + person.name + '" <' + person.email + '>'
+    @event_start = Date.parse(@event.start_date.to_s).strftime('%A, %B %-d')
+    @event_end = Date.parse(@event.end_date.to_s).strftime('%A, %B %-d, %Y')
+
+    @rsvp_deadline = @event.start_date - 2.months
+    @rsvp_deadline = Date.parse(@rsvp_deadline.to_s).strftime('%B %-d, %Y')
+
+    from_email = GetSetting.rsvp_email(@event.location)
+    subject = "#{@event.location} Workshop Invitation: #{@event.name} (#{@event.code})"
+    bcc_email = GetSetting.rsvp_email(@event.location)
+    to_email = '"' + @person.name + '" <' + @person.email + '>'
+
     if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
       to_email = GetSetting.site_email('webmaster_email')
     end
 
-    sub_data = {
-      person_name: "#{person.dear_name}",
-      event_code: "#{event.code}",
-      event_name: "#{event.name}",
-      event_dates: "#{event.dates(:long)}",
-      event_url: "#{event.url}",
-      organizers: "#{organizers}",
-      rsvp_link: "#{rsvp_link}"
-    }
+    template_path = Rails.root.join('app', 'views', 'invitation_mailer',
+                      "#{@event.location}")
+    mail_template = "#{template_path}/#{@event.event_type}.text.erb"
+    text_template = "invitation_mailer/#{@event.location}/#{@event.event_type}.text.erb"
 
-    data = {
-      template_id: "#{event.location.downcase}-participant-invitation",
-      substitution_data: sub_data
-    }
+    # Create PDF attachment
+    template_file = "invitation_mailer/#{@event.location}/#{@event.event_type}.pdf.erb"
+    attachments["#{@event.location}-#{@person.id}.pdf"] = WickedPdf.new.pdf_from_string(
+      render_to_string(template: "#{template_file}", encoding: "UTF-8")
+    )
 
-    mail(to: to_email,
-         from: from_email,
-         subject: subject,
-         sparkpost_data: data) do |format|
-      format.text { render text: '' }
+    if File.exist?(mail_template)
+      mail(to: to_email,
+           bcc: bcc_email,
+           from: from_email,
+           subject: subject,
+           template_path: "invitation_mailer/#{@event.location}",
+           template_name: @event.event_type) do |format|
+        format.text { render text_template }
+      end
+    else
+      error_msg = { problem: 'Participant invitation not sent.',
+                    cause: 'Email template file missing.',
+                    template: mail_template,
+                    person: @person,
+                    membership: invitation.membership,
+                    invitation: invitation }
+      StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
     end
   end
 end

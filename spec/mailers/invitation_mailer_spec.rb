@@ -32,7 +32,7 @@ RSpec.describe InvitationMailer, type: :mailer do
 
     before :each do
       InvitationMailer.invite(@invitation).deliver_now
-      @sparkpost_data = ActionMailer::Base.deliveries.last.sparkpost_data
+      @delivery = ActionMailer::Base.deliveries.last
     end
 
     it 'sends email' do
@@ -40,24 +40,22 @@ RSpec.describe InvitationMailer, type: :mailer do
     end
 
     it 'To: given member, subject: event_code' do
-      header = ActionMailer::Base.deliveries.last
-      expect(header.to).to include(@invitation.membership.person.email)
-      expect(header.subject).to include(@invitation.membership.event.code)
+      expect(@delivery.to_addrs.first).to eq(@invitation.membership.person.email)
+      expect(@delivery.subject).to include(@invitation.membership.event.code)
     end
 
     it "message body includes participant's name" do
-      recipient = @sparkpost_data[:substitution_data][:person_name]
-      expect(recipient).to have_text(@invitation.membership.person.dear_name)
+      participant_name = @invitation.membership.person.dear_name
+      expect(@delivery.text_part).to have_text(participant_name)
     end
 
     it 'message body includes the invitation code' do
-      rsvp_link = @sparkpost_data[:substitution_data][:rsvp_link]
-      expect(rsvp_link).to have_text(@invitation.code)
+      expect(@delivery.text_part).to have_text(@invitation.code)
     end
 
     it 'message body contains event name' do
-      event_code = @sparkpost_data[:substitution_data][:event_name]
-      expect(event_code).to eq(@invitation.membership.event.name)
+      event_name = @invitation.membership.event.name
+      expect(@delivery.text_part).to have_text(event_name)
     end
   end
 end
