@@ -23,6 +23,17 @@ class InvitationMailer < ApplicationMailer
     @person = invitation.membership.person
     @event = invitation.membership.event
 
+    return if @event.start_date.to_time.to_i < Time.now.to_i
+    @event_start = @event.start_date.to_time.strftime('%A, %B %-d')
+    @event_end = @event.end_date.to_time.strftime('%A, %B %-d, %Y')
+
+    @rsvp_deadline = (Date.current + 6.weeks).strftime('%B %-d, %Y')
+    if (@event.start_date - Date.current) < (2.months + 5.days)
+      @rsvp_deadline = (Date.current + 25.days).strftime('%B %-d, %Y')
+    elsif (@event.start_date - Date.current) < 1.month
+      @rsvp_deadline = (Date.current + 10.days).strftime('%B %-d, %Y')
+    end
+
     @rsvp_url = GetSetting.app_url + '/rsvp/' + invitation.code
     @organizers = ''
     @event.organizers.each do |org|
@@ -30,11 +41,6 @@ class InvitationMailer < ApplicationMailer
     end
     @organizers.gsub!(/, $/, '')
 
-    @event_start = Date.parse(@event.start_date.to_s).strftime('%A, %B %-d')
-    @event_end = Date.parse(@event.end_date.to_s).strftime('%A, %B %-d, %Y')
-
-    @rsvp_deadline = @event.start_date - 2.months
-    @rsvp_deadline = Date.parse(@rsvp_deadline.to_s).strftime('%B %-d, %Y')
 
     from_email = GetSetting.rsvp_email(@event.location)
     subject = "#{@event.location} Workshop Invitation: #{@event.name} (#{@event.code})"
@@ -51,10 +57,19 @@ class InvitationMailer < ApplicationMailer
     text_template = "invitation_mailer/#{@event.location}/#{@event.event_type}.text.erb"
 
     # Create PDF attachment
+    @page_title = "#{@event.location} Invitation Details"
     template_file = "invitation_mailer/#{@event.location}/#{@event.event_type}.pdf.erb"
-    attachments["#{@event.location}-#{@person.id}.pdf"] = WickedPdf.new.pdf_from_string(
+
+    pdf_file = WickedPdf.new.pdf_from_string(
       render_to_string(template: "#{template_file}", encoding: "UTF-8")
     )
+    attachments["#{@event.location}-invitation-#{@person.id}.pdf"] = pdf_file
+
+    # save to a file (for testing)
+    # save_path = Rails.root.join('tmp','invitation.pdf')
+    # File.open(save_path, 'wb') do |file|
+    #   file << pdf_file
+    # end
 
     if File.exist?(mail_template)
       mail(to: to_email,
