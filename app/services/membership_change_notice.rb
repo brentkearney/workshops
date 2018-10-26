@@ -22,7 +22,7 @@ class MembershipChangeNotice
   end
 
   NOTIFY_FIELDS = %w(attendance arrival_date departure_date special_info
-                     has_guest own_accommodation updated_by)
+                     has_guest own_accommodation)
 
   private
 
@@ -57,16 +57,18 @@ class MembershipChangeNotice
   end
 
   def build_change_message
-    msg = ''
+    msg = []
     NOTIFY_FIELDS.each do |field|
       if changed.include?(field)
-        msg << "\n\n" unless msg.empty?
         field_was = field + '_was'
         msg << %Q[#{field.titleize} was "#{membership.send(field_was)}" and is now
           "#{membership.send(field)}".].squish
       end
     end
-    msg
+    {
+      message: msg,
+      updated_by: membership.updated_by
+    }
   end
 
   def send_notice(to:)

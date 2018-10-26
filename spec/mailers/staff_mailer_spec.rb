@@ -116,10 +116,8 @@ RSpec.describe StaffMailer, type: :mailer do
   describe '.confirmation_notice' do
     before do
       @member = create(:membership, event: @event)
-    end
-
-    before :each do
-      StaffMailer.confirmation_notice(@member, 'Hi!', 'confirmation_notices')
+      msg = { message: ['Attendance was "Confirmed" and is now "Declined".'], updated_by: 'Rspec' }
+      StaffMailer.confirmation_notice(@member, msg, 'confirmation_notices')
         .deliver_now
     end
 

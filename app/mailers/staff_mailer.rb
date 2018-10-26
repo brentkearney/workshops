@@ -84,7 +84,11 @@ class StaffMailer < ApplicationMailer
     @membership = membership
     @person = membership.person
     @event = membership.event
-    @message = msg
+    @message = ''
+    msg[:message].each do |changed|
+      @message << "#{changed}\n\n"
+    end
+    @updated_by = msg[:updated_by]
     @membership_url = event_membership_url(@event, membership)
     subject = "[#{@event.code}] membership change!"
     mail(to: staff_email, subject: subject)

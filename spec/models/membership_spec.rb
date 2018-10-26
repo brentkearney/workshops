@@ -194,7 +194,7 @@ RSpec.describe 'Model validations: Membership', type: :model do
     end
   end
 
-  it 'includes before and after updated_by fields in change notice' do
+  it 'includes changed fields & updated_by in change notice' do
     @event.start_date = Date.current + 1.day
     @event.end_date = @event.start_date + 5.days
     @event.save
@@ -205,9 +205,9 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.attendance = 'Declined'
     @membership.updated_by = @membership.person.name
     @membership.save
-    message = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].second
-    expect(message).to include('was "Workshops importer"')
-    expect(message).to include(%Q[is now "#{@membership.person.name}"])
+    msg = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].second
+    expect(msg.values.first).to eq(['Attendance was "Confirmed" and is now "Declined".'])
+    expect(msg.values.second).to eq(@membership.person.name)
   end
 
   it 'skips attendance notification if .changed_fields? is untrue' do
