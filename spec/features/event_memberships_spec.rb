@@ -52,6 +52,14 @@ describe 'Event Membership Page', type: :feature do
     expect(page.body).not_to have_css('a', text: 'Email Confirmed Members')
   end
 
+  def shows_invite_buttons
+    expect(page.body).to have_css('a', text: 'Send Invitation')
+  end
+
+  def hides_invite_buttons
+    expect(page.body).not_to have_css('a', text: 'Send Invitation')
+  end
+
   def links_to_confirmed_member_profiles
     @event.memberships.select {|m| m.attendance == 'Confirmed'}.each do |member|
       links_to_profile(member)
@@ -79,8 +87,9 @@ describe 'Event Membership Page', type: :feature do
       end
     end
 
-    it 'hides email buttons' do
+    it 'hides email & invite buttons' do
       hides_email_buttons
+      hides_invite_buttons
     end
   end
 
@@ -95,8 +104,9 @@ describe 'Event Membership Page', type: :feature do
       shows_confirmed_members
     end
 
-    it 'hides email buttons' do
+    it 'hides email & invite buttons' do
       hides_email_buttons
+      hides_invite_buttons
     end
 
     it 'does not show non-confirmed members' do
@@ -119,8 +129,9 @@ describe 'Event Membership Page', type: :feature do
       shows_confirmed_members
     end
 
-    it 'hides email buttons' do
+    it 'hides email & invite buttons' do
       hides_email_buttons
+      hides_invite_buttons
     end
 
     it 'does not show non-confirmed members' do
@@ -144,8 +155,9 @@ describe 'Event Membership Page', type: :feature do
       shows_all_members
     end
 
-    it 'shows email buttons' do
+    it 'shows email & invite buttons' do
       shows_email_buttons
+      shows_invite_buttons
     end
 
     it 'creates sections for attendance status' do
@@ -176,8 +188,9 @@ describe 'Event Membership Page', type: :feature do
         shows_all_members
       end
 
-      it 'shows email buttons' do
+      it 'shows email & invite buttons' do
         shows_email_buttons
+        shows_invite_buttons
       end
 
       it "has links to all members' profiles" do
@@ -217,8 +230,9 @@ describe 'Event Membership Page', type: :feature do
       shows_all_members
     end
 
-    it 'shows email buttons' do
+    it 'shows email & invite buttons' do
       shows_email_buttons
+      shows_invite_buttons
     end
 
     it "has links to all members' profiles" do

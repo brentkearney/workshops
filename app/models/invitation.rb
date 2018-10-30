@@ -69,10 +69,15 @@ class Invitation < ActiveRecord::Base
 
   def update_and_save
     membership.sent_invitation = true
-    membership.attendance = 'Invited' if membership.attendance == 'Not Yet Invited'
     membership.invited_by = invited_by
     membership.invited_on = DateTime.current
-    membership.save
+    membership.update_remote = true
+    if membership.attendance == 'Not Yet Invited'
+      membership.attendance = 'Invited'
+      membership.role = 'Participant' if membership.role == 'Backup Participant'
+      membership.updated_by = invited_by
+    end
+    membership.save!
     save
   end
 

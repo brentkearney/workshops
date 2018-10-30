@@ -87,8 +87,11 @@ FactoryBot.define do
         5.times do
           create(:membership, event: event, role: 'Participant', attendance: 'Confirmed', arrival_date: arrival, departure_date: departure)
         end
-        4.times do
+        2.times do
           create(:membership, event: event, role: 'Participant', attendance: 'Not Yet Invited')
+        end
+        2.times do
+          create(:membership, event: event, role: 'Backup Participant', attendance: 'Not Yet Invited')
         end
         3.times do
           membership = create(:membership, event: event, role: 'Participant', attendance: 'Declined')

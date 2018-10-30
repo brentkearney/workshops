@@ -8,8 +8,6 @@ require "rails_helper"
 include ActiveJob::TestHelper
 
 RSpec.describe InvitationMailer, type: :mailer do
-  # Uses SparkPost now
-
   def expect_email_was_sent
     expect(ActionMailer::Base.deliveries.count).to eq(1)
   end
@@ -46,16 +44,16 @@ RSpec.describe InvitationMailer, type: :mailer do
 
     it "message body includes participant's name" do
       participant_name = @invitation.membership.person.dear_name
-      expect(@delivery.text_part).to have_text(participant_name)
+      expect(@delivery.body).to have_text(participant_name)
     end
 
     it 'message body includes the invitation code' do
-      expect(@delivery.text_part).to have_text(@invitation.code)
+      expect(@delivery.body).to have_text(@invitation.code)
     end
 
     it 'message body contains event name' do
       event_name = @invitation.membership.event.name
-      expect(@delivery.text_part).to have_text(event_name)
+      expect(@delivery.body).to have_text(event_name)
     end
   end
 end

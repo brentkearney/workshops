@@ -3,6 +3,7 @@
   <tr class="<%= member.role.delete(' ').downcase %>-row">
     <td><%= link_to i, event_membership_path(@event, member) %></td>
     <td class="rowlink-skip"><%= link_to "#{member.person.lname}", event_membership_path(@event, member) %></td>
+    <%= show_invite_button(member) %>
     <td class="hidden-xs rowlink-skip"><%= member.person.affiliation %></td>
     <%= show_email(member) %>
     <td class="hidden-xs rowlink-skip no-print"><%= member.role %></td>

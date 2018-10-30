@@ -27,14 +27,19 @@ class InvitationsController < ApplicationController
     end
   end
 
-  def resend
+  def send_invite
     membership = Membership.find_by_id(membership_param)
     if membership.nil?
       redirect_to root_path, error: 'Membership not found.'
     else
-      send_invitation(membership, current_user.name)
-      redirect_to event_memberships_path(membership.event),
-                  success: "Invitation sent to #{membership.person.name}"
+      if policy(membership).send_invitations?
+        send_invitation(membership, current_user.name)
+        redirect_to event_memberships_path(membership.event),
+                    success: "Invitation sent to #{membership.person.name}"
+      else
+        redirect_to event_memberships_path(membership.event),
+            error: 'Access to this feature is restricted.'
+      end
     end
   end
 

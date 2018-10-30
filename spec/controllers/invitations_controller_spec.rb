@@ -122,7 +122,7 @@ RSpec.describe InvitationsController, type: :controller do
     end
   end
 
-  describe 'GET #resend' do
+  describe 'GET #send_invite' do
     before do
       authenticate_for_controllers
       @user.admin!
@@ -131,9 +131,57 @@ RSpec.describe InvitationsController, type: :controller do
       @membership = create(:membership, event: @event, attendance: 'Invited')
     end
 
+    it 'allows admins' do
+      get :send_invite, membership_id: @membership.id
+      expect(flash[:success]).to be_present
+    end
+
+    it 'allows staff' do
+      @user.staff!
+      get :send_invite, membership_id: @membership.id
+      expect(flash[:success]).to be_present
+      @user.admin!
+    end
+
+    it 'does not allow non-member users' do
+      @user.member!
+      get :send_invite, membership_id: @membership.id
+      expect(flash[:error]).to be_present
+      @user.admin!
+    end
+
+    it 'does not allow member users' do
+      @user.member!
+      original_person = @membership.person
+      @membership.person = @user.person
+      @membership.attendance = 'Confirmed'
+      @membership.role = 'Participant'
+      @membership.save
+
+      get :send_invite, membership_id: @membership.id
+      expect(flash[:error]).to be_present
+      @user.admin!
+      @membership.person = original_person
+      @membership.save
+    end
+
+    it 'allows members that are organizers' do
+      @user.member!
+      original_person = @membership.person
+      @membership.person = @user.person
+      @membership.role = 'Organizer'
+      @membership.save
+
+      get :send_invite, membership_id: @membership.id
+      expect(flash[:success]).to be_present
+      @user.admin!
+      @membership.person = original_person
+      @membership.save
+    end
+
     context 'invalid parameter' do
       before do
-        get :resend, membership_id: '69 '
+        get :send_invite, membership_id: '69 '
       end
 
       it 'redirects to root_path' do
@@ -147,7 +195,7 @@ RSpec.describe InvitationsController, type: :controller do
 
     context 'valid parameter' do
       before do
-        get :resend, membership_id: @membership.id
+        get :send_invite, membership_id: @membership.id
       end
 
       it 'redirects to event_memberships_path' do
@@ -163,11 +211,10 @@ RSpec.describe InvitationsController, type: :controller do
         invitation = spy('invitation')
         allow(Invitation).to receive(:new).and_return(invitation)
 
-        get :resend, membership_id: @membership.id
+        get :send_invite, membership_id: @membership.id
 
         expect(invitation).to have_received(:send_invite)
       end
     end
-
   end
 end

@@ -104,9 +104,16 @@ class EventPolicy
   end
 
   def sync?
-    if event.end_date >= Date.today && !event.template
+    if event.end_date >= Date.today && !event.template #&& within_timelimit?
       allow_orgs_and_staff unless Rails.env.test?
     end
+  end
+
+  # limit sync data to once every 5 minutes per user
+  def within_timelimit?
+    sync_time = session[:"#{event.code}_sync"]
+    return true if sync_time.blank?
+    Time.now - Time.parse(sync_time) > 5.minutes
   end
 
   def view_details?

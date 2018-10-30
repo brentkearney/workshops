@@ -28,6 +28,7 @@ class SyncMembers
     prune_members
     @local_members = @event.memberships.includes(:person)
     sync_memberships
+    # set_sync_time
     check_max_participants
     sync_errors.send_report
   end
@@ -45,6 +46,10 @@ class SyncMembers
         save_membership(membership)
       end
     end
+  end
+
+  def set_sync_time
+    session[:"#{event.code}_sync"] = Time.now
   end
 
   def create_new_membership(remote_member)
