@@ -22,6 +22,8 @@ class InvitationMailer < ApplicationMailer
   def invite(invitation)
     @person = invitation.membership.person
     @event = invitation.membership.event
+    @membership = invitation.membership
+    @rsvp_url = GetSetting.app_url + '/rsvp/' + invitation.code
 
     return if @event.start_date.to_time.to_i < Time.now.to_i
     @event_start = @event.start_date.to_time.strftime('%A, %B %-d')
@@ -34,13 +36,11 @@ class InvitationMailer < ApplicationMailer
       @rsvp_deadline = (Date.current + 10.days).strftime('%B %-d, %Y')
     end
 
-    @rsvp_url = GetSetting.app_url + '/rsvp/' + invitation.code
     @organizers = ''
     @event.organizers.each do |org|
       @organizers << org.name + ' (' + org.affiliation + '), '
     end
     @organizers.gsub!(/, $/, '')
-
 
     from_email = GetSetting.rsvp_email(@event.location)
     subject = "#{@event.location} Workshop Invitation: #{@event.name} (#{@event.code})"
@@ -53,16 +53,22 @@ class InvitationMailer < ApplicationMailer
 
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{@event.location}")
-    mail_template = "#{template_path}/#{@event.event_type}.text.erb"
-    pdf_template = "#{template_path}/#{@event.event_type}.pdf.erb"
+    pdf_template_file = "#{template_path}/#{@event.event_type}.pdf.erb"
+    pdf_template = "invitation_mailer/#{@event.location}/#{@event.event_type}.pdf.erb"
+    text_template_file = "#{template_path}/#{@event.event_type}.text.erb"
     text_template = "invitation_mailer/#{@event.location}/#{@event.event_type}.text.erb"
 
+    if @membership.role == 'Observer'
+      text_template_file.gsub!(/\.text/, "-Observer\.text")
+      text_template.gsub!(/\.text/, "-Observer\.text")
+      pdf_template_file = 'no-file'
+    end
+
     # Create PDF attachment
-    if File.exist?(pdf_template)
+    if File.exist?(pdf_template_file)
       @page_title = "#{@event.location} Invitation Details"
-      template_file = "invitation_mailer/#{@event.location}/#{@event.event_type}.pdf.erb"
       pdf_file = WickedPdf.new.pdf_from_string(
-        render_to_string(template: "#{template_file}", encoding: "UTF-8")
+        render_to_string(template: "#{pdf_template}", encoding: "UTF-8")
       )
       attachments["#{@event.location}-invitation-#{@person.id}.pdf"] = pdf_file
 
@@ -73,7 +79,7 @@ class InvitationMailer < ApplicationMailer
       end
     end
 
-    if File.exist?(mail_template)
+    if File.exist?(text_template_file)
       mail(to: to_email,
            bcc: bcc_email,
            from: from_email,
@@ -85,9 +91,9 @@ class InvitationMailer < ApplicationMailer
     else
       error_msg = { problem: 'Participant invitation not sent.',
                     cause: 'Email template file missing.',
-                    template: mail_template,
+                    template: text_template_file,
                     person: @person,
-                    membership: invitation.membership,
+                    membership: @membership,
                     invitation: invitation }
       StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
     end
