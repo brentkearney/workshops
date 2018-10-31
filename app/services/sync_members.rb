@@ -22,8 +22,8 @@
 class SyncMembers
   attr_reader :event, :remote_members, :local_members, :sync_errors
   def initialize(event)
-    return if event.nil? || recently_synced?
     @event = event
+    return if event.nil? || recently_synced?
     @sync_errors = ErrorReport.new(self.class, @event)
     @remote_members = retrieve_remote_members
     prune_members
