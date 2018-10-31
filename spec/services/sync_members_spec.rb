@@ -22,6 +22,56 @@ describe "SyncMembers" do
     expect(sm.sync_errors).to be_a(ErrorReport)
   end
 
+  describe '.recently_synced?' do
+    before do
+      lc = FakeLegacyConnector.new
+      allow(lc).to receive(:get_members).with(@eventm).and_return(lc.get_members_with_changed_fields(@eventm))
+      expect(LegacyConnector).to receive(:new).and_return(lc)
+    end
+
+    it 'returns false if event.sync_time is empty' do
+      sm = SyncMembers.new(@eventm)
+      @eventm.sync_time = nil
+      @eventm.save
+
+      expect(sm.recently_synced?).to be_falsey
+    end
+
+    it 'returns false if event.sync_time is greater than 5 minutes from now' do
+      sm = SyncMembers.new(@eventm)
+      @eventm.sync_time = DateTime.now - 10.minutes
+      @eventm.save
+
+      expect(sm.recently_synced?).to be_falsey
+    end
+
+    it 'returns true if event.sync_time is less than 5 minutes from now' do
+      sm = SyncMembers.new(@eventm)
+      @eventm.sync_time = DateTime.now - 4.minutes
+      @eventm.save
+
+      expect(sm.recently_synced?).to be_truthy
+    end
+  end
+
+  describe '.set_sync_time' do
+    before do
+      lc = FakeLegacyConnector.new
+      allow(lc).to receive(:get_members).with(@eventm).and_return(lc.get_members_with_changed_fields(@eventm))
+      expect(LegacyConnector).to receive(:new).and_return(lc)
+    end
+
+    it 'adds the current time to the event.sync_time field' do
+      @eventm.sync_time = nil
+      @eventm.save
+
+      SyncMembers.new(@eventm).set_sync_time
+      evnt = Event.find(@eventm.id)
+      expect(evnt.sync_time).not_to be_blank
+      expect(evnt.sync_time).to be_a(ActiveSupport::TimeWithZone)
+    end
+  end
+
   describe '.get_remote_members' do
     context 'with no remote members' do
       it 'sends a message to ErrorReport and raises an error message' do

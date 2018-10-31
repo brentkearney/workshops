@@ -22,15 +22,26 @@
 class SyncMembers
   attr_reader :event, :remote_members, :local_members, :sync_errors
   def initialize(event)
+    return if event.nil? || recently_synced?
     @event = event
     @sync_errors = ErrorReport.new(self.class, @event)
     @remote_members = retrieve_remote_members
     prune_members
     @local_members = @event.memberships.includes(:person)
     sync_memberships
-    # set_sync_time
+    set_sync_time
     check_max_participants
     sync_errors.send_report
+  end
+
+  def recently_synced?
+    return false if event.nil? || event.sync_time.blank?
+    Time.now - event.sync_time < 5.minutes
+  end
+
+  def set_sync_time
+    event.sync_time = Time.now.in_time_zone(event.time_zone)
+    event.save
   end
 
   def sync_memberships
@@ -46,10 +57,6 @@ class SyncMembers
         save_membership(membership)
       end
     end
-  end
-
-  def set_sync_time
-    session[:"#{event.code}_sync"] = Time.now
   end
 
   def create_new_membership(remote_member)
@@ -256,7 +263,7 @@ class SyncMembers
 
   def replace_person(replace: other_person, replace_with: person)
     replace.memberships.each do |m|
-      if replace_with.memberships.select { |rm| rm.event_id == m.id }.blank?
+      if replace_with.memberships.select { |rm| rm.event_id == m.event_id }.blank?
         m.person = replace_with
         m.save!
       end

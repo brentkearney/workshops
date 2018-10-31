@@ -33,6 +33,7 @@ class InvitationsController < ApplicationController
       redirect_to root_path, error: 'Membership not found.'
     else
       if policy(membership).send_invitations?
+        pause_membership_syncing(membership.event)
         send_invitation(membership, current_user.name)
         redirect_to event_memberships_path(membership.event),
                     success: "Invitation sent to #{membership.person.name}"
@@ -44,6 +45,11 @@ class InvitationsController < ApplicationController
   end
 
   private
+
+  def pause_membership_syncing(event)
+    event.sync_time = DateTime.now
+    event.save
+  end
 
   def send_invitation(member, invited_by = false)
     (invited_by = @current_user.name if @current_user) unless invited_by
