@@ -54,21 +54,23 @@ class InvitationMailer < ApplicationMailer
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{@event.location}")
     mail_template = "#{template_path}/#{@event.event_type}.text.erb"
+    pdf_template = "#{template_path}/#{@event.event_type}.pdf.erb"
     text_template = "invitation_mailer/#{@event.location}/#{@event.event_type}.text.erb"
 
     # Create PDF attachment
-    @page_title = "#{@event.location} Invitation Details"
-    template_file = "invitation_mailer/#{@event.location}/#{@event.event_type}.pdf.erb"
+    if File.exist?(pdf_template)
+      @page_title = "#{@event.location} Invitation Details"
+      template_file = "invitation_mailer/#{@event.location}/#{@event.event_type}.pdf.erb"
+      pdf_file = WickedPdf.new.pdf_from_string(
+        render_to_string(template: "#{template_file}", encoding: "UTF-8")
+      )
+      attachments["#{@event.location}-invitation-#{@person.id}.pdf"] = pdf_file
 
-    pdf_file = WickedPdf.new.pdf_from_string(
-      render_to_string(template: "#{template_file}", encoding: "UTF-8")
-    )
-    attachments["#{@event.location}-invitation-#{@person.id}.pdf"] = pdf_file
-
-    # save to a file (for testing)
-    save_path = Rails.root.join('tmp','invitation.pdf')
-    File.open(save_path, 'wb') do |file|
-      file << pdf_file
+      # save to a file (for testing)
+      save_path = Rails.root.join('tmp','invitation.pdf')
+      File.open(save_path, 'wb') do |file|
+        file << pdf_file
+      end
     end
 
     if File.exist?(mail_template)
