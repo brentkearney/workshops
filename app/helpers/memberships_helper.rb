@@ -86,16 +86,30 @@ module MembershipsHelper
     policy(member).send_invitations? && member.attendance == 'Not Yet Invited'
   end
 
+  def show_reinvite_buttons?(member)
+    policy(member).send_invitations? &&
+      (member.attendance == 'Invited' || member.attendance == 'Undecided')
+  end
+
   def show_invite_button(member)
-    column = ''
-    if show_invite_buttons?(member)
-      column = '<td class="rowlink-skip no-print">' +
-        link_to("Send Invitation", invitations_send_path(member),
-          data: { confirm: "This will send #{member.person.name}
-          an email, inviting #{member.person.him} to attend this
-          workshop. Are you sure you want to proceed?".squish },
-          class: 'btn btn-sm btn-default') + '</td>'
-    end
+    return unless show_invite_buttons?(member)
+    column = '<td class="rowlink-skip no-print">' +
+      link_to("Send Invitation", invitations_send_path(member),
+        data: { confirm: "This will send #{member.person.name}
+        an email, inviting #{member.person.him} to attend this
+        workshop. Are you sure you want to proceed?".squish },
+        class: 'btn btn-sm btn-default') + '</td>'
+    column.html_safe
+  end
+
+  def show_reinvite_button(member)
+    return unless show_reinvite_buttons?(member)
+    column = '<td class="rowlink-skip no-print">' +
+      link_to("Resend Invitation", invitations_send_path(member),
+        data: { confirm: "This will send #{member.person.name}
+        an email, re-inviting #{member.person.him} to attend this
+        workshop. Are you sure you want to proceed?".squish },
+        class: 'btn btn-sm btn-default') + '</td>'
     column.html_safe
   end
 

@@ -31,7 +31,9 @@ describe 'Event Membership Page', type: :feature do
   end
 
   def hides_nonconfirmed_members
-    @event.memberships.select {|m| m.attendance != 'Confirmed'}.each do |member|
+    @event.memberships.select {|m| m.attendance != 'Confirmed' &&
+      m.attendance != 'Undecided' &&
+      m.attendance != 'Invited' }.each do |member|
       expect(page.body).not_to have_text(member.person.lname)
     end
   end
@@ -58,6 +60,14 @@ describe 'Event Membership Page', type: :feature do
 
   def hides_invite_buttons
     expect(page.body).not_to have_css('a', text: 'Send Invitation')
+  end
+
+  def shows_reinvite_buttons
+    expect(page.body).to have_css('a', text: 'Resend Invitation')
+  end
+
+  def hides_reinvite_buttons
+    expect(page.body).not_to have_css('a', text: 'Resend Invitation')
   end
 
   def links_to_confirmed_member_profiles
@@ -90,6 +100,7 @@ describe 'Event Membership Page', type: :feature do
     it 'hides email & invite buttons' do
       hides_email_buttons
       hides_invite_buttons
+      hides_reinvite_buttons
     end
   end
 
@@ -107,6 +118,7 @@ describe 'Event Membership Page', type: :feature do
     it 'hides email & invite buttons' do
       hides_email_buttons
       hides_invite_buttons
+      hides_reinvite_buttons
     end
 
     it 'does not show non-confirmed members' do
@@ -132,6 +144,7 @@ describe 'Event Membership Page', type: :feature do
     it 'hides email & invite buttons' do
       hides_email_buttons
       hides_invite_buttons
+      hides_reinvite_buttons
     end
 
     it 'does not show non-confirmed members' do
@@ -158,6 +171,7 @@ describe 'Event Membership Page', type: :feature do
     it 'shows email & invite buttons' do
       shows_email_buttons
       shows_invite_buttons
+      shows_reinvite_buttons
     end
 
     it 'creates sections for attendance status' do
@@ -191,6 +205,7 @@ describe 'Event Membership Page', type: :feature do
       it 'shows email & invite buttons' do
         shows_email_buttons
         shows_invite_buttons
+        shows_reinvite_buttons
       end
 
       it "has links to all members' profiles" do
@@ -211,6 +226,8 @@ describe 'Event Membership Page', type: :feature do
 
       it 'hides email buttons' do
         hides_email_buttons
+        hides_invite_buttons
+        hides_reinvite_buttons
       end
 
       it "has links to Confirmed participants' profiles" do
@@ -233,6 +250,7 @@ describe 'Event Membership Page', type: :feature do
     it 'shows email & invite buttons' do
       shows_email_buttons
       shows_invite_buttons
+      shows_reinvite_buttons
     end
 
     it "has links to all members' profiles" do
