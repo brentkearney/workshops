@@ -217,4 +217,100 @@ RSpec.describe InvitationsController, type: :controller do
       end
     end
   end
+
+  describe 'GET #send_all_invites' do
+    before do
+      authenticate_for_controllers
+      @user.admin!
+      @event = @future
+      @membership = create(:membership, event: @event, attendance: 'Not Yet Invited')
+    end
+
+    it 'allows admins' do
+      get :send_all_invites, event_id: @event.id
+      expect(flash[:success]).to be_present
+    end
+
+    it 'allows staff' do
+      @user.staff!
+      get :send_all_invites, event_id: @event.id
+      expect(flash[:success]).to be_present
+      @user.admin!
+    end
+
+    it 'does not allow non-member users' do
+      @user.member!
+      get :send_all_invites, event_id: @event.id
+      expect(flash[:error]).to be_present
+      @user.admin!
+    end
+
+    it 'does not allow member users' do
+      @user.member!
+      original_person = @membership.person
+      @membership.person = @user.person
+      @membership.attendance = 'Confirmed'
+      @membership.role = 'Participant'
+      @membership.save
+
+      get :send_all_invites, event_id: @event.id
+      expect(flash[:error]).to be_present
+      @user.admin!
+      @membership.person = original_person
+      @membership.save
+    end
+
+    it 'allows members that are organizers' do
+      @user.member!
+      original_person = @membership.person
+      @membership.person = @user.person
+      @membership.role = 'Organizer'
+      @membership.save
+
+      get :send_all_invites, event_id: @event.id
+      expect(flash[:success]).to be_present
+      @user.admin!
+      @membership.person = original_person
+      @membership.save
+    end
+
+    context 'invalid parameter' do
+      before do
+        get :send_all_invites, event_id: '69'
+      end
+
+      it 'redirects to root_path' do
+        expect(response).to redirect_to(root_path)
+      end
+
+      it 'assigns error message' do
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    context 'valid parameter' do
+      before do
+        get :send_all_invites, event_id: @event.id
+      end
+
+      it 'redirects to event_memberships_path' do
+        event = @membership.event
+        expect(response).to redirect_to(event_memberships_path(event))
+      end
+
+      it 'assigns success message' do
+        expect(flash[:success]).to be_present
+      end
+
+      it 'sends invitation' do
+        @membership.role = 'Participant'
+        @membership.attendance = 'Not Yet Invited'
+        @membership.save
+
+        get :send_all_invites, event_id: @event.id
+
+        expect(Invitation.last.membership).to eq(@membership)
+      end
+    end
+  end
 end

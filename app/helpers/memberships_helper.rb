@@ -113,6 +113,36 @@ module MembershipsHelper
     column.html_safe
   end
 
+  def add_bottom_buttons(status)
+    return unless policy(@event).view_email_addresses?
+    content = '<div class="no-print" id="email-members">'
+    content << add_email_buttons(status)
+    if status == 'Not Yet Invited'
+      content << ' | ' + link_to("Invite All Not Yet Invited Participants",
+        all_invitations_send_path(@event.id),
+        title: 'Send invitations to all non-Backup members who are Not Yet Invited',
+        data: { confirm: "This will send an email to all Participants (not
+        Backup Participants) who are Not Yet Invited, inviting them to attend
+        this workshop. Are you sure you want to proceed?".squish },
+        class: 'btn btn-sm btn-default')
+    end
+    content << "\n</div>\n"
+    content.html_safe
+  end
+
+  def add_email_buttons(status)
+    return '' unless policy(@event).show_email_buttons?(status)
+    to_email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
+    to_email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
+    content = mail_to(to_email, "<i class=\"fa fa-envelope fa-fw\"></i> Email #{status} Members".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members')
+
+    if status == 'Confirmed'
+      content << ' | '
+      content << mail_to("#{@event.code}-orgs@#{@domain}", "<i class=\"fa fa-envelope fa-fw\"></i> Email Organizers".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members')
+    end
+    content
+  end
+
   def show_email(member)
     column = ''
     if policy(@event).view_email_addresses?

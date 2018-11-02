@@ -52,6 +52,8 @@ Rails.application.routes.draw do
   post '/invitations/create' => 'invitations#create'
   get '/invitations/send/:membership_id' => 'invitations#send_invite',
       as: :invitations_send
+  get '/invitations/send_all/:event_id' => 'invitations#send_all_invites',
+      as: :all_invitations_send
 
   get '/rsvp' => 'rsvp#index'
   get '/rsvp/:otp' => 'rsvp#index', as: :rsvp_otp, constraints: { otp: /[^\/]+/ }

@@ -79,10 +79,6 @@ class MembershipPolicy
     self_organizer_staff || confirmed_member
   end
 
-  def send_invitations?
-    organizer_and_staff
-  end
-
   def edit?
     self_organizer_staff
   end
@@ -95,6 +91,10 @@ class MembershipPolicy
     return false if @current_user.nil?
     organizer_and_staff ||
       (@current_user.is_member?(@event) && @membership.share_email)
+  end
+
+  def send_invitations?
+    organizer_and_staff
   end
 
   def edit_person?

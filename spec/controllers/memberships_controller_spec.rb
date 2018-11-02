@@ -146,10 +146,7 @@ RSpec.describe MembershipsController, type: :controller do
     context 'with a valid event id' do
       before do
         @event = create(:event)
-      end
-
-      after :each do
-        @event.memberships.destroy_all
+        @membership = create(:membership, event: @event, role: 'Confirmed')
       end
 
       describe '#index' do
@@ -160,11 +157,17 @@ RSpec.describe MembershipsController, type: :controller do
         end
 
         it 'assigns @memberships to event members' do
-          membership = create(:membership, event: @event, role: 'Confirmed')
+          get :index, event_id: @event.id
+
+          expect(assigns(:memberships)).to eq('Confirmed' => [@membership])
+        end
+
+        it 'assigns email @domain' do
+          domain = GetSetting.email(@event.location, 'email_domain')
 
           get :index, event_id: @event.id
 
-          expect(assigns(:memberships)).to eq('Confirmed' => [membership])
+          expect(assigns(:domain)).to eq(domain)
         end
 
         context 'as role: member' do
@@ -187,104 +190,6 @@ RSpec.describe MembershipsController, type: :controller do
             get :index, event_id: @event.id
 
             expect(assigns(:organizer_emails)).to be_falsey
-          end
-
-          context 'as @event organizer' do
-            it "assigns @member_emails to confirmed members' emails" do
-              organizer_member = create(:membership, event: @event,
-                                                     role: 'Organizer',
-                                                     person: @user.person)
-              confirmed_member = create(:membership, event: @event,
-                                                     attendance: 'Confirmed')
-
-              get :index, event_id: @event.id
-
-              p1 = organizer_member.person
-              p2 = confirmed_member.person
-              members = [%("#{p1.name}" <#{p1.email}>),
-                         %("#{p2.name}" <#{p2.email}>)]
-              expect(assigns(:member_emails)).to eq(members)
-            end
-
-            it "assigns @organizer_emails to organizer members' emails" do
-              organizer_member = create(:membership, event: @event,
-                                                     role: 'Organizer',
-                                                     person: @user.person)
-
-              get :index, event_id: @event.id
-
-              p = organizer_member.person
-              member = [%("#{p.name}" <#{p.email}>)]
-              expect(assigns(:organizer_emails)).to eq(member)
-            end
-          end
-        end
-
-        # For testing staff and admin users
-        def member_emails?
-          organizer_member = create(:membership, event: @event,
-                                                 role: 'Organizer')
-          confirmed_member = create(:membership, event: @event,
-                                                 attendance: 'Confirmed')
-
-          get :index, event_id: @event.id
-
-          p1 = organizer_member.person
-          p2 = confirmed_member.person
-          members = [%("#{p1.name}" <#{p1.email}>),
-                     %("#{p2.name}" <#{p2.email}>)]
-          expect(assigns(:member_emails)).to eq(members)
-        end
-
-        def organizer_emails?
-          organizer_member = create(:membership, event: @event,
-                                                 role: 'Organizer')
-          get :index, event_id: @event.id
-
-          p = organizer_member.person
-          member = [%("#{p.name}" <#{p.email}>)]
-          expect(assigns(:organizer_emails)).to eq(member)
-        end
-
-        context 'as role: staff' do
-          before do
-            @user.staff!
-          end
-
-          it "assigns @member_emails to confirmed members' emails" do
-            member_emails?
-          end
-
-          it "assigns @organizer_emails to organizer members' emails" do
-            organizer_emails?
-          end
-        end
-
-        context 'as role: admin' do
-          before do
-            @user.admin!
-          end
-
-          it "assigns @member_emails to confirmed members' emails" do
-            member_emails?
-          end
-
-          it "assigns @organizer_emails to organizer members' emails" do
-            organizer_emails?
-          end
-        end
-
-        context 'as role: super_admin' do
-          before do
-            @user.super_admin!
-          end
-
-          it "assigns @member_emails to confirmed members' emails" do
-            member_emails?
-          end
-
-          it "assigns @organizer_emails to organizer members' emails" do
-            organizer_emails?
           end
         end
       end

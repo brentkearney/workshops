@@ -15,5 +15,7 @@ def authenticate_for_controllers
   sign_in @user
 end
 
+# to logout: logout(@user)
+
 # Set the referring page
 # Capybara.current_session.driver.header 'Referer', root_path

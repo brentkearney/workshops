@@ -29,18 +29,48 @@ class InvitationsController < ApplicationController
 
   def send_invite
     membership = Membership.find_by_id(membership_param)
-    if membership.nil?
-      redirect_to root_path, error: 'Membership not found.'
+    redirect_to root_path,
+                error: 'Membership not found.' and return if membership.nil?
+
+    event = membership.event
+    unless policy(event).send_invitations?
+      redirect_to event_memberships_path(event),
+          error: 'Access to this feature is restricted.' and return
+    end
+
+    pause_membership_syncing(event)
+    send_invitation(membership, current_user.name)
+    redirect_to event_memberships_path(event),
+                success: "Invitation sent to #{membership.person.name}"
+  end
+
+  def send_all_invites
+    event = Event.find_by_id(event_param)
+    redirect_to root_path,
+        error: 'Event not found.' and return if event.blank?
+
+    unless policy(event).send_invitations?
+      redirect_to event_memberships_path(event),
+          error: 'Access to this feature is restricted.' and return
+    end
+
+    members = event.memberships.where.not(role: "Backup Participant")
+                   .where(attendance: "Not Yet Invited")
+    if members.empty?
+      redirect_to event_memberships_path(event),
+          error: 'There are no Not-Yet-Invited, non-Backup Participants
+          to send invitations to.'.squish
     else
-      if policy(membership).send_invitations?
-        pause_membership_syncing(membership.event)
+      pause_membership_syncing(event)
+      sent_to = ''
+      Rails.logger.debug "\n\nMembers are: #{members.inspect}\n\n"
+      members.each do |membership|
         send_invitation(membership, current_user.name)
-        redirect_to event_memberships_path(membership.event),
-                    success: "Invitation sent to #{membership.person.name}"
-      else
-        redirect_to event_memberships_path(membership.event),
-            error: 'Access to this feature is restricted.'
+        sent_to << membership.person.name + ', '
       end
+      sent_to.gsub!(/, \z/, '')
+      redirect_to event_memberships_path(event),
+                  success: "Invitations were sent to: #{sent_to}."
     end
   end
 
@@ -71,5 +101,9 @@ class InvitationsController < ApplicationController
 
   def membership_param
     params['membership_id'].to_i
+  end
+
+  def event_param
+    params['event_id'].to_i
   end
 end

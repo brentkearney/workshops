@@ -141,8 +141,11 @@ describe 'Event Membership Page', type: :feature do
       shows_confirmed_members
     end
 
-    it 'hides email & invite buttons' do
-      hides_email_buttons
+    it 'shows email buttons' do
+      shows_email_buttons
+    end
+
+    it 'hides invite buttons' do
       hides_invite_buttons
       hides_reinvite_buttons
     end

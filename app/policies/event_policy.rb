@@ -79,9 +79,8 @@ class EventPolicy
   end
 
   def view_attendance_status?(status)
-    if allow_orgs_and_staff
-      true
-    else
+    return true if allow_orgs_and_staff
+    if current_user
       ['Confirmed', 'Invited', 'Undecided'].include?(status)
     end
   end
@@ -92,6 +91,11 @@ class EventPolicy
     end
   end
 
+  def show_email_buttons?(status)
+    return true if allow_orgs_and_staff
+    member_of_event? && status == 'Confirmed'
+  end
+
   # Allow the use of emails when they are not shared by the member
   def use_email_addresses?
     if current_user
@@ -100,7 +104,11 @@ class EventPolicy
   end
 
   def show_invite_buttons?
-    allow_staff_and_admins
+    allow_orgs_and_staff
+  end
+
+  def send_invitations?
+    allow_orgs_and_staff
   end
 
   def sync?
@@ -120,19 +128,24 @@ class EventPolicy
   private
 
   def staff_at_location
+    return false unless current_user
     current_user.staff? && current_user.location == event.location
   end
 
   def allow_staff_and_admins
-    if current_user
-      current_user.is_admin?  || staff_at_location
-    end
+    return false unless current_user
+    current_user.is_admin?  || staff_at_location
   end
 
   def allow_orgs_and_staff
-    if current_user
-      current_user.is_organizer?(event) || current_user.is_admin?  || staff_at_location
-    end
+    return false unless current_user
+    current_user.is_organizer?(event) || current_user.is_admin?  || staff_at_location
   end
 
+  def member_of_event?
+    return false unless current_user
+    member = Membership.where(person: current_user.person, event: @event).first
+    return false if member.blank?
+    ['Confirmed', 'Invited', 'Undecided'].include?(member.attendance)
+  end
 end

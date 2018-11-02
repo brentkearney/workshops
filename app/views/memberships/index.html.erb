@@ -39,12 +39,7 @@
                 </table>
               </div>
               <!-- /.table-responsive -->
-              <% if status == 'Confirmed' && @member_emails %>
-                <div class="no-print" id="email-members">
-                <%= mail_to @current_user.email, "<i class=\"fa fa-envelope fa-fw\"></i> Email Confirmed Members".html_safe, bcc: @member_emails.join(','), subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members' %>
-                 | <%= mail_to @organizer_emails.join(','), "<i class=\"fa fa-envelope fa-fw\"></i> Email Organizers".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members' %>
-                </div>
-              <% end %>
+              <%= add_bottom_buttons(status) %>
             </div>
             <!-- /.panel-body -->
           </div>

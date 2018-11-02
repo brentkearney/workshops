@@ -15,9 +15,7 @@ class MembershipsController < ApplicationController
     SyncMembers.new(@event) if policy(@event).sync?
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
-
-    # For the "Email Organizers/Participants" buttons
-    assign_buttons if policy(@event).use_email_addresses?
+    @domain = GetSetting.email(@event.location, 'email_domain')
   end
 
   # GET /events/:event_id/memberships/1
@@ -121,21 +119,6 @@ class MembershipsController < ApplicationController
       end
     end
     memberships - [@membership]
-  end
-
-  def assign_buttons
-    @member_emails = map_emails(@memberships['Confirmed'])
-    organizers = @memberships.values[0].nil? ? '' : select_organizers
-    @organizer_emails = map_emails(organizers)
-  end
-
-  def map_emails(members)
-    return [] if members.blank?
-    members.map { |m| "\"#{m.person.name}\" <#{m.person.email}>" }
-  end
-
-  def select_organizers
-    @memberships.values[0].select { |m| m.role =~ /Organizer/ }
   end
 
   def set_membership
