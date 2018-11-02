@@ -12,6 +12,7 @@ describe 'Event Membership Page', type: :feature do
     @member = @event.memberships.where("role='Participant'").first
     @user = create(:user, email: @member.person.email, person: @member.person)
     @non_member_user = create(:user)
+    @domain = GetSetting.email(@event.location, 'email_domain')
   end
 
   def links_to_profile(member)
@@ -44,18 +45,48 @@ describe 'Event Membership Page', type: :feature do
     end
   end
 
-  def shows_email_buttons
+  def shows_confirmed_email_buttons
     expect(page.body).to have_css('a', text: 'Email Organizers')
     expect(page.body).to have_css('a', text: 'Email Confirmed Members')
   end
 
-  def hides_email_buttons
-    expect(page.body).not_to have_css('a', text: 'Email Organizers')
-    expect(page.body).not_to have_css('a', text: 'Email Confirmed Members')
+  def shows_all_email_buttons
+    @event.memberships.select(:attendance).each do |member|
+      status = member.attendance
+      email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
+      email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
+      expect(page.body).to include(email)
+    end
+  end
+
+  def hides_nonconfirmed_email_buttons
+    @event.memberships.select(:attendance).each do |member|
+      status = member.attendance
+      email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
+      email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
+      expect(page.body).not_to include(email) unless status == 'Confirmed'
+    end
+  end
+
+  def hides_all_email_buttons
+    # expect(page.body).not_to have_css('a', text: 'Email Organizers')
+    # expect(page.body).not_to have_css('a', text: 'Email Confirmed Members')
+    @event.memberships.select(:attendance).each do |member|
+      status = member.attendance
+      email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
+      email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
+      expect(page.body).not_to include(email)
+    end
   end
 
   def shows_invite_buttons
-    expect(page.body).to have_css('a', text: 'Send Invitation')
+    # expect(page.body).to have_css('a', text: 'Send Invitation')
+    @event.memberships.where(attendance: 'Not Yet Invited').each do |member|
+      expect(page.body).to have_link('Send Invitation', href: invitations_send_path(member))
+    end
+    @event.memberships.where(attendance: 'Invited').each do |member|
+      expect(page.body).to have_link('Resend Invitation', href: invitations_send_path(member))
+    end
   end
 
   def hides_invite_buttons
@@ -98,7 +129,7 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'hides email & invite buttons' do
-      hides_email_buttons
+      hides_all_email_buttons
       hides_invite_buttons
       hides_reinvite_buttons
     end
@@ -116,7 +147,7 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'hides email & invite buttons' do
-      hides_email_buttons
+      hides_all_email_buttons
       hides_invite_buttons
       hides_reinvite_buttons
     end
@@ -141,8 +172,12 @@ describe 'Event Membership Page', type: :feature do
       shows_confirmed_members
     end
 
-    it 'shows email buttons' do
-      shows_email_buttons
+    it 'shows email buttons for confirmed members' do
+      shows_confirmed_email_buttons
+    end
+
+    it 'hides email buttons for non-confirmed members' do
+      hides_nonconfirmed_email_buttons
     end
 
     it 'hides invite buttons' do
@@ -172,9 +207,21 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'shows email & invite buttons' do
-      shows_email_buttons
+      shows_all_email_buttons
       shows_invite_buttons
       shows_reinvite_buttons
+    end
+
+    it 'hides invite buttons if workshop is full' do
+      @event.max_participants = @event.num_invited_participants
+      @event.save
+
+      visit event_memberships_path(@event)
+
+      hides_invite_buttons
+      shows_reinvite_buttons
+      @event.max_participants = 42
+      @event.save
     end
 
     it 'creates sections for attendance status' do
@@ -206,9 +253,21 @@ describe 'Event Membership Page', type: :feature do
       end
 
       it 'shows email & invite buttons' do
-        shows_email_buttons
+        shows_all_email_buttons
         shows_invite_buttons
         shows_reinvite_buttons
+      end
+
+      it 'hides invite buttons if workshop is full' do
+        @event.max_participants = @event.num_invited_participants
+        @event.save
+
+        visit event_memberships_path(@event)
+
+        hides_invite_buttons
+        shows_reinvite_buttons
+        @event.max_participants = 42
+        @event.save
       end
 
       it "has links to all members' profiles" do
@@ -228,7 +287,7 @@ describe 'Event Membership Page', type: :feature do
       end
 
       it 'hides email buttons' do
-        hides_email_buttons
+        hides_all_email_buttons
         hides_invite_buttons
         hides_reinvite_buttons
       end
@@ -251,9 +310,21 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'shows email & invite buttons' do
-      shows_email_buttons
+      shows_all_email_buttons
       shows_invite_buttons
       shows_reinvite_buttons
+    end
+
+    it 'hides invite buttons if workshop is full' do
+      @event.max_participants = @event.num_invited_participants
+      @event.save
+
+      visit event_memberships_path(@event)
+
+      hides_invite_buttons
+      shows_reinvite_buttons
+      @event.max_participants = 42
+      @event.save
     end
 
     it "has links to all members' profiles" do

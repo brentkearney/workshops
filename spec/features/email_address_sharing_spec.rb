@@ -6,13 +6,12 @@
 
 require 'rails_helper'
 
-describe 'Email address sharing', :type => :feature do
+describe 'Email address sharing', type: :feature do
   before do
     @event = create(:event_with_members)
     @member = create(:membership, event: @event, attendance: 'Confirmed')
     @user = create(:user, person: @member.person)
     @non_member_user = create(:user)
-    @domain = GetSetting.email(@event.location, 'email_domain')
   end
 
   after(:each) do
@@ -54,38 +53,6 @@ describe 'Email address sharing', :type => :feature do
     end
   end
 
-  def does_not_show_email_buttons
-    @event.memberships.select(:attendance).each do |member|
-      status = member.attendance
-      email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
-      email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
-      expect(page.body).not_to include(email)
-    end
-  end
-
-  def shows_all_email_buttons
-    @event.memberships.select(:attendance).each do |member|
-      status = member.attendance
-      email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
-      email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
-      expect(page.body).to include(email)
-    end
-  end
-
-  def shows_invite_buttons
-    @event.memberships.where(attendance: 'Not Yet Invited').each do |member|
-      expect(page.body).to have_link('Send Invitation', href: invitations_send_path(member))
-    end
-    @event.memberships.where(attendance: 'Invited').each do |member|
-      expect(page.body).to have_link('Resend Invitation', href: invitations_send_path(member))
-    end
-  end
-
-  def does_not_show_invite_buttons
-    expect(page.body).not_to include('Send Invitation')
-    expect(page.body).not_to include('Resend Invitation')
-  end
-
   context 'As a not-logged in user' do
     before do
       logout(@user)
@@ -94,10 +61,6 @@ describe 'Email address sharing', :type => :feature do
 
     it 'does not show member email addresses' do
       does_not_show_member_emails
-    end
-
-    it 'does not show "Email Confirmed Members" button' do
-      does_not_show_email_buttons
     end
   end
 
@@ -109,10 +72,6 @@ describe 'Email address sharing', :type => :feature do
 
     it 'does not show member email addresses' do
       does_not_show_member_emails
-    end
-
-    it 'does not show "Email Confirmed Members" button' do
-      does_not_show_email_buttons
     end
   end
 
@@ -132,17 +91,6 @@ describe 'Email address sharing', :type => :feature do
 
       expect(page.body).not_to include(@unshared1.person.email)
       expect(page.body).not_to include(@unshared2.person.email)
-    end
-
-    it 'shows "Email Confirmed Members" & Organizers button' do
-      expect(page.body).to include('Email Confirmed Members')
-      expect(page.body).to include('Email Organizers')
-    end
-
-    it 'does not show Email buttons for non-Confirmed members' do
-      ['Invited', 'Undecided', 'Not Yet Invited', 'Declined'].each do |status|
-        expect(page.body).not_to include("Email #{status} Members")
-      end
     end
   end
 
@@ -167,14 +115,6 @@ describe 'Email address sharing', :type => :feature do
       visit event_memberships_path(@event)
       hides_emails_but_links_to_them
     end
-
-    it 'shows "Email Members" buttons' do
-      shows_all_email_buttons
-    end
-
-    it 'shows "Send Invitation" buttons' do
-      shows_invite_buttons
-    end
   end
 
   context 'As an organizer of a different event' do
@@ -188,14 +128,6 @@ describe 'Email address sharing', :type => :feature do
 
     it 'does not show member email addresses' do
       does_not_show_member_emails
-    end
-
-    it 'does not show "Email Members" buttons' do
-      does_not_show_email_buttons
-    end
-
-    it 'does not show "Send Invitation" buttons' do
-      does_not_show_invite_buttons
     end
   end
 
@@ -211,15 +143,6 @@ describe 'Email address sharing', :type => :feature do
 
       visit event_memberships_path(@event)
       shows_member_emails
-    end
-
-    it 'shows "Email Members" and Invite buttons if staff location matches event location' do
-      @non_member_user.location = @event.location
-      @non_member_user.save!
-
-      visit event_memberships_path(@event)
-      shows_all_email_buttons
-      shows_invite_buttons
     end
 
     it 'hides emails of those who choose not to share, but still adds mailto: links' do
@@ -238,14 +161,6 @@ describe 'Email address sharing', :type => :feature do
       visit event_memberships_path(@event)
       does_not_show_member_emails
     end
-
-    it 'does not show "Email Members" and Invitation buttons if staff location does not match event location' do
-      @non_member_user.location = 'Elsewhere'
-      @non_member_user.save!
-
-      does_not_show_email_buttons
-      does_not_show_invite_buttons
-    end
   end
 
   context 'As an admin user' do
@@ -257,12 +172,6 @@ describe 'Email address sharing', :type => :feature do
     it 'shows member email addresses' do
       visit event_memberships_path(@event)
       shows_member_emails
-    end
-
-    it 'shows "Email Members" and Invitation buttons' do
-      visit event_memberships_path(@event)
-      shows_all_email_buttons
-      shows_invite_buttons
     end
 
     it 'hides emails of those who choose not to share, but still adds mailto: links' do

@@ -38,6 +38,9 @@ class InvitationsController < ApplicationController
           error: 'Access to this feature is restricted.' and return
     end
 
+    redirect_to event_memberships_path(event),
+        error: 'This event is already full.' and return if event_full?(event)
+
     pause_membership_syncing(event)
     send_invitation(membership, current_user.name)
     redirect_to event_memberships_path(event),
@@ -59,7 +62,10 @@ class InvitationsController < ApplicationController
     if members.empty?
       redirect_to event_memberships_path(event),
           error: 'There are no Not-Yet-Invited, non-Backup Participants
-          to send invitations to.'.squish
+          to send invitations to.'.squish and return
+    elsif event_full?(event, members)
+      redirect_to event_memberships_path(event),
+          error: 'This action would make the event over capacity.' and return
     else
       pause_membership_syncing(event)
       sent_to = ''
@@ -75,6 +81,10 @@ class InvitationsController < ApplicationController
   end
 
   private
+
+  def event_full?(event, members=[])
+    event.num_invited_participants + members.count >= event.max_participants
+  end
 
   def pause_membership_syncing(event)
     event.sync_time = DateTime.now

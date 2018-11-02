@@ -92,7 +92,7 @@ module MembershipsHelper
   end
 
   def show_invite_button(member)
-    return unless show_invite_buttons?(member)
+    return unless show_invite_buttons?(member) && spots_left
     column = '<td class="rowlink-skip no-print">' +
       link_to("Send Invitation", invitations_send_path(member),
         data: { confirm: "This will send #{member.person.name}
@@ -117,7 +117,7 @@ module MembershipsHelper
     return unless policy(@event).view_email_addresses?
     content = '<div class="no-print" id="email-members">'
     content << add_email_buttons(status)
-    if status == 'Not Yet Invited'
+    if status == 'Not Yet Invited' && spots_left
       content << ' | ' + link_to("Invite All Not Yet Invited Participants",
         all_invitations_send_path(@event.id),
         title: 'Send invitations to all non-Backup members who are Not Yet Invited',
@@ -128,6 +128,10 @@ module MembershipsHelper
     end
     content << "\n</div>\n"
     content.html_safe
+  end
+
+  def spots_left
+    @event.max_participants - @event.num_invited_participants > 0
   end
 
   def add_email_buttons(status)
@@ -167,5 +171,20 @@ module MembershipsHelper
       end
     end
     column.html_safe
+  end
+
+  def add_limits_message(status)
+    return unless status == 'Not Yet Invited'
+    spots = @event.max_participants - @event.num_invited_participants
+    isare = 'are'
+    isare = 'is' if spots == 1
+    spot_s = 'spots'
+    spot_s = 'spot' if spots == 1
+    unless_cancel = ''
+    if spots == 0
+      unless_cancel = 'Unless someone cancels, no more invitations can be sent.'
+    end
+    ('<div class="no-print" id="limits-message">There ' + "#{isare} #{spots} #{spot_s} left,
+      out of a maximum of #{@event.max_participants}. #{unless_cancel}</div>").squish.html_safe
   end
 end

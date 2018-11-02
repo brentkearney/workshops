@@ -179,6 +179,26 @@ RSpec.describe InvitationsController, type: :controller do
       @membership.save
     end
 
+    it 'does not allow if the event is already full' do
+      @event.max_participants = @event.num_invited_participants
+      @event.save
+
+      @user.member!
+      original_person = @membership.person
+      @membership.person = @user.person
+      @membership.role = 'Organizer'
+      @membership.save
+
+      get :send_invite, membership_id: @membership.id
+      expect(flash[:error]).to be_present
+
+      @user.admin!
+      @membership.person = original_person
+      @membership.save
+      @event.max_participants = @past.max_participants
+      @event.save
+    end
+
     context 'invalid parameter' do
       before do
         get :send_invite, membership_id: '69 '
@@ -272,6 +292,28 @@ RSpec.describe InvitationsController, type: :controller do
       @user.admin!
       @membership.person = original_person
       @membership.save
+    end
+
+    it 'does not allow if event would be full' do
+      @event.max_participants = @event.num_invited_participants - 1
+      @event.save
+      2.times do
+        create(:membership, event: @event, attendance: 'Not Yet Invited')
+      end
+      @user.member!
+      original_person = @membership.person
+      @membership.person = @user.person
+      @membership.role = 'Organizer'
+      @membership.save
+
+      get :send_all_invites, event_id: @event.id
+      expect(flash[:error]).to be_present
+
+      @user.admin!
+      @membership.person = original_person
+      @membership.save
+      @event.max_participants = @past.max_participants
+      @event.save
     end
 
     context 'invalid parameter' do

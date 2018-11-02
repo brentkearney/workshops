@@ -87,6 +87,11 @@ h3#membership, h3#hotel {
   }
 }
 
+#limits-message {
+  font-size: 1.2em;
+  font-style: bold;
+}
+
 @media print {
     .no-print { display:none }
     a[href]:after {
