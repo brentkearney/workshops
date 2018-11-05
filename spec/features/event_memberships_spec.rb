@@ -69,8 +69,6 @@ describe 'Event Membership Page', type: :feature do
   end
 
   def hides_all_email_buttons
-    # expect(page.body).not_to have_css('a', text: 'Email Organizers')
-    # expect(page.body).not_to have_css('a', text: 'Email Confirmed Members')
     @event.memberships.select(:attendance).each do |member|
       status = member.attendance
       email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
@@ -80,7 +78,6 @@ describe 'Event Membership Page', type: :feature do
   end
 
   def shows_invite_buttons
-    # expect(page.body).to have_css('a', text: 'Send Invitation')
     @event.memberships.where(attendance: 'Not Yet Invited').each do |member|
       expect(page.body).to have_link('Send Invitation', href: invitations_send_path(member))
     end

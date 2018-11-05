@@ -74,12 +74,22 @@ module MembershipsHelper
         invited_by='
         <div class="row" id="profile-rsvp-invited">
           Invited by: ' + @membership.invited_by + ' on ' +
-          @membership.invited_on.to_s + '
+          @membership.invited_on.in_time_zone(@membership.event.time_zone).to_s + '
         </div>
         '
       end
     end
     invited_by.html_safe
+  end
+
+  def show_invited_on(member)
+    return unless show_reinvite_buttons?(member)
+    if member.invited_on.blank?
+      return '<td class="rowlink-skip no-print">(not set)</td>'.html_safe
+    end
+    ('<td class="rowlink-skip no-print"><div id="invited-on">' +
+      member.invited_on.strftime('%Y-%m-%d') +
+      '</div></td>').html_safe
   end
 
   def show_invite_buttons?(member)
@@ -88,12 +98,12 @@ module MembershipsHelper
 
   def show_reinvite_buttons?(member)
     policy(member).send_invitations? &&
-      (member.attendance == 'Invited' || member.attendance == 'Undecided')
+      %w(Invited Undecided).include?(member.attendance)
   end
 
   def show_invite_button(member)
     return unless show_invite_buttons?(member) && spots_left
-    column = '<td class="rowlink-skip no-print">' +
+    column = '<td class="rowlink-skip no-print invite-buttons">' +
       link_to("Send Invitation", invitations_send_path(member),
         data: { confirm: "This will send #{member.person.name}
         an email, inviting #{member.person.him} to attend this
@@ -104,7 +114,7 @@ module MembershipsHelper
 
   def show_reinvite_button(member)
     return unless show_reinvite_buttons?(member)
-    column = '<td class="rowlink-skip no-print">' +
+    column = '<td class="rowlink-skip no-print invite-buttons">' +
       link_to("Resend Invitation", invitations_send_path(member),
         data: { confirm: "This will send #{member.person.name}
         an email, re-inviting #{member.person.him} to attend this
@@ -174,7 +184,7 @@ module MembershipsHelper
   end
 
   def add_limits_message(status)
-    return unless status == 'Not Yet Invited'
+    return unless show_invite_buttons?(Membership.new(event: @event, attendance: status))
     spots = @event.max_participants - @event.num_invited_participants
     isare = 'are'
     isare = 'is' if spots == 1

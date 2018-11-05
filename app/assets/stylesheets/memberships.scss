@@ -92,6 +92,13 @@ h3#membership, h3#hotel {
   font-style: bold;
 }
 
+td.invite-buttons {
+  vertical-align:middle;
+  a.btn {
+    margin-top: -2px;
+  }
+}
+
 @media print {
     .no-print { display:none }
     a[href]:after {

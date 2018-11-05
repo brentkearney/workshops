@@ -63,7 +63,7 @@
 
     <% if policy(@membership).show_details? %>
     <div class="panel-footer updated-by">
-      Last updated by: <%= @person.updated_by %> on <%= @person.updated_at %>
+      Last updated by: <%= @person.updated_by %> on <%= @person.updated_at.in_time_zone(@membership.event.time_zone) %>
     </div>
     <% end %>
     </div><!-- panel -->
@@ -114,7 +114,7 @@
       </div><!-- panel-body -->
 
       <div class="panel-footer updated-by">
-        Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at %>
+        Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at.in_time_zone(@membership.event.time_zone) %>
       </div>
     </div><!-- panel -->
   <% end %>
@@ -179,7 +179,7 @@
       </div><!-- panel-body -->
       <% if policy(@membership).show_details? %>
       <div class="panel-footer updated-by">
-        Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at %>
+        Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at.in_time_zone(@membership.event.time_zone) %>
       </div>
       <% end %>
     </div><!-- panel -->
