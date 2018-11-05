@@ -68,8 +68,8 @@ class InvitationMailer < ApplicationMailer
     if File.exist?(pdf_template_file)
       @page_title = "#{@event.location} Invitation Details"
       pdf_file = WickedPdf.new.pdf_from_string(
-        render_to_string(template: "#{pdf_template}", encoding: "UTF-8")
-      )
+        render_to_string(template: "#{pdf_template}", encoding: "UTF-8",
+          lowquality: false, page_size: 'Letter'))
       attachments["#{@event.location}-invitation-#{@person.id}.pdf"] = pdf_file
 
       # save to a file (for testing)

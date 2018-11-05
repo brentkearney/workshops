@@ -38,8 +38,10 @@ class InvitationsController < ApplicationController
           error: 'Access to this feature is restricted.' and return
     end
 
-    redirect_to event_memberships_path(event),
+    unless is_reinvite?(membership)
+      redirect_to event_memberships_path(event),
         error: 'This event is already full.' and return if event_full?(event)
+    end
 
     pause_membership_syncing(event)
     send_invitation(membership, current_user.name)
@@ -81,6 +83,10 @@ class InvitationsController < ApplicationController
   end
 
   private
+
+  def is_reinvite?(membership)
+    %w(Invited Undecided).include?(membership.attendance)
+  end
 
   def event_full?(event, members=[])
     event.num_invited_participants + members.count >= event.max_participants
