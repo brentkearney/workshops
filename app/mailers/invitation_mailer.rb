@@ -72,11 +72,11 @@ class InvitationMailer < ApplicationMailer
           lowquality: false, page_size: 'Letter'))
       attachments["#{@event.location}-invitation-#{@person.id}.pdf"] = pdf_file
 
-      # save to a file (for testing)
-      save_path = Rails.root.join('tmp','invitation.pdf')
-      File.open(save_path, 'wb') do |file|
-        file << pdf_file
-      end
+      ## save to a file (for testing)
+      # save_path = Rails.root.join('tmp','invitation.pdf')
+      # File.open(save_path, 'wb') do |file|
+      #   file << pdf_file
+      # end
     end
 
     if File.exist?(text_template_file)

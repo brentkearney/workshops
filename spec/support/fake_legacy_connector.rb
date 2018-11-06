@@ -105,9 +105,7 @@ class FakeLegacyConnector
                         replied_at: Time.now - 1.days, attendance: 'Confirmed')
     end
 
-    remote_member = [{
-        'Workshop' => '#{e.code}',
-        'Person' => {
+    remote_person = {
           'lastname' => m.person.lastname, 'firstname' => m.person.firstname,
           'email' => m.person.email, 'cc_email' => nil,
           'gender' => m.person.gender, 'affiliation' => m.person.affiliation,
@@ -119,14 +117,26 @@ class FakeLegacyConnector
           'updated_at' => Time.now, 'legacy_id' => m.person.legacy_id,
           'emergency_contact' => nil, 'emergency_phone' => nil,
           'updated_by' => 'FakeLegacyConnector'
-        }.merge(changed_fields.stringify_keys),
-        'Membership' =>  {
+        }
+    remote_membership = {
           'arrival_date' => m.arrival_date, 'role' => m.role,
           'attendance' => m.attendance, 'departure_date' => m.departure_date,
           'replied_at' => m.replied_at, 'updated_by' => 'FakeLegacyConnector',
           'updated_at' => Time.now, 'staff_notes' => m.staff_notes,
           'reviewed' => true, 'room' => 'CH1234', 'billing' => 'OK'
         }
+
+    if changed_fields.key?(:membership)
+      changed_fields = changed_fields.delete(:membership)
+      remote_membership = remote_membership.merge(changed_fields.stringify_keys)
+    else
+      remote_person = remote_person.merge(changed_fields.stringify_keys)
+    end
+
+    remote_member = [{
+        'Workshop' => '#{e.code}',
+        'Person' => remote_person,
+        'Membership' =>  remote_membership
     }]
   end
 

@@ -94,7 +94,8 @@ class MembershipPolicy
   end
 
   def send_invitations?
-    organizer_and_staff
+    return true if allow_staff_and_admins
+    @event.location != 'CMO' && current_user.is_organizer?(event)
   end
 
   def edit_person?
@@ -148,7 +149,8 @@ class MembershipPolicy
   end
 
   def invite?
-    staff_and_admins
+    return true if allow_staff_and_admins
+    @event.location != 'CMO' && current_user.is_organizer?(event)
   end
 
   def hotel_and_billing?

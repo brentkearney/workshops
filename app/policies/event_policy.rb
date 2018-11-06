@@ -104,11 +104,13 @@ class EventPolicy
   end
 
   def show_invite_buttons?
-    allow_orgs_and_staff
+    return true if allow_staff_and_admins
+    @event.location != 'CMO' && current_user.is_organizer?(event)
   end
 
   def send_invitations?
-    allow_orgs_and_staff
+    return true if allow_staff_and_admins
+    @event.location != 'CMO' && current_user.is_organizer?(event)
   end
 
   def sync?

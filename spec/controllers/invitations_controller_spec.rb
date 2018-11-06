@@ -180,14 +180,15 @@ RSpec.describe InvitationsController, type: :controller do
     end
 
     it 'does not allow if the event is already full' do
-      @event.max_participants = @event.num_invited_participants
-      @event.save
-
       @user.member!
       original_person = @membership.person
       @membership.person = @user.person
       @membership.role = 'Organizer'
+      @membership.attendance = 'Not Yet Invited'
       @membership.save
+
+      @event.max_participants = @event.num_invited_participants
+      @event.save
 
       get :send_invite, membership_id: @membership.id
       expect(flash[:error]).to be_present

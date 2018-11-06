@@ -227,6 +227,15 @@ class SyncMembers
       next if k == 'updated_at' && local.updated_at.utc == v
       v = bool_value(v) if booleans.include?(k)
 
+      next if k == 'invited_by'
+      if k == 'invited_on'
+        if local.invited_on.utc.to_i < v.utc.to_i
+          local.invited_on = v.utc
+          local.invited_by = remote['invited_by']
+        end
+      end
+      next if k == 'invited_on'
+
       unless local.send(k).eql? v
         if k.eql? 'email'
           local = update_email(local, remote)

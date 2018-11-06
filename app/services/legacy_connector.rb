@@ -96,8 +96,14 @@ class LegacyConnector
     member.updated_at = member.updated_at
                               .in_time_zone('Pacific Time (US & Canada)')
                               .strftime('%Y-%m-%d %H:%M:%S')
-    unless member.replied_at.nil?
+    unless member.replied_at.blank?
       member.replied_at = member.replied_at
+                                .in_time_zone('Pacific Time (US & Canada)')
+                                .strftime('%Y-%m-%d %H:%M:%S')
+    end
+
+    unless member.invited_on.blank?
+      member.invited_on = member.invited_on
                                 .in_time_zone('Pacific Time (US & Canada)')
                                 .strftime('%Y-%m-%d %H:%M:%S')
     end

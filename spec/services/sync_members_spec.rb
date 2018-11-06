@@ -266,7 +266,35 @@ describe "SyncMembers" do
         end
       end
     end
+
+    context 'invited_by & invited_on updates' do
+      it 'updates invited_by & invited_on if remote is more recent' do
+        membership = create(:membership, invited_by: 'User 1', invited_on: 1.week.ago)
+        more_recent = DateTime.now.in_time_zone(membership.event.time_zone)
+        remote_fields = { membership: { invited_by: 'User 2', invited_on: more_recent } }
+        setup_remote(membership.event, membership, remote_fields)
+        SyncMembers.new(membership.event)
+
+        updated = Membership.find(membership.id)
+        expect(updated.invited_on.to_i).to eq(more_recent.to_i)
+        expect(updated.invited_by).to eq('User 2')
+      end
+
+      it 'does not update invited_by & invited_on if remote is less recent' do
+        recent = 1.day.ago
+        membership = create(:membership, invited_by: 'User 1', invited_on: recent)
+        less_recent = 3.days.ago
+        remote_fields = { membership: { invited_by: 'User 2', invited_on: less_recent } }
+        setup_remote(membership.event, membership, remote_fields)
+        SyncMembers.new(membership.event)
+
+        updated = Membership.find(membership.id)
+        expect(updated.invited_on.to_i).to eq(recent.to_i)
+        expect(updated.invited_by).to eq('User 1')
+      end
+    end
   end
+
 
   describe '.save_person' do
     context 'valid person' do
