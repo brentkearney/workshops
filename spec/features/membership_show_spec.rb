@@ -257,14 +257,10 @@ describe 'Membership#show', type: :feature do
       expect(page).not_to have_link 'Delete Membership'
     end
 
-    it 'denies access to non-confirmed members profiles' do
+    it 'denies access to non-confirmed/invited members profiles' do
       nonconfirmed = @event.memberships.where("role='Participant'").last
 
       nonconfirmed.attendance = 'Declined'
-      nonconfirmed.save
-      denies_access(nonconfirmed)
-
-      nonconfirmed.attendance = 'Invited'
       nonconfirmed.save
       denies_access(nonconfirmed)
 
@@ -500,14 +496,10 @@ describe 'Membership#show', type: :feature do
       expect(page).not_to have_link 'Delete Membership'
     end
 
-    it 'denies access to non-confirmed members profiles' do
+    it 'denies access to non-confirmed/invited members profiles' do
       nonconfirmed = @event.memberships.where("role='Participant'").last
 
       nonconfirmed.attendance = 'Declined'
-      nonconfirmed.save
-      denies_access(nonconfirmed)
-
-      nonconfirmed.attendance = 'Invited'
       nonconfirmed.save
       denies_access(nonconfirmed)
 

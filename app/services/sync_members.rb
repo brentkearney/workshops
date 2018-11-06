@@ -229,8 +229,8 @@ class SyncMembers
 
       next if k == 'invited_by'
       if k == 'invited_on'
-        if local.invited_on.utc.to_i < v.utc.to_i
-          local.invited_on = v.utc
+        if local.invited_on.blank? || local.invited_on.to_i < v.to_i
+          local.invited_on = v
           local.invited_by = remote['invited_by']
         end
       end

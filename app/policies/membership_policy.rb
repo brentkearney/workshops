@@ -76,7 +76,7 @@ class MembershipPolicy
   end
 
   def show?
-    self_organizer_staff || confirmed_member
+    self_organizer_staff || confirmed_or_invited_member
   end
 
   def edit?
@@ -162,6 +162,10 @@ class MembershipPolicy
   def confirmed_member
     @membership.attendance == 'Confirmed' ||
       @membership.attendance == 'Undecided'
+  end
+
+  def confirmed_or_invited_member
+    %w(Confirmed Undecided Invited).include?(@membership.attendance)
   end
 
   def self_organizer_staff
