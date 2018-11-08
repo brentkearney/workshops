@@ -118,7 +118,7 @@ class LegacyConnector
     # add_member() adds or updates memberships
     add_member(membership: member,
                event_code: member.event.code,
-               person: person,
+               person: member.person,
                updated_by: member.updated_by)
   end
 

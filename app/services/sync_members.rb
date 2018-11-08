@@ -272,6 +272,7 @@ class SyncMembers
 
   def replace_person(replace: other_person, replace_with: person)
     replace.memberships.each do |m|
+      #if replace_with.memberships.select { |rm| rm.event_id == m.id }.blank?
       if replace_with.memberships.select { |rm| rm.event_id == m.event_id }.blank?
         m.person = replace_with
         m.save!
