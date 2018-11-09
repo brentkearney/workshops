@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class SettingsController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   before_action :get_settings
   before_action :get_parametizer, except: [:index, :new]
 

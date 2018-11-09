@@ -1,10 +1,12 @@
-# Copyright (c) 2016 Banff International Research Station.
+# app/models/user.rb
+#
+# Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   devise :registerable, :database_authenticatable,
          :recoverable, :rememberable, :trackable, :validatable,
          :lockable, :confirmable, :invitable

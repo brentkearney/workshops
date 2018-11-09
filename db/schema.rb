@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -37,9 +36,8 @@ ActiveRecord::Schema.define(version: 20181031002948) do
     t.boolean  "publish_schedule", default: false
     t.integer  "confirmed_count",  default: 0,     null: false
     t.datetime "sync_time"
+    t.index ["code"], name: "index_events_on_code", unique: true, using: :btree
   end
-
-  add_index "events", ["code"], name: "index_events_on_code", unique: true, using: :btree
 
   create_table "invitations", force: :cascade do |t|
     t.integer  "membership_id"
@@ -50,9 +48,8 @@ ActiveRecord::Schema.define(version: 20181031002948) do
     t.datetime "used_on"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
+    t.index ["membership_id"], name: "index_invitations_on_membership_id", using: :btree
   end
-
-  add_index "invitations", ["membership_id"], name: "index_invitations_on_membership_id", using: :btree
 
   create_table "lectures", force: :cascade do |t|
     t.integer  "event_id",            null: false
@@ -79,10 +76,9 @@ ActiveRecord::Schema.define(version: 20181031002948) do
     t.string   "cmo_license"
     t.string   "keywords"
     t.integer  "legacy_id"
+    t.index ["event_id"], name: "index_lectures_on_event_id", using: :btree
+    t.index ["person_id"], name: "index_lectures_on_person_id", using: :btree
   end
-
-  add_index "lectures", ["event_id"], name: "index_lectures_on_event_id", using: :btree
-  add_index "lectures", ["person_id"], name: "index_lectures_on_person_id", using: :btree
 
   create_table "memberships", force: :cascade do |t|
     t.integer  "event_id"
@@ -110,10 +106,9 @@ ActiveRecord::Schema.define(version: 20181031002948) do
     t.string   "invited_by"
     t.datetime "invited_on"
     t.boolean  "share_email_hotel"
+    t.index ["event_id"], name: "index_memberships_on_event_id", using: :btree
+    t.index ["person_id"], name: "index_memberships_on_person_id", using: :btree
   end
-
-  add_index "memberships", ["event_id"], name: "index_memberships_on_event_id", using: :btree
-  add_index "memberships", ["person_id"], name: "index_memberships_on_person_id", using: :btree
 
   create_table "people", force: :cascade do |t|
     t.string   "lastname"
@@ -146,9 +141,8 @@ ActiveRecord::Schema.define(version: 20181031002948) do
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
     t.integer  "grant_id"
+    t.index ["email"], name: "index_people_on_email", unique: true, using: :btree
   end
-
-  add_index "people", ["email"], name: "index_people_on_email", unique: true, using: :btree
 
   create_table "schedules", force: :cascade do |t|
     t.integer  "event_id",                    null: false
@@ -164,19 +158,17 @@ ActiveRecord::Schema.define(version: 20181031002948) do
     t.boolean  "staff_item",  default: false, null: false
     t.datetime "earliest"
     t.datetime "latest"
+    t.index ["event_id"], name: "index_schedules_on_event_id", using: :btree
   end
-
-  add_index "schedules", ["event_id"], name: "index_schedules_on_event_id", using: :btree
 
   create_table "sessions", force: :cascade do |t|
     t.string   "session_id", null: false
     t.text     "data"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["session_id"], name: "index_sessions_on_session_id", unique: true, using: :btree
+    t.index ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
   end
-
-  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", unique: true, using: :btree
-  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "settings", force: :cascade do |t|
     t.string   "var",                   null: false
@@ -185,9 +177,8 @@ ActiveRecord::Schema.define(version: 20181031002948) do
     t.string   "thing_type", limit: 30
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true, using: :btree
   end
-
-  add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true, using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false
@@ -215,23 +206,22 @@ ActiveRecord::Schema.define(version: 20181031002948) do
     t.datetime "invitation_sent_at"
     t.datetime "invitation_accepted_at"
     t.integer  "invitation_limit"
-    t.integer  "invited_by_id"
     t.string   "invited_by_type"
+    t.integer  "invited_by_id"
     t.integer  "invitations_count",      default: 0
     t.integer  "role",                   default: 0
     t.string   "location"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
+    t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
+    t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true, using: :btree
+    t.index ["invitations_count"], name: "index_users_on_invitations_count", using: :btree
+    t.index ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
+    t.index ["person_id"], name: "index_users_on_person_id", using: :btree
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+    t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
   end
 
-  add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
-  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
-  add_index "users", ["invitation_token"], name: "index_users_on_invitation_token", unique: true, using: :btree
-  add_index "users", ["invitations_count"], name: "index_users_on_invitations_count", using: :btree
-  add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
-  add_index "users", ["person_id"], name: "index_users_on_person_id", using: :btree
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
-  add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
-
-  add_foreign_key "invitations", "memberships", on_delete: :cascade
+  add_foreign_key "invitations", "memberships"
   add_foreign_key "lectures", "events"
   add_foreign_key "lectures", "people"
   add_foreign_key "memberships", "events"

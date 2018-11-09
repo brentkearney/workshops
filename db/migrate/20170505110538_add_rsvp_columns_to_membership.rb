@@ -1,4 +1,4 @@
-class AddRsvpColumnsToMembership < ActiveRecord::Migration
+class AddRsvpColumnsToMembership < ActiveRecord::Migration[4.2]
   def change
     add_column :memberships, :own_accommodation, :boolean, default: false
     add_column :memberships, :has_guest, :boolean, default: false

@@ -1,4 +1,4 @@
-# app/jobs/email_from_nonmember_bounce_job.rb
+# app/models/application_record.rb
 #
 # Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
@@ -6,11 +6,6 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# Initiates BounceMailer to reply to non-member senders
-class EmailFromNonmemberBounceJob < ApplicationJob
-  queue_as :urgent
-
-  def perform(params)
-    BounceMailer.non_member(params).deliver_now
-  end
+class ApplicationRecord < ActiveRecord::Base
+  self.abstract_class = true
 end

@@ -1,10 +1,12 @@
-# Copyright (c) 2016 Banff International Research Station.
+# app/models/event.rb
+#
+# Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-class Event < ActiveRecord::Base
+class Event < ApplicationRecord
   attr_accessor :data_import
 
   has_many :memberships, dependent: :destroy
@@ -19,7 +21,7 @@ class Event < ActiveRecord::Base
   validates :short_name, presence: true, if: :has_long_name
   validates :event_type, presence: true, if: :check_event_type
   validate :starts_before_ends
-  validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.zones_map.keys
+  validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.all.map(&:name)
   validates :code, uniqueness: true, format: {
     with: /#{GetSetting.code_pattern}/,
     message: "- invalid code format. Must match: #{GetSetting.code_pattern}"

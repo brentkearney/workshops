@@ -1,10 +1,12 @@
-# Copyright (c) 2016 Banff International Research Station.
+# app/models/membership.rb
+#
+# Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-class Membership < ActiveRecord::Base
+class Membership < ApplicationRecord
   attr_accessor :sync_memberships, :update_by_staff, :update_remote
 
   belongs_to :event

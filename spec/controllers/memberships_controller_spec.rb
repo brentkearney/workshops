@@ -16,7 +16,7 @@ RSpec.describe MembershipsController, type: :controller do
 
     describe '#index' do
       it 'redirects to login screen' do
-        get :index, event_id: @event.id
+        get :index, params: { event_id: @event.id }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -24,16 +24,15 @@ RSpec.describe MembershipsController, type: :controller do
 
     describe '#show' do
       it 'redirects to login screen' do
-        get :show, event_id: @event.id, id: @membership.id
+        get :show, params: { event_id: @event.id, id: @membership.id }
 
-        # expect(assigns(:membership)).to eq(@membership)
         expect(response).to redirect_to(new_user_session_path)
       end
     end
 
     describe '#new' do
       it 'responds with redirect to sign_in page' do
-        get :new, event_id: 1
+        get :new, params: { event_id: 1 }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -41,7 +40,7 @@ RSpec.describe MembershipsController, type: :controller do
 
     describe '#edit' do
       it 'responds with redirect to sign_in page' do
-        get :edit, event_id: 1, id: 1
+        get :edit, params: { event_id: 1, id: 1 }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -51,7 +50,7 @@ RSpec.describe MembershipsController, type: :controller do
       it 'responds with redirect to sign_in page' do
         membership = build(:membership, event: @event)
 
-        post :create, event_id: 1, membership: membership.attributes
+        post :create, params: { event_id: 1, membership: membership.attributes }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -59,7 +58,7 @@ RSpec.describe MembershipsController, type: :controller do
 
     describe '#update' do
       it 'responds with redirect to sign_in page' do
-        patch :update, event_id: 1, id: 1
+        patch :update, params: { event_id: 1, id: 1 }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -67,7 +66,7 @@ RSpec.describe MembershipsController, type: :controller do
 
     describe '#destroy' do
       it 'responds with redirect to sign_in page' do
-        delete :destroy, event_id: 1, id: 1
+        delete :destroy, params: { event_id: 1, id: 1 }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -83,7 +82,7 @@ RSpec.describe MembershipsController, type: :controller do
 
     context 'with invalid event id' do
       def redirects_with_error
-        get :index, event_id: 'foo'
+        get :index, params: { event_id: 'foo' }
 
         expect(response).to redirect_to(events_path)
         expect(flash[:error]).to be_present
@@ -117,7 +116,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'responds with redirect and error message' do
           membership = build(:membership, event: @event)
 
-          post :create, event_id: 'foo', membership: membership.attributes
+          post :create, params: { event_id: 'foo', membership: membership.attributes }
 
           expect(response).to redirect_to(events_path)
           expect(flash[:error]).to be_present
@@ -126,7 +125,7 @@ RSpec.describe MembershipsController, type: :controller do
 
       describe '#update' do
         it 'responds with redirect and error message' do
-          patch :update, event_id: 'foo', id: 1
+          patch :update, params: { event_id: 'foo', id: 1 }
 
           expect(response).to redirect_to(events_path)
           expect(flash[:error]).to be_present
@@ -135,7 +134,7 @@ RSpec.describe MembershipsController, type: :controller do
 
       describe '#destroy' do
         it 'responds with redirect and error message' do
-          delete :destroy, event_id: 'foo', id: 1
+          delete :destroy, params: { event_id: 'foo', id: 1 }
 
           expect(response).to redirect_to(events_path)
           expect(flash[:error]).to be_present
@@ -151,13 +150,13 @@ RSpec.describe MembershipsController, type: :controller do
 
       describe '#index' do
         it 'responds with success code' do
-          get :index, event_id: @event.id
+          get :index, params: { event_id: @event.id }
 
           expect(response).to be_success
         end
 
         it 'assigns @memberships to event members' do
-          get :index, event_id: @event.id
+          get :index, params: { event_id: @event.id }
 
           expect(assigns(:memberships)).to eq('Confirmed' => [@membership])
         end
@@ -165,7 +164,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'assigns email @domain' do
           domain = GetSetting.email(@event.location, 'email_domain')
 
-          get :index, event_id: @event.id
+          get :index, params: { event_id: @event.id }
 
           expect(assigns(:domain)).to eq(domain)
         end
@@ -178,7 +177,7 @@ RSpec.describe MembershipsController, type: :controller do
           it 'does not assign @member_emails' do
             create(:membership, event: @event, attendance: 'Confirmed')
 
-            get :index, event_id: @event.id
+            get :index, params: { event_id: @event.id }
 
             expect(assigns(:member_emails)).to be_falsey
           end
@@ -187,7 +186,7 @@ RSpec.describe MembershipsController, type: :controller do
             create(:membership, event: @event, attendance: 'Confirmed',
                                 role: 'Organizer')
 
-            get :index, event_id: @event.id
+            get :index, params: { event_id: @event.id }
 
             expect(assigns(:organizer_emails)).to be_falsey
           end
@@ -199,7 +198,7 @@ RSpec.describe MembershipsController, type: :controller do
           it 'assigns @membership' do
             membership = create(:membership, event: @event)
 
-            get :show, event_id: @event.id, id: membership.id
+            get :show, params: { event_id: @event.id, id: membership.id }
 
             expect(assigns(:membership)).to eq(membership)
           end
@@ -207,7 +206,7 @@ RSpec.describe MembershipsController, type: :controller do
 
         context 'with invalid membership' do
           it 'redirects to event members index with error message' do
-            get :show, event_id: @event.id, id: 666
+            get :show, params: { event_id: @event.id, id: 666 }
 
             expect(response).to redirect_to(event_memberships_path(@event))
             expect(flash[:error]).to be_present
@@ -217,13 +216,13 @@ RSpec.describe MembershipsController, type: :controller do
 
       describe '#new' do
         it 'assigns @member' do
-          get :new, event_id: @event.id
+          get :new, params: { event_id: @event.id }
 
           expect(assigns(:membership)).to be_a_new(Membership)
         end
 
         it 'denies access, redirects with error' do
-          get :new, event_id: @event.id
+          get :new, params: { event_id: @event.id }
 
           expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
@@ -234,7 +233,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'assigns @member' do
           membership = create(:membership, event: @event)
 
-          get :edit, event_id: @event.id, id: membership.id
+          get :edit, params: { event_id: @event.id, id: membership.id }
 
           expect(assigns(:membership)).to eq(membership)
         end
@@ -242,7 +241,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'denies access, redirects with error' do
           membership = create(:membership, event: @event)
 
-          get :edit, event_id: @event.id, id: membership.id
+          get :edit, params: { event_id: @event.id, id: membership.id }
 
           expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
@@ -253,7 +252,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'assigns @member' do
           membership = build(:membership, event: @event)
 
-          post :create, event_id: @event.id, membership: membership.attributes
+          post :create, params: { event_id: @event.id, membership: membership.attributes }
 
           expect(assigns(:membership)).to be_a_new(Membership)
         end
@@ -261,7 +260,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'denies access, redirects with error' do
           membership = build(:membership, event: @event)
 
-          post :create, event_id: @event.id, membership: membership.attributes
+          post :create, params: { event_id: @event.id, membership: membership.attributes }
 
           expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
@@ -299,7 +298,7 @@ RSpec.describe MembershipsController, type: :controller do
           expect(@person.firstname).not_to eq(person_params['firstname'])
           expect(@person.email).not_to eq(person_params['email'])
 
-          patch :update, @params
+          patch :update, params: @params
 
           person = Membership.find(@membership.id).person
           person_params.each do |key, value|
@@ -317,7 +316,7 @@ RSpec.describe MembershipsController, type: :controller do
           expect(@membership.arrival_date).not_to eq(mp['arrival_date'])
           expect(@membership.departure_date).not_to eq(mp['departure_date'])
 
-          patch :update, @params
+          patch :update, params: @params
 
           member = Membership.find(@membership.id)
           mp.each do |key, value|
@@ -326,19 +325,24 @@ RSpec.describe MembershipsController, type: :controller do
         end
 
         def allows_hotel_updates
+          @params['membership'][:arrival_date] =
+            @params['membership'][:arrival_date].strftime('%Y-%m-%d')
+          @params['membership'][:departure_date] =
+            @params['membership'][:departure_date].strftime('%Y-%m-%d')
           @params['membership']['room'] = 'Forest'
           @params['membership']['billing'] = '$$$'
           @params['membership']['special_info'] = 'special'
           own_accommodation = @membership.own_accommodation
           @params['membership']['own_accommodation'] = !own_accommodation
-          @params['membership']['has_guest'] = !@membership.has_guest
+          guest_before = @params['membership']['has_guest']
+          @params['membership']['has_guest'] = !guest_before
 
-          patch :update, @params
+          patch :update, params: @params
 
           membership = Membership.find(@membership.id)
           expect(membership.room).to eq('Forest')
           expect(membership.billing).to eq('$$$')
-          expect(membership.has_guest).to eq(!@membership.has_guest)
+          expect(membership.has_guest).to eq(!guest_before)
           expect(membership.special_info).to eq('special')
           expect(membership.own_accommodation).to eq(!own_accommodation)
         end
@@ -351,7 +355,7 @@ RSpec.describe MembershipsController, type: :controller do
           @params['membership']['own_accommodation'] = !own_accommodation
           @params['membership']['has_guest'] = !@membership.has_guest
 
-          patch :update, @params
+          patch :update, params: @params
 
           membership = Membership.find(@membership.id)
           expect(membership.room).not_to eq('Forest')
@@ -369,13 +373,13 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'assigns @member' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(assigns(:membership)).to eq(@membership)
           end
 
           it 'denies access, redirects with error' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(response).to redirect_to(my_events_path)
             expect(flash[:error]).to eq('Access denied.')
@@ -392,14 +396,14 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'assigns @member' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(assigns(:membership)).to eq(@membership)
           end
 
           it 'updates membership, redirects with flash message' do
             @params['membership']['person_attributes'][:email] = @user.email
-            patch :update, @params
+            patch :update, params: @params
 
             expect(response).to redirect_to(event_membership_path(@event,
                                                                   @membership))
@@ -410,7 +414,7 @@ RSpec.describe MembershipsController, type: :controller do
             params_email = @params['membership']['person_attributes'][:email]
             expect(@user.email).not_to eq(params_email)
 
-            patch :update, @params
+            patch :update, params: @params
 
             expect(response).to redirect_to(sign_in_path)
             expect(flash[:notice]).to include('Please verify')
@@ -421,15 +425,19 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'allows updating travel dates' do
-            arrival = @membership.event.start_date + 1.day
-            @params['membership']['arrival_date'] = arrival
-            depart = @membership.event.end_date - 1.day
-            @params['membership']['departure_date'] = depart
+            arrival = (@membership.event.start_date + 1.day).strftime('%Y-%m-%d')
+            @params['membership'][:arrival_date] = arrival
+            depart = (@membership.event.end_date - 1.day).strftime('%Y-%m-%d')
+            @params['membership'][:departure_date] = depart
 
-            patch :update, @params
+            patch :update, params: @params
 
-            expect(Membership.find(@membership.id).arrival_date).to eq(arrival)
-            expect(Membership.find(@membership.id).departure_date).to eq(depart)
+            new_arrival = Membership.find(@membership.id).arrival_date
+                                    .strftime('%Y-%m-%d')
+            new_depart = Membership.find(@membership.id).departure_date
+                                   .strftime('%Y-%m-%d')
+            expect(new_arrival).to eq(arrival)
+            expect(new_depart).to eq(depart)
           end
 
           it 'disallows updating other membership details' do
@@ -442,7 +450,7 @@ RSpec.describe MembershipsController, type: :controller do
             @params['membership']['staff_notes'] = 'Foo'
             @params['membership']['org_notes'] = 'Bar'
 
-            patch :update, @params
+            patch :update, params: @params
 
             membership = Membership.find(@membership.id)
             expect(membership.role).to eq(role)
@@ -469,13 +477,13 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'assigns @member' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(assigns(:membership)).to eq(@membership)
           end
 
           it 'updates membership, redirects with flash message' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(response).to redirect_to(event_membership_path(@event,
                                                                   @membership))
@@ -491,7 +499,7 @@ RSpec.describe MembershipsController, type: :controller do
                    biography: 'The Great Beast 666.', id: @person.id }
             @params['membership']['person_attributes'] = pa
 
-            patch :update, @params
+            patch :update, params: @params
 
             p = Membership.find(@membership.id).person
             expect(p.salutation).to eq('Mr.')
@@ -519,7 +527,7 @@ RSpec.describe MembershipsController, type: :controller do
             @params['membership']['person_attributes'] = pa
             p1 = Membership.find(@membership.id).person
 
-            patch :update, @params
+            patch :update, params: @params
 
             p2 = Membership.find(@membership.id).person
             expect(p2.phone).to eq(p1.phone)
@@ -542,7 +550,7 @@ RSpec.describe MembershipsController, type: :controller do
             @membership.save
             @params['membership']['role'] = 'Backup Participant'
 
-            patch :update, @params
+            patch :update, params: @params
 
             updated_member = Membership.find(@membership.id)
             expect(updated_member.role).to eq('Backup Participant')
@@ -553,7 +561,7 @@ RSpec.describe MembershipsController, type: :controller do
             @membership.save
             @params['membership']['role'] = 'Organizer'
 
-            patch :update, @params
+            patch :update, params: @params
 
             updated_member = Membership.find(@membership.id)
             expect(updated_member.role).not_to eq('Organizer')
@@ -564,7 +572,7 @@ RSpec.describe MembershipsController, type: :controller do
             @membership.save
             @params['membership']['role'] = 'Participant'
 
-            patch :update, @params
+            patch :update, params: @params
 
             updated_member = Membership.find(@membership.id)
             expect(updated_member.role).not_to eq('Participant')
@@ -575,7 +583,7 @@ RSpec.describe MembershipsController, type: :controller do
             @membership.save
             @params['membership']['attendance'] = 'Confirmed'
 
-            patch :update, @params
+            patch :update, params: @params
 
             updated_member = Membership.find(@membership.id)
             expect(updated_member.attendance).to eq('Confirmed')
@@ -591,7 +599,7 @@ RSpec.describe MembershipsController, type: :controller do
             new_departure = @event.end_date - 1.day
             @params['membership']['departure_date'] = new_departure
 
-            patch :update, @params
+            patch :update, params: @params
 
             updated_member = Membership.find(@membership.id)
             expect(updated_member.arrival_date).not_to eq(new_arrival)
@@ -603,7 +611,7 @@ RSpec.describe MembershipsController, type: :controller do
             @membership.save
             @params['membership']['org_notes'] = 'Foo'
 
-            patch :update, @params
+            patch :update, params: @params
 
             updated_member = Membership.find(@membership.id)
             expect(updated_member.org_notes).to eq('Foo')
@@ -622,13 +630,13 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'assigns @member' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(assigns(:membership)).to eq(@membership)
           end
 
           it 'denies access, redirects with error' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(response).to redirect_to(my_events_path)
             expect(flash[:error]).to eq('Access denied.')
@@ -643,13 +651,13 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'assigns @member' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(assigns(:membership)).to eq(@membership)
           end
 
           it 'updates membership, redirects with flash message' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(response).to redirect_to(event_membership_path(@event,
                                                                   @membership))
@@ -667,7 +675,7 @@ RSpec.describe MembershipsController, type: :controller do
           it 'disallows updating organizer notes' do
             @params['membership']['org_notes'] = 'Notey note note'
 
-            patch :update, @params
+            patch :update, params: @params
 
             member = Membership.find(@membership.id)
             expect(member.org_notes).not_to eq('Notey note note')
@@ -684,13 +692,13 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'assigns @membership' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(assigns(:membership)).to eq(@membership)
           end
 
           it 'updates membership, redirects with flash message' do
-            patch :update, @params
+            patch :update, params: @params
 
             expect(response).to redirect_to(event_membership_path(@event,
                                                                   @membership))
@@ -710,7 +718,7 @@ RSpec.describe MembershipsController, type: :controller do
             @membership.save
             @params['membership']['org_notes'] = 'Foo'
 
-            patch :update, @params
+            patch :update, params: @params
 
             updated_member = Membership.find(@membership.id)
             expect(updated_member.org_notes).to eq('Foo')
@@ -728,14 +736,14 @@ RSpec.describe MembershipsController, type: :controller do
         end
 
         def denies_access
-          delete :destroy, event_id: @event.id, id: @membership.id
+          delete :destroy, params: { event_id: @event.id, id: @membership.id }
 
           expect(response).to redirect_to(my_events_path)
           expect(flash[:error]).to eq('Access denied.')
         end
 
         def deletes_membership
-          delete :destroy, event_id: @event.id, id: @membership.id
+          delete :destroy, params: { event_id: @event.id, id: @membership.id }
 
           expect(response).to redirect_to event_memberships_path(@event)
           expect(flash[:notice]).to eq('Membership was successfully destroyed.')
@@ -747,7 +755,7 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'assigns @member' do
-            delete :destroy, event_id: @event.id, id: @membership.id
+            delete :destroy, params: { event_id: @event.id, id: @membership.id }
 
             expect(assigns(:membership)).to eq(@membership)
           end

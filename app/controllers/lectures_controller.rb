@@ -7,7 +7,7 @@
 class LecturesController < ApplicationController
   before_action :set_event, :set_time_zone
   before_action :set_lecture, only: [:update, :destroy]
-  before_filter :authenticate_user!, except: [:index]
+  before_action :authenticate_user!, except: [:index]
 
   # GET /events/:event_id/lectures
   # GET /events/:event_id/lectures.json

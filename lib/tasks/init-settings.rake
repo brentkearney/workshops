@@ -70,7 +70,9 @@ namespace :ws do
           'name_tags' => 'organization-secretary@example.com',
           'confirmation_notices' => 'organization@example.com',
           'rsvp' => 'rsvp@example.com',
-          'confirmation_lead' => '1.year'
+          'confirmation_lead' => '1.year',
+          'maillist_from' => '"Workshops Maillist" <no-reply@example.com>',
+          'email_domain' => 'example.com'
         }
       }
     end

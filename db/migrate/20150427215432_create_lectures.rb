@@ -1,4 +1,4 @@
-class CreateLectures < ActiveRecord::Migration
+class CreateLectures < ActiveRecord::Migration[4.2]
   def change
     create_table :lectures do |t|
       t.references :event, index: true, foreign_key: true, null: false

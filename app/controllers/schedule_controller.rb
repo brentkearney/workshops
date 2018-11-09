@@ -9,8 +9,8 @@ class ScheduleController < ApplicationController
   before_action :set_schedule, only: [:show, :update, :destroy]
   before_action :set_lock_time, only: [:new, :edit, :update, :create]
 
-  before_filter :authenticate_user!, except: [:index]
-  after_filter :flash_notice, only: [:create, :update, :edit]
+  before_action :authenticate_user!, except: [:index]
+  after_action :flash_notice, only: [:create, :update, :edit]
 
   # GET /events/:event_id/schedule
   # GET /events/:event_id/schedule.json

@@ -9,10 +9,10 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   # Enforces access right checks for individuals resources
-  #after_filter :verify_authorized, :except => :index
+  #after_action :verify_authorized, :except => :index
 
   # Enforces access right checks for collections
-  #after_filter :verify_policy_scoped, :except => :index
+  #after_action :verify_policy_scoped, :except => :index
 
   include ApplicationHelper
 

@@ -6,9 +6,9 @@
 
 # Authenticates API access tokens
 class Api::V1::BaseController < ApplicationController
-  skip_before_filter :verify_authenticity_token
+  skip_before_action :verify_authenticity_token
   protect_from_forgery with: :null_session
-  before_filter :parse_request, :authenticate_user_from_token!
+  before_action :parse_request, :authenticate_user_from_token!
   respond_to :json
 
   private

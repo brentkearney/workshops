@@ -146,7 +146,7 @@ module MembershipsHelper
 
   def add_email_buttons(status)
     return '' unless policy(@event).show_email_buttons?(status)
-    to_email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
+    to_email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
     to_email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
     content = mail_to(to_email, "<i class=\"fa fa-envelope fa-fw\"></i> Email #{status} Members".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members')
 

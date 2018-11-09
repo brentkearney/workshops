@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.10'
+gem 'rails', '~> 5.0.7'
 gem 'pg', '0.21.0'
 gem 'sass-rails'
 gem 'bootstrap-sass'
@@ -44,7 +44,7 @@ group :test do
   gem 'selenium-webdriver'
   gem 'faker'
   gem 'database_cleaner'
-  gem "test_after_commit"
+  gem 'rails-controller-testing'
 end
 
 group :production do
@@ -60,8 +60,9 @@ group :development do
   gem 'pronto-reek'
   gem 'pronto-brakeman'
   gem 'pronto-poper'
-  gem 'capistrano-rails', '~> 1.1'
-  gem 'rbnacl-libsodium'
-  gem 'rbnacl', '< 5.0'
-  gem 'bcrypt_pbkdf', '< 2.0'
+  gem 'capistrano', '~> 3.10', require: false
+  gem 'capistrano-rails', '~> 1.4', require: false
+  #gem 'rbnacl-libsodium'
+  gem 'rbnacl', '~> 6.0'
+  gem 'bcrypt_pbkdf', '~> 1.0'
 end

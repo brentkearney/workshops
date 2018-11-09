@@ -6,7 +6,7 @@
 
 # API for updating Lecture records
 class Api::V1::LecturesController < Api::V1::BaseController
-  before_filter :authenticated?, :find_lecture
+  before_action :authenticated?, :find_lecture
   respond_to :json
 
   # PATCH/PUT /api/v1/lectures/1.json

@@ -1,4 +1,4 @@
-class AddColumnsToLectures < ActiveRecord::Migration
+class AddColumnsToLectures < ActiveRecord::Migration[4.2]
   def change
     add_column :lectures, :cmo_license, :string
     add_column :lectures, :keywords, :string

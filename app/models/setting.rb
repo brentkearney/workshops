@@ -1,4 +1,6 @@
-# Copyright (c) 2016 Banff International Research Station.
+# app/models/setting.rb
+#
+# Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.

@@ -6,7 +6,7 @@
 
 # API for adding Event records
 class Api::V1::EventsController < Api::V1::BaseController
-  before_filter :authenticated?
+  before_action :authenticated?
   respond_to :json
 
   # POST /api/v1/events/1.json

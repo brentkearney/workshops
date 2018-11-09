@@ -1,3 +1,5 @@
+# app/jobs/unauthorized_subgroup_bounce_job.rb
+#
 # Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
@@ -5,7 +7,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 # Initiates BounceMailer to reply to unauthorized senders
-class UnauthorizedSubgroupBounceJob < ActiveJob::Base
+class UnauthorizedSubgroupBounceJob < ApplicationJob
   queue_as :urgent
 
   def perform(params)
