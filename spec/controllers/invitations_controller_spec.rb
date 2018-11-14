@@ -58,13 +58,13 @@ RSpec.describe InvitationsController, type: :controller do
     end
 
     it 'assigns @invitation using params' do
-      post :create, @form_params
+      post :create, params: @form_params
       expect(assigns(:invitation)).to be_a(InvitationForm)
     end
 
     context 'valid params' do
       before do
-        post :create, @form_params
+        post :create, params: @form_params
       end
 
       it 'redirects to invitations_new_path' do
@@ -87,7 +87,7 @@ RSpec.describe InvitationsController, type: :controller do
         invitation = spy('invitation')
         allow(Invitation).to receive(:new).and_return(invitation)
 
-        post :create, @form_params
+        post :create, params: @form_params
 
         expect(invitation).to have_received(:send_invite)
       end
@@ -96,7 +96,7 @@ RSpec.describe InvitationsController, type: :controller do
     context 'invalid params' do
       before do
         @form_params = {'invitation' => {'event' => 'foo', 'email' => 'bar'}}
-        post :create, @form_params
+        post :create, params: @form_params
       end
 
       it 'assigns @events' do
@@ -115,7 +115,7 @@ RSpec.describe InvitationsController, type: :controller do
         invitation = spy('invitation')
         allow(Invitation).to receive(:new).and_return(invitation)
 
-        post :create, @form_params
+        post :create, params: @form_params
 
         expect(invitation).not_to have_received(:send_invite)
       end
@@ -132,20 +132,20 @@ RSpec.describe InvitationsController, type: :controller do
     end
 
     it 'allows admins' do
-      get :send_invite, membership_id: @membership.id
+      get :send_invite, params: { membership_id: @membership.id }
       expect(flash[:success]).to be_present
     end
 
     it 'allows staff' do
       @user.staff!
-      get :send_invite, membership_id: @membership.id
+      get :send_invite, params: { membership_id: @membership.id }
       expect(flash[:success]).to be_present
       @user.admin!
     end
 
     it 'does not allow non-member users' do
       @user.member!
-      get :send_invite, membership_id: @membership.id
+      get :send_invite, params: { membership_id: @membership.id }
       expect(flash[:error]).to be_present
       @user.admin!
     end
@@ -158,7 +158,7 @@ RSpec.describe InvitationsController, type: :controller do
       @membership.role = 'Participant'
       @membership.save
 
-      get :send_invite, membership_id: @membership.id
+      get :send_invite, params: { membership_id: @membership.id }
       expect(flash[:error]).to be_present
       @user.admin!
       @membership.person = original_person
@@ -172,7 +172,7 @@ RSpec.describe InvitationsController, type: :controller do
       @membership.role = 'Organizer'
       @membership.save
 
-      get :send_invite, membership_id: @membership.id
+      get :send_invite, params: { membership_id: @membership.id }
       expect(flash[:success]).to be_present
       @user.admin!
       @membership.person = original_person
@@ -190,7 +190,7 @@ RSpec.describe InvitationsController, type: :controller do
       @event.max_participants = @event.num_invited_participants
       @event.save
 
-      get :send_invite, membership_id: @membership.id
+      get :send_invite, params: { membership_id: @membership.id }
       expect(flash[:error]).to be_present
 
       @user.admin!
@@ -202,7 +202,7 @@ RSpec.describe InvitationsController, type: :controller do
 
     context 'invalid parameter' do
       before do
-        get :send_invite, membership_id: '69 '
+        get :send_invite, params: { membership_id: '69 ' }
       end
 
       it 'redirects to root_path' do
@@ -216,7 +216,7 @@ RSpec.describe InvitationsController, type: :controller do
 
     context 'valid parameter' do
       before do
-        get :send_invite, membership_id: @membership.id
+        get :send_invite, params: { membership_id: @membership.id }
       end
 
       it 'redirects to event_memberships_path' do
@@ -232,7 +232,7 @@ RSpec.describe InvitationsController, type: :controller do
         invitation = spy('invitation')
         allow(Invitation).to receive(:new).and_return(invitation)
 
-        get :send_invite, membership_id: @membership.id
+        get :send_invite, params: { membership_id: @membership.id }
 
         expect(invitation).to have_received(:send_invite)
       end
@@ -248,20 +248,20 @@ RSpec.describe InvitationsController, type: :controller do
     end
 
     it 'allows admins' do
-      get :send_all_invites, event_id: @event.id
+      get :send_all_invites, params: { event_id: @event.id }
       expect(flash[:success]).to be_present
     end
 
     it 'allows staff' do
       @user.staff!
-      get :send_all_invites, event_id: @event.id
+      get :send_all_invites, params: { event_id: @event.id }
       expect(flash[:success]).to be_present
       @user.admin!
     end
 
     it 'does not allow non-member users' do
       @user.member!
-      get :send_all_invites, event_id: @event.id
+      get :send_all_invites, params: { event_id: @event.id }
       expect(flash[:error]).to be_present
       @user.admin!
     end
@@ -274,7 +274,7 @@ RSpec.describe InvitationsController, type: :controller do
       @membership.role = 'Participant'
       @membership.save
 
-      get :send_all_invites, event_id: @event.id
+      get :send_all_invites, params: { event_id: @event.id }
       expect(flash[:error]).to be_present
       @user.admin!
       @membership.person = original_person
@@ -288,7 +288,7 @@ RSpec.describe InvitationsController, type: :controller do
       @membership.role = 'Organizer'
       @membership.save
 
-      get :send_all_invites, event_id: @event.id
+      get :send_all_invites, params: { event_id: @event.id }
       expect(flash[:success]).to be_present
       @user.admin!
       @membership.person = original_person
@@ -307,7 +307,7 @@ RSpec.describe InvitationsController, type: :controller do
       @membership.role = 'Organizer'
       @membership.save
 
-      get :send_all_invites, event_id: @event.id
+      get :send_all_invites, params: { event_id: @event.id }
       expect(flash[:error]).to be_present
 
       @user.admin!
@@ -319,7 +319,7 @@ RSpec.describe InvitationsController, type: :controller do
 
     context 'invalid parameter' do
       before do
-        get :send_all_invites, event_id: '69'
+        get :send_all_invites, params: { event_id: '69' }
       end
 
       it 'redirects to root_path' do
@@ -333,7 +333,7 @@ RSpec.describe InvitationsController, type: :controller do
 
     context 'valid parameter' do
       before do
-        get :send_all_invites, event_id: @event.id
+        get :send_all_invites, params: { event_id: @event.id }
       end
 
       it 'redirects to event_memberships_path' do
@@ -350,7 +350,7 @@ RSpec.describe InvitationsController, type: :controller do
         @membership.attendance = 'Not Yet Invited'
         @membership.save
 
-        get :send_all_invites, event_id: @event.id
+        get :send_all_invites, params: { event_id: @event.id }
 
         expect(Invitation.last.membership).to eq(@membership)
       end

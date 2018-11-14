@@ -144,7 +144,7 @@ class EventsController < ApplicationController
     original_event = @event.dup
     @editable_fields = policy(@event).may_edit
     @edit_form = current_user.is_admin? ? 'admin_form' : 'member_form'
-    update_params = event_params.assert_valid_keys(*@editable_fields)
+    update_params = event_params.to_h.assert_valid_keys(*@editable_fields)
         .merge(updated_by: current_user.name)
 
     respond_to do |format|
@@ -194,7 +194,8 @@ class EventsController < ApplicationController
     params.require(:event).permit(:code, :name, :short_name, :start_date,
                                   :end_date, :time_zone, :event_type, :location,
                                   :description, :press_release, :door_code,
-                                  :max_participants, :booking_code, :updated_by)
+                                  :max_participants, :booking_code,
+                                  :updated_by)
   end
 
   def location_params

@@ -16,7 +16,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
     respond_to do |format|
       if @lecture.save
-        format.json { render nothing: true, status: :created }
+        format.json { head :created }
       else
         format.json do
           render json: @lecture.errors,
@@ -62,7 +62,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
   end
 
   def go_away
-    render nothing: true, status: :bad_request
+    head :bad_request
   end
 
   def valid_parameters?

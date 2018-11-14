@@ -25,7 +25,7 @@ RSpec.describe RsvpController, type: :controller do
 
     context 'with a valid OTP in the url' do
       it 'validates the OTP via local db and renders index' do
-        get :index, otp: @invitation.code
+        get :index, params: { otp: @invitation.code }
 
         expect(assigns(:invitation)).to eq(@invitation)
         expect(response).to render_template(:index)
@@ -34,7 +34,7 @@ RSpec.describe RsvpController, type: :controller do
       it 'validates the OTP via legacy db' do
         allow_any_instance_of(InvitationChecker).to receive(:check_legacy_database).and_return(@invitation)
 
-        get :index, otp: '123'
+        get :index, params: { otp: '123' }
 
         expect(assigns(:invitation)).to eq(@invitation)
         expect(response).to render_template(:index)
@@ -47,7 +47,7 @@ RSpec.describe RsvpController, type: :controller do
         expect(LegacyConnector).to receive(:new).and_return(lc)
         allow(lc).to receive(:check_rsvp).with('123').and_return(lc.invalid_otp)
 
-        get :index, otp: '123'
+        get :index, params: { otp: '123' }
 
         expect(assigns(:invitation)).to be_a(InvitationChecker)
         expect(response).to render_template("rsvp/_invitation_errors")
@@ -57,20 +57,20 @@ RSpec.describe RsvpController, type: :controller do
 
   describe 'GET #no' do
     it 'renders no template' do
-      get :no, otp: @invitation.code
+      get :no, params: { otp: @invitation.code }
       expect(response).to render_template(:no)
     end
   end
 
   describe 'POST #no' do
     it 'changes membership attendance to Declined' do
-      post :no, otp: @invitation.code, organizer_message: 'Hi'
+      post :no, params: { otp: @invitation.code, organizer_message: 'Hi' }
 
       expect(Membership.find(@membership.id).attendance).to eq('Declined')
     end
 
     it 'forwards to feedback form' do
-      post :no, otp: @invitation.code, organizer_message: 'Hi'
+      post :no, params: { otp: @invitation.code, organizer_message: 'Hi' }
 
       expect(response).to redirect_to(rsvp_feedback_path(@membership.id))
     end
@@ -80,7 +80,7 @@ RSpec.describe RsvpController, type: :controller do
       expect(LegacyConnector).to receive(:new).and_return(lc)
       allow(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
 
-      post :no, otp: 'foo'
+      post :no, params: { otp: 'foo' }
 
       expect(response).to redirect_to(rsvp_otp_path('foo'))
     end
@@ -88,20 +88,20 @@ RSpec.describe RsvpController, type: :controller do
 
   describe 'GET #maybe' do
     it 'renders maybe template' do
-      get :maybe, otp: @invitation.code
+      get :maybe, params: { otp: @invitation.code }
       expect(response).to render_template(:maybe)
     end
   end
 
   describe 'POST #maybe' do
     it 'changes membership attendance to Undecided' do
-      post :maybe, { otp: @invitation.code, organizer_message: 'Hi' }
+      post :maybe, params: { otp: @invitation.code, organizer_message: 'Hi' }
 
       expect(Membership.find(@membership.id).attendance).to eq('Undecided')
     end
 
     it 'forwards to feedback form' do
-      post :maybe, { otp: @invitation.code, organizer_message: 'Hi' }
+      post :maybe, params: { otp: @invitation.code, organizer_message: 'Hi' }
 
       expect(response).to redirect_to(rsvp_feedback_path(@membership.id))
     end
@@ -111,7 +111,7 @@ RSpec.describe RsvpController, type: :controller do
       expect(LegacyConnector).to receive(:new).and_return(lc)
       allow(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
 
-      post :maybe, { otp: 'foo' }
+      post :maybe, params: { otp: 'foo' }
 
       expect(response).to redirect_to(rsvp_otp_path('foo'))
     end
@@ -119,7 +119,7 @@ RSpec.describe RsvpController, type: :controller do
 
   describe 'GET #yes' do
     it 'renders yes template' do
-      get :yes, { otp: @invitation.code }
+      get :yes, params: { otp: @invitation.code }
       expect(response).to render_template(:yes)
     end
   end
@@ -141,13 +141,13 @@ RSpec.describe RsvpController, type: :controller do
      end
 
     it 'changes membership attendance to Confirmed' do
-      post :yes, { otp: @invitation.code, rsvp: yes_params }
+      post :yes, params: { otp: @invitation.code, rsvp: yes_params }
 
       expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
     end
 
     it 'forwards to feedback form' do
-      post :yes, { otp: @invitation.code, rsvp: yes_params }
+      post :yes, params: { otp: @invitation.code, rsvp: yes_params }
 
       expect(response).to redirect_to(rsvp_feedback_path(@membership.id))
     end
@@ -157,7 +157,7 @@ RSpec.describe RsvpController, type: :controller do
       expect(LegacyConnector).to receive(:new).and_return(lc)
       allow(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
 
-      post :yes, { otp: 'foo', rsvp: yes_params }
+      post :yes, params: { otp: 'foo', rsvp: yes_params }
 
       expect(response).to redirect_to(rsvp_otp_path('foo'))
     end
@@ -165,14 +165,14 @@ RSpec.describe RsvpController, type: :controller do
 
   describe 'GET #feedback' do
     it 'renders feedback template' do
-      get :feedback, { membership_id: @membership.id }
+      get :feedback, params: { membership_id: @membership.id }
       expect(response).to render_template(:feedback)
     end
   end
 
   describe 'POST #feedback' do
     it 'forwards to event memberships page' do
-      post :feedback, { membership_id: @membership.id, feedback_message: 'Hi' }
+      post :feedback, params: { membership_id: @membership.id, feedback_message: 'Hi' }
 
       expect(response).to redirect_to(event_memberships_path(@membership.event_id))
     end
@@ -182,7 +182,7 @@ RSpec.describe RsvpController, type: :controller do
     before { allow(Rails.env).to receive(:production?).and_return(true) }
 
     it 'forwards to event home page' do
-      post :feedback, { membership_id: @membership.id, feedback_message: 'Hi' }
+      post :feedback, params: { membership_id: @membership.id, feedback_message: 'Hi' }
 
       expect(response).to redirect_to(@membership.event.url)
     end

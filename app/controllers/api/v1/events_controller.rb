@@ -17,7 +17,7 @@ class Api::V1::EventsController < Api::V1::BaseController
 
     respond_to do |format|
       if event.save
-        format.json { render nothing: true, status: :created }
+        format.json { head :created }
       else
         format.json { render json: event.errors, status: :unprocessable_entity }
       end
@@ -33,7 +33,7 @@ class Api::V1::EventsController < Api::V1::BaseController
     SyncEventMembersJob.perform_later(event.id)
 
     respond_to do |format|
-      format.json { render nothing: true, status: :success }
+      format.json { head :success }
     end
   end
 
@@ -57,7 +57,7 @@ class Api::V1::EventsController < Api::V1::BaseController
   end
 
   def go_away
-    render nothing: true, status: :bad_request
+    head :bad_request
   end
 
   def valid_event_id?

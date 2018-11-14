@@ -53,7 +53,7 @@ describe 'Event Membership Page', type: :feature do
   def shows_all_email_buttons
     @event.memberships.select(:attendance).each do |member|
       status = member.attendance
-      email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
+      email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
       email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
       expect(page.body).to include(email)
     end
@@ -62,7 +62,7 @@ describe 'Event Membership Page', type: :feature do
   def hides_nonconfirmed_email_buttons
     @event.memberships.select(:attendance).each do |member|
       status = member.attendance
-      email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
+      email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
       email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
       expect(page.body).not_to include(email) unless status == 'Confirmed'
     end
@@ -71,7 +71,7 @@ describe 'Event Membership Page', type: :feature do
   def hides_all_email_buttons
     @event.memberships.select(:attendance).each do |member|
       status = member.attendance
-      email = "#{@event.code}-#{status.parameterize('_')}@#{@domain}"
+      email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
       email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
       expect(page.body).not_to include(email)
     end

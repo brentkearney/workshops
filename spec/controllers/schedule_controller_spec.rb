@@ -61,7 +61,7 @@ RSpec.describe ScheduleController, type: :controller do
         @event.publish_schedule = false
         @event.save
 
-        get :index, event_id: @event.id
+        get :index, params: { event_id: @event.id }
 
         expect(response.status).to eq(302)
         expect(subject).to redirect_to(sign_in_path)
@@ -72,7 +72,7 @@ RSpec.describe ScheduleController, type: :controller do
         @event.publish_schedule = true
         @event.save
 
-        get :index, event_id: @event.id
+        get :index, params: { event_id: @event.id }
 
         expect(@event.schedules).not_to be_empty
         expect(response.status).to eq(200)
@@ -86,7 +86,7 @@ RSpec.describe ScheduleController, type: :controller do
         @event.schedules.delete_all
         @event.save
 
-        get :index, format: :html, event_id: @event.id
+        get :index, params: { format: :html, event_id: @event.id }
 
         expect(response.status).to eq(302)
         expect(subject).to redirect_to(sign_in_path)
@@ -104,7 +104,7 @@ RSpec.describe ScheduleController, type: :controller do
       end
 
       it 'assigns @schedules copied from template event upon first visit' do
-        get :index, event_id: @event.id
+        get :index, params: { event_id: @event.id }
 
         expect(response.status).to eq(200)
         expect(response).to render_template('index')
@@ -122,7 +122,7 @@ RSpec.describe ScheduleController, type: :controller do
 
       it 'assigns an empty @schedules upon first visit' do
         expect(@event.schedules).to be_empty
-        get :index, event_id: @event.id
+        get :index, params: { event_id: @event.id }
         expect(response.status).to eq(200)
         expect(response).to render_template('index')
         expect(assigns(:schedules)).to be_empty
@@ -136,7 +136,7 @@ RSpec.describe ScheduleController, type: :controller do
       @membership.save
 
       day = @event.start_date + 2.days
-      get :new, event_id: @event.id, day: day
+      get :new, params: { event_id: @event.id, day: day }
       expect(assigns(:schedule)).to be_a_new(Schedule)
     end
   end
@@ -151,7 +151,7 @@ RSpec.describe ScheduleController, type: :controller do
       schedule = create(:schedule, event: @event,
                                    start_time: start_time, end_time: end_time)
 
-      get :edit, event_id: @event.id, id: schedule.to_param
+      get :edit, params: { event_id: @event.id, id: schedule.to_param }
       expect(assigns(:schedule)).to eq(schedule)
       expect(assigns(:day)).to eq(schedule.day)
     end
@@ -167,18 +167,18 @@ RSpec.describe ScheduleController, type: :controller do
     context 'with valid params' do
       it 'creates a new Schedule' do
         expect {
-          post :create, event_id: @event.id, schedule: @valid_attributes
+          post :create, params: { event_id: @event.id, schedule: @valid_attributes }
         }.to change(Schedule, :count).by(1)
       end
 
       it 'assigns a newly created schedule as @schedule' do
-        post :create, event_id: @event.id, schedule: @valid_attributes
+        post :create, params: { event_id: @event.id, schedule: @valid_attributes }
         expect(assigns(:schedule)).to be_a(Schedule)
         expect(assigns(:schedule)).to be_persisted
       end
 
       it 'redirects to the created schedule' do
-        post :create, event_id: @event.id, schedule: @valid_attributes
+        post :create, params: { event_id: @event.id, schedule: @valid_attributes }
         day = @event.start_date + 1.days
         expect(response).to redirect_to(event_schedule_day_path(@event, day))
       end
@@ -189,21 +189,21 @@ RSpec.describe ScheduleController, type: :controller do
           .and_return(true)
         ActionMailer::Base.deliveries.clear
 
-        post :create, event_id: @event.id, schedule: @valid_attributes
+        post :create, params: { event_id: @event.id, schedule: @valid_attributes }
         expect(EmailStaffScheduleNoticeJob).to have_received(:perform_later)
       end
     end
 
     context 'with invalid params' do
       it 'assigns a newly created but unsaved schedule as @schedule' do
-        post :create, event_id: @event.id, day: @day,
-                      schedule: @invalid_attributes
+        post :create, params: { event_id: @event.id, day: @day,
+                      schedule: @invalid_attributes }
         expect(assigns(:schedule)).to be_a(Schedule)
       end
 
       it "re-renders the 'new' template" do
-        post :create, event_id: @event.id, day: @day,
-                      schedule: @invalid_attributes
+        post :create, params: { event_id: @event.id, day: @day,
+                      schedule: @invalid_attributes }
         expect(response).to render_template('new')
       end
     end
@@ -227,8 +227,8 @@ RSpec.describe ScheduleController, type: :controller do
       end
 
       it 'updates the schedule' do
-        put :update, event_id: @event.id, id: @schedule.to_param,
-                     schedule: new_attributes
+        put :update, params: { event_id: @event.id, id: @schedule.to_param,
+                     schedule: new_attributes }
         @schedule.reload
 
         expect(@schedule.name).to eq('A new name')
@@ -237,8 +237,8 @@ RSpec.describe ScheduleController, type: :controller do
       end
 
       it "assigns @schedule" do
-        put :update, event_id: @event.id, id: @schedule.to_param,
-                     schedule: @valid_attributes
+        put :update, params: { event_id: @event.id, id: @schedule.to_param,
+                     schedule: @valid_attributes }
 
         expect(assigns(:schedule)).to eq(@schedule)
       end
@@ -246,8 +246,8 @@ RSpec.describe ScheduleController, type: :controller do
       it 'redirects to session[:return_to]' do
         session[:return_to] = event_schedule_edit_path(@event, @schedule)
 
-        put :update, event_id: @event.id, id: @schedule.to_param,
-                     schedule: @valid_attributes
+        put :update, params: { event_id: @event.id, id: @schedule.to_param,
+                     schedule: @valid_attributes }
 
         redirect_path = event_schedule_edit_path(@event, @schedule)
         expect(response).to redirect_to(redirect_path)
@@ -256,8 +256,8 @@ RSpec.describe ScheduleController, type: :controller do
       it 'redirects to the schedule index if session[:return_to] = nil' do
         session[:return_to] = nil
 
-        put :update, event_id: @event.id, id: @schedule.to_param,
-                     schedule: @valid_attributes
+        put :update, params: { event_id: @event.id, id: @schedule.to_param,
+                     schedule: @valid_attributes }
 
         expect(response).to redirect_to(event_schedule_index_path(@event))
       end
@@ -267,8 +267,8 @@ RSpec.describe ScheduleController, type: :controller do
         allow_any_instance_of(Schedule).to receive(:notify_staff?)
           .and_return(true)
 
-        put :update, event_id: @event.id, id: @schedule.to_param,
-                             schedule: @valid_attributes
+        put :update, params: { event_id: @event.id, id: @schedule.to_param,
+                             schedule: @valid_attributes }
 
         expect(EmailStaffScheduleNoticeJob).to have_received(:perform_later)
       end
@@ -282,8 +282,8 @@ RSpec.describe ScheduleController, type: :controller do
         attributes = @valid_attributes.merge(start_time: new_start,
                                              end_time: new_end)
 
-        put :update, event_id: @event.id, id: @schedule.to_param,
-                     change_similar: true, schedule: attributes
+        put :update, params: { event_id: @event.id, id: @schedule.to_param,
+                     change_similar: true, schedule: attributes }
 
         other.reload
         @schedule.reload
@@ -298,15 +298,15 @@ RSpec.describe ScheduleController, type: :controller do
 
       it 'assigns the schedule as @schedule' do
         schedule = Schedule.create! @valid_attributes
-        put :update, event_id: @event.id, id: schedule.to_param,
-                     schedule: @invalid_attributes
+        put :update, params: { event_id: @event.id, id: schedule.to_param,
+                     schedule: @invalid_attributes }
         expect(assigns(:schedule)).to eq(schedule)
       end
 
       it "re-renders the 'edit' template" do
         schedule = Schedule.create! @valid_attributes
-        put :update, event_id: @event.id, id: schedule.to_param,
-                     schedule: @invalid_attributes
+        put :update, params: { event_id: @event.id, id: schedule.to_param,
+                     schedule: @invalid_attributes }
         expect(response).to render_template('edit')
       end
     end
@@ -323,8 +323,8 @@ RSpec.describe ScheduleController, type: :controller do
 
       context 'as an organizer outside of locked time' do
         it 'updates the schedule' do
-          put :update, event_id: @s_event.id, id: @s_schedule.to_param,
-                       schedule: @s_schedule.attributes.merge('name' => 'Yes')
+          put :update, params: { event_id: @s_event.id, id: @s_schedule.to_param,
+                       schedule: @s_schedule.attributes.merge('name' => 'Yes') }
           @s_schedule.reload
 
           expect(@s_schedule.name).to eq('Yes')
@@ -332,16 +332,16 @@ RSpec.describe ScheduleController, type: :controller do
 
         it 'preserves the staff_item attribute value' do
           expect(@s_schedule.staff_item).to be(true)
-          put :update, event_id: @s_event.id, id: @s_schedule.to_param,
-                       schedule: @s_schedule.attributes.merge('name' => 'New')
+          put :update, params: { event_id: @s_event.id, id: @s_schedule.to_param,
+                       schedule: @s_schedule.attributes.merge('name' => 'New') }
           @s_schedule.reload
 
           expect(@s_schedule.staff_item).to be(true)
 
           @s_schedule.staff_item = false
           @s_schedule.save
-          put :update, event_id: @s_event.id, id: @s_schedule.to_param,
-                       schedule: @s_schedule.attributes.merge('name' => 'Foo')
+          put :update, params: { event_id: @s_event.id, id: @s_schedule.to_param,
+                       schedule: @s_schedule.attributes.merge('name' => 'Foo') }
           @s_schedule.reload
 
           expect(@s_schedule.staff_item).to be(false)
@@ -357,8 +357,8 @@ RSpec.describe ScheduleController, type: :controller do
           schedule = create(:schedule, staff_item: true, event: @s_event)
           original_name = schedule.name
 
-          put :update, event_id: @s_event.id, id: schedule.to_param,
-                       schedule: schedule.attributes.merge(name: 'No')
+          put :update, params: { event_id: @s_event.id, id: schedule.to_param,
+                       schedule: schedule.attributes.merge(name: 'No') }
 
           schedule.reload
           expect(schedule.name).to eq(original_name)
@@ -387,8 +387,8 @@ RSpec.describe ScheduleController, type: :controller do
             @s_schedule.name = 'Before update'
             @s_schedule.save
 
-            put :update, event_id: @s_event.id, id: @s_schedule.to_param,
-                         schedule: @s_schedule.attributes.merge(name: 'New')
+            put :update, params: { event_id: @s_event.id, id: @s_schedule.to_param,
+                         schedule: @s_schedule.attributes.merge(name: 'New') }
 
             @s_schedule.reload
             expect(@s_schedule.name).to eq('Before update')
@@ -416,8 +416,8 @@ RSpec.describe ScheduleController, type: :controller do
           it 'updates the schedule' do
             schedule = create(:schedule, staff_item: true, event: @s_event)
 
-            put :update, event_id: @s_event.id, id: schedule.to_param,
-                         schedule: schedule.attributes.merge('name' => 'New')
+            put :update, params: { event_id: @s_event.id, id: schedule.to_param,
+                         schedule: schedule.attributes.merge('name' => 'New') }
 
             expect(Schedule.find(schedule.id).name).to eq('New')
           end
@@ -425,9 +425,9 @@ RSpec.describe ScheduleController, type: :controller do
           it 'can change "staff item: true" to false' do
             schedule = create(:schedule, staff_item: true, event: @s_event)
 
-            put :update, event_id: @s_event.id, id: schedule.to_param,
+            put :update, params: { event_id: @s_event.id, id: schedule.to_param,
                          schedule: schedule.attributes
-                           .merge('staff_item' => false)
+                           .merge('staff_item' => false) }
 
             expect(Schedule.find(schedule.id).staff_item).to eq(false)
           end
@@ -435,9 +435,9 @@ RSpec.describe ScheduleController, type: :controller do
           it 'can change "staff item: false" to true' do
             schedule = create(:schedule, staff_item: false, event: @s_event)
 
-            put :update, event_id: @s_event.id, id: schedule.to_param,
+            put :update, params: { event_id: @s_event.id, id: schedule.to_param,
                          schedule: schedule.attributes
-                           .merge('staff_item' => true)
+                           .merge('staff_item' => true) }
 
             expect(Schedule.find(schedule.id).staff_item).to eq(true)
           end
@@ -459,8 +459,8 @@ RSpec.describe ScheduleController, type: :controller do
           it 'updates the schedule' do
             schedule = create(:schedule, staff_item: true, event: @s_event)
 
-            put :update, event_id: @s_event.id, id: schedule.to_param,
-                         schedule: schedule.attributes.merge('name' => 'New')
+            put :update, params: { event_id: @s_event.id, id: schedule.to_param,
+                         schedule: schedule.attributes.merge('name' => 'New') }
 
             expect(Schedule.find(schedule.id).name).to eq('New')
           end
@@ -468,9 +468,9 @@ RSpec.describe ScheduleController, type: :controller do
           it 'can alter the "staff item" attribute' do
             schedule = create(:schedule, staff_item: false, event: @s_event)
 
-            put :update, event_id: @s_event.id, id: schedule.to_param,
+            put :update, params: { event_id: @s_event.id, id: schedule.to_param,
                          schedule: schedule.attributes
-                           .merge('staff_item' => true)
+                           .merge('staff_item' => true) }
 
             expect(Schedule.find(schedule.id).staff_item).to eq(true)
           end
@@ -497,8 +497,8 @@ RSpec.describe ScheduleController, type: :controller do
           it 'updates the schedule' do
             schedule = create(:schedule, staff_item: true, event: @s_event)
 
-            put :update, event_id: @s_event.id, id: schedule.to_param,
-                         schedule: schedule.attributes.merge('name' => 'New')
+            put :update, params: { event_id: @s_event.id, id: schedule.to_param,
+                         schedule: schedule.attributes.merge('name' => 'New') }
 
             expect(Schedule.find(schedule.id).name).to eq('New')
 
@@ -522,14 +522,14 @@ RSpec.describe ScheduleController, type: :controller do
       allow_any_instance_of(Schedule).to receive(:notify_staff?)
         .and_return(true)
 
-      delete :destroy, event_id: @event.id, id: schedule.to_param
+      delete :destroy, params: { event_id: @event.id, id: schedule.to_param }
       expect(EmailStaffScheduleNoticeJob).to have_received(:perform_later)
     end
 
     it 'destroys the requested schedule' do
       schedule = Schedule.create! @valid_attributes
       expect {
-        delete :destroy, event_id: @event.id, id: schedule.to_param
+        delete :destroy, params: { event_id: @event.id, id: schedule.to_param }
       }.to change(Schedule, :count).by(-1)
     end
 
@@ -542,13 +542,13 @@ RSpec.describe ScheduleController, type: :controller do
       schedule.save
 
       expect {
-        delete :destroy, event_id: @event.id, id: schedule.to_param
+        delete :destroy, params: { event_id: @event.id, id: schedule.to_param }
       }.to change(Lecture, :count).by(-1)
     end
 
     it 'redirects to the schedule list' do
       schedule = Schedule.create! @valid_attributes
-      delete :destroy, event_id: @event.id, id: schedule.to_param
+      delete :destroy, params: { event_id: @event.id, id: schedule.to_param }
       expect(response).to redirect_to(event_schedule_index_path(@event))
     end
   end

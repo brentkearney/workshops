@@ -49,7 +49,7 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
 
     context 'POST without auth token' do
       it 'responds with unauthorized' do
-        post :incoming, incoming_email
+        post :incoming, params: incoming_email
 
         expect(response).to be_unauthorized
       end
@@ -58,7 +58,7 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
     context 'POST with invalid auth token' do
       it 'responds with unauthorized' do
         request.env["X-MessageSystems-Webhook-Token"] = 'foo'
-        post :incoming, incoming_email
+        post :incoming, params: incoming_email
 
         expect(response).to be_unauthorized
       end
@@ -70,7 +70,7 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
         expect(valid_token).not_to be_empty
         @request.headers["X-MessageSystems-Webhook-Token"] = valid_token
 
-        post :incoming, incoming_email
+        post :incoming, params: incoming_email
 
         expect(response).to be_success
       end
@@ -82,7 +82,7 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
         expect(valid_token).not_to be_empty
         @request.headers["X-MessageSystems-Webhook-Token"] = valid_token
 
-        post :incoming, { email: 'Here is my message!' }
+        post :incoming, params: { email: 'Here is my message!' }
 
         expect(response).to be_a_bad_request
       end

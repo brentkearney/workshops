@@ -13,15 +13,15 @@ class Griddler::AuthenticationController < Griddler::EmailsController
 
   def unauthorized
     Rails.logger.debug "\n\nGriddler::AuthenticationController: authorization failed [#{posted_token}].\n\n"
-    render nothing: true, status: :unauthorized and return
+    head :unauthorized and return
   end
 
   def bad_request
-    render nothing: true, status: :bad_request and return
+    head :bad_request and return
   end
 
   def is_ok
-    render nothing: true, status: :ok
+    head :ok
   end
 
   protected

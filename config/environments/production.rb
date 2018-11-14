@@ -79,7 +79,10 @@ Rails.application.configure do
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
 
   # Production URL - depreciated?
-  config.action_mailer.default_url_options = { protocol: 'https', host: 'workshops.birs.ca' }
+  config.action_mailer.default_url_options = {
+    protocol: 'https',
+    host: 'workshops.birs.ca'
+  }
 
   if ENV["RAILS_LOG_TO_STDOUT"].present?
     logger           = ActiveSupport::Logger.new(STDOUT)

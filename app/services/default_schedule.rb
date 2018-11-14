@@ -71,8 +71,8 @@ class DefaultSchedule
   def collect_event_schedule
     schedules = []
     return schedules unless published_schedule
-    schedules = @event.schedules.order(:start_time,
-                                       'lecture_id DESC').includes(:lecture)
+    schedules = @event.schedules.order(:start_time, 'lecture_id DESC')
+                      .includes(:lecture).to_a
     add_lectures(schedules)
   end
 

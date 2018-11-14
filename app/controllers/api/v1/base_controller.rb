@@ -33,10 +33,10 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def unauthorized
-    render nothing: true, status: :unauthorized
+    head :unauthorized
   end
 
   def unavailable
-    render nothing: true, status: :service_unavailable
+    head :service_unavailable
   end
 end

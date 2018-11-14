@@ -13,11 +13,11 @@ module MembershipsHelper
   def date_list
     start_date = @event.start_date
     end_date = @event.end_date
-    if policy(@membership).allow_extended_stays?
+    if policy(@membership).extended_stay?
       start_date -= 7.days
       end_date += 7.days
     end
-    dates = [start_date]
+    dates = ['', start_date]
     dates << dates.last + 1.day while dates.last != end_date
     dates
   end
@@ -39,7 +39,7 @@ module MembershipsHelper
     end
 
     f.select :role, Membership::ROLES,
-             { include_blank: false, disabled: disabled_options },
+             { disabled: disabled_options },
              required: 'true', class: 'form-control'
   end
 
@@ -56,7 +56,7 @@ module MembershipsHelper
         disabled_options = [] unless @current_user.member?
       end
       f.select :attendance, Membership::ATTENDANCE,
-               { include_blank: false, disabled: disabled_options },
+               { disabled: disabled_options },
                  required: 'true', class: 'form-control'
     else
       @membership.attendance

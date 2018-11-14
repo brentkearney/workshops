@@ -23,54 +23,54 @@ describe Api::V1::LecturesController do
     end
 
     it 'authenticates with the correct api key' do
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_success
     end
 
     it 'does not authenticate with an invalid api key' do
       @payload['api_key'] = '123'
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
 
       expect(response).to be_unauthorized
     end
 
     it 'given appropriate keys and lecture data, it updates lectures' do
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_created
       expect(Lecture.find(@lecture.id).title).to eq('A new title')
     end
 
     it 'given invalid or missing lecture_id, it fails' do
       @payload[:lecture_id] = 'X'
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_bad_request
 
       @payload.delete(:lecture_id)
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_bad_request
     end
 
     it 'given invalid or missing event_id, it fails' do
       @payload[:event_id] = 'X'
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_bad_request
 
       @payload.delete(:event_id)
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_bad_request
     end
 
     it 'given missing, invalid or empty lecture, it fails' do
       @payload['lecture'] = {}
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_bad_request
 
       @payload['lecture'] = Array.new
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_bad_request
 
       @payload.delete(:lecture)
-      put "/api/v1/lectures.json", @payload.to_json
+      put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_bad_request
     end
   end
