@@ -145,6 +145,6 @@ class Membership < ApplicationRecord
   end
 
   def notify_staff
-    MembershipChangeNotice.new(changed, self).run
+    MembershipChangeNotice.new(saved_changes.transform_values(&:first), self).run
   end
 end

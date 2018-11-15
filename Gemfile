@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.0.7'
+gem 'rails', '~> 5.1.6'
 gem 'pg', '0.21.0'
 gem 'sass-rails'
 gem 'bootstrap-sass'
@@ -14,8 +14,8 @@ gem 'jbuilder'
 gem 'sdoc', group: :doc
 gem 'bcrypt'
 gem 'activerecord-session_store'
-gem 'momentjs-rails', '>= 2.9.0'
-gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
+gem 'momentjs-rails' #, '>= 2.9.0'
+gem 'bootstrap3-datetimepicker-rails' #, '~> 4.17.47'
 gem 'paper_trail'
 gem 'rest-client'
 gem 'email_validator'
@@ -31,6 +31,8 @@ gem 'griddler-sparkpost'
 gem 'ed25519'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
+gem 'rack-cors', require: 'rack/cors'
+gem 'listen'
 
 group :development, :test do
   gem 'byebug'

@@ -9,7 +9,7 @@ class MembershipChangeNotice
   attr_reader :changed, :membership, :event
 
   def initialize(changed, membership)
-    @changed = changed
+    @changed = changed.to_a
     @membership = membership
     @event = membership.event
   end
