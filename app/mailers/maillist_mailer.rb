@@ -25,8 +25,8 @@ class MaillistMailer < ApplicationMailer
     from = GetSetting.email(location, 'maillist_from')
     subject = message[:subject]
     email_parts = message[:email_parts]
-    text_body = email_parts[:text_body]
-    html_body = email_parts[:html_body]
+    @text_body = email_parts[:text_body]
+    @html_body = email_parts[:html_body]
     inline_attachments = email_parts[:inline_attachments]
 
     unless message[:attachments].blank?
@@ -48,8 +48,8 @@ class MaillistMailer < ApplicationMailer
     end
 
     mail(to: recipient, from: from, subject: subject) do |format|
-      format.html { render html: html_body.html_safe } unless html_body.blank?
-      format.text { render text: text_body }
+      format.html { render html: @html_body.html_safe } unless @html_body.blank?
+      format.text { render text: @text_body }
     end
   end
 end

@@ -60,8 +60,8 @@ RSpec.describe MaillistMailer, type: :mailer do
       expect(@sent_message.to).to eq(@sent_message.to_addrs)
     end
 
-    it 'Message body is the passed-in body (no template)' do
-      expect(@sent_message.body.raw_source).to eq(@msg[:body])
+    it 'Message body is the passed-in body' do
+      expect(@sent_message.body.raw_source.chomp).to eq(@msg[:body])
     end
   end
 end

@@ -71,6 +71,4 @@ describe 'EmailParser' do
     expect(html_body).to include('Just a test')
     expect(html_body).to include(prelude)
   end
-
-  it ':inline_attachments maps filenames:content-ids'
 end

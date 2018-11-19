@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Banff International Research Station
+# Copyright (c) 2018 Banff International Research Station
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,32 +31,32 @@ class OrganizerMailer < ApplicationMailer
     end
     message_to_organizer = args['organizer_message'] || ''
 
-    member = membership.person
-    event = membership.event
-    organizer = event.organizer
-    organization = GetSetting.org_name(event.location)
+    @member = membership.person
+    @event = membership.event
+    @organizer = @event.organizer
+    @organization = GetSetting.org_name(@event.location)
 
     from_email = GetSetting.site_email('application_email')
-    reply_to = GetSetting.rsvp_email(event.location)
-    subject = '[' + event.code + '] Membership invitation reply'
+    reply_to = GetSetting.rsvp_email(@event.location)
+    subject = '[' + @event.code + '] Membership invitation reply'
 
-    to_email = '"' + organizer.name + '" <' + organizer.email + '>'
+    to_email = '"' + @organizer.name + '" <' + @organizer.email + '>'
     if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
       to_email = GetSetting.site_email('webmaster_email')
     end
 
     sub_data = {
-      person_name: "#{organizer.dear_name}",
-      event_code: "#{event.code}",
-      event_name: "#{event.name}",
-      event_dates: "#{event.dates(:long)}",
-      member_name: "#{member.name}",
-      member_firstname: "#{member.firstname}",
-      member_email: "#{member.email}",
-      member_affiliation: "#{member.affiliation}",
+      person_name: "#{@organizer.dear_name}",
+      event_code: "#{@event.code}",
+      event_name: "#{@event.name}",
+      event_dates: "#{@event.dates(:long)}",
+      member_name: "#{@member.name}",
+      member_firstname: "#{@member.firstname}",
+      member_email: "#{@member.email}",
+      member_affiliation: "#{@member.affiliation}",
       attendance_msg: "#{@attendance_msg}",
       message_to_organizer: "#{message_to_organizer}",
-      organization: "#{organization}"
+      organization: "#{@organization}"
     }
 
     data = {

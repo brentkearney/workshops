@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Banff International Research Station.
+# Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
@@ -205,7 +205,9 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.attendance = 'Declined'
     @membership.updated_by = @membership.person.name
     @membership.save
+
     msg = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].second
+
     expect(msg.values.first).to eq(['Attendance was "Confirmed" and is now "Declined".'])
     expect(msg.values.second).to eq(@membership.person.name)
   end
@@ -344,13 +346,13 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@membership.shares_email?).to be_falsey
   end
 
-  it '.is_org? tests if member is organizer' do
+  it '.organizer? tests if member is organizer' do
     @membership.role = 'Participant'
     @membership.save
-    expect(@membership.is_org?).to be_falsey
+    expect(@membership.organizer?).to be_falsey
 
     @membership.role = 'Organizer'
     @membership.save
-    expect(@membership.is_org?).to be_truthy
+    expect(@membership.organizer?).to be_truthy
   end
 end

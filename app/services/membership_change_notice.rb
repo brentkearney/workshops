@@ -9,7 +9,7 @@ class MembershipChangeNotice
   attr_reader :changed, :membership, :event
 
   def initialize(changed, membership)
-    @changed = changed.to_a
+    @changed = changed.to_h
     @membership = membership
     @event = membership.event
   end
@@ -27,7 +27,8 @@ class MembershipChangeNotice
   private
 
   def changed_fields?
-    !(NOTIFY_FIELDS & changed).empty?
+    Rails.logger.debug "changed = #{changed}"
+    !(NOTIFY_FIELDS & changed.keys).empty?
   end
 
   def confirmation_lead_time
@@ -59,16 +60,25 @@ class MembershipChangeNotice
   def build_change_message
     msg = []
     NOTIFY_FIELDS.each do |field|
-      if changed.include?(field)
-        field_was = field + '_was'
-        msg << %Q[#{field.titleize} was "#{membership.send(field_was)}" and is now
-          "#{membership.send(field)}".].squish
+      field_was = add_changed_field?(field)
+      if field_was
+        msg << %(#{field.titleize} was "#{field_was}" and is now
+          "#{membership.send(field)}".).squish
       end
     end
+    message_hash(msg)
+  end
+
+  def message_hash(msg)
     {
       message: msg,
       updated_by: membership.updated_by
     }
+  end
+
+  def add_changed_field?(field)
+    return false unless changed.keys.include?(field)
+    membership.saved_changes.transform_values(&:first)[field]
   end
 
   def send_notice(to:)

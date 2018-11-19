@@ -5,7 +5,7 @@
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
-
+#
 class Membership < ApplicationRecord
   attr_accessor :sync_memberships, :update_by_staff, :update_remote
 
@@ -41,7 +41,7 @@ class Membership < ApplicationRecord
     share_email
   end
 
-  def is_org?
+  def organizer?
     role == 'Organizer' || role == 'Contact Organizer'
   end
 
@@ -145,6 +145,7 @@ class Membership < ApplicationRecord
   end
 
   def notify_staff
-    MembershipChangeNotice.new(saved_changes.transform_values(&:first), self).run
+    changes = saved_changes.transform_values(&:first)
+    MembershipChangeNotice.new(changes, self).run
   end
 end
