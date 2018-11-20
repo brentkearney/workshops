@@ -38,7 +38,7 @@ RSpec.describe WelcomeController, type: :controller do
         it 'responds with success code' do
           get :index
 
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it 'renders :index' do

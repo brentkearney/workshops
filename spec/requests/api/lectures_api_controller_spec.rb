@@ -24,7 +24,7 @@ describe Api::V1::LecturesController do
 
     it 'authenticates with the correct api key' do
       put "/api/v1/lectures.json", params: @payload.to_json
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'does not authenticate with an invalid api key' do

@@ -21,7 +21,7 @@
       it 'responds with success code' do
         get :index
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'assigns @events to all events' do
@@ -159,7 +159,7 @@
         it 'responds with success code' do
           get :my_events
 
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it "assigns @events to user's events" do
@@ -204,7 +204,7 @@
       it 'responds with success code' do
         get :past
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'renders :index' do
@@ -285,7 +285,7 @@
       it 'responds with success code' do
         get :future
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'renders :index' do
@@ -349,7 +349,7 @@
       it 'responds with success code' do
         get :year, params: { year: year }
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'renders :index' do
@@ -385,7 +385,7 @@
           it 'responds with success code' do
             get :location, params: { location: location }
 
-            expect(response).to be_success
+            expect(response).to be_successful
           end
 
           it 'renders :index' do
@@ -432,7 +432,7 @@
           it 'responds with success code' do
             get :kind, params: { kind: kind }
 
-            expect(response).to be_success
+            expect(response).to be_successful
           end
 
           it 'renders :index' do

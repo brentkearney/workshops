@@ -152,7 +152,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'responds with success code' do
           get :index, params: { event_id: @event.id }
 
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it 'assigns @memberships to event members' do

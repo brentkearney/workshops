@@ -72,7 +72,7 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
 
         post :incoming, params: incoming_email
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 

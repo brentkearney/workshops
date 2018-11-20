@@ -26,7 +26,7 @@ RSpec.describe InvitationsController, type: :controller do
     end
 
     it 'responds with success code' do
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'renders :new template' do

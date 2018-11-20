@@ -24,7 +24,7 @@ describe Api::V1::EventsController do
 
     it 'authenticates with the correct api key' do
       post "/api/v1/events.json", params: @payload.to_json
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'does not authenticate with an invalid api key' do
