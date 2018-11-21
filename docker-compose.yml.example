@@ -24,8 +24,6 @@ db:
     - DB_PASS=
     - PSQL_TRUST_LOCALNET=true
     - PGDATA=/var/lib/postgresql/data/pgdata
-    - DB_USER=db_username
-    - DB_PASS=
     - DB_PORT=5433
     - DB_NAME=workshops_production,workshops_development,workshops_test
 web:
@@ -56,3 +54,6 @@ web:
     - EMAIL_SERVER=mail.example.com
     - EMAIL_PORT=25
     - EMAIL_STARTTLS=true
+    - SPARKPOST_API_KEY=your_key
+    - CORS_HOSTS="https://yoursite.com"
+

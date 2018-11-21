@@ -21,49 +21,47 @@ echo
 echo "Create gemset..."
 gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
 /usr/bin/curl -sSL https://get.rvm.io | bash -s stable
-# /usr/local/rvm/bin/rvm gemset create ruby-2.5.1
-/usr/local/rvm/bin/rvm gemset use ruby-2.5.1@global
-# /usr/local/rvm/bin/rvm 2.5.1@ruby-2.5.1
+/usr/local/rvm/bin/rvm gemset create ruby-2.5.3
+/usr/local/rvm/bin/rvm gemset use ruby-2.5.3@global
 /usr/local/rvm/bin/rvm cleanup all
 /usr/local/rvm/bin/rvm reload
 
 echo
 echo "Installing latest bundler..."
-/usr/local/rvm/bin/rvm-exec 2.5.1 gem install bundlera
-/usr/local/rvm/bin/rvm-exec 2.5.1 gem install rubygems-bundler
+/usr/local/rvm/bin/rvm-exec 2.5.3 gem install bundler
+/usr/local/rvm/bin/rvm-exec 2.5.3 gem install rubygems-bundler
 
-echo
-echo "Bundle update rails..."
-RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.1 bundle update rails
+# echo
+# echo "Bundle update rails..."
+# RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.3 bundle update rails
 
 echo
 echo "Bundle install..."
-RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.1 bundle install
+RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.3 bundle install
 
 # echo
 # echo "Bundle update..."
-# RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.1 bundle update
+# RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.3 bundle update
 
 echo
 echo "Running migrations..."
 rake db:migrate RAILS_ENV=development
 rake db:migrate RAILS_ENV=test
-rake db:migrate RAILS_ENV=production
+# rake db:migrate RAILS_ENV=production
 
-# # Default settings
-# rake ws:init_settings
-
-# echo
-# echo "Creating admins..."
-# if [ -e lib/tasks/birs.rake ]; then
-#   rake birs:create_admin RAILS_ENV=development
-# else
-#   rake ws:create_admins RAILS_ENV=development
-# fi
-
+# Default settings
+echo
+echo "Adding default Settings..."
+rake ws:init_settings
 
 echo
-echo "Chowning..."
+echo "Creating admins..."
+if [ -e lib/tasks/ws.rake ]; then
+  rake ws:create_admins RAILS_ENV=development
+fi
+
+echo
+echo "Changing to non-root file permissions..."
 chown -R app:app /usr/local/rvm/gems
 if [ ! -e /home/app/workshops/tmp ]; then
  mkdir /home/app/workshops/tmp
@@ -71,9 +69,9 @@ if [ ! -e /home/app/workshops/tmp ]; then
 fi
 chown -R app:app /home/app/workshops
 
-# echo
-# echo "Compiling Assets..."
-# su - app -c "cd /home/app/workshops; RAILS_ENV=production SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
+echo
+echo "Compiling Assets..."
+su - app -c "cd /home/app/workshops; RAILS_ENV=development SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
 
 echo
 echo "Starting web server..."

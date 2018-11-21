@@ -1,22 +1,28 @@
 # See: https://github.com/phusion/passenger-docker
 # Latest image versions: https://github.com/phusion/passenger-docker/blob/master/Changelog.md
-FROM phusion/passenger-ruby25:0.9.30
+FROM phusion/passenger-ruby25:1.0.0
 
 ENV HOME /root
 
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
 
+# Yarn package
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
+# Postgres
+RUN curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+
 RUN apt-get update -qq && apt-get dist-upgrade --yes && \
-  apt-get install --yes pkg-config apt-utils build-essential cmake automake\
+  apt-get install --yes pkg-config apt-utils build-essential cmake automake \
   && apt-get upgrade --fix-missing --yes --allow-remove-essential \
   -o Dpkg::Options::="--force-confold"
-  RUN apt-get install --yes tzdata udev locales curl git gnupg ca-certificates \
-    gnupg libpq-dev nodejs wget \
-    && apt-get clean && apt-get autoremove --yes && \
+
+RUN apt-get install --yes tzdata udev locales curl git gnupg ca-certificates \
+    gnupg libpq-dev nodejs wget libxrender1 libxext6 libsodium23 \
+    libsodium-dev yarn && apt-get clean && apt-get autoremove --yes && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
-  apt-key add -
 
 # Use en_CA.utf8 as our locale
 RUN locale-gen en_CA.utf8
@@ -24,7 +30,16 @@ ENV LANG en_CA.utf8
 ENV LANGUAGE en_CA:en
 ENV LC_ALL en_CA.utf8
 
-# Local machine uses 999 for docker user
+# Upgrade Ruby
+#RUN /usr/local/rvm/bin/rvm remove ruby-2.5.1
+#RUN /usr/local/rvm/bin/rvm install "ruby-2.5.3"
+#RUN bash -lc 'rvm --default use ruby-2.5.3'
+#RUN /usr/local/rvm/bin/rvm all do gem regenerate_binstubs
+#RUN /usr/local/rvm/bin/rvm reload && /usr/local/rvm/bin/rvm repair all
+#RUN /usr/local/rvm/bin/rvm wrapper 2.5.3 --no-prefix --all
+#RUN /usr/local/rvm/bin/rvm wrapper regenerate
+
+# Container uses 999 for docker user
 RUN /usr/sbin/usermod -u 999 app
 
 #ADD rails-env.conf /etc/nginx/main.d/rails-env.conf
@@ -34,6 +49,7 @@ ADD . $APP_HOME
 WORKDIR $APP_HOME
 RUN rm docker-compose.yml
 RUN rm Dockerfile
+RUN touch config/app.yml
 RUN chown app -R ./
 
 EXPOSE 80 443
