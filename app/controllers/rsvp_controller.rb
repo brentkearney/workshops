@@ -13,20 +13,19 @@ class RsvpController < ApplicationController
     unless @invitation.event.nil?
       @inv_event = @invitation.event
       @pc_email = GetSetting.email(@inv_event.location, 'program_coordinator')
-      SyncEventMembersJob.perform_later(@invitation.membership.event_id)
     end
   end
 
   # GET /rsvp/yes/:otp
   # POST /rsvp/yes/:otp
   def yes
+    SyncMember.new(@invitation.membership)
     @rsvp = RsvpForm.new(@invitation)
     @years = (1930..Date.current.year).to_a.reverse
     set_default_dates
 
-    if request.post? && @rsvp.validate_form(yes_params)
-      update_and_redirect(rsvp: :accept)
-    end
+    return unless request.post? && @rsvp.validate_form(yes_params)
+    update_and_redirect(rsvp: :accept)
   end
 
   # GET /rsvp/no/:otp

@@ -7,9 +7,9 @@
 # Receives Griddler:Email object, distributes message to confirmed members
 class EventMaillist
   def initialize(email, mailist_params)
-    @email = email
-    @event = mailist_params[:event]
-    @group = mailist_params[:group]
+    @email       = email
+    @event       = mailist_params[:event]
+    @group       = mailist_params[:group]
     @destination = mailist_params[:destination]
   end
 

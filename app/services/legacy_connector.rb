@@ -1,4 +1,4 @@
-  # Copyright (c) 2016 Banff International Research Station
+# Copyright (c) 2018 Banff International Research Station
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,13 @@ class LegacyConnector
   # get membership data for an event
   def get_members(event)
     JSON.parse((RestClient.get "#{@rest_url}/members/#{event.code}"))
+  end
+
+  # get a member record data
+  def get_member(membership)
+    mbr = { event_id: membership.event.code,
+            person_id: membership.person.legacy_id }
+    JSON.parse((RestClient.get "#{@rest_url}/get_member", params: mbr))
   end
 
   # get a person record data

@@ -52,7 +52,6 @@ class FakeLegacyConnector
     # Change the existing members and return them
     event.memberships.each do |m|
       remote_members << {
-          'Workshop' => "#{event.code}",
           'Person' => {
               'lastname' => m.person.lastname, 'firstname' => m.person.firstname,
               'email' => m.person.email, 'cc_email' => nil,
@@ -86,12 +85,19 @@ class FakeLegacyConnector
     remote_members.each do |m|
       m['Person']['updated_by'] = ''
       m['Person']['updated_at'] = nil
+      m['Person']['email'] = humanize_it(m['Person']['email'])
       m['Membership']['updated_by'] = ''
       m['Membership']['updated_at'] = nil
       m['Membership']['role'] = 'Backup Participant'
+      m['Membership']['replied_at'] = '0000-00-00 00:00:00'
       new_remote_members << m
     end
     new_remote_members
+  end
+
+  def humanize_it(email)
+    return if email.blank?
+    ' ' + email.capitalize + ' '
   end
 
   def get_members_with_person(e: event, m: membership, changed_fields:)
@@ -134,7 +140,6 @@ class FakeLegacyConnector
     end
 
     remote_member = [{
-        'Workshop' => '#{e.code}',
         'Person' => remote_person,
         'Membership' =>  remote_membership
     }]
@@ -143,7 +148,6 @@ class FakeLegacyConnector
   def get_members_with_new_membership(e: event, p: person)
     m = Membership.new(event: e, person: p)
     [{
-      'Workshop' => e.code,
       'Person' => {
         'lastname' => p.lastname, 'firstname' => p.firstname,
         'email' => p.email, 'cc_email' => nil,
@@ -169,7 +173,6 @@ class FakeLegacyConnector
 
   def get_members_with_changed_membership(m: membership, sn: staff_notes)
     [{
-      'Workshop' => m.event.code,
       'Person' => {
         'lastname' => m.person.lastname, 'firstname' => m.person.firstname,
         'email' => m.person.email, 'cc_email' => nil, 'salutation' => nil,
@@ -201,7 +204,6 @@ class FakeLegacyConnector
       membership.updated_by = 'FakeLegacyConnector'
       membership.attendance = 'Confirmed'
       remote_members << {
-          'Workshop' => "#{event.code}",
           'Person' => membership.person.attributes,
           'Membership' => membership.attributes
       }

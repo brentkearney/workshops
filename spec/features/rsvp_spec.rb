@@ -19,7 +19,6 @@ describe 'RSVP', type: :feature do
     @membership = create(:membership, event: @event, person: @person,
                          attendance: 'Invited')
     @invitation = create(:invitation, membership: @membership)
-    allow(SyncEventMembersJob).to receive(:perform_later).with(@event.id)
   end
 
   before do
@@ -31,10 +30,6 @@ describe 'RSVP', type: :feature do
 
   before :each do
     visit rsvp_otp_path(@invitation.code)
-  end
-
-  it 'syncs event membership data' do
-    expect(SyncEventMembersJob).to have_received(:perform_later).with(@event.id)
   end
 
   it 'welcomes the user' do
@@ -305,9 +300,14 @@ describe 'RSVP', type: :feature do
   context 'User says Yes' do
     before do
       reset_database
+      allow(SyncMember).to receive(:new).with(@membership)
       @rsvp = RsvpForm.new(@invitation)
       visit rsvp_otp_path(@invitation.code)
       click_link "Yes"
+    end
+
+    it 'syncs membership data' do
+      expect(SyncMember).to have_received(:new).with(@membership)
     end
 
     it 'has arrival and departure date section' do
@@ -444,6 +444,7 @@ describe 'RSVP', type: :feature do
       it 'updates legacy database' do
         allow(SyncMembershipJob).to receive(:perform_later)
         reset_database
+        allow(SyncMember).to receive(:new).with(@membership)
 
         visit rsvp_yes_path(@invitation.code)
         click_button 'Confirm Attendance'

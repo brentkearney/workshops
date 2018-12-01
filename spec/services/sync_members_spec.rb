@@ -65,7 +65,7 @@ describe "SyncMembers" do
       @eventm.sync_time = nil
       @eventm.save
 
-      SyncMembers.new(@eventm).set_sync_time
+      SyncMembers.new(@eventm)
       evnt = Event.find(@eventm.id)
       expect(evnt.sync_time).not_to be_blank
       expect(evnt.sync_time).to be_a(ActiveSupport::TimeWithZone)
@@ -107,11 +107,14 @@ describe "SyncMembers" do
   end
 
   describe '.fix_remote_fields' do
-    it 'fills in blank fields, sets Backup Participant attendance to "Not Yet Invited"' do
+    before do
       lc = FakeLegacyConnector.new
+      # get_members_with_changed_fields() sets nil fields and messes up email
       allow(lc).to receive(:get_members).with(@eventm).and_return(lc.get_members_with_changed_fields(@eventm))
       expect(LegacyConnector).to receive(:new).and_return(lc)
+    end
 
+    it 'fills in blank fields, sets Backup Participant attendance to "Not Yet Invited"' do
       SyncMembers.new(@eventm)
       member = Event.find(@eventm.id).memberships.last
 
@@ -119,8 +122,16 @@ describe "SyncMembers" do
       expect(member.person.updated_at).not_to be_nil
       expect(member.updated_by).to eq('Workshops importer')
       expect(member.updated_at).not_to be_nil
+      expect(member.replied_at).to be_nil
       expect(member.role).to eq('Backup Participant')
       expect(member.attendance).to eq('Not Yet Invited')
+    end
+
+    it 'downcases and strips whitespace from emails' do
+      before_email = Event.find(@eventm.id).memberships.first.person.email
+      SyncMembers.new(@eventm)
+      after_email =  Event.find(@eventm.id).memberships.first.person.email
+      expect(after_email).to eq(before_email)
     end
   end
 

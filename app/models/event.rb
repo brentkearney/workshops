@@ -90,6 +90,13 @@ class Event < ApplicationRecord
     end
   end
 
+  def set_sync_time
+    def record_timestamps; false; end
+    self.sync_time = DateTime.current
+    save!
+    def record_timestamps; super; end
+  end
+
   private
 
   def clean_data
