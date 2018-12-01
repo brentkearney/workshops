@@ -36,8 +36,8 @@ class SyncMember
     return if remote_member.blank?
 
     remote_member = fix_remote_fields(remote_member)
-    person = update_record(local_member.person, remote_member['Person'])
-    membership = update_record(local_member, remote_member['Membership'])
+    person = update_record(membership.person, remote_member['Person'])
+    membership = update_record(membership, remote_member['Membership'])
     membership.person = person
     save_membership(membership)
   end

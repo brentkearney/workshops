@@ -21,6 +21,7 @@
 
 # updates one person record with data from remote db
 class SyncPerson
+  attr_reader :person
   include Syncable
 
   def initialize(person)
@@ -29,11 +30,13 @@ class SyncPerson
   end
 
   def sync_person
-    return if @person.legacy_id.blank?
+    return if person.legacy_id.blank?
     lc = LegacyConnector.new
-    @remote_person = lc.get_person(@person.legacy_id)
-    return if @remote_person.blank?
-    return if @person.updated_at.to_i >= @remote_person['updated_at'].to_i
-    find_and_update_person(@remote_person)
+    remote_person = lc.get_person(person.legacy_id)
+    return if remote_person.blank?
+    return if person.updated_at.to_i >= remote_person['updated_at'].to_i
+
+    local_person = update_record(person, remote_person)
+    save_person(local_person)
   end
 end
