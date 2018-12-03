@@ -16,6 +16,7 @@ class MembershipsController < ApplicationController
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
     @domain = GetSetting.email(@event.location, 'email_domain')
+    assign_buttons if policy(@event).use_email_addresses?
   end
 
   # GET /events/:event_id/memberships/1
@@ -107,6 +108,20 @@ class MembershipsController < ApplicationController
   end
 
   private
+
+  def assign_buttons
+     organizers = @memberships.values[0].nil? ? '' : select_organizers
+     @organizer_emails = map_emails(organizers)
+   end
+
+   def map_emails(members)
+     return [] if members.blank?
+     members.map { |m| "\"#{m.person.name}\" <#{m.person.email}>" }
+   end
+
+   def select_organizers
+     @memberships.values[0].select { |m| m.role =~ /Organizer/ }
+   end
 
   def other_memberships
     memberships = []

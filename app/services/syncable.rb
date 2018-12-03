@@ -92,6 +92,7 @@ module Syncable
   end
 
   def boolean_fields(obj)
+    return if obj.nil?
     fields = []
     obj.attribute_names.each do |field|
       fields << field if obj.type_for_attribute(field).type == :boolean
