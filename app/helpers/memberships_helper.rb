@@ -73,10 +73,12 @@ module MembershipsHelper
       unless @membership.invited_by.blank?
         invited_by='
         <div class="row" id="profile-rsvp-invited">
-          Invited by: ' + @membership.invited_by + ' on ' +
-          @membership.invited_on.in_time_zone(@membership.event.time_zone).to_s + '
-        </div>
-        '
+          Invited by: ' + @membership.invited_by
+        unless @membership.invited_on.blank?
+          invited_by << ' on '
+          invited_by << @membership.invited_on.in_time_zone(@membership.event.time_zone).to_s
+          invited_by << '</div>'
+        end
       end
     end
     invited_by.html_safe
