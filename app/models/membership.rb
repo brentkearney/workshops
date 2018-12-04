@@ -38,7 +38,7 @@ class Membership < ApplicationRecord
                 'Declined'].freeze
 
   def shares_email?
-    share_email
+    self.share_email
   end
 
   def organizer?

@@ -118,6 +118,11 @@ RSpec.describe RsvpController, type: :controller do
   end
 
   describe 'GET #yes' do
+    before do
+      lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive(:new).and_return(lc)
+    end
+
     it 'renders yes template' do
       get :yes, params: { otp: @invitation.code }
       expect(response).to render_template(:yes)
@@ -125,6 +130,11 @@ RSpec.describe RsvpController, type: :controller do
   end
 
   describe 'POST #yes' do
+    before do
+      @lc = FakeLegacyConnector.new
+      expect(LegacyConnector).to receive(:new).and_return(@lc)
+    end
+
     def yes_params
       {'membership' => { arrival_date: @invitation.membership.event.start_date,
           departure_date: @invitation.membership.event.end_date,
@@ -153,9 +163,9 @@ RSpec.describe RsvpController, type: :controller do
     end
 
     it 'with an invalid OTP, it forwards to rsvp_otp' do
-      lc = FakeLegacyConnector.new
-      expect(LegacyConnector).to receive(:new).and_return(lc)
-      allow(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
+      # lc = FakeLegacyConnector.new
+      # expect(LegacyConnector).to receive(:new).and_return(lc)
+      allow(@lc).to receive(:check_rsvp).with('foo').and_return(@lc.invalid_otp)
 
       post :yes, params: { otp: 'foo', rsvp: yes_params }
 

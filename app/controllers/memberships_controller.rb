@@ -16,7 +16,7 @@ class MembershipsController < ApplicationController
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
     @domain = GetSetting.email(@event.location, 'email_domain')
-    assign_buttons if policy(@event).use_email_addresses?
+    assign_buttons if policy(@event).show_email_buttons?('Confirmed')
   end
 
   # GET /events/:event_id/memberships/1

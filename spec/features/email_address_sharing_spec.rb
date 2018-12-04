@@ -31,12 +31,12 @@ describe 'Email address sharing', type: :feature do
   end
 
   def unshare_some_emails
-    @unshared1 = @event.memberships.where(attendance: 'Confirmed').first
+    @unshared1 = @event.memberships.where(attendance: 'Confirmed', role: 'Participant').first
     expect(@unshared1.person).not_to eq(@user.person)
     @unshared1.share_email = false
     @unshared1.save
 
-    @unshared2 = @event.memberships.where(attendance: 'Confirmed').second
+    @unshared2 = @event.memberships.where(attendance: 'Confirmed', role: 'Participant').second
     expect(@unshared2.person).not_to eq(@user.person)
     @unshared2.share_email = false
     @unshared2.save
@@ -77,6 +77,9 @@ describe 'Email address sharing', type: :feature do
 
   context 'As a logged-in user who is a member of the event' do
     before do
+      @user.member!
+      @member.role = 'Participant'
+      @member.save
       login_as @user, scope: :user
       visit event_memberships_path(@event)
     end

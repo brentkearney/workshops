@@ -150,7 +150,7 @@ module MembershipsHelper
     to_email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
     content = mail_to(to_email, "<i class=\"fa fa-envelope fa-fw\"></i> Email #{status} Members".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members')
 
-    if status == 'Confirmed'
+    if status == 'Confirmed' && !@organizer_emails.blank?
       content << ' | '
       content << mail_to(@organizer_emails.join(','), "<i class=\"fa fa-envelope fa-fw\"></i> Email Organizers".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members')
     end

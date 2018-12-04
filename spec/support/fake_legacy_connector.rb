@@ -46,6 +46,20 @@ class FakeLegacyConnector
 
   end
 
+  def get_member(membership)
+    {
+      'Person' => membership.person.attributes.merge(
+        updated_at: DateTime.current,
+        research_areas: 'stuff'
+      ),
+      'Membership' => membership.attributes.merge(
+        updated_at: DateTime.current,
+        arrival_date: membership.event.start_date + 1.day,
+        departure_date: membership.event.end_date - 1.day,
+      )
+    }
+  end
+
   def get_members(event)
     remote_members = []
 
