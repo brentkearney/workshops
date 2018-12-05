@@ -89,12 +89,19 @@ class SyncMembers
     undecided = 0
     nyninvited = 0
     declined = 0
+    observers = 0
     Event.find(@event.id).memberships.each do |membership|
       confirmed += 1 if membership.attendance == 'Confirmed'
       invited += 1 if membership.attendance == 'Invited'
       undecided += 1 if membership.attendance == 'Undecided'
       nyninvited += 1 if membership.attendance == 'Not Yet Invited'
       declined += 1 if membership.attendance == 'Declined'
+
+      if membership.role == 'Observer'
+        observers += 1
+        confirmed -= 1 if membership.attendance == 'Confirmed'
+        invited -= 1 if membership.attendance == 'Invited'
+      end
     end
 
     total_invited = confirmed + invited + undecided
@@ -105,7 +112,8 @@ class SyncMembers
       msg += "Undecided participants: #{undecided}\n"
       msg += "Not Yet Invited participants: #{nyninvited}\n"
       msg += "Declined participants: #{declined}\n\n"
-      msg += "Total invited: #{total_invited}\n"
+      msg += "Total invited participants: #{total_invited}\n"
+      msg += "Total observers: #{observers}\n"
       msg += "#{@event.code} Maximum allowed: #{@event.max_participants}\n"
 
       sync_errors.add(@event, "#{@event.code} is overbooked!\n\n#{msg}")

@@ -77,8 +77,8 @@ module MembershipsHelper
         unless @membership.invited_on.blank?
           invited_by << ' on '
           invited_by << @membership.invited_on.in_time_zone(@membership.event.time_zone).to_s
-          invited_by << '</div>'
         end
+        invited_by << '</div>'
       end
     end
     invited_by.html_safe

@@ -27,12 +27,12 @@ class SettingParametizer
   end
 
   def organize_params
-    @setting.value = update_params
+    @setting.value = update_params.to_unsafe_h
   end
 
   def update_params
     data = @params.require(:setting).permit(@setting.var => valid_fields)
-    data.to_h[@setting.var.to_s]
+    data[@setting.var.to_s]
   end
 
   def valid_fields

@@ -511,7 +511,8 @@ describe "SyncMembers" do
       msg += "Undecided participants: 0\n"
       msg += "Not Yet Invited participants: 0\n"
       msg += "Declined participants: 0\n\n"
-      msg += "Total invited: #{total_invited}\n"
+      msg += "Total invited participants: #{total_invited}\n"
+      msg += "Total observers: 0\n"
       msg += "#{@event.code} Maximum allowed: #{@event.max_participants}\n"
       message = "#{@event.code} is overbooked!\n\n#{msg}"
 

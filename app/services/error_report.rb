@@ -92,8 +92,7 @@ class ErrorReport
 
         if errors.has_key?('Event')
           error_messages = errors['Event'].first.message.to_s
-          membership_url = GetSetting.app_url + '/events/'
-            + @event.code + '/memberships'
+          membership_url = GetSetting.app_url + '/events/' + @event.code + '/memberships'
           error_messages << "\n" + membership_url
         end
 
