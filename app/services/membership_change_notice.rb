@@ -21,13 +21,13 @@ class MembershipChangeNotice
     end
   end
 
+  # if these fields change, notify staff
   NOTIFY_FIELDS = %w(attendance arrival_date departure_date special_info
                      has_guest own_accommodation)
 
   private
 
   def changed_fields?
-    Rails.logger.debug "changed = #{changed}"
     !(NOTIFY_FIELDS & changed.keys).empty?
   end
 

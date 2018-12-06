@@ -78,6 +78,7 @@ class LegacyConnector
       person:      person.as_json,
       updated_by:  updated_by
     )
+    remote_membership = update_booleans(remote_membership)
 
     JSON.parse((RestClient.post "#{@rest_url}/add_member/#{event_code}",
                                 remote_membership.to_json,
@@ -164,5 +165,15 @@ class LegacyConnector
 
   def check_rsvp(otp)
     JSON.parse((RestClient.get "#{@rest_url}/check_rsvp/#{otp}"))
+  end
+
+  def update_booleans(obj)
+    new_obj = {}
+    obj.each_pair do |k, v|
+      v = 1 if v == true
+      v = 0 if v == false
+      new_obj[k] = v
+    end
+    new_obj
   end
 end

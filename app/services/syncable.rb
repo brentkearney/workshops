@@ -203,9 +203,7 @@ module Syncable
     membership.person.member_import = true
     membership.sync_memberships = true
     if membership.save
-      if membership.previous_changes.empty?
-        Rails.logger.info "\n\nNo changes to #{membership.person.name}'s membership.\n\n"
-      else
+      unless membership.previous_changes.empty?
         Rails.logger.info "\n\n" + "* Saved #{membership.event.code} membership for
           #{membership.person.name}".squish + "\n"
       end
