@@ -8,7 +8,7 @@
     <div class='col-md-12'>
         <p class='lead text-center'>You have been invited to the
         <%= @inv_event.event_type %>, <%= @inv_event.code %>:
-        "<%= link_to @inv_event.name, @inv_event.url, target: '_new' %>", on
+        "<%= link_to @inv_event.name, event_path(@inv_event), target: '_new' %>", on
         <%= @inv_event.dates(:long) %>.
         Will you attend?</p>
     </div>
