@@ -67,12 +67,14 @@ class InvitationsController < ApplicationController
           to send invitations to.'.squish and return
     elsif event_full?(event, members)
       redirect_to event_memberships_path(event),
-          error: 'This action would make the event over capacity.' and return
+          error: "You may not invite more than
+                  #{event.max_participants} participants.".squish and return
     else
       pause_membership_syncing(event)
       sent_to = ''
-      Rails.logger.debug "\n\nMembers are: #{members.inspect}\n\n"
+
       members.each do |membership|
+        membership.person.member_import = true # skip validations on save
         send_invitation(membership, current_user.name)
         sent_to << membership.person.name + ', '
       end
@@ -89,7 +91,7 @@ class InvitationsController < ApplicationController
   end
 
   def event_full?(event, members=[])
-    event.num_invited_participants + members.count >= event.max_participants
+    event.num_invited_participants + members.count > event.max_participants
   end
 
   def pause_membership_syncing(event)
