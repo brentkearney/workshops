@@ -10,6 +10,10 @@ $(document).on 'turbolinks:load', ->
     $('li#event-locations').each (index, element) =>
       $(element).removeClass('active')
 
+  $('a#event-years-link').click ->
+    $('li#event-years').each (index, element) =>
+      $(element).removeClass('active')
+
     $('span#locations-arrow').toggleClass('arrow')
     $('span#locations-arrow').toggleClass('arrow-down')
 
