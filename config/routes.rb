@@ -75,12 +75,4 @@ Rails.application.routes.draw do
 
   # Maillists
   post "/maillist" => 'griddler/authentication#incoming'
-
-  # Broken Android icon requests
-  get '/android-icon-192x192.png', to: redirect('/icons/android-icon-192x192.png')
-  get '/android-icon-144x144.png', to: redirect('/icons/android-icon-144x144.png')
-  get '/android-icon-96x96.png', to: redirect('/icons/android-icon-96x96.png')
-  get '/android-icon-72x72.png', to: redirect('/icons/android-icon-72x72.png')
-  get '/android-icon-48x48.png', to: redirect('/icons/android-icon-48x48.png')
-  get '/android-icon-36x36.png', to: redirect('/icons/android-icon-36x36.png')
 end
