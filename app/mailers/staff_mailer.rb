@@ -35,7 +35,7 @@ class StaffMailer < ApplicationMailer
   def event_sync(event, error_messages)
     @event = event
     @error_messages = error_messages
-    to_email = GetSetting.email(@event.location, 'program_coordinator')
+    to_email = GetSetting.email(@event.location, 'secretary')
     cc_email = GetSetting.site_email('sysadmin_email')
     subject = "!! #{event.code} (#{event.location}) Data errors !!"
 
