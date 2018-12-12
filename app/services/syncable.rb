@@ -173,13 +173,18 @@ module Syncable
       l.save
     end
 
-    user_account = User.where(person_id: replace.id).first
-    unless user_account.nil?
-      user_account.person = replace_with
-      user_account.email = replace_with.email
-      user_account.skip_reconfirmation!
-      user_account.save
+    if User.where(person_id: replace_with.id).blank?
+      user_account = User.where(person_id: replace.id).first
+      unless user_account.nil?
+        user_account.person = replace_with
+        user_account.email = replace_with.email
+        user_account.skip_reconfirmation!
+        user_account.save
+      end
     end
+
+    lc = LegacyConnector.new
+    lc.replace_person(replace: replace, replace_with: replace_with)
 
     # there can be only one!
     Person.find(replace.id).destroy

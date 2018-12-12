@@ -16,10 +16,23 @@ class RsvpController < ApplicationController
     end
   end
 
+  # GET /rsvp/email/:otp
+  # POST /rsvp/email/:otp
+  def email
+    SyncMember.new(@invitation.membership)
+    @person = @invitation.membership.person
+
+    if request.post?
+      unless @person.email == email_param
+        SyncPerson.change_email(@person, email_param)
+      end
+      redirect_to rsvp_yes_path(otp: @invitation.otp)
+    end
+  end
+
   # GET /rsvp/yes/:otp
   # POST /rsvp/yes/:otp
   def yes
-    SyncMember.new(@invitation.membership)
     @rsvp = RsvpForm.new(@invitation)
     @years = (1930..Date.current.year).to_a.reverse
     set_default_dates
@@ -123,5 +136,9 @@ class RsvpController < ApplicationController
         :postal_code, :country, :emergency_contact, :emergency_phone,
         :biography, :research_areas, :grant_id],
     )
+  end
+
+  def email_param
+    params.require(:rsvp).permit(person: [:email])
   end
 end

@@ -39,4 +39,17 @@ class SyncPerson
     local_person = update_record(person, remote_person)
     save_person(local_person)
   end
+
+  def self.change_email(person, new_email)
+    @person = person
+    other_person = Person.find_by_email(new_email)
+    return if other_person.blank?
+
+    person_name = I18n.transliterate(person.name.downcase)
+    if I18n.transliterate(other_person.name.downcase) == person_name
+      replace_person(replace: person, replace_with: other_person)
+    else
+      # email staff re: email match, name mismatch
+    end
+  end
 end

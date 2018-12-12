@@ -95,7 +95,7 @@ class MembershipPolicy
 
   def send_invitations?
     return true if allow_staff_and_admins
-    @event.location != 'CMO' && current_user.is_organizer?(event)
+    current_user.is_organizer?(event)
   end
 
   def edit_person?
