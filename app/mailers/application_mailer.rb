@@ -21,4 +21,8 @@
 class ApplicationMailer < ActionMailer::Base
   default from: GetSetting.site_email('application_email')
   layout 'mailer'
+
+  def seconds_diff(d1, d2)
+    (d1 - d2).to_i * 60 * 60 * 24
+  end
 end
