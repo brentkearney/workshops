@@ -83,7 +83,7 @@ describe "ErrorReport" do
         @er.send_report
 
         expect(ActionMailer::Base.deliveries.count).to eq(1)
-        to_email = GetSetting.email(@event.location, 'program_coordinator')
+        to_email = GetSetting.email(@event.location, 'secretary')
         expect(ActionMailer::Base.deliveries.first.to).to include(to_email)
       end
 

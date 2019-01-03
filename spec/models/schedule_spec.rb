@@ -180,7 +180,8 @@ RSpec.describe 'Model validations: Schedule', type: :model do
 
   context '.notify_staff?' do
     it 'true if event is current' do
-      event = build(:event, current: true)
+      event = build(:event, start_date: Date.current,
+                            end_date: Date.current + 5.days)
       schedule = build(:schedule, event: event, staff_item: true,
         start_time: Time.now, end_time: Time.now + 30.minutes)
 

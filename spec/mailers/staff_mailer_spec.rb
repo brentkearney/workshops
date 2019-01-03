@@ -33,7 +33,7 @@ RSpec.describe StaffMailer, type: :mailer do
       StaffMailer.event_sync(@event, @sync_errors).deliver_now
 
       expect_email_was_sent
-      pc = GetSetting.email(@event.location, 'program_coordinator')
+      pc = GetSetting.email(@event.location, 'secretary')
       expect(ActionMailer::Base.deliveries.first.to).to include(pc)
       expect(ActionMailer::Base.deliveries.first.cc).to include(@sysadmin_email)
     end
