@@ -29,14 +29,7 @@ class InvitationMailer < ApplicationMailer
     @event_start = @event.start_date.to_time.strftime('%A, %B %-d')
     @event_end = @event.end_date.to_time.strftime('%A, %B %-d, %Y')
 
-    @rsvp_deadline = (Date.current + 6.weeks).strftime('%B %-d, %Y')
-    if seconds_diff(@event.start_date, Date.current) < 10.days
-      @rsvp_deadline = @event.start_date.strftime('%B %-d, %Y')
-    elsif seconds_diff(@event.start_date, Date.current) < 1.month
-      @rsvp_deadline = (Date.current + 10.days).strftime('%B %-d, %Y')
-    elsif seconds_diff(@event.start_date, Date.current) < (2.months + 5.days)
-      @rsvp_deadline = (Date.current + 25.days).strftime('%B %-d, %Y')
-    end
+    @rsvp_deadline = RsvpDeadline.new(@event.start_date).rsvp_by
 
     @organizers = ''
     @event.organizers.each do |org|
