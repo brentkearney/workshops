@@ -103,18 +103,14 @@ class EventPolicy
     end
   end
 
-  def show_invite_buttons?
-    return true if allow_staff_and_admins
-    @event.location != 'CMO' && current_user.is_organizer?(event)
-  end
-
   def send_invitations?
+    return false if event.start_date < Date.current
     return true if allow_staff_and_admins
-    @event.location != 'CMO' && current_user.is_organizer?(event)
+    current_user.is_organizer?(event)
   end
 
   def sync?
-    if event.end_date >= Date.today && !event.template #&& within_timelimit?
+    if event.end_date >= Date.today && !event.template
       allow_orgs_and_staff unless Rails.env.test?
     end
   end

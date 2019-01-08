@@ -95,22 +95,24 @@ module MembershipsHelper
   end
 
   def show_invite_buttons?(member)
-    policy(member).send_invitations? && member.attendance == 'Not Yet Invited'
+    policy(@event).send_invitations? && member.attendance == 'Not Yet Invited'
   end
 
   def show_reinvite_buttons?(member)
-    policy(member).send_invitations? &&
+    policy(@event).send_invitations? &&
       %w(Invited Undecided).include?(member.attendance)
   end
 
   def show_invite_button(member)
-    return unless show_invite_buttons?(member) && spots_left
-    column = '<td class="rowlink-skip no-print invite-buttons">' +
-      link_to("Send Invitation", invitations_send_path(member),
+    column = '<td class="rowlink-skip no-print invite-buttons">'
+    if show_invite_buttons?(member) && spots_left
+      column << link_to("Send Invitation", invitations_send_path(member),
         data: { confirm: "This will send #{member.person.name}
         an email, inviting #{member.person.him} to attend this
         workshop. Are you sure you want to proceed?".squish },
-        class: 'btn btn-sm btn-default') + '</td>'
+        class: 'btn btn-sm btn-default')
+    end
+    column << '</td>'
     column.html_safe
   end
 

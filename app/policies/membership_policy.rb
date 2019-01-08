@@ -93,11 +93,6 @@ class MembershipPolicy
       (@current_user.is_member?(@event) && @membership.share_email)
   end
 
-  def send_invitations?
-    return true if allow_staff_and_admins
-    current_user.is_organizer?(event)
-  end
-
   def edit_person?
     self_organizer_staff
   end

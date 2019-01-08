@@ -9,6 +9,9 @@ require 'rails_helper'
 describe 'Event Membership Page', type: :feature do
   before do
     @event = create(:event_with_members)
+    @event.start_date = (Date.current + 1.month).beginning_of_week(:sunday)
+    @event.end_date = @event.start_date + 5.days
+    @event.save
     @member = @event.memberships.where("role='Participant'").first
     @user = create(:user, email: @member.person.email, person: @member.person)
     @non_member_user = create(:user)
@@ -204,6 +207,7 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'shows email & invite buttons' do
+      puts page.body
       shows_all_email_buttons
       shows_invite_buttons
       shows_reinvite_buttons
@@ -218,6 +222,22 @@ describe 'Event Membership Page', type: :feature do
       hides_invite_buttons
       shows_reinvite_buttons
       @event.max_participants = 42
+      @event.save
+    end
+
+    it 'hides invite buttons if workshop has already started' do
+      original_start = @event.start_date
+      original_end = @event.end_date
+      @event.start_date = Date.current - 1.day
+      @event.end_date = Date.current + 4.days
+      @event.save
+
+      visit event_memberships_path(@event)
+
+      hides_invite_buttons
+      hides_reinvite_buttons
+      @event.start_date = original_start
+      @event.end_date = original_end
       @event.save
     end
 
