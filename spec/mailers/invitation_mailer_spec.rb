@@ -56,4 +56,62 @@ RSpec.describe InvitationMailer, type: :mailer do
       expect(@delivery.text_part).to have_text(event_name)
     end
   end
+
+  describe 'RSVP deadline' do
+    before do
+      @invitation = create(:invitation)
+    end
+
+    it 'sets date to 6 weeks in advance' do
+      event = @invitation.membership.event
+      event.start_date = Date.current + 12.weeks
+      event.end_date = Date.current + 12.weeks + 5.days
+      event.save
+
+      InvitationMailer.invite(@invitation).deliver_now
+      delivery = ActionMailer::Base.deliveries.last
+
+      rsvp_date = (Date.current + 6.weeks).strftime('%B %-d, %Y')
+      expect(delivery.text_part).to have_text("before #{rsvp_date}")
+    end
+
+    it 'sets date to event start if < 10 days in advance' do
+      event = @invitation.membership.event
+      event.start_date = Date.current + 9.days
+      event.end_date = Date.current + 14.days
+      event.save
+
+      InvitationMailer.invite(@invitation).deliver_now
+      delivery = ActionMailer::Base.deliveries.last
+
+      rsvp_date = (event.start_date).strftime('%B %-d, %Y')
+      expect(delivery.text_part).to have_text("before #{rsvp_date}")
+    end
+
+    it 'sets date to 10 days in advance if event is < 1 month away' do
+      event = @invitation.membership.event
+      event.start_date = Date.current + 3.weeks
+      event.end_date = Date.current + 3.weeks + 5.days
+      event.save
+
+      InvitationMailer.invite(@invitation).deliver_now
+      delivery = ActionMailer::Base.deliveries.last
+
+      rsvp_date = (Date.current + 10.days).strftime('%B %-d, %Y')
+      expect(delivery.text_part).to have_text("before #{rsvp_date}")
+    end
+
+    it 'sets date to 25 days in advance if event is < 2 months, 5 days away' do
+      event = @invitation.membership.event
+      event.start_date = Date.current + 2.months
+      event.end_date = Date.current + 2.months + 5.days
+      event.save
+
+      InvitationMailer.invite(@invitation).deliver_now
+      delivery = ActionMailer::Base.deliveries.last
+
+      rsvp_date = (Date.current + 25.days).strftime('%B %-d, %Y')
+      expect(delivery.text_part).to have_text("before #{rsvp_date}")
+    end
+  end
 end

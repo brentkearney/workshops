@@ -183,12 +183,14 @@ RSpec.describe InvitationsController, type: :controller do
       @user.member!
       original_person = @membership.person
       @membership.person = @user.person
-      @membership.role = 'Organizer'
+      @membership.role = 'Participant'
       @membership.attendance = 'Not Yet Invited'
-      @membership.save
+      @membership.save!
 
-      @event.max_participants = @event.num_invited_participants
-      @event.save
+      event = @membership.event
+      create(:membership, event: event)
+      event.max_participants = event.num_invited_participants
+      event.save
 
       get :send_invite, params: { membership_id: @membership.id }
       expect(flash[:error]).to be_present
@@ -196,8 +198,8 @@ RSpec.describe InvitationsController, type: :controller do
       @user.admin!
       @membership.person = original_person
       @membership.save
-      @event.max_participants = @past.max_participants
-      @event.save
+      event.max_participants = @past.max_participants
+      event.save
     end
 
     context 'invalid parameter' do

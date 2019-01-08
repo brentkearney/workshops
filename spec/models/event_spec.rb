@@ -114,7 +114,7 @@ RSpec.describe "Model validations: Event ", type: :model do
     end
 
     it 'true if current time is inside event dates' do
-      e = build(:event, current: true)
+      e = build(:event, start_date: Date.current)
 
       expect(e.current?).to be_truthy
     end
