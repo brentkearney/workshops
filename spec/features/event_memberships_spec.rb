@@ -207,7 +207,6 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'shows email & invite buttons' do
-      puts page.body
       shows_all_email_buttons
       shows_invite_buttons
       shows_reinvite_buttons
