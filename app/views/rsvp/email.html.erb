@@ -1,0 +1,35 @@
+<div class="row invitation-box container">
+  <div class="col-md-8 col-md-offset-1">
+    <%= render 'validation_errors' %>
+    <div class="panel panel-primary" id="email-form">
+      <div class="panel-heading">
+        <span class="panel-title"><h4>Confirm E-mail</h4></span>
+      </div>
+      <div class="panel-body">
+        <%= form_tag({controller: 'rsvp', action: 'email', method: 'post'},
+                     { class: 'form', role: 'form'}) do %>
+        <div class="row">
+          <div class="col-md-12">
+              <p class="lead text-center">Is this your preferred email for
+              correspondence from BIRS?<br>If not, please update it.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class='col-md-3'></div>
+          <div class='col-md-6 text-center'>
+            <%= text_field_tag(:email, @person.email, class: 'form-control') %>
+          </div>
+          <div class='col-md-3'></div>
+        </div>
+        <div class="row">
+          <div class='col-md-3'></div>
+          <div class='col-md-6 text-center'>
+            <%= submit_tag('Confirm E-mail and Continue', class: 'btn btn-lg btn-success text-center') %>
+          </div>
+          <div class='col-md-3'></div>
+        </div>
+        <% end %>
+      </div><!-- panel-body -->
+    </div><!-- panel maybe-form -->
+  </div><!-- col-md-8 -->
+</div><!-- container -->

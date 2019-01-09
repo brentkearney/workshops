@@ -167,6 +167,15 @@ class LegacyConnector
     JSON.parse((RestClient.get "#{@rest_url}/check_rsvp/#{otp}"))
   end
 
+  def replace_person(replace: replace, replace_with: replace_with)
+    replace = {
+      person_to_replace: replace.legacy_id,
+      replace_person_with: replace_with.attributes
+    }
+    url = "#{@rest_url}/replace_person"
+    RestClient.post url, replace.to_json, content_type: :json, accept: :json
+  end
+
   def update_booleans(obj)
     new_obj = {}
     obj.each_pair do |k, v|

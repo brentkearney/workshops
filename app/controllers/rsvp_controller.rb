@@ -26,7 +26,8 @@ class RsvpController < ApplicationController
       unless @person.email == email_param
         SyncPerson.change_email(@person, email_param)
       end
-      redirect_to rsvp_yes_path(otp: @invitation.otp)
+      halt
+      redirect_to rsvp_yes_path(otp: otp_params)
     end
   end
 
@@ -139,6 +140,6 @@ class RsvpController < ApplicationController
   end
 
   def email_param
-    params.require(:rsvp).permit(person: [:email])
+    params.require(:email)
   end
 end

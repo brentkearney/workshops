@@ -122,4 +122,21 @@ class StaffMailer < ApplicationMailer
     @message = message
     mail(to: to_email, subject: subject, template_name: 'notify_sysadmin')
   end
+
+  def email_conflict(args)
+    person_id = args[:person]
+    other_person_id = args[:other_person]
+    @new_email = args[:new_email]
+    @person = Person.find(person_id)
+    @other_person = Person.find(other_person_id)
+
+    to_email = GetSetting.site_email('sysadmin_email')
+    subject = 'Email conflict'
+    @message = %Q("#{@person.name}" <#{@person.email}> (#{@person.id}) tried
+      changing their email to #{@new_email}, but it is already taken by
+      #{@other_preson.name} (#{@other_person.id}).\n\n
+      https://workshops.birs.ca).squish
+
+    mail(to: to_email, subject: subject, template_name: 'notify_sysadmin')
+  end
 end
