@@ -113,7 +113,7 @@ module MembershipsHelper
         class: 'btn btn-sm btn-default')
     end
     column << '</td>'
-    column.html_safe
+    column.html_safe if member.attendance == 'Not Yet Invited'
   end
 
   def show_reinvite_button(member)
