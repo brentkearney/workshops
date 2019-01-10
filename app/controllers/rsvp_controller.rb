@@ -30,8 +30,7 @@ class RsvpController < ApplicationController
   # GET /rsvp/yes/:otp
   # POST /rsvp/yes/:otp
   def yes
-    @invitation.reload
-    @rsvp = RsvpForm.new(@invitation)
+    @rsvp = RsvpForm.new(@invitation.reload)
     @years = (1930..Date.current.year).to_a.reverse
     set_default_dates
 

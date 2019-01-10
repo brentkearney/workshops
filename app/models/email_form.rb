@@ -8,7 +8,6 @@
 
 # Facilitates email change form
 class EmailForm < ComplexForms
-  include Syncable
   attr_accessor :person
 
   def initialize(person)
@@ -18,10 +17,12 @@ class EmailForm < ComplexForms
   def validate_email(attributes = {})
     submitted_email = attributes['person']['email'].downcase.strip
     if @person.email != submitted_email
-      if Person.find_by_email(submitted_email).blank?
+      other_person = Person.find_by_email(submitted_email)
+      if other_person.blank?
         @person.email = submitted_email
       else
-        swap_person(attributes['person']['email'])
+        SyncPerson.change_email(@person, submitted_email)
+        @person = other_person
       end
     end
 
@@ -32,28 +33,5 @@ class EmailForm < ComplexForms
     end
 
     @person.save! if @person.valid?
-  end
-
-  def names_match(p1, p2)
-    I18n.transliterate(p1.downcase) == I18n.transliterate(p2.downcase)
-  end
-
-  def swap_person(new_email)
-    return unless EmailValidator.valid?(new_email)
-    other_person = Person.where(email: new_email).where.not(id: @person.id).first
-
-    # if the names match, replace the new with the old
-    if names_match(other_person.name, @person.name)
-      replace_person(replace: @person, replace_with: other_person)
-      @person = Person.find(other_person.id)
-    # otherwise, send a confirmation email
-    else
-      Rails.logger.debug "Names mismatch! #{@person.name} != #{other_person.name}"
-      # params = { method: :email_conflict, person: person.id,
-      #            new_email: new_email, other_person: other_person.id }
-      # send confirmation email to new_email?
-      # EmailStaffUpdateProblem.perform_later(params)
-      halt
-    end
   end
 end
