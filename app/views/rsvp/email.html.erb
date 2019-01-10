@@ -1,23 +1,23 @@
 <div class="row invitation-box container">
   <div class="col-md-8 col-md-offset-1">
     <%= render 'validation_errors' %>
-    <div class="panel panel-primary" id="email-form">
+    <div class="panel panel-primary" id="yes-form">
       <div class="panel-heading">
-        <span class="panel-title"><h4>Confirm E-mail</h4></span>
+        <span class="panel-title"><h4>Confirm Your E-mail Address</h4></span>
       </div>
       <div class="panel-body">
-        <%= form_tag({controller: 'rsvp', action: 'email', method: 'post'},
-                     { class: 'form', role: 'form'}) do %>
-        <div class="row">
-          <div class="col-md-12">
-              <p class="lead text-center">Is this your preferred email for
-              correspondence from BIRS?<br>If not, please update it.</p>
-          </div>
-        </div>
+        <h1>We're glad you can attend! 🎉<br />
+        <small>First, please confirm this is your preferred email, or update it:</small></h1>
+        <%= form_for @email_form, as: :email_form,
+           url: rsvp_email_path(@invitation.code), method: :post,
+          html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |email_form| %>
+        <fieldset>
+
+        <%= email_form.fields_for :person, @email_form.person do |p| %>
         <div class="row">
           <div class='col-md-3'></div>
           <div class='col-md-6 text-center'>
-            <%= text_field_tag(:email, @person.email, class: 'form-control') %>
+            <%= p.email_field :email, class: "form-control", autocomplete: "email" %>
           </div>
           <div class='col-md-3'></div>
         </div>
@@ -30,6 +30,7 @@
         </div>
         <% end %>
       </div><!-- panel-body -->
-    </div><!-- panel maybe-form -->
+      <% end %>
+    </div><!-- panel email-form -->
   </div><!-- col-md-8 -->
 </div><!-- container -->

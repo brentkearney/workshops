@@ -39,28 +39,4 @@ class SyncPerson
     local_person = update_record(person, remote_person)
     save_person(local_person)
   end
-
-  def self.change_email(person, new_email)
-    @person = person
-    other_person = Person.where(email: new_email).where.not(id: @person.id)
-
-    if other_person.blank?
-      @person.email = new_email
-      @person.save
-    else
-      # if the names match, replace the new with the old
-      if I18n.transliterate(other_person.name.downcase) ==
-         I18n.transliterate(@person.name.downcase)
-        replace_person(replace: @person, replace_with: other_person)
-
-      # otherwise, send a confirmation email
-      else
-        # params = { method: :email_conflict, person: person.id,
-        #            new_email: new_email, other_person: other_person.id }
-        # send confirmation email to new_email
-        # EmailStaffUpdateProblem.perform_later(params)
-        halt
-      end
-    end
-  end
 end

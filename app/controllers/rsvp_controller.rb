@@ -20,13 +20,9 @@ class RsvpController < ApplicationController
   # POST /rsvp/email/:otp
   def email
     SyncMember.new(@invitation.membership)
-    @person = @invitation.membership.person
+    @email_form = EmailForm.new(@invitation.membership.person)
 
-    if request.post?
-      unless @person.email == email_param
-        SyncPerson.change_email(@person, email_param)
-      end
-      halt
+    if request.post? && @email_form.validate_email(email_param)
       redirect_to rsvp_yes_path(otp: otp_params)
     end
   end
@@ -34,6 +30,7 @@ class RsvpController < ApplicationController
   # GET /rsvp/yes/:otp
   # POST /rsvp/yes/:otp
   def yes
+    @invitation.reload
     @rsvp = RsvpForm.new(@invitation)
     @years = (1930..Date.current.year).to_a.reverse
     set_default_dates
@@ -140,6 +137,6 @@ class RsvpController < ApplicationController
   end
 
   def email_param
-    params.require(:email)
+    params.require(:email_form).permit(person: [:email])
   end
 end

@@ -6,7 +6,7 @@
         <span class="panel-title"><h4>Invitation RSVP: <%= @rsvp.event.code %></h4></span>
       </div>
       <div class="panel-body">
-        <h1>We're glad you can attend! 🎉<br />
+        <h1>Thanks for confirming your email.<br />
         <small>Please share your plans, and click the "Confirm Attendance" button:</small></h1>
         <%= form_for @rsvp, as: :rsvp,
            url: rsvp_yes_path(@rsvp.invitation.code), method: :post,

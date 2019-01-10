@@ -37,6 +37,7 @@ class SyncMembers
 
   def recently_synced?
     return false if event.nil? || event.sync_time.blank?
+    # return true if Rails.env.development?
     Time.now - event.sync_time < 5.minutes
   end
 

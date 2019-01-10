@@ -25,6 +25,10 @@ class InvitationChecker
     @otp.length < 50 ? @otp.ljust(50, '-') : @otp
   end
 
+  def reload
+    @invitation = Invitation.find_by_code(@otp)
+  end
+
   def event
     invitation.is_a?(Invitation) ? invitation.event : nil
   end
