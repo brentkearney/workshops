@@ -16,15 +16,7 @@ class EmailForm < ComplexForms
 
   def validate_email(attributes = {})
     submitted_email = attributes['person']['email'].downcase.strip
-    if @person.email != submitted_email
-      other_person = Person.find_by_email(submitted_email)
-      if other_person.blank?
-        @person.email = submitted_email
-      else
-        SyncPerson.change_email(@person, submitted_email)
-        @person = other_person
-      end
-    end
+    @person = SyncPerson.change_email(@person, submitted_email)
 
     unless @person.valid?
       @person.errors.full_messages.each do |msg|

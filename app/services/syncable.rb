@@ -186,8 +186,10 @@ module Syncable
       end
     end
 
-    lc = LegacyConnector.new
-    lc.replace_person(replace: replace, replace_with: replace_with)
+    # Update legacy database
+    unless replace.legacy_id.blank? || replace_with.legacy_id.blank?
+      ReplacePersonJob.perform_later(replace.legacy_id, replace_with.legacy_id)
+    end
 
     # there can be only one!
     replace.delete

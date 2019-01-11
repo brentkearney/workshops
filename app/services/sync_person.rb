@@ -45,8 +45,20 @@ class SyncPerson
   end
 
   def self.change_email(person, new_email)
-    return unless EmailValidator.valid?(new_email)
+    new_email = new_email.downcase.strip
+    return person if person.email == new_email
+
+    # Attempts to save this record will throw invalid email error
+    unless EmailValidator.valid?(new_email)
+      person.email = new_email
+      return person
+    end
+
     other_person = Person.where(email: new_email).where.not(id: person.id).first
+    if other_person.nil?
+      person.email = new_email
+      return person
+    end
 
     # if the names match, replace the new with the old
     if names_match(other_person.name, person.name)
