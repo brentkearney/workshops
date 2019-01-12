@@ -1,4 +1,5 @@
-# Copyright (c) 2018 Banff International Research Station
+# app/models/confirm_email_change.rb
+# Copyright (c) 2019 Banff International Research Station
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,27 +19,33 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Remove attachments from mail logger in debugging mode
-module ActionMailer
-  class LogSubscriber < ActiveSupport::LogSubscriber
-    def deliver(event)
-      info do
-        recipients = Array(event.payload[:to]).join(', ')
-        "\nSent mail to #{recipients}, Subject: #{event.payload[:subject]}, on #{Time.now} (#{event.duration.round(1)}ms)"
-      end
+# If user requests changing email and another record has that email,
+# this will send confirmation links to both addresses to confirm ownership
+# before one person record is replaced with the other
+class ConfirmEmailChange < ApplicationRecord
+  attr_accessor :replace_person, :replace_with
+  has_many :people
+  validates :replace_person, presence: true
+  validates :replace_with, presence: true
 
-      debug { remove_attachments(event.payload[:mail]) }
-    end
+  after_initialize :generate_codes
+  before_save :set_emails
 
-    def remove_attachments(message)
-      new_message = ''
-      skip = false
-      message.each_line do |line|
-        new_message << line unless skip
-        skip = true if line =~ /Content-Disposition: attachment;/
-        skip = false if skip && line =~ /----==_mimepart/
-      end
-      new_message
+  def generate_codes
+    if self.replace_code.blank?
+      self.replace_code = SecureRandom.urlsafe_base64(10)
     end
+    if self.replace_with_code.blank?
+      self.replace_with_code = SecureRandom.urlsafe_base64(10)
+    end
+  end
+
+  def set_emails
+    self.replace_email = replace_person.email
+    self.replace_with_email = replace_with.email
+  end
+
+  def send_email
+
   end
 end

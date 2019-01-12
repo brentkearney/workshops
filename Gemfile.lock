@@ -150,7 +150,7 @@ GEM
     gitlab (4.8.0)
       httparty (>= 0.14.0)
       terminal-table (>= 1.5.1)
-    globalid (0.4.1)
+    globalid (0.4.2)
       activesupport (>= 4.2.0)
     griddler (1.5.2)
       htmlentities

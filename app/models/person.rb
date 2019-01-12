@@ -15,6 +15,8 @@ class Person < ApplicationRecord
   }, through: :memberships, source: :event
   has_one :user, dependent: :destroy
   has_many :invitations, foreign_key: 'invited_by'
+  belongs_to :replace_person, class_name: "ConfirmEmailChange", foreign_key: :replace_person_id
+  belongs_to :replace_with, class_name: "ConfirmEmailChange", foreign_key: :replace_with_id
 
   before_validation :downcase_email
   before_save :clean_data

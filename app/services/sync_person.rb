@@ -63,14 +63,9 @@ class SyncPerson
     # if the names match, replace the new with the old
     if names_match(other_person.name, person.name)
       replace_person(replace: person, replace_with: other_person)
-    # otherwise, send a confirmation email
     else
-      Rails.logger.debug "Names mismatch! #{@person.name} != #{other_person.name}"
-      # params = { method: :email_conflict, person: person.id,
-      #            new_email: new_email, other_person: other_person.id }
-      # send confirmation email to new_email?
-      # EmailStaffUpdateProblem.perform_later(params)
-      halt
+      ConfirmEmailChange.create(replace_person: person,
+                                  replace_with: other_person).send_email
     end
   end
 end
