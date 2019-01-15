@@ -7,7 +7,7 @@
       </div>
       <div class="panel-body">
         <h1>We're glad you can attend! 🎉<br />
-        <small>First, please confirm this is your preferred email, or update it:</small></h1>
+        <small>Please enter your preferred email address:</small></h1>
         <%= form_for @email_form, as: :email_form,
            url: rsvp_email_path(@invitation.code), method: :post,
           html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |email_form| %>
@@ -24,7 +24,7 @@
         <div class="row">
           <div class='col-md-3'></div>
           <div class='col-md-6 text-center'>
-            <%= submit_tag('Confirm E-mail and Continue', class: 'btn btn-lg btn-success text-center') %>
+            <%= submit_tag('This is my preferred email. Onward!', class: 'btn btn-lg btn-success text-center') %>
           </div>
           <div class='col-md-3'></div>
         </div>

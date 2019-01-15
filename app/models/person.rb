@@ -15,8 +15,8 @@ class Person < ApplicationRecord
   }, through: :memberships, source: :event
   has_one :user, dependent: :destroy
   has_many :invitations, foreign_key: 'invited_by'
-  belongs_to :replace_person, class_name: "ConfirmEmailChange", foreign_key: :replace_person_id
-  belongs_to :replace_with, class_name: "ConfirmEmailChange", foreign_key: :replace_with_id
+  belongs_to :replace_person, class_name: "ConfirmEmailChange", optional: true
+  belongs_to :replace_with, class_name: "ConfirmEmailChange", optional: true
 
   before_validation :downcase_email
   before_save :clean_data
@@ -39,6 +39,10 @@ class Person < ApplicationRecord
 
   # app/models/concerns/person_decorators.rb
   include PersonDecorators
+
+  def pending_replacement?
+    !ConfirmEmailChange.where(replace_person_id: self.id).first.blank?
+  end
 
   private
 

@@ -21,12 +21,12 @@
 
 # updates one person record with data from remote db
 class SyncPerson
-  attr_reader :person
+  attr_reader :person, :new_email
   include Syncable
 
-  def initialize(person)
+  def initialize(person, new_email = nil)
     @person = person
-    sync_person
+    @new_email = new_email.downcase.strip
   end
 
   def sync_person
@@ -40,15 +40,14 @@ class SyncPerson
     save_person(local_person)
   end
 
-  def names_match(p1, p2)
-    I18n.transliterate(p1.downcase) == I18n.transliterate(p2.downcase)
+  def names_match(n1, n2)
+    I18n.transliterate(n1.downcase) == I18n.transliterate(n2.downcase)
   end
 
-  def self.change_email(person, new_email)
-    new_email = new_email.downcase.strip
+  def change_email
     return person if person.email == new_email
 
-    # Attempts to save this record will throw invalid email error
+    # EmailForm does person.valid?, so send it back if email is invalid
     unless EmailValidator.valid?(new_email)
       person.email = new_email
       return person
@@ -64,8 +63,9 @@ class SyncPerson
     if names_match(other_person.name, person.name)
       replace_person(replace: person, replace_with: other_person)
     else
-      ConfirmEmailChange.create(replace_person: person,
+      ConfirmEmailChange.create!(replace_person: person,
                                   replace_with: other_person).send_email
     end
+    person
   end
 end

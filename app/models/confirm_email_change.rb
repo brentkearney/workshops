@@ -27,9 +27,17 @@ class ConfirmEmailChange < ApplicationRecord
   has_many :people
   validates :replace_person, presence: true
   validates :replace_with, presence: true
+  validate :already_exists?
 
   after_initialize :generate_codes
-  before_save :set_emails
+  before_save :set_values
+
+  def already_exists?
+    unless ConfirmEmailChange.where(replace_person_id: replace_person.id,
+                                      replace_with_id: replace_with.id).blank?
+      errors.add(:replace_person, "already pending for this record")
+    end
+  end
 
   def generate_codes
     if self.replace_code.blank?
@@ -40,12 +48,14 @@ class ConfirmEmailChange < ApplicationRecord
     end
   end
 
-  def set_emails
+  def set_values
+    self.replace_person_id = replace_person.id
     self.replace_email = replace_person.email
+    self.replace_with_id = replace_with.id
     self.replace_with_email = replace_with.email
   end
 
   def send_email
-
+    ConfirmEmailReplacementJob.perform_later(self.id)
   end
 end
