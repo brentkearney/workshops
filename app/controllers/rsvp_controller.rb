@@ -20,10 +20,21 @@ class RsvpController < ApplicationController
   # POST /rsvp/email/:otp
   def email
     SyncMember.new(@invitation.membership)
-    @email_form = EmailForm.new(@invitation.membership.person)
+    @person = @invitation.membership.person
+    @email_form = EmailForm.new(@person)
 
     if request.post? && @email_form.validate_email(email_param)
       redirect_to rsvp_yes_path(otp: otp_params)
+    end
+  end
+
+  def confirm_email
+    @person = Person.find(confirm_email_params['person_id'])
+    @email_form = EmailForm.new(@person)
+    if @email_form.verify_email_change(confirm_email_params)
+      redirect_to rsvp_yes_path(otp: otp_params)
+    else
+      render 'email'
     end
   end
 
@@ -137,5 +148,10 @@ class RsvpController < ApplicationController
 
   def email_param
     params.require(:email_form).permit(person: [:email])
+  end
+
+  def confirm_email_params
+    params.require(:email_form).permit(:person_id, :replace_email_code,
+                                       :replace_with_email_code)
   end
 end

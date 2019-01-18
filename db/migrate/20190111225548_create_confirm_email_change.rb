@@ -7,8 +7,7 @@ class CreateConfirmEmailChange < ActiveRecord::Migration[5.2]
       t.string :replace_with_email
       t.string :replace_code
       t.string :replace_with_code
-      t.boolean :replace_confirmed, default: false
-      t.boolean :replace_with_confirmed, default: false
+      t.boolean :confirmed, default: false
 
       t.timestamps
     end

@@ -27,7 +27,7 @@ class ConfirmEmailChange < ApplicationRecord
   has_many :people
   validates :replace_person, presence: true
   validates :replace_with, presence: true
-  validate :already_exists?
+  #validate :already_exists?
 
   after_initialize :generate_codes
   before_save :set_values
@@ -41,10 +41,10 @@ class ConfirmEmailChange < ApplicationRecord
 
   def generate_codes
     if self.replace_code.blank?
-      self.replace_code = SecureRandom.urlsafe_base64(10)
+      self.replace_code = SecureRandom.alphanumeric(8)
     end
     if self.replace_with_code.blank?
-      self.replace_with_code = SecureRandom.urlsafe_base64(10)
+      self.replace_with_code = SecureRandom.alphanumeric(8)
     end
   end
 

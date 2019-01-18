@@ -1,16 +1,17 @@
 Dear <%= @person.name %>,
 
 To confirm your email change request, and thereby merge all data associated
-with <%= @replace_email %> into the record associated to <%= @person.email %>,
-please visit the following link:
+with <%= @replace_email %> (such as workshop membreships) into the record
+associated to <%= @person.email %>, please enter the folowing code into the
+form you were shown:
 
-<%= @email_confirmation_link %>
+Verification code for <%= @person.email %>: <%= @verification_code %>
 
 You will also need to verify that you control the <%= @replace_email %>
-account by visiting a link sent to that address.
+account by entering the code sent to that address.
 
-If you did not request this change of your email, please do NOT follow the link
-and reply to this message to let us know.
+If you did not request this change of your email, please reply to this message
+to let us know.
 
 Thank you,
 Banff International Research Station

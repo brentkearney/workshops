@@ -8,7 +8,8 @@
 
 # Facilitates RSVP email change form
 class EmailForm < ComplexForms
-  attr_accessor :person
+  attr_accessor :person, :replace_email, :replace_with_email,
+                :replace_email_code, :replace_with_email_code
 
   def initialize(person)
     @person = person
@@ -26,5 +27,24 @@ class EmailForm < ComplexForms
 
     return false if person.pending_replacement?
     person.save! if person.valid?
+  end
+
+  def verify_email_change(attributes = {})
+    person_id = attributes['person_id']
+    replace_code = attributes['replace_email_code']
+    replace_with_code = attributes['replace_with_email_code']
+
+    confirmation = ConfirmEmailChange.where(replace_person_id: @person.id,
+                                       replace_code: replace_code,
+                                       replace_with_code: replace_with_code).first
+    if confirmation.nil?
+      errors.add('Error:', 'One of the submitted codes is invalid.')
+      return false
+    end
+
+    confirmation.confirmed = true
+    confirmation.save
+    SyncPerson.new(@person).confirmed_email_change(confirmation)
+    true
   end
 end

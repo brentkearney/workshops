@@ -25,21 +25,17 @@ class ConfirmEmailMailer < ApplicationMailer
   default from: app_email
 
   def send_msg(confirm_id, mode: 'replace')
-    Rails.logger.debug "\n\n****************** ConfirmEmailMailer mode: #{mode} ******************\n\n"
-
     confirm = ConfirmEmailChange.find(confirm_id)
-    Rails.logger.debug "\n\n Found confirm record: #{confirm.inspect}\n\n"
     @replace_email = confirm.replace_email
     @replace_with_email = confirm.replace_with_email
+
     person_id = mode == 'replace' ? 'replace_person_id' : 'replace_with_id'
     @person = Person.find("#{confirm.send(person_id)}")
-    Rails.logger.debug "\n\nPerson is: #{@person.inspect}\n\n"
-    @email_confirmation_link = GetSetting.site_setting('app_url') +
-      '/email_change/' + confirm.send(mode + '_code')
+    @verification_code = confirm.send(mode + '_code')
 
     to_email = %Q("#{@person.name}" <#{@person.email}>)
     subject = "BIRS email change confirmation"
+
     mail(to: to_email, subject: subject, template_name: mode)
-    Rails.logger.debug "\n\n****************** ConfirmEmailMailer end ******************\n\n"
   end
 end

@@ -26,7 +26,7 @@ class SyncPerson
 
   def initialize(person, new_email = nil)
     @person = person
-    @new_email = new_email.downcase.strip
+    @new_email = new_email.downcase.strip unless new_email.nil?
   end
 
   def sync_person
@@ -64,8 +64,13 @@ class SyncPerson
       replace_person(replace: person, replace_with: other_person)
     else
       ConfirmEmailChange.create!(replace_person: person,
-                                  replace_with: other_person).send_email
+                                   replace_with: other_person).send_email
     end
     person
+  end
+
+  def confirmed_email_change(confirmation)
+    replace_with_person = Person.find(confirmation.replace_with_id)
+    replace_person(replace: person, replace_with: replace_with_person)
   end
 end

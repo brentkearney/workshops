@@ -15,22 +15,20 @@ ActiveRecord::Schema.define(version: 2019_01_11_225548) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "confirm_email_change", force: :cascade do |t|
+  create_table "confirm_email_changes", force: :cascade do |t|
     t.bigint "replace_person_id"
     t.bigint "replace_with_id"
     t.string "replace_email"
     t.string "replace_with_email"
     t.string "replace_code"
     t.string "replace_with_code"
-    t.boolean "replace_confirmed", default: false
-    t.boolean "replace_with_confirmed", default: false
-    t.datetime "created_on"
+    t.boolean "confirmed", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["replace_code"], name: "index_confirm_email_change_on_replace_code"
-    t.index ["replace_person_id"], name: "index_confirm_email_change_on_replace_person_id"
-    t.index ["replace_with_code"], name: "index_confirm_email_change_on_replace_with_code"
-    t.index ["replace_with_id"], name: "index_confirm_email_change_on_replace_with_id"
+    t.index ["replace_code"], name: "index_confirm_email_changes_on_replace_code"
+    t.index ["replace_person_id"], name: "index_confirm_email_changes_on_replace_person_id"
+    t.index ["replace_with_code"], name: "index_confirm_email_changes_on_replace_with_code"
+    t.index ["replace_with_id"], name: "index_confirm_email_changes_on_replace_with_id"
   end
 
   create_table "events", id: :serial, force: :cascade do |t|
