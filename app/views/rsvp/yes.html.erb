@@ -152,7 +152,7 @@
               </div>
               <div class="form-group">
                 <%= p.label :email, 'E-mail', class: "mandatory" %>
-                <%= p.email_field :email, class: "form-control", autocomplete: "email" %>
+                <%= p.email_field :email, class: "form-control", disabled: true %>
                 <div class="form-inline inline-checkbox">
                   <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
                     <%= m.check_box :share_email, { class: "form-control checkbox" }, true %>
