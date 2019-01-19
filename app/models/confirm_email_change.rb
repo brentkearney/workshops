@@ -27,14 +27,15 @@ class ConfirmEmailChange < ApplicationRecord
   has_many :people
   validates :replace_person, presence: true
   validates :replace_with, presence: true
-  #validate :already_exists?
+  validate :already_exists?, on: :create
 
   after_initialize :generate_codes
   before_save :set_values
 
   def already_exists?
     unless ConfirmEmailChange.where(replace_person_id: replace_person.id,
-                                      replace_with_id: replace_with.id).blank?
+                                      replace_with_id: replace_with.id,
+                                      confirmed: false).blank?
       errors.add(:replace_person, "already pending for this record")
     end
   end

@@ -14,7 +14,7 @@
 </div>
 <div class="row">
   <div class='col-md-6 text-right'>
-    <p>Verification code sent to <strong><%= replace_email(@person) %></strong>:</p>
+    <p>Verification code for <strong><%= replace_email(@person) %></strong>:</p>
   </div>
   <div class='col-md-6'>
     <%= email_form.text_field :replace_email_code, class: "form-control" %>
@@ -22,7 +22,7 @@
 </div>
 <div class="row">
   <div class='col-md-6 text-right'>
-    <p>Verification code sent to <strong><%= replace_with_email(@person) %></strong>:</p>
+    <p>Verification code for <strong><%= replace_with_email(@person) %></strong>:</p>
   </div>
   <div class='col-md-6'>
     <%= email_form.text_field :replace_with_email_code, class: "form-control" %>

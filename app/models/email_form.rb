@@ -30,21 +30,19 @@ class EmailForm < ComplexForms
   end
 
   def verify_email_change(attributes = {})
-    person_id = attributes['person_id']
     replace_code = attributes['replace_email_code']
     replace_with_code = attributes['replace_with_email_code']
-
     confirmation = ConfirmEmailChange.where(replace_person_id: @person.id,
                                        replace_code: replace_code,
                                        replace_with_code: replace_with_code).first
     if confirmation.nil?
-      errors.add('Error:', 'One of the submitted codes is invalid.')
+      errors.add('Error:', 'At least one of the submitted codes is invalid.')
       return false
     end
 
+    SyncPerson.new(@person).confirmed_email_change(confirmation)
     confirmation.confirmed = true
     confirmation.save
-    SyncPerson.new(@person).confirmed_email_change(confirmation)
     true
   end
 end

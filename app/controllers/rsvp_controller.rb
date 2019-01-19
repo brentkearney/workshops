@@ -28,11 +28,15 @@ class RsvpController < ApplicationController
     end
   end
 
+  # GET /rsvp/confirm_email/:otp
+  # POST /rsvp/confirm_email/:otp
   def confirm_email
-    @person = Person.find(confirm_email_params['person_id'])
+    redirect_to email_path(otp: otp_params) and return unless request.post?
+    @person = Person.find_by_id(confirm_email_params['person_id'])
+    redirect_to rsvp_yes_path(otp: otp_params) and return if @person.blank?
     @email_form = EmailForm.new(@person)
     if @email_form.verify_email_change(confirm_email_params)
-      redirect_to rsvp_yes_path(otp: otp_params)
+      redirect_to rsvp_yes_path(otp: otp_params) and return
     else
       render 'email'
     end

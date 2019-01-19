@@ -34,7 +34,9 @@ class SyncMember
     lc = LegacyConnector.new
     remote_member = lc.get_member(membership)
     return if remote_member.blank?
-    return if membership.updated_at.to_i >= remote_member['Membership']['updated_at'].to_i
+    return if remote_member['Membership']['updated_at'].blank?
+    return if membership.updated_at.to_i >=
+              remote_member['Membership']['updated_at'].to_i
 
     remote_member = fix_remote_fields(remote_member)
     updated_person = update_record(membership.person, remote_member['Person'])
