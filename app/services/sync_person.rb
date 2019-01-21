@@ -67,8 +67,9 @@ class SyncPerson
         ConfirmEmailChange.create!(replace_person: person,
                                    replace_with: other_person).send_email
       rescue ActiveRecord::RecordInvalid => e
-        return if e.message =~ /Validation failed/
+        return person if e.message =~ /Validation failed/
         msg = { problem: 'Unable to create! new ConfirmEmailChange',
+                source: 'SyncPerson.change_email',
                 person: "#{person.name} (id: #{person.id}",
                 error: e.inspect }
         StaffMailer.notify_sysadmin(nil, msg).deliver_now

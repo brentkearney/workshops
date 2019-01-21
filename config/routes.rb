@@ -59,6 +59,7 @@ Rails.application.routes.draw do
   get '/rsvp/:otp' => 'rsvp#index', as: :rsvp_otp, constraints: { otp: /[^\/]+/ }
   match '/rsvp/email/:otp' => 'rsvp#email', as: :rsvp_email, via: [:get, :post]
   match '/rsvp/confirm_email/:otp' => 'rsvp#confirm_email', as: :rsvp_confirm_email, via: [:get, :post]
+  match '/rsvp/cancel/:otp/:confirmation' => 'rsvp#cancel', as: :rsvp_cancel, via: [:get, :post]
   match '/rsvp/yes/:otp' => 'rsvp#yes', as: :rsvp_yes, via: [:get, :post]
   match '/rsvp/no/:otp' => 'rsvp#no', as: :rsvp_no, via: [:get, :post]
   match '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe, via: [:get, :post]

@@ -19,27 +19,32 @@ class RsvpController < ApplicationController
   # GET /rsvp/email/:otp
   # POST /rsvp/email/:otp
   def email
-    SyncMember.new(@invitation.membership)
     @person = @invitation.membership.person
     @email_form = EmailForm.new(@person)
-
     if request.post? && @email_form.validate_email(email_param)
-      redirect_to rsvp_yes_path(otp: otp_params)
+      redirect_to rsvp_yes_path(otp: otp_params) and return
     end
+
+    render 'confirm_email' and return if @person.pending_replacement?
+    SyncMember.new(@invitation.membership)
   end
 
   # GET /rsvp/confirm_email/:otp
   # POST /rsvp/confirm_email/:otp
   def confirm_email
-    redirect_to email_path(otp: otp_params) and return unless request.post?
     @person = Person.find_by_id(confirm_email_params['person_id'])
+    # if person record not found, it was replaced
     redirect_to rsvp_yes_path(otp: otp_params) and return if @person.blank?
+
     @email_form = EmailForm.new(@person)
     if @email_form.verify_email_change(confirm_email_params)
       redirect_to rsvp_yes_path(otp: otp_params) and return
-    else
-      render 'email'
     end
+  end
+
+  def cancel
+    ConfirmEmailChange.find(cancel_params).delete
+    redirect_to rsvp_email_path(otp: otp_params)
   end
 
   # GET /rsvp/yes/:otp
@@ -127,6 +132,10 @@ class RsvpController < ApplicationController
 
   def otp_params
     params[:otp].tr('^A-Za-z0-9_-', '')
+  end
+
+  def cancel_params
+    params[:confirmation]
   end
 
   def message_params

@@ -33,8 +33,8 @@ class EmailForm < ComplexForms
     replace_code = attributes['replace_email_code']
     replace_with_code = attributes['replace_with_email_code']
     confirmation = ConfirmEmailChange.where(replace_person_id: @person.id,
-                                       replace_code: replace_code,
-                                       replace_with_code: replace_with_code).first
+                                      replace_code: replace_code,
+                                      replace_with_code: replace_with_code).first
     if confirmation.nil?
       errors.add('Error:', 'At least one of the submitted codes is invalid.')
       return false
