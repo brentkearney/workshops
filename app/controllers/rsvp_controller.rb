@@ -43,7 +43,9 @@ class RsvpController < ApplicationController
   end
 
   def cancel
-    ConfirmEmailChange.find(cancel_params).delete
+    person = @invitation.membership.person
+    ConfirmEmailChange.where(replace_person_id: person.id,
+                             replace_email: person.email).first.delete
     redirect_to rsvp_email_path(otp: otp_params)
   end
 
@@ -132,10 +134,6 @@ class RsvpController < ApplicationController
 
   def otp_params
     params[:otp].tr('^A-Za-z0-9_-', '')
-  end
-
-  def cancel_params
-    params[:confirmation]
   end
 
   def message_params

@@ -38,7 +38,7 @@
       </div>
       <div class="row">
         <div class='col-md-6'>
-
+          <a href="<%= rsvp_cancel_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-danger">Cancel Email Change</a>
         </div>
         <div class='col-md-6'>
           <%= email_form.submit 'Submit Verification Codes', class: 'btn btn-lg btn-success text-center pull-right' %>
