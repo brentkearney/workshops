@@ -41,7 +41,8 @@ class Person < ApplicationRecord
   include PersonDecorators
 
   def pending_replacement?
-    !ConfirmEmailChange.where(replace_person_id: self.id, confirmed: false).first.blank?
+    !ConfirmEmailChange.where(replace_person_id: self.id, confirmed: false)
+                       .first.blank?
   end
 
   private

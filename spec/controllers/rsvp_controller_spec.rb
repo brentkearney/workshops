@@ -117,24 +117,134 @@ RSpec.describe RsvpController, type: :controller do
     end
   end
 
-  describe 'GET #yes' do
+  describe 'GET #email' do
     before do
       lc = FakeLegacyConnector.new
       expect(LegacyConnector).to receive(:new).and_return(lc)
     end
 
+    it 'renders email template' do
+      get :email, params: { otp: @invitation.code }
+      expect(response).to render_template(:email)
+    end
+
+    it 'assigns person variable' do
+      get :email, params: { otp: @invitation.code }
+      expect(assigns(:person)).to eq(@invitation.membership.person)
+    end
+  end
+
+  describe 'POST #email' do
+    context 'invalid email' do
+      it 'renders validation errors on invalid email submission' do
+        lc = FakeLegacyConnector.new
+        expect(LegacyConnector).to receive(:new).and_return(lc)
+        post :email, params: { otp: @invitation.code, 'email_form' =>
+                                    {'person' => { email: 'foo' }}}
+        expect(response).to render_template(:email)
+        expect(response).to render_template("rsvp/_validation_errors")
+      end
+    end
+
+    context 'valid email' do
+      before do
+        @invitation = create(:invitation)
+        @email_params = { otp: @invitation.code, 'email_form' =>
+                            {'person' => { email: 'foo@bar.com' }}}
+      end
+
+      it 'changes participants email & forwards to #yes' do
+        post :email, params: @email_params
+        person_id = @invitation.membership.person_id
+        expect(Person.find(person_id).email).to eq('foo@bar.com')
+        expect(response).to redirect_to(rsvp_yes_path(otp: @invitation.code))
+      end
+
+      it 'renders confirm_email form if email is held by another record' do
+        person = @invitation.membership.person
+        person.email = 'mail@example.com'
+        person.save
+        other_person = create(:person, email: 'foo@bar.com')
+
+        post :email, params: @email_params
+
+        expect(response).to render_template(:confirm_email)
+      end
+    end
+  end
+
+  describe 'POST #confirm_email' do
+    def other_person
+      Person.find_by_email('foo@bar.com') ||
+        create(:person, email: 'foo@bar.com')
+    end
+
+    before do
+      ConfirmEmailChange.destroy_all
+      @email_params = { otp: @invitation.code, 'email_form' =>
+                            {'person' => { email: 'foo@bar.com' }}}
+      @person = @invitation.membership.person
+      @person.email = 'mail@example.com'
+      @person.save
+      @other_person = other_person
+      post :email, params: @email_params
+    end
+
+    it 'sets person variable' do
+      expect(assigns(:person)).to eq(@person)
+    end
+
+    it 'validates confirmation codes' do
+      confirm_params = { otp: @invitation.code, 'email_form' =>
+                          { person_id: @person.id, replace_email_code: '123',
+                            replace_with_email_code: '456'}}
+      post :confirm_email, params: confirm_params
+
+      expect(response).to render_template(:confirm_email)
+      expect(response).to render_template("rsvp/_validation_errors")
+    end
+
+    context 'valid confirmation codes' do
+      before do
+        @membership = @person.memberships.first
+        confirm = ConfirmEmailChange.where(replace_person_id: @person.id).first
+        replace_code = confirm.replace_code
+        replace_with_code = confirm.replace_with_code
+
+        confirm_params = { otp: @invitation.code, 'email_form' =>
+                            { person_id: @person.id,
+                              replace_email_code: replace_code,
+                              replace_with_email_code: replace_with_code }}
+        post :confirm_email, params: confirm_params
+      end
+
+      it "adds person's memberships to other person" do
+        expect(@other_person.memberships).to include(@membership)
+      end
+
+      it 'destroys person record' do
+        expect(Person.find_by_id(@person.id)).to be_nil
+      end
+
+      it 'redirects to #yes' do
+        expect(response).to redirect_to(rsvp_yes_path(otp: @invitation.code))
+      end
+    end
+  end
+
+  describe 'GET #yes' do
     it 'renders yes template' do
       get :yes, params: { otp: @invitation.code }
       expect(response).to render_template(:yes)
     end
+
+    it 'assigns an array of years' do
+      get :yes, params: { otp: @invitation.code }
+      expect(assigns(:years)).to include(1930..Date.current.year)
+    end
   end
 
   describe 'POST #yes' do
-    before do
-      @lc = FakeLegacyConnector.new
-      expect(LegacyConnector).to receive(:new).and_return(@lc)
-    end
-
     def yes_params
       {'membership' => { arrival_date: @invitation.membership.event.start_date,
           departure_date: @invitation.membership.event.end_date,
@@ -163,9 +273,9 @@ RSpec.describe RsvpController, type: :controller do
     end
 
     it 'with an invalid OTP, it forwards to rsvp_otp' do
-      # lc = FakeLegacyConnector.new
-      # expect(LegacyConnector).to receive(:new).and_return(lc)
-      allow(@lc).to receive(:check_rsvp).with('foo').and_return(@lc.invalid_otp)
+      lc = FakeLegacyConnector.new
+      allow(LegacyConnector).to receive(:new).and_return(lc)
+      expect(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
 
       post :yes, params: { otp: 'foo', rsvp: yes_params }
 

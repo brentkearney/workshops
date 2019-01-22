@@ -40,9 +40,9 @@ class EmailForm < ComplexForms
       return false
     end
 
-    SyncPerson.new(@person).confirmed_email_change(confirmation)
     confirmation.confirmed = true
     confirmation.save
+    SyncPerson.new(@person).confirmed_email_change(confirmation)
     true
   end
 end

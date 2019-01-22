@@ -33,7 +33,7 @@ class RsvpController < ApplicationController
   # POST /rsvp/confirm_email/:otp
   def confirm_email
     @person = Person.find_by_id(confirm_email_params['person_id'])
-    # if person record not found, it was replaced
+    # if person record not found, it was successfully replaced
     redirect_to rsvp_yes_path(otp: otp_params) and return if @person.blank?
 
     @email_form = EmailForm.new(@person)
@@ -42,6 +42,7 @@ class RsvpController < ApplicationController
     end
   end
 
+  # GET /rsvp/cancel/:otp
   def cancel
     person = @invitation.membership.person
     ConfirmEmailChange.where(replace_person_id: person.id,
