@@ -6,11 +6,13 @@
 
 # Receives Griddler:Email object from EventMaillist, returns formatted parts
 class EmailParser
-  attr_accessor :text_body, :html_body, :inline_attachments
+  attr_accessor :text_body, :html_body, :inline_attachments, :person
 
   def initialize(email, list_name)
     @email = email
     @list_name = list_name
+    person = Person.find_by_email(@email.from[:email].downcase.strip)
+    @person_name = person.nil? ? @email.from[:full] : person.name
   end
 
   def parse
@@ -22,7 +24,7 @@ class EmailParser
   end
 
   def prepare_text(text_body)
-    prelude = "From #{@email.from[:full]} to #{@list_name} on #{@email.headers['Date']}:"
+    prelude = "From #{@person_name} to #{@list_name} on #{@email.headers['Date']}:"
     prelude << "\n" + '-' * 70 + "\n\n"
 
     if text_body.blank?
@@ -35,7 +37,7 @@ class EmailParser
 
   def prepare_html(html_body)
     unless html_body.blank?
-      prelude = "<p>From #{@email.from[:full]} to #{@list_name} on #{@email.headers['Date']}:</p>\n"
+      prelude = "<p>From #{@person_name} to #{@list_name} on #{@email.headers['Date']}:</p>\n"
       prelude << "<hr width=\"100%\" />\n\n"
 
       if html_body.include?('<body')

@@ -18,13 +18,15 @@ describe 'EmailParser' do
   }
   end
 
-  let(:prelude) { "From #{params[:from]} to 18w6660@example.com" }
-
-  subject { Griddler::Email.new(params) }
-
   before do
+    @from_person = create(:person, email: 'webmaster@example.net',
+                                   firstname: 'Webmaster')
     @ep = EmailParser.new(subject, '18w6660@example.com')
   end
+
+  let(:prelude) { "From #{@from_person.name} to 18w6660@example.com" }
+
+  subject { Griddler::Email.new(params) }
 
   it 'accepts a Griddler::Email object' do
     expect(@ep.class).to eq(EmailParser)
