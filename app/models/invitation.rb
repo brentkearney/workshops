@@ -80,6 +80,7 @@ class Invitation < ApplicationRecord
     membership.invited_by = invited_by
     membership.invited_on = DateTime.current
     membership.update_remote = true
+    membership.sync_memberships = true
     membership.person.member_import = true
     if membership.attendance == 'Not Yet Invited'
       membership.attendance = 'Invited'

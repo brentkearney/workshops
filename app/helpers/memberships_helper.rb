@@ -95,7 +95,7 @@ module MembershipsHelper
   end
 
   def show_invite_buttons?(member)
-    policy(@event).send_invitations? && member.attendance == 'Not Yet Invited'
+    member.attendance == 'Not Yet Invited' && policy(@event).send_invitations?
   end
 
   def show_reinvite_buttons?(member)
@@ -131,7 +131,7 @@ module MembershipsHelper
     return unless policy(@event).view_email_addresses?
     content = '<div class="no-print" id="email-members">'
     content << add_email_buttons(status)
-    if status == 'Not Yet Invited' && spots_left
+    if status == 'Not Yet Invited' && spots_left && policy(@event).send_invitations?
       content << ' | ' + link_to("Invite All Not Yet Invited Participants",
         all_invitations_send_path(@event.id),
         title: 'Send invitations to all non-Backup members who are Not Yet Invited',

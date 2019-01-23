@@ -86,8 +86,8 @@ class Membership < ApplicationRecord
   end
 
   def arrival_and_departure_dates
+    return if update_by_staff || sync_memberships
     w = event
-
     unless arrival_date.blank?
       if arrival_date.to_date > w.end_date.to_date
         errors.add(:arrival_date,
@@ -98,7 +98,6 @@ class Membership < ApplicationRecord
                    '- arrival date must be within 30 days of the event.')
       end
 
-      return if update_by_staff || sync_memberships
       if arrival_date.to_date < w.start_date.to_date
         errors.add(:arrival_date,
                    '- special permission required for early arrival.')
@@ -111,7 +110,6 @@ class Membership < ApplicationRecord
                    '- departure date must be after the beginning of the event.')
       end
 
-      return if update_by_staff || sync_memberships
       if departure_date.to_date > w.end_date.to_date
         errors.add(:departure_date,
                    '- special permission required for late departure.')
