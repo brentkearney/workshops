@@ -62,7 +62,7 @@ Rails.application.routes.draw do
   match '/rsvp/cancel/:otp' => 'rsvp#cancel', as: :rsvp_cancel, via: [:get, :post]
   match '/rsvp/yes/:otp' => 'rsvp#yes', as: :rsvp_yes, via: [:get, :post]
   match '/rsvp/no/:otp' => 'rsvp#no', as: :rsvp_no, via: [:get, :post]
-  match '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe, via: [:get]
+  match '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe, via: [:get, :post]
   match '/rsvp/feedback/:membership_id' => 'rsvp#feedback',
         as: :rsvp_feedback, via: [:get, :post]
 

@@ -45,37 +45,38 @@ class SyncPerson
   end
 
   def change_email
-    return person if person.email == new_email
+    return @person if @person.email == new_email
 
     # EmailForm does person.valid?, so send it back if email is invalid
     unless EmailValidator.valid?(new_email)
-      person.email = new_email
-      return person
+      @person.email = new_email
+      return @person
     end
 
-    other_person = Person.where(email: new_email).where.not(id: person.id).first
+    other_person = Person.where(email: new_email).where.not(id: @person.id).first
     if other_person.nil?
-      person.email = new_email
-      return person
+      @person.email = new_email
+      return @person
     end
 
     # if the names match, replace the new with the old
-    if names_match(other_person.name, person.name)
-      replace_person(replace: person, replace_with: other_person)
+    if names_match(other_person.name, @person.name)
+      replace_person(replace: @person, replace_with: other_person)
+      @person = other_person
     else
       begin
-        ConfirmEmailChange.create!(replace_person: person,
+        ConfirmEmailChange.create!(replace_person: @person,
                                    replace_with: other_person).send_email
       rescue ActiveRecord::RecordInvalid => e
-        return person if e.message =~ /Validation failed/
+        return @person if e.message =~ /Validation failed/
         msg = { problem: 'Unable to create! new ConfirmEmailChange',
                 source: 'SyncPerson.change_email',
-                person: "#{person.name} (id: #{person.id}",
+                person: "#{@person.name} (id: #{@person.id}",
                 error: e.inspect }
         StaffMailer.notify_sysadmin(nil, msg).deliver_now
       end
     end
-    person
+    @person
   end
 
   def confirmed_email_change(confirmation)
