@@ -1,0 +1,51 @@
+<div class="row invitation-box container">
+  <div class="col-md-8 col-md-offset-1">
+    <%= render 'validation_errors' %>
+    <div class="panel panel-primary" id="email-form">
+      <div class="panel-heading">
+        <span class="panel-title"><h4>Confirm Your E-mail Address</h4></span>
+      </div>
+      <div class="panel-body">
+      <h2>Oops! We have an e-mail conflict.</h2>
+      <%= form_for @email_form, as: :email_form,
+         url: rsvp_confirm_email_path(@invitation.code), method: :post,
+        html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |email_form| %>
+      <fieldset>
+      <%= email_form.hidden_field :person_id, value: @person.id %>
+      <div class="row">
+        <div class='col-md-12'>
+          <p>There is another record in our database using <em><%= replace_with_email(@person) %></em>.
+            But that's OK! We will consolidate the data into a single record. First we must verify that
+            you control both accounts.</p>
+          <p><strong>Please check both of your email accounts, and enter the codes we sent:</strong></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class='col-md-6 text-right'>
+          <p>Verification code for <strong><%= replace_email(@person) %></strong>:</p>
+        </div>
+        <div class='col-md-6'>
+          <%= email_form.text_field :replace_email_code, class: "form-control" %>
+        </div>
+      </div>
+      <div class="row">
+        <div class='col-md-6 text-right'>
+          <p>Verification code for <strong><%= replace_with_email(@person) %></strong>:</p>
+        </div>
+        <div class='col-md-6'>
+          <%= email_form.text_field :replace_with_email_code, class: "form-control" %>
+        </div>
+      </div>
+      <div class="row">
+        <div class='col-md-6'>
+          <a href="<%= rsvp_cancel_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-danger">Cancel Email Change</a>
+        </div>
+        <div class='col-md-6'>
+          <%= email_form.submit 'Submit Verification Codes', class: 'btn btn-lg btn-success text-center pull-right' %>
+        </div>
+      </div>
+      <% end %>
+      </div><!-- panel-body -->
+    </div><!-- panel email-form -->
+  </div><!-- col-md-8 -->
+</div><!-- container -->

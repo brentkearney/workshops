@@ -160,29 +160,39 @@ module Syncable
 
   def replace_person(replace: other_person, replace_with: person)
     replace.memberships.each do |m|
-      if replace_with.memberships.select { |rm| rm.event_id == m.event_id }.blank?
-        m.person = replace_with
-        m.save!
+      replace_with_membership = Membership.where(event: m.event,
+                                                person: replace_with).first
+      if replace_with_membership.blank?
+        m.update(person: replace_with)
       else
-        m.destroy
+        Invitation.where(membership: m).each do |i|
+          i.update(membership: replace_with_membership)
+        end
+        m.delete
       end
     end
 
     Lecture.where(person_id: replace.id).each do |l|
-      l.person = replace_with
-      l.save
+      l.update(person: replace_with)
     end
 
-    user_account = User.where(person_id: replace.id).first
-    unless user_account.nil?
-      user_account.person = replace_with
-      user_account.email = replace_with.email
-      user_account.skip_reconfirmation!
-      user_account.save
+    if User.where(person_id: replace_with.id).blank?
+      user_account = User.where(person_id: replace.id).first
+      unless user_account.nil?
+        user_account.person = replace_with
+        user_account.email = replace_with.email
+        user_account.skip_reconfirmation!
+        user_account.save
+      end
+    end
+
+    # Update legacy database
+    unless replace.legacy_id.blank? || replace_with.legacy_id.blank?
+      ReplacePersonJob.perform_later(replace.legacy_id, replace_with.legacy_id)
     end
 
     # there can be only one!
-    Person.find(replace.id).destroy
+    replace.delete
   end
 
   def save_person(person)

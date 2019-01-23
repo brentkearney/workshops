@@ -1,4 +1,5 @@
-# Copyright (c) 2018 Banff International Research Station
+# app/mailers/confirm_email_mailer.rb
+# Copyright (c) 2019 Banff International Research Station
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,27 +19,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Remove attachments from mail logger in debugging mode
-module ActionMailer
-  class LogSubscriber < ActiveSupport::LogSubscriber
-    def deliver(event)
-      info do
-        recipients = Array(event.payload[:to]).join(', ')
-        "\nSent mail to #{recipients}, Subject: #{event.payload[:subject]}, on #{Time.now} (#{event.duration.round(1)}ms)"
-      end
+# Notification messages to Staff
+class ConfirmEmailMailer < ApplicationMailer
+  app_email = GetSetting.site_email('webmaster_email')
+  default from: app_email
 
-      debug { remove_attachments(event.payload[:mail]) }
-    end
+  def send_msg(confirm_id, mode: 'replace')
+    confirm = ConfirmEmailChange.find(confirm_id)
+    @replace_email = confirm.replace_email
+    @replace_with_email = confirm.replace_with_email
 
-    def remove_attachments(message)
-      new_message = ''
-      skip = false
-      message.each_line do |line|
-        new_message << line unless skip
-        skip = true if line =~ /Content-Disposition: attachment;/
-        skip = false if skip && line =~ /----==_mimepart/
-      end
-      new_message
-    end
+    person_id = mode == 'replace' ? 'replace_person_id' : 'replace_with_id'
+    @person = Person.find("#{confirm.send(person_id)}")
+    @verification_code = confirm.send(mode + '_code')
+
+    to_email = %Q("#{@person.name}" <#{@person.email}>)
+    subject = "BIRS email change confirmation"
+
+    mail(to: to_email, subject: subject, template_name: mode)
   end
 end

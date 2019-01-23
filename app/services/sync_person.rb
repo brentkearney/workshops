@@ -21,12 +21,12 @@
 
 # updates one person record with data from remote db
 class SyncPerson
-  attr_reader :person
+  attr_reader :person, :new_email
   include Syncable
 
-  def initialize(person)
+  def initialize(person, new_email = nil)
     @person = person
-    sync_person
+    @new_email = new_email.downcase.strip unless new_email.nil?
   end
 
   def sync_person
@@ -38,5 +38,49 @@ class SyncPerson
 
     local_person = update_record(person, remote_person)
     save_person(local_person)
+  end
+
+  def names_match(n1, n2)
+    I18n.transliterate(n1.downcase) == I18n.transliterate(n2.downcase)
+  end
+
+  def change_email
+    return @person if @person.email == new_email
+
+    # EmailForm does person.valid?, so send it back if email is invalid
+    unless EmailValidator.valid?(new_email)
+      @person.email = new_email
+      return @person
+    end
+
+    other_person = Person.where(email: new_email).where.not(id: @person.id).first
+    if other_person.nil?
+      @person.email = new_email
+      return @person
+    end
+
+    # if the names match, replace the new with the old
+    if names_match(other_person.name, @person.name)
+      replace_person(replace: @person, replace_with: other_person)
+      @person = other_person
+    else
+      begin
+        ConfirmEmailChange.create!(replace_person: @person,
+                                   replace_with: other_person).send_email
+      rescue ActiveRecord::RecordInvalid => e
+        return @person if e.message =~ /Validation failed/
+        msg = { problem: 'Unable to create! new ConfirmEmailChange',
+                source: 'SyncPerson.change_email',
+                person: "#{@person.name} (id: #{@person.id}",
+                error: e.inspect }
+        StaffMailer.notify_sysadmin(nil, msg).deliver_now
+      end
+    end
+    @person
+  end
+
+  def confirmed_email_change(confirmation)
+    replace_with_person = Person.find(confirmation.replace_with_id)
+    replace_person(replace: person, replace_with: replace_with_person)
   end
 end

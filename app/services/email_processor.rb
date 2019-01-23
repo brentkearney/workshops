@@ -62,7 +62,7 @@ class EmailProcessor
   end
 
   def valid_sender?(event, to_email, group)
-    from_email = @email.from[:email]
+    from_email = @email.from[:email].downcase.strip
     send_report and return false unless EmailValidator.valid?(from_email)
     person = Person.find_by_email(from_email)
 

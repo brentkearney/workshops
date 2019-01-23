@@ -10,10 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_31_002948) do
+ActiveRecord::Schema.define(version: 2019_01_11_225548) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "confirm_email_changes", force: :cascade do |t|
+    t.bigint "replace_person_id"
+    t.bigint "replace_with_id"
+    t.string "replace_email"
+    t.string "replace_with_email"
+    t.string "replace_code"
+    t.string "replace_with_code"
+    t.boolean "confirmed", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["replace_code"], name: "index_confirm_email_changes_on_replace_code"
+    t.index ["replace_person_id"], name: "index_confirm_email_changes_on_replace_person_id"
+    t.index ["replace_with_code"], name: "index_confirm_email_changes_on_replace_with_code"
+    t.index ["replace_with_id"], name: "index_confirm_email_changes_on_replace_with_id"
+  end
 
   create_table "events", id: :serial, force: :cascade do |t|
     t.string "code"

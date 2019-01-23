@@ -1,4 +1,5 @@
-# Copyright (c) 2016 Banff International Research Station.
+# app/helpers/person_helper.rb
+# Copyright (c) 2019 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
@@ -16,5 +17,13 @@ module PersonHelper
     address += ' &nbsp;' + person.postal_code unless person.postal_code.blank?
     address += "<br />\n" + person.country unless person.country.blank?
     address.html_safe
+  end
+
+  def replace_email(person)
+    ConfirmEmailChange.where(replace_person_id: person.id).first.replace_email
+  end
+
+  def replace_with_email(person)
+    ConfirmEmailChange.where(replace_person_id: person.id).first.replace_with_email
   end
 end

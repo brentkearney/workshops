@@ -6,7 +6,7 @@
         <span class="panel-title"><h4>Invitation RSVP: <%= @rsvp.event.code %></h4></span>
       </div>
       <div class="panel-body">
-        <h1>We're glad you can attend! 🎉<br />
+        <h1>Thanks for confirming your email.<br />
         <small>Please share your plans, and click the "Confirm Attendance" button:</small></h1>
         <%= form_for @rsvp, as: :rsvp,
            url: rsvp_yes_path(@rsvp.invitation.code), method: :post,
@@ -152,7 +152,7 @@
               </div>
               <div class="form-group">
                 <%= p.label :email, 'E-mail', class: "mandatory" %>
-                <%= p.email_field :email, class: "form-control", autocomplete: "email" %>
+                <%= p.email_field :email, class: "form-control", disabled: true %>
                 <div class="form-inline inline-checkbox">
                   <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
                     <%= m.check_box :share_email, { class: "form-control checkbox" }, true %>
