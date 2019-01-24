@@ -5,7 +5,7 @@
 # Create data volumes like this:
 # docker run -v /var/lib/postgresql --name pgdata postgres:9.6.5 echo 'Postgres data'
 # docker run -v /usr/local/rvm/gems -v /home/app/workshops/vendor/cache \
-#    --name rubygems "phusion/passenger-ruby25:0.9.29" echo 'Ruby gems'
+#    --name rubygems "phusion/passenger-ruby25:1.0.0" echo 'Ruby gems'
 #
 # Generate secure strings for the keys, passwords and tokens using:
 # < /dev/urandom LC_CTYPE=C tr -dc _A-Z-a-z-0-9 | head -c${1:-64};echo
@@ -19,11 +19,10 @@ db:
     - pgdata
   environment:
     - POSTGRES_USER=postgres
-    - POSTGRES_PASSWORD=
+    - POSTGRES_PASSWORD=xxxxxxxx
     - DB_USER=db_username
-    - DB_PASS=
+    - DB_PASS=yyyyyyyyyyyyy
     - PSQL_TRUST_LOCALNET=true
-    - PGDATA=/var/lib/postgresql/data/pgdata
     - DB_PORT=5433
     - DB_NAME=workshops_production,workshops_development,workshops_test
 web:

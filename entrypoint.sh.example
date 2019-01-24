@@ -28,8 +28,9 @@ gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB8
 
 echo
 echo "Installing latest bundler..."
+/usr/local/rvm/bin/rvm-exec 2.5.3 gem update --system
 /usr/local/rvm/bin/rvm-exec 2.5.3 gem install bundler
-/usr/local/rvm/bin/rvm-exec 2.5.3 gem install rubygems-bundler
+# /usr/local/rvm/bin/rvm-exec 2.5.3 gem install rubygems-bundler
 
 # echo
 # echo "Bundle update rails..."

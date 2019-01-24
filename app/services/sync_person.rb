@@ -44,18 +44,28 @@ class SyncPerson
     I18n.transliterate(n1.downcase) == I18n.transliterate(n2.downcase)
   end
 
+  def find_other_person
+    Person.where(email: new_email).where.not(id: @person.id).first
+  end
+
+  def has_conflict?
+    other_person = find_other_person
+    return false if other_person.nil?
+    !names_match(@person.name, other_person.name)
+  end
+
   def change_email
-    return @person if @person.email == new_email
+    return @person if @person.email == @new_email
 
     # EmailForm does person.valid?, so send it back if email is invalid
-    unless EmailValidator.valid?(new_email)
-      @person.email = new_email
+    unless EmailValidator.valid?(@new_email)
+      @person.email = @new_email
       return @person
     end
 
-    other_person = Person.where(email: new_email).where.not(id: @person.id).first
+    other_person = find_other_person
     if other_person.nil?
-      @person.email = new_email
+      @person.email = @new_email
       return @person
     end
 

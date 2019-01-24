@@ -126,6 +126,11 @@ class GetSetting
     Setting.Locations.first.first
   end
 
+  def self.new_registration_msg
+    setting = Setting.Site['new_registration_msg']
+    setting.blank? ? '' : setting
+  end
+
   # Emails set in Settings.Site
   def self.site_email(email_setting)
     email = site_setting(email_setting)
