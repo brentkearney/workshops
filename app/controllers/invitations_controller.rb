@@ -44,7 +44,6 @@ class InvitationsController < ApplicationController
     end
 
     pause_membership_syncing(event)
-    membership.person.member_import = true # skip validations on save
     send_invitation(membership, current_user.name)
     redirect_to event_memberships_path(event),
                 success: "Invitation sent to #{membership.person.name}"

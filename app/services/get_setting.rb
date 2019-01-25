@@ -16,7 +16,7 @@ class GetSetting
   end
 
   def self.no_setting(setting_string)
-    parts = setting_string.scan(/\w+/)
+    parts = setting_string.scan(/\w+-?\w*/) # include hyphenated words
     settings_hash = Setting.send(parts[0]) # i.e. Locations
     return true if settings_hash.blank?
     location = parts[1]
