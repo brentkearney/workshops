@@ -64,14 +64,18 @@ class SyncMembers
       if local_member.nil?
         create_new_membership(remote_member)
       else
-        person = update_record(local_member.person, remote_member['Person'])
-        membership = update_record(local_member, remote_member['Membership'])
-        membership.person = person
-        save_membership(membership)
+        update_records(local_member, remote_member)
       end
     end
     remote_members = fixed_remote_members
     prune_members
+  end
+
+  def update_records(local_member, remote_member)
+    person = update_record(local_member.person, remote_member['Person'])
+    membership = update_record(local_member, remote_member['Membership'])
+    membership.person = person
+    save_membership(membership)
   end
 
   def prune_members

@@ -102,8 +102,10 @@ module Syncable
 
   # local record, remote hash
   def update_record(local, remote)
-    booleans = boolean_fields(local)
+    remote_updated = prepare_value('updated_at', remote['updated_at'])
+    return local if local.updated_at >= remote_updated
 
+    booleans = boolean_fields(local)
     remote.each_pair do |k, v|
       next if v.blank?
       v = prepare_value(k, v)
