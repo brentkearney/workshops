@@ -18,6 +18,7 @@ class EmailForm < ComplexForms
   def validate_email(attributes = {})
     submitted_email = attributes['person']['email']
     person = SyncPerson.new(@person, submitted_email).change_email
+    person.member_import = true # skip some validations
 
     unless person.valid?
       person.errors.full_messages.each do |msg|
