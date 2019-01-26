@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2.1'
+gem 'rails', '~> 5.2.2'
 gem 'pg', '1.1.3'
 gem 'sass-rails'
 gem 'bootstrap-sass'
@@ -34,6 +34,7 @@ gem 'wkhtmltopdf-binary'
 gem 'rack-cors', require: 'rack/cors'
 gem 'listen'
 gem 'bootsnap'
+gem 'administrate'
 
 group :development, :test do
   gem 'byebug'
