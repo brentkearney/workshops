@@ -22,7 +22,8 @@ class RsvpController < ApplicationController
     @person = @invitation.membership.person
     @email_form = EmailForm.new(@person)
     if request.post? && @email_form.validate_email(email_param)
-      redirect_to rsvp_yes_path(otp: otp_params) and return
+      redirect_to rsvp_yes_path(otp: otp_params),
+                  success: 'E-mail updated/confirmed -- thanks!' and return
     end
 
     render 'confirm_email' and return if @person.pending_replacement?

@@ -48,7 +48,7 @@ Rails.application.routes.draw do
 
   # Invitations & RSVP
   get '/invitations' => 'invitations#index'
-  get '/invitations/new' => 'invitations#new'
+  get '/invitations/new/(:id)' => 'invitations#new', as: :invitations_new
   post '/invitations/create' => 'invitations#create'
   get '/invitations/send/:membership_id' => 'invitations#send_invite',
       as: :invitations_send

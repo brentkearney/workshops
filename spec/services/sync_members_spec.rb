@@ -12,6 +12,14 @@ describe "SyncMembers" do
     @eventm = create(:event_with_members)
   end
 
+  def reset_dates
+    @eventm.memberships.each do |m|
+      m.updated_at = DateTime.parse('1970-01-01 00:00:00')
+      m.person.updated_at = DateTime.parse('1970-01-01 00:00:00')
+      m.save
+    end
+  end
+
   it '.initialize' do
     expect(LegacyConnector).to receive(:new).and_return(FakeLegacyConnector.new)
 
@@ -27,6 +35,7 @@ describe "SyncMembers" do
       lc = FakeLegacyConnector.new
       allow(lc).to receive(:get_members).with(@eventm).and_return(lc.get_members_with_changed_fields(@eventm))
       expect(LegacyConnector).to receive(:new).and_return(lc)
+      reset_dates
     end
 
     it 'returns false if event.sync_time is empty' do
@@ -112,6 +121,7 @@ describe "SyncMembers" do
       # get_members_with_changed_fields() sets nil fields and messes up email
       allow(lc).to receive(:get_members).with(@eventm).and_return(lc.get_members_with_changed_fields(@eventm))
       expect(LegacyConnector).to receive(:new).and_return(lc)
+      reset_dates
     end
 
     it 'fills in blank fields, sets Backup Participant attendance to "Not Yet Invited"' do
@@ -136,8 +146,14 @@ describe "SyncMembers" do
   end
 
   describe '.update_person' do
+    before do
+      reset_dates
+    end
+
     def test_update(local_person:, fields:)
-      membership = create(:membership, event: @eventm, person: local_person)
+      updated = DateTime.parse('1970-01-01 00:00:00')
+      membership = create(:membership, event: @eventm, person: local_person,
+        updated_at: updated)
       lc = FakeLegacyConnector.new
       allow(lc).to receive(:get_members).with(@eventm)
         .and_return(lc.get_members_with_person(e: @eventm,
@@ -166,7 +182,9 @@ describe "SyncMembers" do
 
     context 'remote person with matching legacy_id' do
       it 'updates the local person with changed fields' do
-        local_person = create(:person, lastname: 'Localperson', legacy_id: 666)
+        updated = DateTime.parse('1970-01-01 00:00:00')
+        local_person = create(:person, lastname: 'Localperson', legacy_id: 666,
+          updated_at: updated)
         updated_fields = { lastname: 'RemotePerson', address1: 'foo' }
         test_update(local_person: local_person, fields: updated_fields)
       end
@@ -174,7 +192,9 @@ describe "SyncMembers" do
 
     context 'remote person without a legacy_id' do
       it 'finds local person based on email address, and updates' do
-        local_person = create(:person, lastname: 'Localperson', legacy_id: nil)
+        updated = DateTime.parse('1970-01-01 00:00:00')
+        local_person = create(:person, lastname: 'Localperson', legacy_id: nil,
+            updated_at: updated)
         updated_fields = { lastname: 'RemotePerson' }
         test_update(local_person: local_person, fields: updated_fields)
       end
@@ -194,11 +214,16 @@ describe "SyncMembers" do
     context 'Email & legacy_id updates' do
       context 'remote member has matching email, different legacy_id' do
         before do
-          @person1 = create(:person, email: 'sam@jones.net', legacy_id: 111)
-          @membership1 = create(:membership, person: @person1, event: @eventm)
+          updated = DateTime.parse('1970-01-01 00:00:00')
+          @person1 = create(:person, email: 'sam@jones.net', legacy_id: 111,
+            updated_at: updated)
+          @membership1 = create(:membership, person: @person1, event: @eventm,
+            updated_at: updated)
 
-          @person2 = create(:person, email: 'fred@smith.com', legacy_id: 222)
-          @membership2 = create(:membership, person: @person2, event: @event)
+          @person2 = create(:person, email: 'fred@smith.com', legacy_id: 222,
+            updated_at: updated)
+          @membership2 = create(:membership, person: @person2, event: @event,
+            updated_at: updated)
 
           @lecture = create(:lecture, person: @person1, event: @eventm)
           create(:user, person: @person1, email: @person1.email)
@@ -220,11 +245,16 @@ describe "SyncMembers" do
 
       context 'remote member has matching legacy_id, but different email' do
         before do
-          @person1 = create(:person, email: 'sam@jones.net', legacy_id: 111)
-          @membership1 = create(:membership, person: @person1, event: @eventm)
+          updated = DateTime.parse('1970-01-01 00:00:00')
+          @person1 = create(:person, email: 'sam@jones.net', legacy_id: 111,
+            updated_at: updated)
+          @membership1 = create(:membership, person: @person1, event: @eventm,
+            updated_at: updated)
 
-          @person2 = create(:person, email: 'fred@smith.com', legacy_id: 222)
-          @membership2 = create(:membership, person: @person2, event: @event)
+          @person2 = create(:person, email: 'fred@smith.com', legacy_id: 222,
+            updated_at: updated)
+          @membership2 = create(:membership, person: @person2, event: @event,
+            updated_at: updated)
 
           @lecture = create(:lecture, person: @person1, event: @eventm)
           create(:user, person: @person1, email: @person1.email)
@@ -280,7 +310,9 @@ describe "SyncMembers" do
 
     context 'invited_by & invited_on updates' do
       it 'updates invited_by & invited_on if remote is more recent' do
-        membership = create(:membership, invited_by: 'User 1', invited_on: 1.week.ago)
+        updated = DateTime.parse('1970-01-01 00:00:00')
+        membership = create(:membership, invited_by: 'User 1',
+          invited_on: 1.week.ago, updated_at: updated)
         more_recent = DateTime.now.in_time_zone(membership.event.time_zone)
         remote_fields = { membership: { invited_by: 'User 2', invited_on: more_recent } }
         setup_remote(membership.event, membership, remote_fields)
@@ -308,6 +340,10 @@ describe "SyncMembers" do
 
 
   describe '.save_person' do
+    before do
+      reset_dates
+    end
+
     context 'valid person' do
       it 'saves the Person and logs a message' do
         lc = FakeLegacyConnector.new
@@ -360,9 +396,10 @@ describe "SyncMembers" do
   describe '.save_membership' do
     context 'valid membership' do
       before do
-        @person = create(:person, lastname: 'Smith')
+        updated = DateTime.parse('1970-01-01 00:00:00')
+        @person = create(:person, lastname: 'Smith', updated_at: updated)
         @membership = build(:membership, person: @person, event: @event,
-                                        staff_notes: 'Hi there!')
+                                  staff_notes: 'Hi there!', updated_at: updated)
         @lc = FakeLegacyConnector.new
       end
 
@@ -441,7 +478,7 @@ describe "SyncMembers" do
   describe '.update_membership' do
     context 'without a local membership' do
       it 'creates a new membership' do
-        person = create(:person)
+        person = create(:person, updated_at: DateTime.parse('1970-01-01 00:00:00'))
         lc = FakeLegacyConnector.new
         allow(lc).to receive(:get_members).with(@event).and_return(lc.get_members_with_new_membership(e: @event, p: person))
         expect(LegacyConnector).to receive(:new).and_return(lc)
@@ -455,6 +492,7 @@ describe "SyncMembers" do
 
     context 'with a local membership' do
       it 'updates the local membership' do
+        reset_dates
         membership = @eventm.memberships.last
         lc = FakeLegacyConnector.new
         allow(lc).to receive(:get_members).with(membership.event).and_return(lc.get_members_with_changed_membership(m: membership, sn: 'Hi'))

@@ -6,8 +6,9 @@
         <span class="panel-title"><h4>Invitation RSVP: <%= @rsvp.event.code %></h4></span>
       </div>
       <div class="panel-body">
-        <h1>Thanks for confirming your email.<br />
-        <small>Please share your plans, and click the "Confirm Attendance" button:</small></h1>
+        <h1>Please share your plans, then click the green button.<br>
+          <small>You may return any time to update this information.</small>
+        </h1>
         <%= form_for @rsvp, as: :rsvp,
            url: rsvp_yes_path(@rsvp.invitation.code), method: :post,
           html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |rsvp| %>
@@ -271,12 +272,14 @@
             to complete your RSVP ➜</span>
           </div>
         </div>
-
         </fieldset>
         <% end %>
       </div>
       <div class="row">
         <div class="col-md-12">
+          <span id="revisit-note" class="pull-right">You may revisit this page any time
+            by <%= link_to 'generating a new invitation link', invitations_new_path(@rsvp.event.code) %>.</span>
+
           <div class="well">
             <p><%= @rsvp.privacy_notice %></p>
           </div>
