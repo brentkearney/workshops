@@ -5,8 +5,8 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RsvpController < ApplicationController
-  before_action :set_invitation, except: [:canadian_grants, :feedback]
-  before_action :after_selection, only: %i[yes no maybe]
+  before_action :set_invitation, except: [:feedback]
+  before_action :after_selection, except: [:index, :feedback]
 
   # GET /rsvp/:otp
   def index
