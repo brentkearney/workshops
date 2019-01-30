@@ -39,6 +39,11 @@ Rails.application.routes.draw do
     get 'lectures' => 'lectures#index'
   end
 
+  # People
+  resources :people do
+    get 'email_change' => 'people#email_change', as: :email_change
+  end
+
   resources :settings
   post 'settings/delete' => 'settings#delete'
 

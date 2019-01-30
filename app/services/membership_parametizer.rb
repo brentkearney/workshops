@@ -7,13 +7,14 @@
 # Authorizes and tweaks posted form data
 class MembershipParametizer
   include Pundit
-  attr_accessor :form_data, :current_user, :person_data, :user_update
+  attr_accessor :form_data, :current_user, :person_data, :user_update,
+                :verify_email
 
   def initialize(membership, form_data, current_user)
     @form_data = form_data
     @membership = membership
     @current_user = current_user
-    @person_data = form_data.delete(:person_attributes)
+    @person_data = @form_data.delete(:person_attributes)
 
     update_membership
     update_person
@@ -21,9 +22,9 @@ class MembershipParametizer
 
   def update_membership
     db_member = Membership.find(@membership.id)
-    db_member.assign_attributes(form_data)
+    db_member.assign_attributes(cleaned_data(@form_data))
     if db_member.changed?
-      form_data['updated_by'] = @current_user.name
+      @form_data['updated_by'] = @current_user.name
       update_role?(db_member)
       @membership.update_remote = true
     end
@@ -41,27 +42,48 @@ class MembershipParametizer
   end
 
   def update_person
-    return if person_data.blank?
+    return if @person_data.blank?
     person = Person.find(@membership.person_id)
-    person.assign_attributes(person_data)
+    person.assign_attributes(@person_data)
     return unless person.changed?
     data_massage
-    form_data['person_attributes'] = person_data
     @membership.update_remote = true
+    @form_data['person_attributes'] = @person_data
   end
 
   def data_massage
-    person_data['updated_by'] = @current_user.name
-    update_user_email?
+    @person_data['updated_by'] = @current_user.name
+    email_update if @person_data['email'] != @membership.person.email
     update_gender?
     numeric_phd_year?
   end
 
-  def update_user_email?
+  def email_update
+    new_email = @person_data.delete(:email)
+    sync = SyncPerson.new(@membership.person, new_email)
+    if sync.has_conflict?
+      @verify_email = true
+      SyncPerson.new(@membership.person, new_email).change_email
+      @person_data = cleaned_data(@person_data)
+                       .merge(email: @membership.person.email)
+    else
+      update_user_email(new_email)
+      person = sync.change_email
+      @person_data = person.attributes.merge(cleaned_data(@person_data))
+      @person_data['id'] = person.id
+      @membership.person_id = person.id
+    end
+  end
+
+  def cleaned_data(attribs)
+    attribs.delete_if { |k, v| v.empty? }
+  end
+
+  def update_user_email(new_email)
     user = User.find_by_person_id(@membership.person_id)
-    return if user.nil? || user.email == person_data['email']
+    return if user.nil? || user.email == new_email
     @user_update = true if @current_user.person_id == user.person_id
-    user.email = person_data['email']
+    user.email = new_email
     user.save
   end
 
@@ -77,7 +99,7 @@ class MembershipParametizer
 
   def data
     @membership.update_by_staff = true if policy(@membership).staff_update?
-    form_data
+    @form_data
   end
 
   def new_user_email?

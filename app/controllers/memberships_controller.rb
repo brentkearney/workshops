@@ -1,3 +1,4 @@
+# ./app/controllers/memberships_controller.rb
 # Copyright (c) 2016 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
@@ -69,7 +70,10 @@ class MembershipsController < ApplicationController
     respond_to do |format|
       if @membership.update(member_params.data)
         format.html do
-          if member_params.new_user_email?
+          if member_params.verify_email
+            redirect_to person_email_change_path(@membership.person_id),
+              warning: 'Membership updated, but there is an email conflict!'
+          elsif member_params.new_user_email?
             sign_out @current_user
             redirect_to sign_in_path, notice: 'Please verify your account by
               clicking the confirmation link that we sent to your new email

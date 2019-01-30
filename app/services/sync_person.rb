@@ -57,7 +57,7 @@ class SyncPerson
   def change_email
     return @person if @person.email == @new_email
 
-    # EmailForm does person.valid?, so send it back if email is invalid
+    # Person model validates, so send it back if email is invalid
     unless EmailValidator.valid?(@new_email)
       @person.email = @new_email
       return @person
