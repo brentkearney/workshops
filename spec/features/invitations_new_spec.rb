@@ -30,6 +30,15 @@ describe 'Invitation#new', type: :feature do
     expect(page.body).not_to have_select('invitation[event]', with_options: past_events)
   end
 
+  it 'preselects event if it was passed into the URI' do
+    event = Event.future.last
+    visit "#{invitations_new_path}/#{event.code}"
+    expect( find(:css, 'select#invitation_event').value ).to eq(event.code)
+
+    visit "#{invitations_new_path}/#{event.id}"
+    expect( find(:css, 'select#invitation_event').value ).to eq(event.code)
+  end
+
   it 'excludes events for whose expiry dates will already have passed' do
     expect(page.body).not_to have_select('invitation[event]', with_options: [@current_event.code])
   end

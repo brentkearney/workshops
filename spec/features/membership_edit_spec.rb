@@ -1,3 +1,4 @@
+# ./spec/features/membership_edit_spec.rb
 # Copyright (c) 2016 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
@@ -14,6 +15,7 @@ describe 'Membership#edit', type: :feature do
     @participant_user = create(:user, email: @participant.person.email,
                                       person: @participant.person)
     @non_member_user = create(:user)
+    @other_person = create(:person)
   end
 
   after(:each) do
@@ -44,6 +46,7 @@ describe 'Membership#edit', type: :feature do
 
     person = Person.find(member.person_id)
     expect(person.name).to eq('Samuel Jackson')
+    expect(person.email).to eq('sam@jackson.edu')
     expect(person.affil_with_title).to eq('Hollywood, Movies — Actor')
     expect(person.url).to eq('http://sam.i.am')
     expect(person.biography).to eq('I did a thing.')
@@ -205,6 +208,7 @@ describe 'Membership#edit', type: :feature do
     end
 
     before :each do
+      ActionMailer::Base.deliveries.clear
       visit edit_event_membership_path(@event, @participant)
     end
 
@@ -217,20 +221,85 @@ describe 'Membership#edit', type: :feature do
       allows_person_editing(@participant)
     end
 
-    it 'changing email signs out user' do
+    def assign_participant_email_to_user
       @participant.person.email = Faker::Internet.email
-      @participant_user.email = @participant.person.email
       @participant.save
+      @participant_user.email = @participant.person.email
+      @participant_user.skip_reconfirmation!
       @participant_user.save
+    end
+
+    it 'changing email signs out user and sends confirmation email' do
+      assign_participant_email_to_user
+      old_email = @participant.person.email
+      new_email = 'new@email.com'
 
       visit edit_event_membership_path(@event, @participant)
-      fill_in 'membership_person_attributes_email', with: 'new@email.com'
+      fill_in 'membership_person_attributes_email', with: new_email
 
       click_button 'Update Member'
 
-      expect(current_path).to eq(sign_in_path)
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      expect(ActionMailer::Base.deliveries.first.to).to eq([new_email])
       expect(page.body).to have_css('div.alert-notice', text: 'Please verify')
+      expect(current_path).to eq(sign_in_path)
     end
+
+    it 'changing email to an email of another record with a matching name
+         merges the person records, adding new form data'.squish do
+      assign_participant_email_to_user
+      other_person = create(:person,
+                            firstname: @participant.person.firstname,
+                             lastname: @participant.person.lastname,
+                    emergency_contact: 'Me')
+      old_email = @participant.person.email
+      new_email = other_person.email
+
+      visit edit_event_membership_path(@event, @participant)
+      fill_in 'membership_person_attributes_email', with: new_email
+      fill_in 'membership_person_attributes_biography', with: 'Yes.'
+      fill_in 'membership_person_attributes_emergency_contact', with: 'You'
+
+      click_button 'Update Member'
+
+      updated = Membership.find(@participant.id)
+      expect(updated.person.email).to eq(new_email)
+      expect(updated.person.emergency_contact).to eq('You')
+      expect(updated.person.biography).to eq('Yes.')
+    end
+
+    it 'changing email to an email of another record with a different name
+          updates original record, creates a new ConfirmEmailChange, and
+          forwards to people#email_change'.squish do
+      assign_participant_email_to_user
+      other_person = create(:person)
+      old_email = @participant.person.email
+      new_email = other_person.email
+
+      visit edit_event_membership_path(@event, @participant)
+      fill_in 'membership_person_attributes_email', with: new_email
+      fill_in 'membership_person_attributes_biography', with: 'Yes.'
+      fill_in 'membership_person_attributes_emergency_contact', with: 'Me'
+
+      click_button 'Update Member'
+
+      updated = Membership.find(@participant.id)
+      expect(updated.person.emergency_contact).to eq('Me')
+      expect(updated.person.biography).to eq('Yes.')
+      expect(updated.person.email).to eq(old_email)
+
+      newpath = person_email_change_path(updated.person)
+      expect(current_path).to eq(newpath)
+
+      expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).not_to eq 0
+      active_job = ActiveJob::Base.queue_adapter.enqueued_jobs.first
+      expect(active_job[:job]).to eq(ConfirmEmailReplacementJob)
+
+      confirmation = ConfirmEmailChange.find(active_job[:args].first)
+      expect(confirmation.replace_email).to eq(new_email)
+      expect(confirmation.replace_with_email).to eq(old_email)
+    end
+
 
     it 'allows editing of personal info' do
       allows_personal_info_editing(@participant)
@@ -302,6 +371,38 @@ describe 'Membership#edit', type: :feature do
 
     it 'disallows editing of personal info' do
       disallows_personal_info_editing
+    end
+
+    it 'allows changing email to one taken by another record with
+      the same name'.squish do
+      @other_person.firstname = @participant.person.firstname
+      @other_person.lastname = @participant.person.lastname
+      @other_person.save
+
+      fill_in 'membership_person_attributes_email', with: @other_person.email
+
+      click_button 'Update Member'
+
+      updated = Membership.find(@participant.id)
+      expect(updated.person.email).to eq(@other_person.email)
+      expect(current_path).to eq(event_membership_path(@event, @participant))
+    end
+
+    it 'disallows changing email to one taken by another record with a
+      different name'.squish do
+      expect(@other_person.name).not_to eq(@participant.person.name)
+
+      fill_in 'membership_person_attributes_email', with: @other_person.email
+
+      click_button 'Update Member'
+
+      updated = Membership.find(@participant.id)
+      expect(updated.person.email).not_to eq(@other_person.email)
+      confirmation = ConfirmEmailChange
+                              .where(replace_person_id: @participant.person_id)
+      expect(confirmation).to be_blank
+      expect(page.body).to have_css('div.alert-danger')
+      expect(page.body).to have_text('Person email has already been taken')
     end
 
     it 'allows changing membership role' do
@@ -470,6 +571,38 @@ describe 'Membership#edit', type: :feature do
 
     it 'allows editing of personal info' do
       allows_personal_info_editing(@participant)
+    end
+
+    it 'allows changing email to one taken by another record with
+      the same name'.squish do
+      @other_person.firstname = @participant.person.firstname
+      @other_person.lastname = @participant.person.lastname
+      @other_person.save
+
+      fill_in 'membership_person_attributes_email', with: @other_person.email
+
+      click_button 'Update Member'
+
+      updated = Membership.find(@participant.id)
+      expect(updated.person.email).to eq(@other_person.email)
+      expect(current_path).to eq(event_membership_path(@event, @participant))
+    end
+
+    it 'disallows changing email to one taken by another record with a
+      different name'.squish do
+      expect(@other_person.name).not_to eq(@participant.person.name)
+
+      fill_in 'membership_person_attributes_email', with: @other_person.email
+
+      click_button 'Update Member'
+
+      updated = Membership.find(@participant.id)
+      expect(updated.person.email).not_to eq(@other_person.email)
+      confirmation = ConfirmEmailChange
+                              .where(replace_person_id: @participant.person_id)
+      expect(confirmation).to be_blank
+      expect(page.body).to have_css('div.alert-danger')
+      expect(page.body).to have_text('Person email has already been taken')
     end
 
     it 'allows editing of membership info' do

@@ -55,3 +55,4 @@ app/assets/images/*_logo.png
 public/icons/*
 .rubocop.yml
 
+yarn.lock

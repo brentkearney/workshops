@@ -5,8 +5,8 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RsvpController < ApplicationController
-  before_action :set_invitation, except: [:canadian_grants, :feedback]
-  before_action :after_selection, only: %i[yes no maybe]
+  before_action :set_invitation, except: [:feedback]
+  before_action :after_selection, except: [:index, :feedback]
 
   # GET /rsvp/:otp
   def index
@@ -22,7 +22,8 @@ class RsvpController < ApplicationController
     @person = @invitation.membership.person
     @email_form = EmailForm.new(@person)
     if request.post? && @email_form.validate_email(email_param)
-      redirect_to rsvp_yes_path(otp: otp_params) and return
+      redirect_to rsvp_yes_path(otp: otp_params),
+                  success: 'E-mail updated/confirmed -- thanks!' and return
     end
 
     render 'confirm_email' and return if @person.pending_replacement?

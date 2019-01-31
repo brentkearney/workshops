@@ -17,7 +17,7 @@
               <p>
               <%= f.label :event, 'Select the event you were invited to:' %><br />
               <%= f.collection_select(:event, @events, :code, :options_list,
-                                { include_blank: true }, { class: 'form-control' }) %>
+                                { include_blank: true, selected: @code }, { class: 'form-control' }) %>
              </p>
             </div>
           </div>

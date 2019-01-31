@@ -39,6 +39,11 @@ Rails.application.routes.draw do
     get 'lectures' => 'lectures#index'
   end
 
+  # People
+  resources :people do
+    get 'email_change' => 'people#email_change', as: :email_change
+  end
+
   resources :settings
   post 'settings/delete' => 'settings#delete'
 
@@ -48,7 +53,7 @@ Rails.application.routes.draw do
 
   # Invitations & RSVP
   get '/invitations' => 'invitations#index'
-  get '/invitations/new' => 'invitations#new'
+  get '/invitations/new/(:id)' => 'invitations#new', as: :invitations_new
   post '/invitations/create' => 'invitations#create'
   get '/invitations/send/:membership_id' => 'invitations#send_invite',
       as: :invitations_send

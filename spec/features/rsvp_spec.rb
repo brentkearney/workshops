@@ -456,6 +456,10 @@ describe 'RSVP', type: :feature do
         expect(page).to have_field("rsvp_organizer_message")
       end
 
+      it 'has link to new invitations form for this event' do
+        expect(page).to have_link(nil, href: invitations_new_path(@event.code))
+      end
+
       it 'persists the organizer message through form validation' do
         fill_in 'rsvp_organizer_message', with: 'Hi Org!'
         fill_in 'rsvp_person_firstname', with: ''

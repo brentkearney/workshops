@@ -11,6 +11,8 @@ class InvitationsController < ApplicationController
 
   def new
     @events = future_events
+    @code = Event.find(event_param['id']).code unless event_param.blank?
+    @code ||= ''
     @invitation = InvitationForm.new
   end
 
@@ -28,7 +30,7 @@ class InvitationsController < ApplicationController
   end
 
   def send_invite
-    membership = Membership.find_by_id(membership_param)
+    membership = Membership.find_by_id(membership_param['membership_id'])
     redirect_to root_path,
                 error: 'Membership not found.' and return if membership.nil?
 
@@ -50,7 +52,7 @@ class InvitationsController < ApplicationController
   end
 
   def send_all_invites
-    event = Event.find_by_id(event_param)
+    event = Event.find_by_id(event_param['event_id'])
     redirect_to root_path,
         error: 'Event not found.' and return if event.blank?
 
@@ -118,10 +120,10 @@ class InvitationsController < ApplicationController
   end
 
   def membership_param
-    params['membership_id'].to_i
+    params.permit(:membership_id)
   end
 
   def event_param
-    params['event_id'].to_i
+    params.permit(:id, :event_id)
   end
 end

@@ -48,8 +48,10 @@ class InvitationChecker
         return nil
       end
 
-      SyncEventMembersJob.perform_now(event.id) unless event.nil?
-      sleep 1
+      if !event.nil? && event.start_date > Date.current
+        SyncEventMembersJob.perform_now(event.id)
+        sleep 1
+      end
 
       person = Person.where(legacy_id: response['legacy_id'].to_i).first
       if person.nil?

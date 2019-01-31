@@ -390,6 +390,8 @@ RSpec.describe MembershipsController, type: :controller do
           before do
             @user.role = :member
             @user.person = @membership.person
+            @user.email = @membership.person.email
+            @user.skip_reconfirmation!
             @user.save
             @membership.role = 'Participant'
             @membership.save
@@ -411,13 +413,17 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'updates user email, signs out with flash message' do
-            params_email = @params['membership']['person_attributes'][:email]
+            params_email = 'new@email.com'
+            @params['membership']['person_attributes'][:email] = params_email
             expect(@user.email).not_to eq(params_email)
+            expect(@user.email).to eq(@membership.person.email)
 
             patch :update, params: @params
 
             expect(response).to redirect_to(sign_in_path)
             expect(flash[:notice]).to include('Please verify')
+            expect(Person.find(@person.id).email).to eq(params_email)
+            expect(User.find(@user.id).pending_reconfirmation?).to be_truthy
           end
 
           it 'allows updating person fields' do
