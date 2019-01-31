@@ -61,10 +61,19 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
   ./nginx.conf.erb.example
   ./Passengerfile.json.example
   ```
-3. Read the instructions at the top of docker-compose.yml (to create data-containers, if desired)
-4. Edit the lib/tasks/ws.rake file to change default user account information, noting passwords.
-5. Run `docker-compose up` (or possibly `docker build .` first)
-6. Login to the web interface, and visit /settings. Update the Site settings with correct info.
+  Bash command to copy them all to new names:
+  ```
+  for file in `ls -1 *.example`; do newfile=`echo $file | sed 's/\.example$//'`; cp $file $newfile; done
+  ```
+3. Edit docker-compose.yml to set your preferred usernames and password in the environment variables. Note the instructions
+   at the top for creating data containers, for storing database and ruby gems.
+
+   The first time the database container is run, databases and database accounts will be created via the script at
+   ./db/pg-init/init-user-db.sh. It uses the environment variables that you set in docker-compose.yml.
+4. Edit the lib/tasks/ws.rake file to change default user account information, setting your own passwords.
+5. Run `docker-compose up` (or possibly `docker build .` first).
+6. Login to the web interface (http://localhost) with your admin account, and visit /settings (click the drop-down menu in the
+   to-right and choose "Settings"). Update the Site settings with your preferences.
 
 After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out some of it, such as running migrations, updating RVM, etc..
 
