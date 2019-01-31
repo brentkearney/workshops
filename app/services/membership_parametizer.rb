@@ -15,14 +15,13 @@ class MembershipParametizer
     @membership = membership
     @current_user = current_user
     @person_data = @form_data.delete(:person_attributes)
-
     update_membership
     update_person
   end
 
   def update_membership
     db_member = Membership.find(@membership.id)
-    db_member.assign_attributes(cleaned_data(@form_data))
+    db_member.assign_attributes(@form_data)
     if db_member.changed?
       @form_data['updated_by'] = @current_user.name
       update_role?(db_member)
@@ -62,21 +61,20 @@ class MembershipParametizer
     new_email = @person_data.delete(:email)
     sync = SyncPerson.new(@membership.person, new_email)
     if sync.has_conflict?
-      @verify_email = true
-      SyncPerson.new(@membership.person, new_email).change_email
-      @person_data = cleaned_data(@person_data)
-                       .merge(email: @membership.person.email)
+      if @current_user.person_id == @membership.person_id
+        @verify_email = true # forward to confirmation form
+        sync.change_email    # adds ConfirmEmailChange record
+        @person_data['email'] = @membership.person.email
+      else
+        @person_data['email'] = new_email
+      end
     else
-      update_user_email(new_email)
+      update_user_email(new_email) # sends reconfirmation email
       person = sync.change_email
-      @person_data = person.attributes.merge(cleaned_data(@person_data))
+      @person_data = person.attributes.merge(@person_data)
       @person_data['id'] = person.id
       @membership.person_id = person.id
     end
-  end
-
-  def cleaned_data(attribs)
-    attribs.delete_if { |k, v| v.empty? }
   end
 
   def update_user_email(new_email)
