@@ -45,7 +45,7 @@ class SyncPerson
   end
 
   def find_other_person
-    Person.where(email: new_email).where.not(id: @person.id).first
+    Person.where(email: @new_email).where.not(id: @person.id).first
   end
 
   def has_conflict?
@@ -74,19 +74,25 @@ class SyncPerson
       replace_person(replace: @person, replace_with: other_person)
       @person = other_person
     else
-      begin
-        ConfirmEmailChange.create!(replace_person: @person,
-                                   replace_with: other_person).send_email
-      rescue ActiveRecord::RecordInvalid => e
-        return @person if e.message =~ /Validation failed/
-        msg = { problem: 'Unable to create! new ConfirmEmailChange',
-                source: 'SyncPerson.change_email',
-                person: "#{@person.name} (id: #{@person.id}",
-                error: e.inspect }
-        StaffMailer.notify_sysadmin(nil, msg).deliver_now
-      end
+      create_change_confirmation(@person, other_person)
     end
+
     @person
+  end
+
+  def create_change_confirmation(person, replace_with)
+    begin
+      ConfirmEmailChange.create!(replace_person: person,
+                                 replace_with: replace_with).send_email
+    rescue ActiveRecord::RecordInvalid => e
+      return person if e.message =~ /Validation failed/
+      msg = { problem: 'Unable to create! new ConfirmEmailChange',
+              source: 'SyncPerson.create_change_confirmation',
+              person: "#{person.name} (id: #{person.id}",
+              replace_with: "#{replace_with.name} (id: #{replace_with.id}",
+              error: e.inspect }
+      StaffMailer.notify_sysadmin(nil, msg).deliver_now
+    end
   end
 
   def confirmed_email_change(confirmation)

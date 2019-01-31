@@ -63,7 +63,8 @@ class MembershipParametizer
     if sync.has_conflict?
       if @current_user.person_id == @membership.person_id
         @verify_email = true # forward to confirmation form
-        sync.change_email    # adds ConfirmEmailChange record
+        sync.create_change_confirmation(sync.find_other_person,
+                                        @membership.person)
         @person_data['email'] = @membership.person.email
       else
         @person_data['email'] = new_email

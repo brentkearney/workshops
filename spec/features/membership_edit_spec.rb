@@ -296,8 +296,8 @@ describe 'Membership#edit', type: :feature do
       expect(active_job[:job]).to eq(ConfirmEmailReplacementJob)
 
       confirmation = ConfirmEmailChange.find(active_job[:args].first)
-      expect(confirmation.replace_email).to eq(old_email)
-      expect(confirmation.replace_with_email).to eq(new_email)
+      expect(confirmation.replace_email).to eq(new_email)
+      expect(confirmation.replace_with_email).to eq(old_email)
     end
 
 
