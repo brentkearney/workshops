@@ -73,9 +73,10 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
 4. Edit the lib/tasks/ws.rake file to change default user account information, setting your own passwords.
 5. Run `docker-compose up` (or possibly `docker build .` first).
 6. Login to the web interface (http://localhost) with your admin account, and visit /settings (click the drop-down menu in the
-   to-right and choose "Settings"). Update the Site settings with your preferences.
+   top-right and choose "Settings"). Update the Site settings with your preferences.
 
-After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out some of it, such as running migrations, updating RVM, etc..
+After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out some of it, such as
+creating the gemset, adding default settings, and creating admin accounts. Change the `bundle install` to `bundle update`.
 
 
 
