@@ -38,14 +38,15 @@ Installation instructions are below.
 ### Upcoming Features:
 * Staff and Organizers can add members to their workshop (currently participants are added by external program and imported via API).
 * After-event feedback forms - automatically mail participants after an event, with one-click URL for providing feedback on the event.
-* API integration with the Visual One room booking software, used by many hotels and conference centers, for automatic room booking.
+* Drag & drop interface for scheduling features.
 * Staff can assign hotel rooms, generate reports for hotel room bookings, and manage other hospitality details for workshop participants.
-* Task scheduler, to allow automated performance of tasks such as reminder emails for participants to RSVP, room booking tasks, etc..
+* Task scheduler, to allow automated performance of tasks such as reminder emails for participants to RSVP, after event feedback requests, etc.
 * Staff and admin can create new events (currently they're imported via API).
 * Admin users can manage other users (add/remove/change passwords, etc) - currently they can only change their own passwords.
-* Drag & drop interface for scheduling features.
 * When organizers schedule a participant to give a talk, members optionally get notified with a link to fill in the talk title and abstract.
-* Addition of a forum/mail list software for each workshop, such as [Discourse](http://www.discourse.org).
+* Interface for managing Lectures, so participants can easily view all of the talks they've recorded, sign consent forms, add slides files, update abstracts.
+* API integration with the Visual One room booking software, used by many hotels and conference centers, for automatic room booking.
+* Addition of integrated forum software for each workshop, such as [Discourse](http://www.discourse.org), or possiblly Slack-alternative [Mattermost](https://mattermost.com).
 * Crowd-sourcing feature for workshop participants to post open problems to the public, soliciting solutions.
 
 
@@ -61,13 +62,26 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
   ./nginx.conf.erb.example
   ./Passengerfile.json.example
   ```
-3. Read the instructions at the top of docker-compose.yml (to create data-containers, if desired)
-4. Edit the lib/tasks/ws.rake file to change default user account information, noting passwords.
-5. Run `docker-compose up` (or possibly `docker build .` first)
-6. Login to the web interface, and visit /settings. Update the Site settings with correct info.
+  Bash command to copy them all to new names:
+  ```
+  for file in `ls -1 *.example`; do newfile=`echo $file | sed 's/\.example$//'`; cp $file $newfile; done
+  ```
+3. Edit docker-compose.yml to set your preferred usernames and password in the environment variables. Note the instructions
+   at the top for creating data containers, for storing database and ruby gems.
 
-After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out some of it, such as running migrations, updating RVM, etc..
+   The first time the database container is run, databases and database accounts will be created via the script at
+   ./db/pg-init/init-user-db.sh. It uses the environment variables that you set in docker-compose.yml.
+4. Edit the lib/tasks/ws.rake file to change default user account information, setting your own passwords.
+5. If you want your instance to be accessible at a domain, edit nginx.conf.erb to change `server_name YOUR.HOSTNAME.COM;`.
+6. Run `docker-compose up` (or possibly `docker build .` first).
+7. Login to the web interface (http://localhost) with your admin account, and visit /settings (click the drop-down menu in the
+   top-right and choose "Settings"). Update the Site settings with your preferences.
 
+After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out some of it, such as
+creating the gemset, adding default settings, and creating admin accounts. Change the `bundle install` to `bundle update`.
+
+The config files are setup to run Rails in development mode. If you would like to change it to production, edit the entrypoint.sh
+to change all of the `RAILS_ENV=development` statements, and the Passengerfile.json `"environment": "development"` line.
 
 
 ### License:
