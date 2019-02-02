@@ -178,8 +178,8 @@ module Syncable
       l.update(person: replace_with)
     end
 
-    if User.where(person_id: replace_with.id).blank?
-      user_account = User.where(person_id: replace.id).first
+    if User.find_by_person_id(replace_with.id).blank?
+      user_account = User.find_by_person_id(replace.id)
       unless user_account.nil?
         user_account.person = replace_with
         user_account.email = replace_with.email

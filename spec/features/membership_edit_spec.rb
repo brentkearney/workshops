@@ -270,7 +270,7 @@ describe 'Membership#edit', type: :feature do
 
     it 'changing email to an email of another record with a different name
           updates original record, creates a new ConfirmEmailChange, and
-          forwards to people#email_change'.squish do
+          forwards to #email_change'.squish do
       assign_participant_email_to_user
       other_person = create(:person)
       old_email = @participant.person.email
@@ -288,18 +288,91 @@ describe 'Membership#edit', type: :feature do
       expect(updated.person.biography).to eq('Yes.')
       expect(updated.person.email).to eq(old_email)
 
-      newpath = person_email_change_path(updated.person)
-      expect(current_path).to eq(newpath)
-
       expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).not_to eq 0
       active_job = ActiveJob::Base.queue_adapter.enqueued_jobs.first
       expect(active_job[:job]).to eq(ConfirmEmailReplacementJob)
 
       confirmation = ConfirmEmailChange.find(active_job[:args].first)
-      expect(confirmation.replace_email).to eq(new_email)
-      expect(confirmation.replace_with_email).to eq(old_email)
+      expect(confirmation.replace_email).to eq(old_email)
+      expect(confirmation.replace_with_email).to eq(new_email)
+
+      email_path = event_membership_email_change_path(@event, @participant)
+      expect(current_path).to eq(email_path)
+      expect(page.body).to have_text('there is an email conflict')
     end
 
+    context '#email_change form' do
+      before do
+        assign_participant_email_to_user
+        @other_person = create(:person)
+        @old_email = @participant.person.email
+        @new_email = @other_person.email
+
+        visit edit_event_membership_path(@event, @participant)
+        fill_in 'membership_person_attributes_email', with: @new_email
+        click_button 'Update Member'
+        email_path = event_membership_email_change_path(@event, @participant)
+        expect(current_path).to eq(email_path)
+        @confirm = ConfirmEmailChange.where(replace_person_id: @other_person.id,
+                    replace_with_id: @participant.person_id).first
+        expect(@confirm).not_to be_blank
+      end
+
+      it 'displays the correct emails and input forms' do
+        expected_text = "There is another record in our database using
+          #{@new_email}".squish
+        expect(page).to have_text(expected_text)
+        expect(page).to have_text("Verification code for #{@old_email}")
+        expect(page).to have_text("Verification code for #{@new_email}")
+        expect(page).to have_field('email_form[replace_email_code]')
+        expect(page).to have_field('email_form[replace_with_email_code]')
+        expect(page).to have_link('Cancel Email Change')
+      end
+
+      it 'validates confirmation codes' do
+        fill_in 'email_form[replace_email_code]', with: @confirm.replace_code
+        fill_in 'email_form[replace_with_email_code]', with: 'wrong code'
+        click_button 'Submit Verification Codes'
+        error_message = 'At least one of the submitted codes is invalid'
+        expect(page).to have_text(error_message)
+
+        fill_in 'email_form[replace_email_code]', with: 'wrong code'
+        fill_in 'email_form[replace_with_email_code]',
+          with: @confirm.replace_with_code
+        click_button 'Submit Verification Codes'
+        expect(page).to have_text(error_message)
+      end
+
+      it 'correct codes: sets confirmation = true' do
+        fill_in 'email_form[replace_email_code]', with: @confirm.replace_code
+        fill_in 'email_form[replace_with_email_code]',
+                                                with: @confirm.replace_with_code
+        click_button 'Submit Verification Codes'
+
+        updated = ConfirmEmailChange.find(@confirm.id)
+        expect(updated.confirmed).to be_truthy
+      end
+
+      it 'correct codes: merges updated person record into other record, with
+        new email address' do
+        fill_in 'email_form[replace_email_code]', with: @confirm.replace_code
+        fill_in 'email_form[replace_with_email_code]',
+                                                with: @confirm.replace_with_code
+        click_button 'Submit Verification Codes'
+
+        expect(Person.find_by_id(@other_person.id)).to be_blank
+        updated = Person.find(@participant.person_id)
+        expect(updated.email).to eq(@new_email)
+      end
+
+      it 'deletes ConfirmEmailChange if cancel button clicked' do
+        click_link 'Cancel Email Change'
+        expect(ConfirmEmailChange.find_by_id(@confirm.id)).to be_blank
+        expect(current_path).to eq(event_membership_path(@participant.event,
+                                                         @participant))
+        expect(page).to have_text('Email change cancelled')
+      end
+    end
 
     it 'allows editing of personal info' do
       allows_personal_info_editing(@participant)
