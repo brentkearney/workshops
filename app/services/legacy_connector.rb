@@ -163,6 +163,11 @@ class LegacyConnector
     JSON.parse((RestClient.get "#{@rest_url}/delete_lecture/#{lecture_id}"))
   end
 
+  def delete_member(membership)
+    url = "#{@rest_url}/delete_membership/#{membership['event_id']}"
+    RestClient.post url, membership.to_json, content_type: :json, accept: :json
+  end
+
   def check_rsvp(otp)
     JSON.parse((RestClient.get "#{@rest_url}/check_rsvp/#{otp}"))
   end

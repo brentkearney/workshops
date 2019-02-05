@@ -170,6 +170,7 @@ module Syncable
         Invitation.where(membership: m).each do |i|
           i.update(membership: replace_with_membership)
         end
+        m.sync_memberships = true
         m.delete
       end
     end

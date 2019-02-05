@@ -17,6 +17,7 @@ class Membership < ApplicationRecord
   after_save :update_counter_cache
   after_update :notify_staff
   after_commit :sync_with_legacy
+  before_destroy :delete_on_legacy
   after_destroy :update_counter_cache
 
   validates :event, presence: true
@@ -141,6 +142,12 @@ class Membership < ApplicationRecord
     unless sync_memberships
       SyncMembershipJob.perform_later(id) if update_remote
     end
+  end
+
+  def delete_on_legacy
+    member = { event_id: event.code, legacy_id: person.legacy_id,
+               person_id: person_id, updated_by: updated_by }
+    DeleteMembershipJob.perform_later(member) unless sync_memberships
   end
 
   def notify_staff

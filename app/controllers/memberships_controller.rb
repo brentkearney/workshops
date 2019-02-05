@@ -124,6 +124,7 @@ class MembershipsController < ApplicationController
   # DELETE /events/:event_id/memberships/1.json
   def destroy
     authorize @membership
+    @membership.updated_by = @current_user.name
     @membership.destroy
 
     respond_to do |format|

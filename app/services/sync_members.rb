@@ -83,6 +83,7 @@ class SyncMembers
     remote_emails = remote_members.map { |m| m['Person']['email'] }
 
     Event.find(@event.id).memberships.includes(:person).each do |m|
+      m.sync_memberships = true
       m.destroy unless remote_ids.include?(m.person.legacy_id) ||
         remote_emails.include?(m.person.email)
     end
