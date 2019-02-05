@@ -438,8 +438,8 @@ describe 'Membership#show', type: :feature do
       expect(page).to have_link 'Edit Membership'
     end
 
-    it 'excludes delete button' do
-      expect(page).not_to have_link 'Delete Membership'
+    it 'includes delete button' do
+      expect(page).to have_link 'Delete Membership'
     end
 
     it 'shows other memberships' do

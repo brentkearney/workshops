@@ -80,10 +80,19 @@ class SyncPerson
     @person
   end
 
-  def create_change_confirmation(person, replace_with)
+  def create_change_confirmation(person, replace_with, reverse_emails: false)
     begin
-      ConfirmEmailChange.create!(replace_person: person,
-                                 replace_with: replace_with).send_email
+      params = {
+        replace_person: person,
+        replace_with: replace_with,
+        replace_email: person.email,
+        replace_with_email: replace_with.email
+      }
+      if reverse_emails
+        params.merge!(replace_email: replace_with.email,
+                     replace_with_email: person.email)
+      end
+      confirmation = ConfirmEmailChange.create!(params)
     rescue ActiveRecord::RecordInvalid => e
       return person if e.message =~ /Validation failed/
       msg = { problem: 'Unable to create! new ConfirmEmailChange',
@@ -92,11 +101,14 @@ class SyncPerson
               replace_with: "#{replace_with.name} (id: #{replace_with.id}",
               error: e.inspect }
       StaffMailer.notify_sysadmin(nil, msg).deliver_now
+      return
     end
+    confirmation.send_email
+    confirmation
   end
 
   def confirmed_email_change(confirmation)
     replace_with_person = Person.find(confirmation.replace_with_id)
-    replace_person(replace: person, replace_with: replace_with_person)
+    replace_person(replace: @person, replace_with: replace_with_person)
   end
 end

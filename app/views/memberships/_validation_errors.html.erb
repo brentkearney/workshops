@@ -1,0 +1,14 @@
+<% if @email_form && @email_form.errors.any? %>
+<section id="errors">
+<div class="alert alert-danger">
+  <header>
+    <h3>There is a problem with what you entered:</h3>
+  </header>
+  <ul>
+    <% @email_form.errors.full_messages.each do |message| %>
+      <li><%= message.html_safe %></li>
+    <% end %>
+  </ul>
+</div>
+</section>
+<% end %>

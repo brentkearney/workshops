@@ -8,7 +8,7 @@
 class MembershipsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_event, :set_user
-  before_action :set_membership, only: [:show, :edit, :update, :destroy, :invite]
+  before_action :set_membership, except: [:index, :new, :create]
 
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
@@ -71,7 +71,7 @@ class MembershipsController < ApplicationController
       if @membership.update(member_params.data)
         format.html do
           if member_params.verify_email
-            redirect_to person_email_change_path(@membership.person_id),
+            redirect_to event_membership_email_change_path(@event, @membership),
               warning: 'Membership updated, but there is an email conflict!'
           elsif member_params.new_user_email?
             sign_out @current_user
@@ -96,10 +96,35 @@ class MembershipsController < ApplicationController
     end
   end
 
+  def email_change
+    @confirmation = ConfirmEmailChange.where(replace_with_id:
+                                             @membership.person_id).first
+    if @confirmation.nil?
+      redirect_to event_membership_path(@membership.event, @membership),
+        error: 'No email change confirmation record found.' and return
+    end
+    person = Person.find_by_id(@confirmation.replace_person_id) ||
+             @membership.person
+    @email_form = EmailForm.new(person)
+
+    if request.post? && @email_form.verify_email_change(confirm_email_params)
+      redirect_to event_membership_path(@membership.event, @membership),
+        success: 'Email changed and records consolidated!'
+    end
+  end
+
+  def cancel_email_change
+    ConfirmEmailChange.where(replace_with_id: @membership.person_id)
+                      .first.delete
+    redirect_to event_membership_path(@membership.event, @membership),
+        success: 'Email change cancelled.'
+  end
+
   # DELETE /events/:event_id/memberships/1
   # DELETE /events/:event_id/memberships/1.json
   def destroy
     authorize @membership
+    @membership.updated_by = @current_user.name
     @membership.destroy
 
     respond_to do |format|
@@ -114,18 +139,18 @@ class MembershipsController < ApplicationController
   private
 
   def assign_buttons
-     organizers = @memberships.values[0].nil? ? '' : select_organizers
-     @organizer_emails = map_emails(organizers)
-   end
+    organizers = @memberships.values[0].nil? ? '' : select_organizers
+    @organizer_emails = map_emails(organizers)
+  end
 
-   def map_emails(members)
-     return [] if members.blank?
-     members.map { |m| "\"#{m.person.name}\" <#{m.person.email}>" }
-   end
+  def map_emails(members)
+    return [] if members.blank?
+    members.map { |m| "\"#{m.person.name}\" <#{m.person.email}>" }
+  end
 
-   def select_organizers
-     @memberships.values[0].select { |m| m.role =~ /Organizer/ }
-   end
+  def select_organizers
+    @memberships.values[0].select { |m| m.role =~ /Organizer/ }
+  end
 
   def other_memberships
     memberships = []
@@ -141,7 +166,8 @@ class MembershipsController < ApplicationController
   end
 
   def set_membership
-    @membership = Membership.find(params[:id])
+    membership_id = (params[:id] || params[:membership_id]).to_i
+    @membership = Membership.find(membership_id)
   rescue ActiveRecord::RecordNotFound
     redirect_to event_memberships_path(@event), error: 'Member not found.'
   end
@@ -154,5 +180,10 @@ class MembershipsController < ApplicationController
     @membership = Membership.new(event: @event) if @membership.nil?
     allowed_fields = policy(@membership).allowed_fields?
     params.require(:membership).permit(allowed_fields)
+  end
+
+  def confirm_email_params
+    params.require(:email_form).permit(:person_id, :replace_email_code,
+                                       :replace_with_email_code)
   end
 end

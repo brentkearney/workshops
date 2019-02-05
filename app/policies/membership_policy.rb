@@ -102,7 +102,7 @@ class MembershipPolicy
   end
 
   def delete_membership?
-    staff_and_admins
+    organizer_and_staff
   end
 
   def edit_role?
@@ -178,7 +178,8 @@ class MembershipPolicy
 
   def organizer?
     return false if @current_user.nil? || @event.nil?
-    @current_user.is_organizer?(@event)
+    isorg = @current_user.is_organizer?(@event)
+    isorg
   end
 
   def staff_and_admins

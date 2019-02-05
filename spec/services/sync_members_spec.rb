@@ -403,10 +403,6 @@ describe "SyncMembers" do
         @lc = FakeLegacyConnector.new
       end
 
-      after do
-        @event.memberships.destroy_all
-      end
-
       it 'saves the Membership and logs a message' do
         fields = { lastname: 'Smith' }
         allow(@lc).to receive(:get_members).with(@event)

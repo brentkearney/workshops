@@ -229,17 +229,7 @@
 		<div class="col-sm-3">
 			<%= show_attendances(f) %>
 		</div>
-		<div class="col-sm-3">
-			<% if policy(@membership).edit_attendance? &&
-				    @membership.role != 'Backup Participant' %>
-				<%= link_to "Send Invitation",
-					invitations_send_path(@membership),
-					data: { confirm: "Are you sure you want to send
-						#{@membership.person.name} an invitation email?".squish },
-					class: 'btn btn-sm btn-default' %>
-			<% end %>
-		</div>
-		<div class="col-sm-9"></div>
+		<div class="col-sm-6"></div>
 	</div>
 <% end %>
 

@@ -1,17 +1,12 @@
-Dear <%= @person.name %>,
+Dear <%= @replace_person.name %>,
 
-To confirm your intention to change your email address in the BIRS database to
-<%= @replace_with_email %>, and thereby merge all of the data (such as workshop
-memberships) from the <%= @person.email %> record into the <%= @replace_with_email %>
-record, please enter the following code into the form you were shown:
+To confirm your intention to merge all of the data (such as workshop memberships) between the records associated with <%= @replace_email %> and <%= @replace_with_email %>, please enter the following code into the form you were shown:
 
-Verification code for <%= @person.email %>: <%= @verification_code %>
+Verification code for <%= @replace_email %>: <%= @replace_code %>
 
-You will also need to verify that you control the <%= @replace_with_email %>
-account by entering the code sent to that address.
+You will also need to verify that you control the <%= @replace_with_email %> account by entering the code sent to that address.
 
-If you did not request this change of your email, please reply to this message
-to let us know.
+If you did not request this change of your email, please reply to this message to let us know.
 
 Thank you,
 Banff International Research Station

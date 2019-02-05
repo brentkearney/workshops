@@ -61,14 +61,8 @@ class MembershipParametizer
     new_email = @person_data.delete(:email)
     sync = SyncPerson.new(@membership.person, new_email)
     if sync.has_conflict?
-      if @current_user.person_id == @membership.person_id
-        @verify_email = true # forward to confirmation form
-        sync.create_change_confirmation(sync.find_other_person,
-                                        @membership.person)
-        @person_data['email'] = @membership.person.email
-      else
-        @person_data['email'] = new_email
-      end
+      create_email_change_confirmation(sync) ||
+        @person_data['email'] = new_email # create validation error
     else
       update_user_email(new_email) # sends reconfirmation email
       person = sync.change_email
@@ -76,6 +70,15 @@ class MembershipParametizer
       @person_data['id'] = person.id
       @membership.person_id = person.id
     end
+  end
+
+  def create_email_change_confirmation(sync)
+    return unless @current_user.person_id == @membership.person_id
+    @verify_email = true # forward to email confirmation form
+    sync.create_change_confirmation(sync.find_other_person,
+                                    @membership.person,
+                                    reverse_emails: true)
+    @person_data['email'] = @membership.person.email
   end
 
   def update_user_email(new_email)

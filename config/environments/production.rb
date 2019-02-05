@@ -90,7 +90,7 @@ Rails.application.configure do
     config.logger = ActiveSupport::TaggedLogging.new(logger)
   end
 
-  ## SMTP Settings - depreciated?
+  ## SMTP Settings
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :sparkpost
   config.action_mailer.smtp_settings = {

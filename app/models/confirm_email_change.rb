@@ -27,7 +27,7 @@ class ConfirmEmailChange < ApplicationRecord
   has_many :people
   validates :replace_person, presence: true
   validates :replace_with, presence: true
-  validate :already_exists?, on: :create
+  # validate :already_exists?, on: :create
 
   after_initialize :generate_codes
   before_save :set_values
@@ -50,10 +50,10 @@ class ConfirmEmailChange < ApplicationRecord
   end
 
   def set_values
-    self.replace_person_id = replace_person.id
-    self.replace_email = replace_person.email
-    self.replace_with_id = replace_with.id
-    self.replace_with_email = replace_with.email
+    self.replace_person_id ||= replace_person.id
+    self.replace_email ||= replace_person.email
+    self.replace_with_id ||= replace_with.id
+    self.replace_with_email ||= replace_with.email
   end
 
   def send_email

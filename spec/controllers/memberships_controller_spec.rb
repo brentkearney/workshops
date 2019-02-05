@@ -412,7 +412,7 @@ RSpec.describe MembershipsController, type: :controller do
             expect(flash[:notice]).to eq('Membership successfully updated.')
           end
 
-          it 'updates user email, signs out with flash message' do
+          it 'updates User email, signs out with flash message' do
             params_email = 'new@email.com'
             @params['membership']['person_attributes'][:email] = params_email
             expect(@user.email).not_to eq(params_email)

@@ -50,7 +50,7 @@ Installation instructions are below.
 * Crowd-sourcing feature for workshop participants to post open problems to the public, soliciting solutions.
 
 
-### Installation Instructions:
+## Installation Instructions:
 The application is setup to work in a [Docker](http://www.docker.com) container.
 
 1. Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
@@ -66,22 +66,25 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
   ```
   for file in `ls -1 *.example`; do newfile=`echo $file | sed 's/\.example$//'`; cp $file $newfile; done
   ```
-3. Edit docker-compose.yml to set your preferred usernames and password in the environment variables. Note the instructions
-   at the top for creating data containers, for storing database and ruby gems.
+3. Edit docker-compose.yml to set your preferred usernames and passwords in the environment variables. Note the instructions
+   at the top for creating data containers, for storing database and ruby gems persistently.
 
    The first time the database container is run, databases and database accounts will be created via the script at
    ./db/pg-init/init-user-db.sh. It uses the environment variables that you set in docker-compose.yml.
-4. Edit the lib/tasks/ws.rake file to change default user account information, setting your own passwords.
+4. Edit the lib/tasks/ws.rake file to change default user account information, to set your own credentials for logging into
+    the Workshops web interface.
 5. If you want your instance to be accessible at a domain, edit nginx.conf.erb to change `server_name YOUR.HOSTNAME.COM;`.
 6. Run `docker-compose up` (or possibly `docker build .` first).
-7. Login to the web interface (http://localhost) with your admin account, and visit /settings (click the drop-down menu in the
-   top-right and choose "Settings"). Update the Site settings with your preferences.
+7. Login to the web interface (http://localhost) with the account you setup in ws.rake, and visit /settings (click the
+  drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
 
 After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out some of it, such as
 creating the gemset, adding default settings, and creating admin accounts. Change the `bundle install` to `bundle update`.
 
 The config files are setup to run Rails in development mode. If you would like to change it to production, edit the entrypoint.sh
 to change all of the `RAILS_ENV=development` statements, and the Passengerfile.json `"environment": "development"` line.
+
+It is currently configured to use [Sparkpost](https://www.sparkpost.com) for mail delivery, in production mode. If you're not using Sparkpost, edit the `config/environments/production.rb` file and adjust the [ActionMailer settings](https://guides.rubyonrails.org/v4.0.0/configuring.html#configuring-action-mailer) to your preference.
 
 
 ### License:

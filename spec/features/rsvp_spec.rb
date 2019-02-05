@@ -357,6 +357,7 @@ describe 'RSVP', type: :feature do
         reset_database
         @other_person = create(:person, email: 'foo@bar.com')
         allow(SyncMember).to receive(:new).with(@membership)
+        expect(@membership.person.email).not_to eq('foo@bar.com')
 
         visit rsvp_email_path(@invitation.code)
         fill_in 'email_form_person_email', with: 'foo@bar.com'
@@ -394,8 +395,11 @@ describe 'RSVP', type: :feature do
         click_button("Submit Verification Codes")
 
         expect(Person.find_by_id(person.id)).to be_nil
-        expect(Membership.find(@membership.id).person).to eq(@other_person)
+        updated = Membership.find(@membership.id).person
+        expect(updated).to eq(@other_person)
+        expect(updated.email).to eq('foo@bar.com')
         expect(current_path).to eq(rsvp_yes_path(@invitation.code))
+        expect(page).to have_text('E-mail updated')
       end
     end
 

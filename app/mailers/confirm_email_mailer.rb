@@ -26,14 +26,28 @@ class ConfirmEmailMailer < ApplicationMailer
 
   def send_msg(confirm_id, mode: 'replace')
     confirm = ConfirmEmailChange.find(confirm_id)
-    @replace_email = confirm.replace_email
-    @replace_with_email = confirm.replace_with_email
+    @replace_person = Person.find_by_id(confirm.replace_person_id)
+    @replace_with_person = Person.find_by_id(confirm.replace_with_id)
 
-    person_id = mode == 'replace' ? 'replace_person_id' : 'replace_with_id'
-    @person = Person.find("#{confirm.send(person_id)}")
-    @verification_code = confirm.send(mode + '_code')
+    # If invoked from the membership#edit form, these are reversed
+    if @replace_person.email != confirm.replace_email
+      @replace_email = confirm.replace_with_email
+      @replace_code = confirm.replace_with_code
+    else
+      @replace_email =  confirm.replace_email
+      @replace_code = confirm.replace_code
+    end
 
-    to_email = %Q("#{@person.name}" <#{@person.email}>)
+    if @replace_with_person.email != confirm.replace_with_email
+      @replace_with_email = confirm.replace_email
+      @replace_with_code = confirm.replace_code
+    else
+      @replace_with_email = confirm.replace_with_email
+      @replace_with_code = confirm.replace_with_code
+    end
+
+    person = mode == 'replace' ? @replace_person : @replace_with_person
+    to_email = %Q("#{person.name}" <#{person.email}>)
     subject = "BIRS email change confirmation"
 
     mail(to: to_email, subject: subject, template_name: mode)
