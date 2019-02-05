@@ -81,11 +81,9 @@ class InvitationsController < ApplicationController
       members.each do |membership|
         membership.person.member_import = true # skip validations on save
         send_invitation(membership, current_user.name)
-        sent_to << membership.person.name + ', '
       end
-      sent_to.gsub!(/, \z/, '')
       redirect_to event_memberships_path(event),
-                  success: "Invitations were sent to: #{sent_to}."
+        success: "Invitations were sent to: #{members.size} participants."
     end
   end
 
