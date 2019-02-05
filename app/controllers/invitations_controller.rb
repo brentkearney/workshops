@@ -42,8 +42,10 @@ class InvitationsController < ApplicationController
     end
 
     unless is_reinvite?(membership)
-      redirect_to event_memberships_path(event),
-        error: 'This event is already full.' and return if event_full?(event)
+      if event_full?(event, [membership])
+        redirect_to event_memberships_path(event),
+          error: 'This event is already full.' and return
+      end
     end
 
     pause_membership_syncing(event)
@@ -94,7 +96,7 @@ class InvitationsController < ApplicationController
   end
 
   def event_full?(event, members=[])
-    event.num_invited_participants + members.count >= event.max_participants
+    event.num_invited_participants + members.count > event.max_participants
   end
 
   def pause_membership_syncing(event)
