@@ -1,4 +1,5 @@
-# Copyright (c) 2016 Banff International Research Station.
+# ./app/controllers/invitations_controller.rb
+# Copyright (c) 2019 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
@@ -93,7 +94,7 @@ class InvitationsController < ApplicationController
   end
 
   def event_full?(event, members=[])
-    event.num_invited_participants + members.count > event.max_participants
+    event.num_invited_participants + members.count >= event.max_participants
   end
 
   def pause_membership_syncing(event)

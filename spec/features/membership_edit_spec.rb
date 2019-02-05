@@ -416,10 +416,6 @@ describe 'Membership#edit', type: :feature do
     it 'hides hotel & billing fields' do
       disallows_hotel_fields
     end
-
-    it 'has no send invitation link' do
-      expect(page.body).not_to have_link 'Send Invitation'
-    end
   end
 
   context 'As an organizer of the event' do
@@ -590,21 +586,6 @@ describe 'Membership#edit', type: :feature do
     it 'hides hotel & billing fields' do
       disallows_hotel_fields
     end
-
-    it 'has send invitation link' do
-      expect(page.body).to have_link 'Send Invitation'
-    end
-
-    it 'has no send invitation link if role is Backup Participant' do
-      @participant.role = 'Backup Participant'
-      @participant.save
-
-      visit edit_event_membership_path(@event, @participant)
-
-      expect(page.body).not_to have_link 'Send Invitation'
-      @participant.role = 'Participant'
-      @participant.save
-    end
   end
 
   context 'As a staff user at a different location' do
@@ -699,10 +680,6 @@ describe 'Membership#edit', type: :feature do
       allows_billing_info_editing(@participant)
     end
 
-    it 'has send invitation link' do
-      expect(page.body).to have_link 'Send Invitation'
-    end
-
     it 'updates legacy database with changes' do
       allow(SyncMembershipJob).to receive(:perform_later)
 
@@ -749,10 +726,6 @@ describe 'Membership#edit', type: :feature do
 
     it 'allows editing of membership info' do
       allows_membership_info_editing(@participant)
-    end
-
-    it 'has send invitation link' do
-      expect(page.body).to have_link 'Send Invitation'
     end
 
     it 'allows organizer notes' do
