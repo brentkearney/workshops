@@ -12,7 +12,7 @@ class Membership < ApplicationRecord
   belongs_to :event
   belongs_to :person
   accepts_nested_attributes_for :person
-  has_one :invitation, dependent: :destroy
+  has_one :invitation, dependent: :delete
 
   after_save :update_counter_cache
   after_update :notify_staff
