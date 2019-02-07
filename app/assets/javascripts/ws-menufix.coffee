@@ -14,6 +14,10 @@ $(document).on 'turbolinks:load', ->
     $('li#event-years').each (index, element) =>
       $(element).removeClass('active')
 
+  $('a#event-members-link').click ->
+    $('li#event-memberships').each (index, element) =>
+      $(element).removeClass('active')
+
     $('span#locations-arrow').toggleClass('arrow')
     $('span#locations-arrow').toggleClass('arrow-down')
 
@@ -29,7 +33,10 @@ $(document).on 'turbolinks:load', ->
   else if path.match(/events\/(.+)\/schedule/)
       $('li#event-schedule').addClass('active')
   else if path.match(/events\/(.+)\/memberships/)
-      $('li#event-memberships').addClass('active')
+      $('li#event-members-list').addClass('active')
+      if path.match((/events\/(.+)\/memberships\/add/))
+        $('li#event-members-list').removeClass('active')
+        $('li#event-members-add').addClass('active')
   else if path.match(/events\/(.+)$/)
       $('li#event-details').addClass('active')
 

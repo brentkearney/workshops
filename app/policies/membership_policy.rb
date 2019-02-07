@@ -87,6 +87,10 @@ class MembershipPolicy
     self_organizer_staff
   end
 
+  def add_members?
+    organizer_and_staff
+  end
+
   def show_email_address?
     return false if @current_user.nil?
     organizer_and_staff ||

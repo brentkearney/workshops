@@ -30,7 +30,6 @@ a {
 }
 
 
-
 /* Header area */
 .navbar-top-links a {
   color: inherit;
@@ -147,6 +146,12 @@ li.spacer {
 li.rightside {
 	float: right;
 	text-align: right;
+}
+
+.nav-second-level .memberships {
+  li a {
+    margin-left: 20px;
+  }
 }
 
 /* centered columns styles */

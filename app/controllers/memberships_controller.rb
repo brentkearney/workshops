@@ -8,7 +8,7 @@
 class MembershipsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_event, :set_user
-  before_action :set_membership, except: [:index, :new, :create]
+  before_action :set_membership, except: [:index, :new, :create, :add]
 
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
@@ -30,7 +30,14 @@ class MembershipsController < ApplicationController
 
   # GET /events/:event_id/memberships/new
   def new
-    @membership = Membership.new
+    @membership = Membership.new(event: @event)
+    authorize @membership
+  end
+
+  # GET /events/:event_id/memberships/add
+  # POST /events/:event_id/memberships/add
+  def add
+    @membership = Membership.new(event: @event)
     authorize @membership
   end
 
