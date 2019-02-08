@@ -1,4 +1,4 @@
-# app/models/rsvp_form.rb
+# app/forms/rsvp_form.rb
 #
 # Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under

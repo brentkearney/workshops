@@ -8,7 +8,8 @@
 class MembershipsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_event, :set_user
-  before_action :set_membership, except: [:index, :new, :create, :add]
+  before_action :set_membership, except: [:index, :new, :create, :add,
+    :process_new]
 
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
@@ -35,10 +36,17 @@ class MembershipsController < ApplicationController
   end
 
   # GET /events/:event_id/memberships/add
-  # POST /events/:event_id/memberships/add
   def add
     @membership = Membership.new(event: @event)
     authorize @membership
+
+    @add_members = AddMembersForm.new(@event)
+  end
+
+  # POST /events/:event_id/memberships/process_new
+  def process_new
+    Rails.logger.debug "\n\nprocess_new:\n members: #{params['add_members']}\n"
+    Rails.logger.debug "backup: #{params['backup_participants']}\n\n"
   end
 
   # GET /events/:event_id/memberships/1/edit

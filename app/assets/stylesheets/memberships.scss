@@ -103,6 +103,28 @@ td.invite-buttons {
   }
 }
 
+#add-members {
+  p {
+    margin: 0.8em 0;
+  }
+  .inline-checkbox {
+    margin-top: 10px;
+    margin-left: 5px;
+    p {
+      font-size: 1.2em;
+      display: inline;
+      margin-left: 5px;
+    }
+    .checkbox {
+      margin-bottom: 12px;
+      display: inline;
+    }
+  }
+  #add-members-submit {
+    margin-top: 20px;
+  }
+}
+
 @media print {
     .no-print { display:none }
     a[href]:after {

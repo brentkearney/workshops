@@ -1,10 +1,38 @@
 <h1>Add Members to <%= @event.code %></h1>
 
-<p>Enter the email addresses of the people you wish to add to the workshop. You can enter the email addresses one per line, or separated by commas, and/or by spaces. If they match with records in our database, they will be added. Otherwise, you will be presented with a form for additional information, such as their name(s).</p>
-
-<form>
-  <textarea width="100%">
-  </textarea>
-  <br />
-  <input type="submit" name="submit" value="Submit" />
-</form>
+<div class="panel-body" id="add-members">
+  <div class="row">
+    <div class="col-md-12">
+      <p>In the space below, enter at least the email addresses of the people you wish to add to the workshop, one per line. Optionally also include their name, gender, and affiliation, like so:</p>
+      <blockquote>
+        alice_fang@sfu.ca, Fang, Alice, F, Simon Fraser University<br>
+        john.smith@ubc.ca<br>
+        rgupta@mit.edu, Gupta, Rajesh
+      </blockquote>
+      <p>If the email addresses match records in our database, they will be added as "Not Yet Invited" members. Otherwise, you will be presented with a form for additional information, if necessary, such as their name(s), genders, and affiliations.</p>
+      <p>Once members are added, then you can send them invitations to attend the workshop. If you wish to add them
+      as "Backup Participants", which are excluded from mass-invitations, then select the "Add as Backup Participant" checkbox.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+    <%= form_with model: @add_members, url: add_event_memberships_path(@event),
+                         class: 'form', role: 'form' do |form| %>
+    <%= form.text_area :add_members, rows: 6, class: 'form-control', placeholder:
+                 "john.smith@ubc.ca, Smith, John, M, University of British
+                 Columbia".squish %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-9">
+      <div class="form-inline inline-checkbox">
+        <%= form.check_box :backup_participants, class: 'form-control checkbox' %>
+        <p>Add the above as Backup Participants</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <%= form.submit 'Add New Members', id: 'add-members-submit', class: 'btn btn-md btn-default pull-right' %>
+    </div>
+  </div>
+<% end %>
+</div>

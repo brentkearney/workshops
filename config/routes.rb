@@ -38,6 +38,7 @@ Rails.application.routes.draw do
       match 'email_change' => 'memberships#email_change', as: :email_change, via: [:get, :post]
       get 'cancel_email_change' =>  'memberships#cancel_email_change', as: :email_cancel
       get 'add', on: :collection
+      post 'process_new', on: :collection
     end
     get 'lectures' => 'lectures#index'
   end
