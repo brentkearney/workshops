@@ -41,10 +41,10 @@ class EventDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = [
-    :memberships,
-    :members,
-    :schedules,
-    :lectures,
+    :id,
+    :code,
+    :short_name,
+    :start_date
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
@@ -108,7 +108,7 @@ class EventDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how events are displayed
   # across all pages of the admin dashboard.
   #
-   #def display_resource(event)
-     #{}" #{event.id}"
-   #end
+   def display_resource(event)
+     " #{event.id}"
+   end
 end

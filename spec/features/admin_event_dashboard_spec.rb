@@ -24,20 +24,20 @@ describe 'Events Admin Dashboard', type: :feature do
     end
 
     it "should redirect to root path" do
-      expect(page).to redirect_to root_path
-      expect(page).to have_content("You dont have permission")
+      expect(page).to have_current_path(root_path)
+      expect(page).to have_content("Not Authorized")
     end
   end
 
-  context 'As a staff user' do
+  context 'As a member user' do
     before do
       login_as @member_user, scope: :user
       visit 'admin/events'
     end
 
     it "should redirect to root path" do
-      expect(page).to redirect_to root_path
-      expect(page).to have_content("You dont have permission")
+      expect(page).to have_current_path(root_path)
+      expect(page).to have_content("Not Authorized")
     end
   end
 
@@ -47,6 +47,7 @@ describe 'Events Admin Dashboard', type: :feature do
     end
 
     it "should display admin events dashboard" do
+      expect(page).to have_current_path('/admin/events')
 	end
   end
 
@@ -55,6 +56,7 @@ describe 'Events Admin Dashboard', type: :feature do
       login_as @admin_user, scope: :user
     end
     it "should display admin events dashboard" do
+      expect(page).to have_current_path('/admin/events')
 	end
   end
 end

@@ -75,7 +75,7 @@ class ScheduleDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how schedules are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(schedule)
-  #   "Schedule ##{schedule.id}"
-  # end
+   def display_resource(schedule)
+     "Schedule ##{schedule.event_id}"
+   end
 end
