@@ -29,7 +29,7 @@ class EventDashboard < Administrate::BaseDashboard
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
     template: Field::Boolean,
-    time_zone: Field::String,
+    time_zone: Field::Select.with_options(collection: ActiveSupport::TimeZone.all.map(&:name)),
     publish_schedule: Field::Boolean,
     confirmed_count: Field::Number,
     sync_time: Field::DateTime,
