@@ -8,7 +8,11 @@ require 'rails_helper'
 
 describe 'Events Admin Dashboard', type: :feature do
   before do
-  	@member_user = create(:user, role: 'member')
+  	@event = create(:event)
+  	person = create(:person)
+  	membership = create(:membership, event: @event, person: person, role: 'Organizer')
+
+  	@member_user = create(:user,email: person.email,person: person, role: 0)
     @staff_user = create(:user, :staff)
     @admin_user = create(:user, :admin)
     @super_admin_user = create(:user, :super_admin)  
@@ -18,14 +22,32 @@ describe 'Events Admin Dashboard', type: :feature do
     Warden.test_reset!
   end
 
+  def fill_in_new_events_fields
+  	fill_in 'Code', with: '23w0001'
+	fill_in 'Name', with: '5 Day Workshop Schedule Template'
+	fill_in "Short name", with: 'Schedule template'
+	fill_in 'Start date', with: Time.now + 1.days
+	fill_in 'End date', with: Time.now + 3.days
+	fill_in 'Event type', with: 'Summer School'
+	fill_in 'Location', with: 'EO'
+	fill_in 'Description', with: 'Description for testing purposes'
+	fill_in 'Max participants', with: 5
+	fill_in 'Door code', with: 12
+	fill_in 'Updated by', with: 'Capybara'
+	fill_in 'Time zone', with: 'Mountain Time (US & Canada)'
+	check 'Template'
+
+	click_on('Create Event')
+  end
+
   context 'As a not-logged in user' do
     before do
       visit 'admin/events'
     end
 
     it "should redirect to root path" do
-      expect(page).to have_current_path(root_path)
-      expect(page).to have_content("Not Authorized")
+      expect(page).to have_current_path('/users/sign_in')
+      expect(page).to have_content("You need to sign in or sign up before continuing")
     end
   end
 
@@ -36,27 +58,49 @@ describe 'Events Admin Dashboard', type: :feature do
     end
 
     it "should redirect to root path" do
-      expect(page).to have_current_path(root_path)
+      expect(page).to have_current_path('/events/future')
       expect(page).to have_content("Not Authorized")
     end
   end
 
-  context 'As an staff user' do
+  context 'As a staff user' do
     before do
-      login_as @staff, scope: :user
+      login_as @staff_user, scope: :user
+      visit 'admin/events'
     end
 
     it "should display admin events dashboard" do
-      expect(page).to have_current_path('/admin/events')
+      expect(page).to have_current_path(admin_events_path)
+	end
+
+	it "can create new event" do
+		click_link('New event')
+		
+		fill_in_new_events_fields
+		
+		visit admin_events_path
+
+		expect(page).to have_content('23w0001')
 	end
   end
 
-  context 'As an admin user' do
+  context 'As a admin user' do
     before do
       login_as @admin_user, scope: :user
+      visit 'admin/events'
     end
     it "should display admin events dashboard" do
-      expect(page).to have_current_path('/admin/events')
+      expect(page).to have_current_path(admin_events_path)
+	end
+
+	it "can create new event" do
+	  click_link('New event')
+		
+	  fill_in_new_events_fields
+		
+	  visit admin_events_path
+
+	  expect(page).to have_content('23w0001')
 	end
   end
 end
