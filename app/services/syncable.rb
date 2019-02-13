@@ -88,8 +88,6 @@ module Syncable
   # local record, remote hash
   def update_record(local, remote)
     remote_updated = prepare_value('updated_at', remote['updated_at'])
-    return local if local.updated_at >= remote_updated
-
     booleans = boolean_fields(local)
     remote.each_pair do |k, v|
       next if v.blank?
@@ -113,7 +111,7 @@ module Syncable
         if k == 'legacy_id' || k == 'email'
           local = resolve_duplicates(local, remote, k)
         else
-          local.send("#{k}=", v)
+          local.send("#{k}=", v) unless local.updated_at >= remote_updated
         end
       end
     end
