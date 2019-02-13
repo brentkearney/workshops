@@ -89,7 +89,7 @@ module Syncable
   def update_record(local, remote)
     remote_updated = prepare_value('updated_at', remote['updated_at'])
     return local if local.updated_at >= remote_updated
-    Rails.logger.debug "update_record: #{local.inspect}\n\nremote: #{remote.inspect}\n\n"
+
     booleans = boolean_fields(local)
     remote.each_pair do |k, v|
       next if v.blank?
@@ -126,7 +126,7 @@ module Syncable
     other_person = Person.find_by("#{mode}": remote[mode])
     if other_person.blank?
       replace_remote(Person.new(remote), local) if mode == 'legacy_id'
-      update_email(local, remote['email']) if mode == 'email'
+      person = update_email(local, remote['email']) if mode == 'email'
     else
       person = merge_person_records(local, other_person)
     end
@@ -136,6 +136,7 @@ module Syncable
   def update_email(person, email)
     person.email = email
     update_user_account(person, person, email)
+    person
   end
 
   # keep the record with most associated data, merge the other

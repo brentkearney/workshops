@@ -292,8 +292,9 @@ describe "SyncMembers" do
 
         it 'adds local record to the event' do
           SyncMembers.new(@eventm)
-          expect(Event.find(@eventm.id).members).to include(@person1)
-          expect(Event.find(@eventm.id).members).not_to include(@person2)
+          members = Event.find(@eventm.id).members
+          expect(members).to include(@person1)
+          expect(members).not_to include(@person2)
         end
 
         it 'updates legacy_db to fix duplicates' do
