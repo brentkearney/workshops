@@ -11,7 +11,8 @@ RSpec.describe Lecture, type: :model do
     @event = build(:event)
     @lecture = build(:lecture, event: @event,
       start_time: (@event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
-      end_time: (@event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
+      end_time: (@event.start_date + 1.days).to_time.change({ hour: 10, min: 0}),
+      person: create(:person))
   end
 
   it 'has valid factory' do

@@ -1,23 +1,10 @@
 # app/services/syncable.rb
 # Copyright (c) 2018 Banff International Research Station
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# This file is part of Workshops. Workshops is licensed under
+# the GNU Affero General Public License as published by the
+# Free Software Foundation, version 3 of the License.
+# See the COPYRIGHT file for details and exceptions.
 
 # methods for SyncMember(s) & SyncPerson
 module Syncable
@@ -30,7 +17,6 @@ module Syncable
   def local_members
     @local_members ||= event.memberships.includes(:person)
   end
-
 
   def fix_remote_fields(h)
     h['Person'] = Person.new.attributes if h['Person'].blank?
@@ -77,7 +63,6 @@ module Syncable
 
   def find_and_update_person(remote_person)
     local_person = get_local_person(remote_person)
-
     if local_person.blank?
       local_person = save_person(Person.new(remote_person))
     else
@@ -104,7 +89,7 @@ module Syncable
   def update_record(local, remote)
     remote_updated = prepare_value('updated_at', remote['updated_at'])
     return local if local.updated_at >= remote_updated
-
+    Rails.logger.debug "update_record: #{local.inspect}\n\nremote: #{remote.inspect}\n\n"
     booleans = boolean_fields(local)
     remote.each_pair do |k, v|
       next if v.blank?
@@ -119,17 +104,46 @@ module Syncable
           local.invited_by = remote['invited_by']
         end
       end
+
       next if k == 'invited_on'
 
       unless local.send(k).eql? v
-        if k.eql? 'email'
-          local = update_email(local, remote)
+        # if its an email change, User account may also need updating
+        # if its a legacy_id change, also update event associations on legacydb
+        if k == 'legacy_id' || k == 'email'
+          local = resolve_duplicates(local, remote, k)
         else
           local.send("#{k}=", v)
         end
       end
     end
     local
+  end
+
+  # find duplicate Person records based on email or legacy_id (mode)
+  def resolve_duplicates(local, remote, mode)
+    person = local
+    other_person = Person.find_by("#{mode}": remote[mode])
+    if other_person.blank?
+      replace_remote(Person.new(remote), local) if mode == 'legacy_id'
+      update_email(local, remote['email']) if mode == 'email'
+    else
+      person = merge_person_records(local, other_person)
+    end
+    person
+  end
+
+  def update_email(person, email)
+    person.email = email
+    update_user_account(person, person, email)
+  end
+
+  # keep the record with most associated data, merge the other
+  def merge_person_records(p1, p2)
+    replace_with = ComparePersons.new(p1, p2).better_record
+    replace = replace_with.eql?(p1) ? p2 : p1
+    replace_person(replace: replace, replace_with: replace_with)
+    replace_with
   end
 
   def prepare_value(k, v)
@@ -146,18 +160,6 @@ module Syncable
   def convert_to_time(v)
     return Time.at(v) if v.is_a?(Integer)
     DateTime.parse(v.to_s)
-  end
-
-  def update_email(local_person, remote_person_hash)
-    other_person = Person.find_by_email(remote_person_hash['email'])
-    unless other_person.nil? || other_person.id == local_person.id
-      # local_person has the same legacy_id as remote, but different email.
-      # other_person has same email as remote, but is not a member of this event
-      # and has different legacy_id. Merge data and destroy other_person:
-      replace_person(replace: other_person, replace_with: local_person)
-    end
-    local_person.email = remote_person_hash['email']
-    local_person
   end
 
   def replace_person(replace: other_person, replace_with: person)
@@ -180,22 +182,29 @@ module Syncable
     end
 
     if User.find_by_person_id(replace_with.id).blank?
-      user_account = User.find_by_person_id(replace.id)
-      unless user_account.nil?
-        user_account.person = replace_with
-        user_account.email = replace_with.email
-        user_account.skip_reconfirmation!
-        user_account.save
-      end
+      update_user_account(replace, replace_with, replace_with.email)
     end
 
     # Update legacy database
-    unless replace.legacy_id.blank? || replace_with.legacy_id.blank?
-      ReplacePersonJob.perform_later(replace.legacy_id, replace_with.legacy_id)
-    end
+    replace_remote(replace, replace_with)
 
     # there can be only one!
     replace.delete
+  end
+
+  def update_user_account(person, replace_with, email)
+    user_account = User.find_by_person_id(person.id)
+    unless user_account.nil?
+      user_account.person = replace_with
+      user_account.email = email
+      user_account.skip_reconfirmation!
+      user_account.save
+    end
+  end
+
+  def replace_remote(replace, replace_with)
+    return if replace.legacy_id.blank? || replace_with.legacy_id.blank?
+    ReplacePersonJob.perform_later(replace.legacy_id, replace_with.legacy_id)
   end
 
   def save_person(person)

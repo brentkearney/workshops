@@ -27,6 +27,7 @@ describe "SyncMembers" do
 
     expect(sm.event).to eq(@eventm)
     expect(sm.remote_members).not_to be_empty
+    expect(sm.local_members).not_to be_empty
     expect(sm.sync_errors).to be_a(ErrorReport)
   end
 
@@ -172,6 +173,8 @@ describe "SyncMembers" do
 
     def setup_remote(event, membership, changed_fields)
       lc = FakeLegacyConnector.new
+      membership ||= create(:membership, event: event)
+
       remote_members = lc.get_members_with_person(
         e: event, m: membership, changed_fields: changed_fields
       )
@@ -202,17 +205,19 @@ describe "SyncMembers" do
 
     context 'without a local person' do
       it 'creates a new person record' do
-        setup_remote(@eventm, nil, lastname: 'Remoteperson')
+        remote_fields = { lastname: 'RemotePerson', email: 'new@member.net',
+                           legacy_id: 1234 }
+        setup_remote(@eventm, nil, remote_fields)
 
         SyncMembers.new(@eventm)
 
-        lp = Event.find(@eventm.id).members.last
-        expect(lp.lastname).to eq('Remoteperson')
+        person = Person.find_by_email('new@member.net')
+        expect(person.events).to include(@eventm)
       end
     end
 
     context 'Email & legacy_id updates' do
-      context 'remote member has matching email, different legacy_id' do
+      context 'matching legacy_ids, but different emails' do
         before do
           updated = DateTime.parse('1970-01-01 00:00:00')
           @person1 = create(:person, email: 'sam@jones.net', legacy_id: 111,
@@ -225,39 +230,8 @@ describe "SyncMembers" do
           @membership2 = create(:membership, person: @person2, event: @event,
             updated_at: updated)
 
-          @lecture = create(:lecture, person: @person1, event: @eventm)
-          create(:user, person: @person1, email: @person1.email)
-
-          remote_fields = { email: 'sam@jones.net', legacy_id: 222 }
-          setup_remote(@eventm, @membership1, remote_fields)
-          SyncMembers.new(@eventm)
-        end
-
-        after do
-          @event.memberships.destroy_all
-        end
-
-        it 'updates the legacy_id of local member with matching email' do
-          membership = Membership.find(@membership1.id)
-          expect(membership.person.legacy_id).to eq(222)
-        end
-      end
-
-      context 'remote member has matching legacy_id, but different email' do
-        before do
-          updated = DateTime.parse('1970-01-01 00:00:00')
-          @person1 = create(:person, email: 'sam@jones.net', legacy_id: 111,
-            updated_at: updated)
-          @membership1 = create(:membership, person: @person1, event: @eventm,
-            updated_at: updated)
-
-          @person2 = create(:person, email: 'fred@smith.com', legacy_id: 222,
-            updated_at: updated)
-          @membership2 = create(:membership, person: @person2, event: @event,
-            updated_at: updated)
-
-          @lecture = create(:lecture, person: @person1, event: @eventm)
-          create(:user, person: @person1, email: @person1.email)
+          @lecture = create(:lecture, person: @person2, event: @eventm)
+          create(:user, person: @person2, email: @person2.email)
 
           remote_fields = { email: 'fred@smith.com', legacy_id: 111 }
           setup_remote(@eventm, @membership1, remote_fields)
@@ -268,27 +242,83 @@ describe "SyncMembers" do
           @event.memberships.destroy_all
         end
 
-        it 'updates the email address of local member with matching legacy_id' do
+        it 'chooses the person record with the most data' do
           membership = Membership.find(@membership1.id)
-          expect(membership.person.email).to eq('fred@smith.com')
+          expect(membership.person_id).to eq(@person2.id)
         end
 
         it 'consolidates event memberships into one person record' do
-          expect { Person.find(@person2.id) }
+          expect { Person.find(@person1.id) }
             .to raise_exception(ActiveRecord::RecordNotFound)
-          updated_person = Person.find(@person1.id)
+          updated_person = Person.find(@person2.id)
           events = updated_person.memberships.collect(&:event).flatten
           expect(events).to match_array([@event, @eventm])
-          expect(updated_person.legacy_id).to eq(111)
+          expect(updated_person.legacy_id).to eq(222)
         end
 
         it 'consolidates lectures into one person record' do
           lecture = Lecture.find(@lecture.id)
-          expect(lecture.person).to eq(@person1)
+          expect(lecture.person).to eq(@person2)
         end
 
         it 'moves user account to updated person record' do
-          expect(User.where(person_id: @person1.id)).not_to be_nil
+          expect(User.where(person_id: @person2.id)).not_to be_nil
+        end
+      end
+
+      context 'matching emails, but different legacy_ids' do
+        before do
+          updated = DateTime.parse('1970-01-01 00:00:00')
+          @person1 = create(:person, email: 'sam@jones.net', legacy_id: 111,
+            updated_at: updated)
+          @membership1 = create(:membership, person: @person1, event: @eventm,
+            updated_at: updated)
+
+          @person2 = create(:person, email: 'fred@smith.com', legacy_id: 222,
+            updated_at: updated)
+          @membership2 = create(:membership, person: @person2, event: @event,
+            updated_at: updated)
+
+          @lecture = create(:lecture, person: @person2, event: @event)
+          @puser = create(:user, person: @person1, email: @person1.email)
+
+          remote_fields = { email: 'sam@jones.net', legacy_id: 222, fax: 1234 }
+          setup_remote(@eventm, @membership1, remote_fields)
+        end
+
+        after do
+          @event.memberships.destroy_all
+        end
+
+        it 'adds local record to the event' do
+          SyncMembers.new(@eventm)
+          expect(Event.find(@eventm.id).members).to include(@person1)
+          expect(Event.find(@eventm.id).members).not_to include(@person2)
+        end
+
+        it 'updates legacy_db to fix duplicates' do
+          allow(ReplacePersonJob).to receive(:perform_later)
+          SyncMembers.new(@eventm)
+          expect(ReplacePersonJob).to have_received(:perform_later).with(222, 111)
+        end
+
+        it 'if already a member of the event, does not produce error' do
+          sync_errors = spy('sync_errors')
+          allow(ErrorReport).to receive(:new).and_return(sync_errors)
+
+          SyncMembers.new(@eventm)
+
+          expect(sync_errors).not_to have_received(:add)
+        end
+
+        it 'transfers lectures' do
+          SyncMembers.new(@eventm)
+          expect(Lecture.find(@lecture.id).person_id).to eq(@person1.id)
+        end
+
+        it 'updates local record with remote information' do
+          SyncMembers.new(@eventm)
+          expect(Person.find(@person1.id).fax).to eq('1234')
         end
       end
 

@@ -38,6 +38,9 @@ class FakeLegacyConnector
     end
   end
 
+  def replace_person(replace, replace_with)
+  end
+
   def get_event_data(event_id)
 
   end
