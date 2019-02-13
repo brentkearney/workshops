@@ -10,8 +10,12 @@ module Admin
     before_action :authenticate_admin
 
     def authenticate_admin
+      #staff can access only admin/people dashboard
+      return true if current_user.is_staff? && params[:controller] == 'admin/people'
+
       current_user.is_admin? ? true : (redirect_to root_path, notice: 'Not Authorized')
     end
+
 
     # Override this value to specify the number of elements to display at a time
     # on index pages. Defaults to 20.

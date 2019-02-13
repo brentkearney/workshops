@@ -8,10 +8,8 @@ class PersonDashboard < Administrate::BaseDashboard
   # which determines how the attribute is displayed
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
-    memberships: Field::HasMany,
-    events: Field::HasMany,
-    user: Field::HasOne,
-    invitations: Field::HasMany,
+    #memberships: Field::HasMany,
+    #events: Field::HasMany,
     replace_person: Field::BelongsTo.with_options(class_name: "ConfirmEmailChange"),
     replace_with: Field::BelongsTo.with_options(class_name: "ConfirmEmailChange"),
     id: Field::Number,
@@ -53,19 +51,17 @@ class PersonDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = [
-    :memberships,
-    :events,
-    :user,
-    :invitations,
+    :id,
+    :email,
+    :lastname,
+    :firstname,
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = [
-    :memberships,
-    :events,
-    :user,
-    :invitations,
+    #:memberships,
+    #:events,
     :replace_person,
     :replace_with,
     :id,
@@ -105,12 +101,8 @@ class PersonDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = [
-    :memberships,
-    :events,
-    :user,
-    :invitations,
-    :replace_person,
-    :replace_with,
+    #:memberships,
+    #:events,
     :lastname,
     :firstname,
     :salutation,

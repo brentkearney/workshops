@@ -1,6 +1,6 @@
 require "administrate/base_dashboard"
 
-class ScheduleDashboard < Administrate::BaseDashboard
+class ConfirmEmailChangeDashboard < Administrate::BaseDashboard
   # ATTRIBUTE_TYPES
   # a hash that describes the type of each of the model's fields.
   #
@@ -8,20 +8,17 @@ class ScheduleDashboard < Administrate::BaseDashboard
   # which determines how the attribute is displayed
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
-    event: Field::BelongsTo,
-    lecture: Field::BelongsTo,
+    people: Field::HasMany,
     id: Field::Number,
-    start_time: Field::DateTime,
-    end_time: Field::DateTime,
-    name: Field::String,
-    description: Field::Text,
-    location: Field::String,
-    updated_by: Field::String,
+    replace_person_id: Field::Number,
+    replace_with_id: Field::Number,
+    replace_email: Field::String,
+    replace_with_email: Field::String,
+    replace_code: Field::String,
+    replace_with_code: Field::String,
+    confirmed: Field::Boolean,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
-    staff_item: Field::Boolean,
-    earliest: Field::DateTime,
-    latest: Field::DateTime,
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -30,52 +27,46 @@ class ScheduleDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = [
-    :event,
-    :lecture,
+    :people,
     :id,
-    :start_time,
+    :replace_person_id,
+    :replace_with_id,
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = [
-    :event,
-    :lecture,
+    :people,
     :id,
-    :start_time,
-    :end_time,
-    :name,
-    :description,
-    :location,
-    :updated_by,
+    :replace_person_id,
+    :replace_with_id,
+    :replace_email,
+    :replace_with_email,
+    :replace_code,
+    :replace_with_code,
+    :confirmed,
     :created_at,
     :updated_at,
-    :staff_item,
-    :earliest,
-    :latest,
   ].freeze
 
   # FORM_ATTRIBUTES
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = [
-    :event,
-    :lecture,
-    :start_time,
-    :end_time,
-    :name,
-    :description,
-    :location,
-    :updated_by,
-    :staff_item,
-    :earliest,
-    :latest,
+    :people,
+    :replace_person_id,
+    :replace_with_id,
+    :replace_email,
+    :replace_with_email,
+    :replace_code,
+    :replace_with_code,
+    :confirmed,
   ].freeze
 
-  # Overwrite this method to customize how schedules are displayed
+  # Overwrite this method to customize how confirm email changes are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(schedule)
-  #   "Schedule ##{schedule.id}"
+  # def display_resource(confirm_email_change)
+  #   "ConfirmEmailChange ##{confirm_email_change.id}"
   # end
 end

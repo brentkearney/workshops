@@ -114,7 +114,7 @@ class MembershipDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how memberships are displayed
   # across all pages of the admin dashboard.
   #
-   #def display_resource(membership)
-    # "Membership ##{membership.id}"
-   #end
+  # def display_resource(membership)
+  #   "Membership ##{membership.id}"
+  # end
 end

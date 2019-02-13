@@ -27,7 +27,7 @@ describe 'Lectures Admin Dashboard', type: :feature do
       visit 'admin/lectures'
     end
 
-    it "should redirect to root path" do
+    it "should redirect to sign_in" do
       expect(page).to have_current_path('/users/sign_in')
       expect(page).to have_content("You need to sign in or sign up before continuing")
     end
@@ -35,11 +35,12 @@ describe 'Lectures Admin Dashboard', type: :feature do
 
   context 'As a member user' do
     before do
+      login_as @member_user, scope: :user
       visit 'admin/lectures'
     end
 
     it "should redirect to root path" do
-      expect(page).to have_current_path('/events/future')
+      expect(page).to have_current_path(root_path)
       expect(page).to have_content("Not Authorized")
     end
   end
@@ -51,7 +52,7 @@ describe 'Lectures Admin Dashboard', type: :feature do
     end
 
     it "should redirect to root path" do
-      expect(page).to have_current_path('admin/lectures')
+      expect(page).to have_current_path(events_future_path(@member_user.location))
     end
   end
 
@@ -61,8 +62,8 @@ describe 'Lectures Admin Dashboard', type: :feature do
       visit 'admin/lectures'
     end
 
-    it "should redirect to root path" do
-      expect(page).to have_current_path('admin/lectures')
+    it "should display admin lectures dashboard" do
+      expect(page).to have_current_path(admin_lectures_path)
     end
   end
 
@@ -72,8 +73,8 @@ describe 'Lectures Admin Dashboard', type: :feature do
       visit 'admin/lectures'
     end
 
-    it "should redirect to root path" do
-      expect(page).to have_current_path('admin/lectures')
+    it "should display admin lectures dashboard" do
+      expect(page).to have_current_path(admin_lectures_path)
     end
   end
 end

@@ -27,7 +27,7 @@ describe 'People Admin Dashboard', type: :feature do
       visit 'admin/people'
     end
 
-    it "should redirect to root path" do
+    it "should redirect to sing_in" do
       expect(page).to have_current_path('/users/sign_in')
       expect(page).to have_content("You need to sign in or sign up before continuing")
     end
@@ -35,11 +35,12 @@ describe 'People Admin Dashboard', type: :feature do
 
   context 'As a member user' do
     before do
+      login_as @member_user, scope: :user
       visit 'admin/people'
     end
 
     it "should redirect to root path" do
-      expect(page).to have_current_path('/events/future')
+      expect(page).to have_current_path(root_path)
       expect(page).to have_content("Not Authorized")
     end
   end
@@ -50,8 +51,8 @@ describe 'People Admin Dashboard', type: :feature do
       visit 'admin/people'
     end
 
-    it "should redirect to root path" do
-      expect(page).to have_current_path('admin/people')
+    it "should display admin people dashboard" do
+      expect(page).to have_current_path(admin_people_path)
     end
   end
 
@@ -61,8 +62,8 @@ describe 'People Admin Dashboard', type: :feature do
       visit 'admin/people'
     end
 
-    it "should redirect to root path" do
-      expect(page).to have_current_path('admin/people')
+    it "should display admin people dashboard" do
+      expect(page).to have_current_path(admin_people_path)
     end
   end
 
@@ -72,8 +73,8 @@ describe 'People Admin Dashboard', type: :feature do
       visit 'admin/people'
     end
 
-    it "should redirect to root path" do
-      expect(page).to have_current_path('admin/people')
+    it "should display admin people dashboard" do
+      expect(page).to have_current_path(admin_people_path)
     end
   end
 end
