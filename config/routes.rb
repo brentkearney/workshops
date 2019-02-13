@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+ 
+
   root 'welcome#index'
 
   # Devise (login/logout)
@@ -82,6 +84,17 @@ Rails.application.routes.draw do
       post 'events/sync' => 'events#sync'
     end
   end
+
+  # Admin dashboard
+  namespace :admin do
+      
+    resources :events
+    resources :people
+    resources :lectures
+
+    root to: "events#index"
+  end
+
 
   # Maillists
   post "/maillist" => 'griddler/authentication#incoming'
