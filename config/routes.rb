@@ -88,7 +88,9 @@ Rails.application.routes.draw do
   # Admin dashboard
   namespace :admin do
       
-    resources :events 
+    resources :events
+    resources :people
+    resources :lectures
 
     root to: "events#index"
   end
