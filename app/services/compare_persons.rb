@@ -16,14 +16,7 @@ class ComparePersons
   end
 
   def better_record
-    return person1 if self_updated?(person1, person2)
-    return person2 if self_updated?(person2, person1)
-
     data_score(person1) > data_score(person2) ? person1 : person2
-  end
-
-  def self_updated?(p1, p2)
-    p1.updated_by == p1.name && p2.updated_by != p2.name
   end
 
   def data_score(person)
@@ -31,6 +24,7 @@ class ComparePersons
     score += person.memberships.size
     score += person.lectures.size
     score += 200 unless person.user.nil?
+    score += 100 if person.updated_by == person.name
     person.attributes.each_value {|v| score += size_of(v) }
     score
   end
