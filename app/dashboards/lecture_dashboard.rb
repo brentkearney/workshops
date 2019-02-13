@@ -85,7 +85,7 @@ class LectureDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = [
     :event,
     :person,
-    :schedule,
+    #:schedule,
     :title,
     :start_time,
     :end_time,

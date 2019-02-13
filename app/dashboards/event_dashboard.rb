@@ -54,7 +54,7 @@ class EventDashboard < Administrate::BaseDashboard
     :members,
     :schedules,
     :lectures,
-    :id,
+    #:id,
     :code,
     :name,
     :short_name,
@@ -81,10 +81,10 @@ class EventDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = [
-    :memberships,
-    :members,
-    :schedules,
-    :lectures,
+    #:memberships,
+    #:members,
+    #:schedules,
+    #:lectures,
     :code,
     :name,
     :short_name,
@@ -109,6 +109,6 @@ class EventDashboard < Administrate::BaseDashboard
   # across all pages of the admin dashboard.
   #
    def display_resource(event)
-     " #{event.id}"
+     " #{event.short_name}"
    end
 end

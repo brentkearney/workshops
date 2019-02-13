@@ -62,9 +62,9 @@ class PersonDashboard < Administrate::BaseDashboard
   SHOW_PAGE_ATTRIBUTES = [
     #:memberships,
     #:events,
-    :replace_person,
-    :replace_with,
-    :id,
+    #:replace_person,
+    #:replace_with,
+    #:id,
     :lastname,
     :firstname,
     :salutation,
@@ -137,6 +137,6 @@ class PersonDashboard < Administrate::BaseDashboard
   # across all pages of the admin dashboard.
   #
    def display_resource(person)
-     "Person ##{person.lastname+", "+ person.lastname}"
+     "#{person.lastname+", "+ person.lastname}"
    end
 end
