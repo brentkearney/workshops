@@ -132,6 +132,7 @@ module Syncable
   end
 
   def update_email(person, email)
+    return person if person.email == email
     person.email = email
     update_user_account(person, person, email)
     person
@@ -165,14 +166,14 @@ module Syncable
     replace.memberships.each do |m|
       replace_with_membership = Membership.where(event: m.event,
                                                 person: replace_with).first
+      m.sync_memberships = true
       if replace_with_membership.blank?
         m.update(person: replace_with)
       else
         Invitation.where(membership: m).each do |i|
           i.update(membership: replace_with_membership)
         end
-        m.sync_memberships = true
-        m.delete
+        m.delete!
       end
     end
 

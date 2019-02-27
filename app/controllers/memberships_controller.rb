@@ -36,11 +36,18 @@ class MembershipsController < ApplicationController
   end
 
   # GET /events/:event_id/memberships/add
+  # POST /events/:event_id/memberships/add
   def add
     @membership = Membership.new(event: @event)
     authorize @membership
 
     @add_members = AddMembersForm.new(@event)
+    if request.post?
+      Rails.logger.debug "\n\nmemberships#add received: #{add_params.inspect}\n\n"
+      @add_members.process(add_params)
+      # flash[:success] = "Added #{@add_members.added_count} new members" if @add_members.added_count > 0
+      # flash[:error] = "Failed to add #{@add_members.failed_count} new members" if @add_members.failed_count > 0
+    end
   end
 
   # POST /events/:event_id/memberships/process_new
@@ -200,5 +207,9 @@ class MembershipsController < ApplicationController
   def confirm_email_params
     params.require(:email_form).permit(:person_id, :replace_email_code,
                                        :replace_with_email_code)
+  end
+
+  def add_params
+    params.require(:add_members_form).permit(:add_members, :backup_participants)
   end
 end

@@ -125,6 +125,32 @@ td.invite-buttons {
   }
 }
 
+ol#added-members {
+  margin: 1em;
+  font-size: 1.2em;
+  li {
+    margin-bottom: 1em;
+  }
+}
+
+table#new-people {
+  td, th {
+    font-size: 1.2em;
+  }
+  td.counter {
+    margin: 15px;
+    font-style: bold;
+    font-size: 14pt;
+  }
+  td {
+    input[type="text"].has-error {
+      background-color: #ffb3b3;
+    }
+  }
+}
+
+
+
 @media print {
     .no-print { display:none }
     a[href]:after {

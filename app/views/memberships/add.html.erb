@@ -3,26 +3,63 @@
 <div class="panel-body" id="add-members">
   <div class="row">
     <div class="col-md-12">
-      <p>In the space below, enter at least the email addresses of the people you wish to add to the workshop, one per line. Optionally also include their name, gender, and affiliation, like so:</p>
+      <%= form_with model: @add_members, url: add_event_memberships_path(@event),
+                           class: 'form', role: 'form' do |form| %>
+
+      <% unless @add_members.added.empty? %>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2>These new members have been added:</h2>
+        </div>
+        <ol id="added-members">
+        <% @add_members.added.each do |p| %>
+          <li><%= p.name %>, <%= p.email %>, <%= p.affiliation %></li>
+        <% end %>
+        </ol>
+      </div>
+      <% end %>
+
+      <% unless @add_members.new_people.empty? %>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2>These new records will be created and added:<br>
+            <small>Please fill in all missing fields.</small></h2>
+        </div>
+
+        <table class="table table-striped" id="new-people">
+          <tr><th>#</th><th>E-mail</th><th>Lastname</th><th>Firstname</th><th>Affiliation</th></tr>
+          <% count = 0; @add_members.new_people.each do |row| %>
+          <tr>
+            <td class="counter"><%= count %></td>
+            <td><%= form.text_field :email, value: row[0], class: 'form-control person-data' %></td>
+            <td><%= form.text_field :lastname, value: row[1], class: 'form-control person-data' %></td>
+            <td><div class="form-group"><%= form.text_field :firstname, value: row[2], class: 'form-control person-data' %></div></td>
+            <td><%= form.text_field :affiliation, value: row[3], class: 'form-control form-group person-data' %></td>
+          </tr>
+          <% end %>
+        </table>
+
+      </div>
+      <% else %>
+      <p>In the space below, enter at least the email addresses of the people you wish to add to the workshop, <strong>one per line</strong>. After you add them, they will appear under "Not Yet Invited Members" in your <%= link_to 'membership list', event_memberships_path(@event) %>, where you may send them invitations. Optionally also include their name and affiliation, like so:</p>
       <blockquote>
-        alice_fang@sfu.ca, Fang, Alice, F, Simon Fraser University<br>
+        alice_fang@sfu.ca, Fang, Alice, Simon Fraser University<br>
         john.smith@ubc.ca<br>
         rgupta@mit.edu, Gupta, Rajesh
       </blockquote>
-      <p>If the email addresses match records in our database, they will be added as "Not Yet Invited" members. Otherwise, you will be presented with a form for additional information, if necessary, such as their name(s), genders, and affiliations.</p>
-      <p>Once members are added, then you can send them invitations to attend the workshop. If you wish to add them
-      as "Backup Participants", which are excluded from mass-invitations, then select the "Add as Backup Participant" checkbox.</p>
+      <p>If the email addresses match records in our database, they will be added immediately. Otherwise, you will be presented with a form to collect additional information, if necessary, such as names and affiliations.</p>
+      <p>"<strong>Backup Participants</strong>" are people who you plan to invite if regular participants decline your invitation, or cancel. Backup participants are only visible to organizers, and will <em>not</em> be sent invitations when the "Invite All Not Yet Invited Participants" button is clicked. Select the checkbox below, to add them as backups.</p>
     </div>
   </div>
   <div class="row">
     <div class="col-md-12">
-    <%= form_with model: @add_members, url: add_event_memberships_path(@event),
-                         class: 'form', role: 'form' do |form| %>
+
     <%= form.text_area :add_members, rows: 6, class: 'form-control', placeholder:
-                 "john.smith@ubc.ca, Smith, John, M, University of British
+                 "john.smith@ubc.ca, Smith, John, University of British
                  Columbia".squish %>
     </div>
   </div>
+  <% end %>
   <div class="row">
     <div class="col-md-9">
       <div class="form-inline inline-checkbox">
@@ -31,7 +68,7 @@
       </div>
     </div>
     <div class="col-md-3">
-      <%= form.submit 'Add New Members', id: 'add-members-submit', class: 'btn btn-md btn-default pull-right' %>
+      <%= form.submit 'Add These Members', id: 'add-members-submit', class: 'btn btn-md btn-default pull-right' %>
     </div>
   </div>
 <% end %>
