@@ -54,7 +54,7 @@ GEM
       sshkit (>= 1.6.1, != 1.7.0)
     arel (9.0.0)
     ast (2.4.0)
-    autoprefixer-rails (9.4.7)
+    autoprefixer-rails (9.4.9)
       execjs
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -63,16 +63,16 @@ GEM
     bcrypt (3.1.12)
     bcrypt_pbkdf (1.0.0)
     bindex (0.5.0)
-    bootsnap (1.4.0)
+    bootsnap (1.4.1)
       msgpack (~> 1.0)
-    bootstrap-sass (3.4.0)
+    bootstrap-sass (3.4.1)
       autoprefixer-rails (>= 5.2.1)
       sassc (>= 2.0.0)
     bootstrap3-datetimepicker-rails (4.17.47)
       momentjs-rails (>= 2.8.1)
     brakeman (4.4.0)
     builder (3.2.3)
-    byebug (10.0.2)
+    byebug (11.0.0)
     capistrano (3.11.0)
       airbrussh (>= 1.0.0)
       i18n
@@ -83,7 +83,7 @@ GEM
     capistrano-rails (1.4.0)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
-    capybara (3.13.2)
+    capybara (3.14.0)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
@@ -117,9 +117,9 @@ GEM
       warden (~> 1.2.3)
     devise-encryptable (0.2.0)
       devise (>= 2.1.0)
-    devise_invitable (1.7.5)
-      actionmailer (>= 4.1.0)
-      devise (>= 4.0.0)
+    devise_invitable (2.0.0)
+      actionmailer (>= 5.0)
+      devise (>= 4.6)
     diff-lcs (1.3)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
@@ -130,7 +130,7 @@ GEM
     erubi (1.8.0)
     erubis (2.7.0)
     execjs (2.7.0)
-    factory_bot (5.0.0)
+    factory_bot (5.0.2)
       activesupport (>= 4.2.0)
     factory_bot_rails (5.0.1)
       factory_bot (~> 5.0.0)
@@ -139,7 +139,7 @@ GEM
       i18n (>= 0.7)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
-    ffi (1.9.25)
+    ffi (1.10.0)
     flay (2.12.0)
       erubis (~> 2.7.0)
       path_expander (~> 1.0)
@@ -147,7 +147,7 @@ GEM
       sexp_processor (~> 4.0)
     font-awesome-rails (4.7.0.4)
       railties (>= 3.2, < 6.0)
-    gitlab (4.9.0)
+    gitlab (4.10.0)
       httparty (~> 0.14, >= 0.14.0)
       terminal-table (~> 1.5, >= 1.5.1)
     globalid (0.4.2)
@@ -208,7 +208,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (5.1.0)
     netrc (0.11.0)
-    newrelic_rpm (6.0.0.351)
+    newrelic_rpm (6.1.0.352)
     nio4r (2.3.1)
     nokogiri (1.10.1)
       mini_portile2 (~> 2.4.0)
@@ -218,10 +218,10 @@ GEM
     paper_trail (10.2.0)
       activerecord (>= 4.2, < 6.1)
       request_store (~> 1.1)
-    parallel (1.13.0)
+    parallel (1.14.0)
     parser (2.6.0.0)
       ast (~> 2.4.0)
-    passenger (6.0.1)
+    passenger (6.0.2)
       rack
       rake (>= 0.8.1)
     path_expander (1.0.3)
@@ -314,7 +314,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rollbar (2.18.2)
+    rollbar (2.19.2)
       multi_json
     rspec-core (3.8.0)
       rspec-support (~> 3.8.0)
@@ -333,11 +333,12 @@ GEM
       rspec-mocks (~> 3.8.0)
       rspec-support (~> 3.8.0)
     rspec-support (3.8.0)
-    rubocop (0.64.0)
+    rubocop (0.65.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)
       powerpack (~> 0.1)
+      psych (>= 3.1.0)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.4.0)
@@ -346,7 +347,7 @@ GEM
     ruby_parser (3.12.0)
       sexp_processor (~> 4.9)
     rubyzip (1.2.2)
-    rugged (0.27.7)
+    rugged (0.28.0)
     sass (3.7.3)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -358,8 +359,8 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
-    sassc (2.0.0)
-      ffi (~> 1.9.6)
+    sassc (2.0.1)
+      ffi (~> 1.9)
       rake
     sawyer (0.8.1)
       addressable (>= 2.3.5, < 2.6)
@@ -430,7 +431,7 @@ DEPENDENCIES
   bcrypt
   bcrypt_pbkdf (~> 1.0)
   bootsnap
-  bootstrap-sass
+  bootstrap-sass (~> 3.4.1)
   bootstrap3-datetimepicker-rails
   byebug
   capistrano (~> 3.10)
@@ -471,7 +472,7 @@ DEPENDENCIES
   rest-client
   rollbar
   rspec-rails
-  sass-rails
+  sass-rails (~> 5.0.7)
   sdoc
   selenium-webdriver
   sparkpost_rails

@@ -32,15 +32,25 @@ module MembershipsHelper
     end
   end
 
-  def show_roles(f)
+  def show_roles(f, default: nil)
     disabled_options = []
     if @current_user.is_organizer?(@event)
       disabled_options = ['Contact Organizer', 'Organizer']
     end
 
     f.select :role, Membership::ROLES,
-             { disabled: disabled_options },
+             { disabled: disabled_options, selected: default },
              required: 'true', class: 'form-control'
+  end
+
+  def add_member_errors(add_members)
+    return '' if add_members.errors.empty?
+    msg = '<p><strong>➜ These problems were detected:</strong> '
+    add_members.errors.full_messages.each do |error|
+      msg << error + ', '
+    end
+    msg.chomp!(', ')
+    msg << '</p>'
   end
 
   def show_attendances(f)

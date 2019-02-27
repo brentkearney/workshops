@@ -107,6 +107,7 @@ td.invite-buttons {
   p {
     margin: 0.8em 0;
   }
+
   .inline-checkbox {
     margin-top: 10px;
     margin-left: 5px;
@@ -120,8 +121,41 @@ td.invite-buttons {
       display: inline;
     }
   }
+
   #add-members-submit {
-    margin-top: 20px;
+    margin-top: 10px;
+  }
+
+  .member-roles {
+    margin-top: 10px;
+    font-size: 1.2em;
+    font-weight: normal;
+  }
+
+  #roles-icon {
+    margin-left: 10px;
+    font-size: 1.5em;
+  }
+
+  ul#about-roles-list {
+    font-size: 1.2em;
+    font-weight: normal;
+    li {
+      margin-bottom: 1.2em;
+      line-height: 1.5em;
+    }
+  }
+}
+
+#add-members-success {
+  margin-bottom: 50px;
+}
+
+#add-member-errors {
+  text-align: left;
+  margin-left: 100px;
+  ul {
+    align: left;
   }
 }
 
@@ -148,8 +182,6 @@ table#new-people {
     }
   }
 }
-
-
 
 @media print {
     .no-print { display:none }

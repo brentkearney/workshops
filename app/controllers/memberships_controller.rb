@@ -45,9 +45,17 @@ class MembershipsController < ApplicationController
     if request.post?
       Rails.logger.debug "\n\nmemberships#add received: #{add_params.inspect}\n\n"
       @add_members.process(add_params)
-      # flash[:success] = "Added #{@add_members.added_count} new members" if @add_members.added_count > 0
-      # flash[:error] = "Failed to add #{@add_members.failed_count} new members" if @add_members.failed_count > 0
+      #flash[:error] = list_add_errors(@add_members)
     end
+  end
+
+  def list_add_errors(add_members)
+    return if add_members.errors.empty?
+    message = '<div id="add-member-errors"><h4>Errors:</h4><ul>'
+    add_members.errors.full_messages.each do |m|
+      message << '<li>' + m + '</li>'
+    end
+    message << '</ul></div>'
   end
 
   # POST /events/:event_id/memberships/process_new

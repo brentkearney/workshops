@@ -31,6 +31,7 @@ class AddMembersForm < ComplexForms
       if EmailValidator.valid?(email)
         person = find_person(email)
         if person.nil?
+          parts[2] = ''
           self.new_people << parts
         else
           self.added << person
@@ -38,7 +39,7 @@ class AddMembersForm < ComplexForms
         end
       else
         errors.add(:"Invalid email:", email)
-        self.failed << line
+        self.new_people << parts
       end
     end
 

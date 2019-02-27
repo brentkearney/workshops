@@ -1,3 +1,20 @@
+
+<% unless @add_members.added.empty? %>
+<div class="panel panel-default" id="add-members-success">
+  <div class="panel-heading">
+    <h3>
+      These people have been added to your workshop:<br>
+      <small>You can send them invitations in the "List Members" section.</small>
+    </h3>
+  </div>
+  <ol id="added-members">
+  <% @add_members.added.each do |p| %>
+    <li><%= p.name %>, <%= p.email %>, <%= p.affiliation %></li>
+  <% end %>
+  </ol>
+</div>
+<% end %>
+
 <h1>Add Members to <%= @event.code %></h1>
 
 <div class="panel-body" id="add-members">
@@ -6,34 +23,25 @@
       <%= form_with model: @add_members, url: add_event_memberships_path(@event),
                            class: 'form', role: 'form' do |form| %>
 
-      <% unless @add_members.added.empty? %>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2>These new members have been added:</h2>
-        </div>
-        <ol id="added-members">
-        <% @add_members.added.each do |p| %>
-          <li><%= p.name %>, <%= p.email %>, <%= p.affiliation %></li>
-        <% end %>
-        </ol>
-      </div>
-      <% end %>
-
       <% unless @add_members.new_people.empty? %>
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h2>These new records will be created and added:<br>
-            <small>Please fill in all missing fields.</small></h2>
+          <h2>
+            New records will be created for these people:<br>
+            <small>Please ensure all data is complete and in the correct fields.</small>
+          </h2>
+          <%= add_member_errors(@add_members).html_safe %>
         </div>
 
         <table class="table table-striped" id="new-people">
           <tr><th>#</th><th>E-mail</th><th>Lastname</th><th>Firstname</th><th>Affiliation</th></tr>
           <% count = 0; @add_members.new_people.each do |row| %>
+            <% count += 1; %>
           <tr>
             <td class="counter"><%= count %></td>
             <td><%= form.text_field :email, value: row[0], class: 'form-control person-data' %></td>
             <td><%= form.text_field :lastname, value: row[1], class: 'form-control person-data' %></td>
-            <td><div class="form-group"><%= form.text_field :firstname, value: row[2], class: 'form-control person-data' %></div></td>
+            <td><%= form.text_field :firstname, value: row[2], class: 'form-control person-data' %></td>
             <td><%= form.text_field :affiliation, value: row[3], class: 'form-control form-group person-data' %></td>
           </tr>
           <% end %>
@@ -41,6 +49,7 @@
 
       </div>
       <% else %>
+
       <p>In the space below, enter at least the email addresses of the people you wish to add to the workshop, <strong>one per line</strong>. After you add them, they will appear under "Not Yet Invited Members" in your <%= link_to 'membership list', event_memberships_path(@event) %>, where you may send them invitations. Optionally also include their name and affiliation, like so:</p>
       <blockquote>
         alice_fang@sfu.ca, Fang, Alice, Simon Fraser University<br>
@@ -48,7 +57,7 @@
         rgupta@mit.edu, Gupta, Rajesh
       </blockquote>
       <p>If the email addresses match records in our database, they will be added immediately. Otherwise, you will be presented with a form to collect additional information, if necessary, such as names and affiliations.</p>
-      <p>"<strong>Backup Participants</strong>" are people who you plan to invite if regular participants decline your invitation, or cancel. Backup participants are only visible to organizers, and will <em>not</em> be sent invitations when the "Invite All Not Yet Invited Participants" button is clicked. Select the checkbox below, to add them as backups.</p>
+
     </div>
   </div>
   <div class="row">
@@ -62,13 +71,38 @@
   <% end %>
   <div class="row">
     <div class="col-md-9">
-      <div class="form-inline inline-checkbox">
-        <%= form.check_box :backup_participants, class: 'form-control checkbox' %>
-        <p>Add the above as Backup Participants</p>
+      <div class="form-inline control-label member-roles pull-left">
+        <%= form.label :role, "Add members with role: " %>
+        <%= show_roles(form, default: 'Participant') %>
+        <a href="#" data-toggle="modal" data-target="#about-roles"><span id="roles-icon" class="glyphicon glyphicon-question-sign"></span></a>
       </div>
     </div>
+
     <div class="col-md-3">
-      <%= form.submit 'Add These Members', id: 'add-members-submit', class: 'btn btn-md btn-default pull-right' %>
+      <%= form.submit 'Add These Members', id: 'add-members-submit', data: { disable_with: false }, class: 'btn btn-md btn-default pull-right' %>
+    </div>
+  </div>
+
+  <!-- About Roles Modal -->
+  <div class="modal fade" id="about-roles" tabindex="-1" role="dialog" aria-labelledby="about-roles" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="about-roles-title">About Member Roles</h3>
+        </div>
+        <div class="modal-body">
+          <ul id="about-roles-list">
+            <li>"<strong>Organizers</strong>" have special access to see all added members (including non-invited and declined ones), edit data, send invitations, and add new members.</li>
+            <li>"<strong>Participants</strong>" are people you plan to invite to participate in your workshop. They can only see other invited members, the workshop description and schedule, and can only edit their own data.</li>
+            <li>"<strong>Backup Participants</strong>" are people who you plan to invite if regular Participants decline your invitation, or cancel. Backup participants will <em>not</em> be sent invitations when the "Invite All Not Yet Invited Participants" button is clicked.</li>
+            <li>"<strong>Observers</strong>" are people who are willing to attend the workshop without funding. They will pay for their own food and accommodation.</li>
+          </ul>
+          <p>After adding them, you can edit members to change their role.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 <% end %>
