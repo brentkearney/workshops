@@ -4,7 +4,7 @@ en:
   devise:
     confirmations:
       confirmed: "Thank you! Your account has been successfully confirmed, and you are now logged in."
-      send_instructions: "Please check your email for confirmation instructions."
+      send_instructions: "Please check your email (including spam/junk mail folders) for confirmation instructions."
       send_paranoid_instructions: "If your email address exists in our database, you will receive an email with instructions for how to confirm your email address in a few minutes."
     failure:
       already_authenticated: "You are already signed in."
@@ -15,7 +15,7 @@ en:
       not_found_in_database: "Invalid %{authentication_keys} or password."
       timeout: "Your session expired. Please sign in again to continue."
       unauthenticated: "You need to sign in or sign up before continuing."
-      unconfirmed: "Please check your email, and click the link we sent you, to confirm your identity."
+      unconfirmed: "Please check your email (including spam/junk mail folders), and click the link we sent you, to confirm your identity."
     mailer:
       confirmation_instructions:
         subject: "BIRS Workshops account confirmation"
@@ -47,7 +47,7 @@ en:
       has_no_person_record: 'This account has no associated person record.'
       has_no_memberships: 'This account is not associated to any events.'
     unlocks:
-      send_instructions: "You will receive an email with instructions for how to unlock your account in a few minutes."
+      send_instructions: "You will receive an email (check spam/junk mail folders) with instructions for how to unlock your account in a few minutes."
       send_paranoid_instructions: "If your account exists, you will receive an email with instructions for how to unlock it in a few minutes."
       unlocked: "Your account has been unlocked successfully. Please sign in to continue."
   errors:
