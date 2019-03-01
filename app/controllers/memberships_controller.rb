@@ -38,31 +38,15 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships/add
   # POST /events/:event_id/memberships/add
   def add
-    @membership = Membership.new(event: @event)
-    authorize @membership
-
+    authorize Membership.new(event: @event)
     @add_members = AddMembersForm.new(@event)
+
     if request.post?
       Rails.logger.debug "\n\nmemberships#add received: #{add_params.inspect}\n\n"
       @add_members.process(add_params)
-      #flash[:error] = list_add_errors(@add_members)
     end
   end
 
-  def list_add_errors(add_members)
-    return if add_members.errors.empty?
-    message = '<div id="add-member-errors"><h4>Errors:</h4><ul>'
-    add_members.errors.full_messages.each do |m|
-      message << '<li>' + m + '</li>'
-    end
-    message << '</ul></div>'
-  end
-
-  # POST /events/:event_id/memberships/process_new
-  def process_new
-    Rails.logger.debug "\n\nprocess_new:\n members: #{params['add_members']}\n"
-    Rails.logger.debug "backup: #{params['backup_participants']}\n\n"
-  end
 
   # GET /events/:event_id/memberships/1/edit
   def edit
@@ -218,6 +202,7 @@ class MembershipsController < ApplicationController
   end
 
   def add_params
-    params.require(:add_members_form).permit(:add_members, :backup_participants)
+    params.require(:add_members_form).permit(:add_members, :role,
+                   new_people: [:email, :lastname, :firstname, :affiliation])
   end
 end

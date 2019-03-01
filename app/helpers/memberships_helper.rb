@@ -45,11 +45,18 @@ module MembershipsHelper
 
   def add_member_errors(add_members)
     return '' if add_members.errors.empty?
-    msg = '<p><strong>➜ These problems were detected:</strong> '
-    add_members.errors.full_messages.each do |error|
-      msg << error + ', '
+    errors = add_members.errors
+    msg = "<p><strong>‼️These problems were detected:</strong>\n"
+    msg << "<ol id=\"add-members-errors\">\n"
+    errors.messages.each do |line|
+      msg << "<li value=\"#{line[0].to_s}\">"
+      line[1].each do |prob|
+        msg << "#{prob}, "
+      end
+      msg.chomp!(', ') << ".</li>\n"
     end
-    msg.chomp!(', ')
+    msg << "</ol>\n"
+
     msg << '</p>'
   end
 

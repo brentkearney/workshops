@@ -8,26 +8,58 @@
 
 # For views/memberships/add.html.erb
 class AddMembersForm < ComplexForms
-  attr_accessor :added, :failed, :new_people
+  attr_accessor :added, :new_people
 
   include Syncable
 
   def initialize(event)
     @event = event
     self.added = []
-    self.failed = []
     self.new_people = []
   end
 
   def process(params)
+    errors.clear
     role = params['role']
+    Rails.logger.debug "\nNew people: #{params['new_people']}\n"
 
-    Rails.logger.debug "\nAddMembersForm.process received:\n#{params.inspect}\n\n"
+    unless params['add_members'].blank?
+      process_add_members(params['add_members'])
+    end
 
-    params['add_members'].each_line do |line|
-      Rails.logger.debug "Evaluating line: #{line}"
+    unless params['new_people'].blank?
+      process_new_people(params['new_people'])
+    end
+  end
+
+  def process_new_people(new_people)
+    i = 0;
+    new_people.each do |p|
+      next if p.values.all?(&:blank?)
+      i += 1;
+
+      if p['email'].blank?
+        errors.add(i.to_s, "Email is required") if p['email'].blank?
+      else
+        unless EmailValidator.valid?(p['email'])
+          errors.add(i.to_s, "Email '#{p['email']}' is invalid")
+        end
+      end
+      errors.add(i.to_s, "Lastname: is required" ) if p['lastname'].blank?
+      errors.add(i.to_s, "Firstname is required" ) if p['firstname'].blank?
+      errors.add(i.to_s, "Affiliation is required" ) if p['affiliation'].blank?
+
+      self.new_people << [ p['email'], p['lastname'], p['firstname'], p['affiliation'] ]
+    end
+  end
+
+  def process_add_members(members_to_add)
+    i = 0;
+    members_to_add.each_line do |line|
+      i += 1
       parts = line.split(/,/)
       email = parts[0].strip
+
       if EmailValidator.valid?(email)
         person = find_person(email)
         if person.nil?
@@ -38,12 +70,11 @@ class AddMembersForm < ComplexForms
           # @event << person
         end
       else
-        errors.add(:"Invalid email:", email)
+        errors.add(i.to_s, "Email '#{email}' is invalid")
         self.new_people << parts
       end
     end
 
-    Rails.logger.debug "\n\nNew members:\n"
     self.added.each do |p|
       if p.respond_to? :name
         Rails.logger.debug "* #{p.name} (#{p.email}), #{p.affiliation}<br>\n"
@@ -54,11 +85,6 @@ class AddMembersForm < ComplexForms
 
     Rails.logger.debug "\n\nTo be added members:\n"
     self.new_people.each do |f|
-      Rails.logger.debug "* #{f}"
-    end
-
-    Rails.logger.debug "\n\nFailed members:\n"
-    self.failed.each do |f|
       Rails.logger.debug "* #{f}"
     end
   end
