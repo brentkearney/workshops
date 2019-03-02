@@ -70,7 +70,6 @@ class AddMembersForm < ComplexForms
   def get_a_person(data, i)
     return if data[:email].blank?
     if EmailValidator.valid?(data[:email])
-      Rails.logger.debug "Valid email!"
       find_person(data[:email]) || add_new_person(data, i)
     else
       errors.add(i.to_s, "E-mail is invalid")
@@ -92,17 +91,17 @@ class AddMembersForm < ComplexForms
   def add_new_member(person, role)
     return true if @event.members.include?(person)
     begin
+      @event.set_sync_time
       m = Membership.new(event: @event, person: person, role: role,
                          updated_by: @current_user.name, update_remote: true)
       m.save
-      @event.set_sync_time
     rescue ActiveRecord::RecordInvalid => e
       errors.add(:"0", e.message)
-      msg = { problem: 'Unable to save! new member',
+      msg = { problem: 'Unable to save new member',
               source: 'AddMembersForm.add_new_member',
               person: "#{person.name} (id: #{person.id})",
-              membership: "#{membership.inspect}",
-              error: e.inspect }
+              membership: membership.pretty_inspect,
+              error: e.pretty_inspect }
       StaffMailer.notify_sysadmin(@event, msg).deliver_now
       return false
     end
