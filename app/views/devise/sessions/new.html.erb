@@ -1,7 +1,7 @@
 <div class="authform">
   <%= form_for(resource, :as => resource_name, :url => session_path(resource_name), :html => { :role => 'form'}) do |f| %>
     <h3>Sign in</h3>
-    <%= devise_error_messages! %>
+    <%= render "devise/shared/error_messages" %>
     <div class="form-group">
       <%= f.label :email %>
       <%= f.email_field :email, autofocus: true, class: 'form-control' %>
