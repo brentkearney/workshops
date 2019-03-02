@@ -39,7 +39,7 @@ class MembershipsController < ApplicationController
   # POST /events/:event_id/memberships/add
   def add
     authorize Membership.new(event: @event)
-    @add_members = AddMembersForm.new(@event)
+    @add_members = AddMembersForm.new(@event, current_user)
 
     if request.post?
       Rails.logger.debug "\n\nmemberships#add received: #{add_params.inspect}\n\n"

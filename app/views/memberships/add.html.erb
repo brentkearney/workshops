@@ -1,8 +1,7 @@
 
-<%= render 'added_members' unless @add_members.added.empty? %>
 
 <h1>Add Members to <%= @event.code %></h1>
-
+<%= render 'added_members' unless @add_members.added.empty? %>
 <%= form_with model: @add_members, url: add_event_memberships_path(@event),
                      class: 'form', role: 'form' do |form| %>
 <div class="panel-body" id="add-members">
@@ -20,7 +19,7 @@
     <div class="col-md-8">
       <div class="form-inline control-label member-roles pull-left">
         <%= form.label :role, "Add members with role: " %>
-        <%= show_roles(form, default: 'Participant') %>
+        <%= show_roles(form, default: @add_members.role) %>
       </div>
       <div class="col-md-1">
         <div id="roles-icon">

@@ -1,10 +1,8 @@
-<div class="panel panel-default" id="add-members-success">
-  <div class="panel-heading">
-    <h3>
-      These people have been added to your workshop:<br>
-      <small>You can send them invitations in the "List Members" section.</small>
-    </h3>
-  </div>
+<div class="well" id="add-members-success">
+  <h3>
+    These people have been added to your workshop:<br>
+    <small>You can send them invitations in the "List Members" section.</small>
+  </h3>
   <ol id="added-members">
   <% @add_members.added.each do |p| %>
     <li><%= p.name %>, <%= p.email %>, <%= p.affiliation %></li>

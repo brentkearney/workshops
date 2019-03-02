@@ -1,6 +1,6 @@
 # app/forms/add_members_form.rb
 #
-# Copyright (c) 2018 Banff International Research Station.
+# Copyright (c) 2019 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
@@ -8,84 +8,103 @@
 
 # For views/memberships/add.html.erb
 class AddMembersForm < ComplexForms
-  attr_accessor :added, :new_people
+  attr_accessor :added, :new_people, :role
 
   include Syncable
 
-  def initialize(event)
+  def initialize(event, current_user)
     @event = event
+    @current_user = current_user
     self.added = []
     self.new_people = []
+    self.role = 'Participant'
   end
 
   def process(params)
     errors.clear
-    role = params['role']
-    Rails.logger.debug "\nNew people: #{params['new_people']}\n"
-
-    unless params['add_members'].blank?
-      process_add_members(params['add_members'])
-    end
-
-    unless params['new_people'].blank?
-      process_new_people(params['new_people'])
-    end
-  end
-
-  def process_new_people(new_people)
-    i = 0;
-    new_people.each do |p|
-      next if p.values.all?(&:blank?)
+    @role = role_param(params['role'])
+    i = 0
+    organize_params(params).each do |pdata|
+      next if pdata.values.all?(&:blank?)
       i += 1;
+      check_empty_fields(pdata, i)
+      person = get_a_person(pdata, i)
 
-      if p['email'].blank?
-        errors.add(i.to_s, "Email is required") if p['email'].blank?
+      if person.nil?
+        @new_people << pdata
       else
-        unless EmailValidator.valid?(p['email'])
-          errors.add(i.to_s, "Email '#{p['email']}' is invalid")
-        end
+        errors.delete(:"#{i}")
+        i -= 1
+        @added << person if add_new_member(person, @role)
       end
-      errors.add(i.to_s, "Lastname: is required" ) if p['lastname'].blank?
-      errors.add(i.to_s, "Firstname is required" ) if p['firstname'].blank?
-      errors.add(i.to_s, "Affiliation is required" ) if p['affiliation'].blank?
-
-      self.new_people << [ p['email'], p['lastname'], p['firstname'], p['affiliation'] ]
     end
   end
 
-  def process_add_members(members_to_add)
-    i = 0;
-    members_to_add.each_line do |line|
-      i += 1
-      parts = line.split(/,/)
-      email = parts[0].strip
-
-      if EmailValidator.valid?(email)
-        person = find_person(email)
-        if person.nil?
-          parts[2] = ''
-          self.new_people << parts
-        else
-          self.added << person
-          # @event << person
-        end
-      else
-        errors.add(i.to_s, "Email '#{email}' is invalid")
-        self.new_people << parts
+  def organize_params(params)
+    data = []
+    if !params['add_members'].blank?
+      params['add_members'].each_line do |line|
+        parts = line.chomp.split(/,/)
+        record = { email: parts[0], lastname: parts[1], firstname: parts[2],
+                   affiliation: parts[3] }
+        data << record
       end
+      data
     end
 
-    self.added.each do |p|
-      if p.respond_to? :name
-        Rails.logger.debug "* #{p.name} (#{p.email}), #{p.affiliation}<br>\n"
-      else
-        Rails.logger.debug " --> Error: #{p.inspect}"
+    if !params['new_people'].blank?
+      params['new_people'].each do |p|
+        data << p
       end
     end
+    data
+  end
 
-    Rails.logger.debug "\n\nTo be added members:\n"
-    self.new_people.each do |f|
-      Rails.logger.debug "* #{f}"
+  def check_empty_fields(pdata, i)
+    pdata.each do |key, value|
+      value.strip! unless value.nil?
+      errors.add(i.to_s, "#{key.to_s.titleize } is required" ) if value.blank?
+    end
+  end
+
+  def get_a_person(data, i)
+    return if data[:email].blank?
+    if EmailValidator.valid?(data[:email])
+      Rails.logger.debug "Valid email!"
+      find_person(data[:email]) || add_new_person(data, i)
+    else
+      errors.add(i.to_s, "E-mail is invalid")
+      return
+    end
+  end
+
+  def add_new_person(data, i)
+    return if errors.messages.keys.include?(:"#{i}")
+    person = Person.new(lastname: data[:lastname],
+                        firstname: data[:firstname],
+                        affiliation: data[:affiliation],
+                        email: data[:email],
+                        updated_by: @current_user.name)
+    person.save!
+    person
+  end
+
+  def add_new_member(person, role)
+    return true if @event.members.include?(person)
+    begin
+      m = Membership.new(event: @event, person: person, role: role,
+                         updated_by: @current_user.name, update_remote: true)
+      m.save
+      @event.set_sync_time
+    rescue ActiveRecord::RecordInvalid => e
+      errors.add(:"0", e.message)
+      msg = { problem: 'Unable to save! new member',
+              source: 'AddMembersForm.add_new_member',
+              person: "#{person.name} (id: #{person.id})",
+              membership: "#{membership.inspect}",
+              error: e.inspect }
+      StaffMailer.notify_sysadmin(@event, msg).deliver_now
+      return false
     end
   end
 
@@ -97,5 +116,14 @@ class AddMembersForm < ComplexForms
     remote_person = LegacyConnector.new.search_person(email)
     return if remote_person.blank?
     find_and_update_person(remote_person)
+  end
+
+  def role_param(role)
+    all_roles = Membership::ROLES
+    unless @current_user.is_staff?
+      all_roles -= ['Contact Organizer', 'Organizer']
+    end
+    return role if all_roles.include?(role)
+    return 'Participant'
   end
 end

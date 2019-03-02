@@ -87,7 +87,7 @@ class MembershipPolicy
     self_organizer_staff
   end
 
-  def add_members?
+  def add?
     organizer_and_staff
   end
 
@@ -182,8 +182,7 @@ class MembershipPolicy
 
   def organizer?
     return false if @current_user.nil? || @event.nil?
-    isorg = @current_user.is_organizer?(@event)
-    isorg
+    @current_user.is_organizer?(@event)
   end
 
   def staff_and_admins

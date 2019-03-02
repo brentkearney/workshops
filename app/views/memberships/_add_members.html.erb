@@ -1,10 +1,10 @@
-<p>In the space below, enter at least the email addresses of the people you wish to add to the workshop, <strong>one per line</strong>. After you add them, they will appear under "Not Yet Invited Members" in your <%= link_to 'membership list', event_memberships_path(@event) %>, where you may send them invitations. Optionally also include their name and affiliation, like so:</p>
+<p>In the space below, enter at least the email addresses of the people you wish to add to the workshop, <strong>one per line</strong>. Optionally also include their name and affiliation, like so:</p>
 <blockquote>
   alice_fang@sfu.ca, Fang, Alice, Simon Fraser University<br>
   john.smith@ubc.ca<br>
   rgupta@mit.edu, Gupta, Rajesh
 </blockquote>
-<p>If the email addresses match records in our database, they will be added immediately. Otherwise, you will be presented with a form to collect additional information, if necessary, such as names and affiliations.</p>
+<p>If the email addresses match records in our database, they will be added immediately. Otherwise, you will be presented with a form to collect names and affiliations, if necessary.</p>
 
 
 <%= f.text_area :add_members, rows: 6, class: 'form-control', placeholder:
