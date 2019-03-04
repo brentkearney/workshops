@@ -171,22 +171,29 @@ table#new-people {
     font-size: 1.2em;
   }
   th.counter {
-    width: 50px;
+    width: 40px;
     padding-left: 20px;
   }
   td.counter {
-    width: 50px;
+    width: 40px;
     align: center;
     valign: middle;
     vertical-align: center;
     font-size: 12pt;
-    padding-top: 15px;
+    padding-top: 20px;
     padding-left: 20px;
   }
   td {
     input[type="text"].has-error {
       background-color: #ffb3b3;
     }
+  }
+  td input {
+    margin: 5px;
+    padding: 5px;
+  }
+  td.last-column {
+    padding-right: 20px;
   }
 }
 
