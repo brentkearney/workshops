@@ -7,7 +7,7 @@
     <%= add_member_errors(@add_members).html_safe %>
   </div>
   <table class="table table-striped" id="new-people">
-    <tr><th>#</th><th>E-mail</th><th>Lastname</th><th>Firstname</th><th>Affiliation</th></tr>
+    <tr><th class="counter">#</th><th>E-mail</th><th>Lastname</th><th>Firstname</th><th>Affiliation</th></tr>
     <% count = 0; @add_members.new_people.each do |row| %>
       <% count += 1; %>
     <tr>

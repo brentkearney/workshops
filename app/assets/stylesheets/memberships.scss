@@ -152,11 +152,9 @@ td.invite-buttons {
   background: #d7f7d8;
 }
 
-#add-member-errors {
-  text-align: left;
-  margin-left: 100px;
-  ul {
-    align: left;
+ol#add-members-errors {
+  li {
+    font-size: 12pt;
   }
 }
 
@@ -172,10 +170,18 @@ table#new-people {
   td, th {
     font-size: 1.2em;
   }
+  th.counter {
+    width: 50px;
+    padding-left: 20px;
+  }
   td.counter {
-    margin: 15px;
-    font-style: bold;
-    font-size: 14pt;
+    width: 50px;
+    align: center;
+    valign: middle;
+    vertical-align: center;
+    font-size: 12pt;
+    padding-top: 15px;
+    padding-left: 20px;
   }
   td {
     input[type="text"].has-error {
