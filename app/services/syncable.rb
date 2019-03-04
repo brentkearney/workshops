@@ -64,7 +64,8 @@ module Syncable
   def find_and_update_person(remote_person)
     local_person = get_local_person(remote_person)
     if local_person.blank?
-      local_person = save_person(Person.new(remote_person))
+      new_person = update_record(Person.new, remote_person)
+      local_person = save_person(new_person)
     else
       local_person = update_record(local_person, remote_person)
       save_person(local_person)
@@ -88,6 +89,8 @@ module Syncable
   # local record, remote hash
   def update_record(local, remote)
     remote_updated = prepare_value('updated_at', remote['updated_at'])
+    local.updated_at = DateTime.new(1970,1,1) if local.updated_at.blank?
+    local.updated_by = 'Workshops Import' if local.updated_by.blank?
     booleans = boolean_fields(local)
     remote.each_pair do |k, v|
       next if v.blank?
@@ -95,7 +98,9 @@ module Syncable
       next if k == 'updated_at' && local.updated_at.utc == v
       v = bool_value(v) if booleans.include?(k)
 
-      next if k == 'invited_by'
+      next if k == 'invited_by' unless v.blank?
+      v = 'Workshops Importer' if k == 'invited_by' && v.blank?
+
       if k == 'invited_on'
         if local.invited_on.blank? || local.invited_on.to_i < v.to_i
           local.invited_on = v

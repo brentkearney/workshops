@@ -1,5 +1,3 @@
-import jquery from 'jquery'
-
 const $ = jquery || window.jQuery || window.$
 
 class BootstrapSwitch {

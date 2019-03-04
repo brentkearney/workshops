@@ -8,13 +8,14 @@
 
 # For views/memberships/add.html.erb
 class AddMembersForm < ComplexForms
-  attr_accessor :added, :new_people, :role
+  attr_accessor :added, :new_people, :role, :sync_errors
 
   include Syncable
 
   def initialize(event, current_user)
     @event = event
     @current_user = current_user
+    @sync_errors = ErrorReport.new(self.class, @event)
     self.added = []
     self.new_people = []
     self.role = 'Participant'
