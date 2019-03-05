@@ -47,7 +47,7 @@ $(document).on 'turbolinks:load', ->
       dataType: 'html'
       data: { publish_schedule: state }
       success: (data, status, response) ->
-        alert 'Publishing successful! received: ' + data + ' resp:' + response
+        #alert 'Publishing successful! received: ' + data + ' resp:' + response
       error: ->
         alert 'Failed to change publishing status! :('
 
@@ -62,7 +62,6 @@ $(document).on 'turbolinks:load', ->
       event.preventDefault()
       desc_id = this.id.replace("link", "description")
       $('#' + desc_id).fadeToggle()
-
 
 
   if $("body.schedule.new").length > 0 || $("body.schedule.edit").length > 0

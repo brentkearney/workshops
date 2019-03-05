@@ -44,6 +44,9 @@ class MembershipsController < ApplicationController
     if request.post?
       Rails.logger.debug "\n\nmemberships#add received: #{add_params.inspect}\n\n"
       @add_members.process(add_params)
+      if @add_members.new_people.blank?
+        redirect_to event_memberships_path(@event), success: 'New members added!'
+      end
     end
   end
 
@@ -144,7 +147,7 @@ class MembershipsController < ApplicationController
     respond_to do |format|
       format.html do
         redirect_to event_memberships_path(@event),
-                    notice: 'Membership was successfully destroyed.'
+                    notice: 'Membership was successfully removed.'
       end
       format.json { head :no_content }
     end
