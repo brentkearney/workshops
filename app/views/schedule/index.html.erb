@@ -48,14 +48,15 @@
   <% end %>
 
   <% if policy(Schedule.new(event: @event)).publish_schedule? %>
+  <div id="event-code"><%= @event.code %></div>
   <div class="row bottom-buttons">
     <div class="col-md-6">
       <div class="well publish_schedule_controls">
-        <div id="event-code"><%= @event.code %></div>
-        <span class="publish_schedule_text">
-          Publish This Schedule:
+        <label class="switch">
           <%= check_box_tag(:publish_schedule, @event.publish_schedule, @event.publish_schedule) %>
-        </span>
+          <span class="slider round"></span>
+        </label>
+        <div id="publish_schedule_text">Publish Schedule (OFF/ON)</div>
       </div>
       <!-- /.well -->
     </div>
@@ -65,6 +66,7 @@
         <span class="print_schedule">
           <%= link_to '<i class="fa fa-print fa-fw"></i> Print this Schedule'.html_safe, '#print', id: 'print-button', class: 'btn btn-default' %>
         </span>
+        <div id="spacer"></div>
       </div>
       <!-- /.well -->
     </div>

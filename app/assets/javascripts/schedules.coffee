@@ -39,33 +39,30 @@ $(document).on 'turbolinks:load', ->
   if /firefox|msie/i.test(navigator.userAgent)
     $('select').removeClass('form-control')
 
-  if $("body.schedule.index").length > 0
-    publish_toggle = $('#publish_schedule')
-    publish_toggle.bootstrapSwitch()
-    publish_toggle.on 'switchChange.bootstrapSwitch', (event,state) ->
-      $.ajax
-        url: '/events/' + $('#event-code').text() + '/schedule/publish_schedule'
-        type: 'POST'
-        dataType: 'html'
-        data :
-          publish_schedule: state
-        success: (data, status, response) ->
-          #alert 'Publishing successful! received: ' + data
-        error: ->
-          alert 'Failed to change publishing status! :('
+
+  publish_schedule =(state) ->
+    $.ajax
+      url: '/events/' + $('#event-code').text() + '/schedule/publish_schedule'
+      type: 'POST'
+      dataType: 'html'
+      data: { publish_schedule: state }
+      success: (data, status, response) ->
+        alert 'Publishing successful! received: ' + data + ' resp:' + response
+      error: ->
+        alert 'Failed to change publishing status! :('
+
+  $('#publish_schedule').change ->
+    if this.checked
+      publish_schedule('true')
+    else
+      publish_schedule('false')
+
 
     $('.item-link').click (event) ->
       event.preventDefault()
       desc_id = this.id.replace("link", "description")
       $('#' + desc_id).fadeToggle()
 
-      toggle_icon = $('#' + this.id + ' .fa')
-      if toggle_icon.hasClass('fa-toggle-down')
-        toggle_icon.removeClass('fa-toggle-down')
-        toggle_icon.addClass('fa-toggle-up')
-      else
-        toggle_icon.removeClass('fa-toggle-up')
-        toggle_icon.addClass('fa-toggle-down')
 
 
   if $("body.schedule.new").length > 0 || $("body.schedule.edit").length > 0
