@@ -2,18 +2,8 @@
 <section id="errors">
 <div class="alert alert-danger">
   <header>
-  <% if @rsvp.errors.has_key?(:Membership) %>
-    <h3>
-      Your request could not be made:
-    </h3>
-  <% else %>
-    <h3>
-      There is an error in your request.
-    </h3>
-    <h4>
-      Please correct the following:
-    </h4>
-  <% end %>
+    <h3>Submission Not Successful!</h3>
+    <h4>Please correct the following problems:</h4>
   </header>
   <ul>
     <% @rsvp.errors.full_messages.each do |message| %>
