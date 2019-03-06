@@ -138,15 +138,16 @@ module MembershipsHelper
   end
 
   def show_reinvite_button(member)
-    column = '<td class="rowlink-skip no-print invite-buttons">'
+    column = ''
     if show_reinvite_buttons?(member)
+      column << '<td class="rowlink-skip no-print invite-buttons">'
       column << link_to("Resend Invitation", invitations_send_path(member),
         data: { confirm: "This will send #{member.person.name}
         an email, re-inviting #{member.person.him} to attend this
         workshop. Are you sure you want to proceed?".squish },
         class: 'btn btn-sm btn-default')
+      column << '</td>'
     end
-    column << '</td>'
     column.html_safe
   end
 
