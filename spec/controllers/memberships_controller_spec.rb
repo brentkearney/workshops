@@ -752,7 +752,7 @@ RSpec.describe MembershipsController, type: :controller do
           delete :destroy, params: { event_id: @event.id, id: @membership.id }
 
           expect(response).to redirect_to event_memberships_path(@event)
-          expect(flash[:notice]).to eq('Membership was successfully destroyed.')
+          expect(flash[:notice]).to eq('Membership was successfully removed.')
         end
 
         context 'as role: member' do

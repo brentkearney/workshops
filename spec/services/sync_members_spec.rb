@@ -129,7 +129,7 @@ describe "SyncMembers" do
       SyncMembers.new(@eventm)
       member = Event.find(@eventm.id).memberships.last
 
-      expect(member.person.updated_by).to eq('Workshops importer')
+      expect(member.person.updated_by).to eq('FactoryBot')
       expect(member.person.updated_at).not_to be_nil
       expect(member.updated_by).to eq('Workshops importer')
       expect(member.updated_at).not_to be_nil

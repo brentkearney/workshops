@@ -58,7 +58,7 @@ module Syncable
 
   def get_local_person(remote_person)
     Person.find_by(legacy_id: remote_person['legacy_id'].to_i) ||
-      Person.find_by(email: remote_person['email'])
+      Person.find_by(email: remote_person['email'].downcase.strip)
   end
 
   def find_and_update_person(remote_person)
@@ -89,8 +89,10 @@ module Syncable
   # local record, remote hash
   def update_record(local, remote)
     remote_updated = prepare_value('updated_at', remote['updated_at'])
+    remote_updated = DateTime.new(1970,1,30) if remote_updated.blank?
     local.updated_at = DateTime.new(1970,1,1) if local.updated_at.blank?
     local.updated_by = 'Workshops Import' if local.updated_by.blank?
+
     booleans = boolean_fields(local)
     remote.each_pair do |k, v|
       next if v.blank?
@@ -107,7 +109,6 @@ module Syncable
           local.invited_by = remote['invited_by']
         end
       end
-
       next if k == 'invited_on'
 
       unless local.send(k).eql? v
@@ -126,7 +127,7 @@ module Syncable
   # find duplicate Person records based on email or legacy_id (mode)
   def resolve_duplicates(local, remote, mode)
     person = local
-    other_person = Person.find_by("#{mode}": remote[mode])
+    other_person = Person.find_by("#{mode}": remote["#{mode}"])
     if other_person.blank?
       replace_remote(Person.new(remote), local) if mode == 'legacy_id'
       person = update_email(local, remote['email']) if mode == 'email'
@@ -164,7 +165,7 @@ module Syncable
 
   def convert_to_time(v)
     return Time.at(v) if v.is_a?(Integer)
-    DateTime.parse(v.to_s)
+    DateTime.parse(v.to_s).in_time_zone(@event.time_zone)
   end
 
   def replace_person(replace: other_person, replace_with: person)

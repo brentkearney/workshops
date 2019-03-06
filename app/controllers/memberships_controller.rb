@@ -42,9 +42,8 @@ class MembershipsController < ApplicationController
     @add_members = AddMembersForm.new(@event, current_user)
 
     if request.post?
-      Rails.logger.debug "\n\nmemberships#add received: #{add_params.inspect}\n\n"
       @add_members.process(add_params)
-      if @add_members.new_people.blank?
+      if @add_members.new_people.empty? && !@add_members.added.empty?
         redirect_to event_memberships_path(@event), success: 'New members added!'
       end
     end

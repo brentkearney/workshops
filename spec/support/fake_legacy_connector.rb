@@ -38,6 +38,12 @@ class FakeLegacyConnector
     end
   end
 
+  def search_person(email)
+    Rails.logger.debug "search_person received email: #{email}\n"
+    person = build(:person, email: email).attributes
+    Rails.logger.debug "returning person: #{person.pretty_inspect}\n\n"
+  end
+
   def replace_person(replace, replace_with)
   end
 

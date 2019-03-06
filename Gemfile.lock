@@ -124,7 +124,7 @@ GEM
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     ed25519 (1.2.4)
-    email_validator (2.0.0)
+    email_validator (1.6.0)
       activemodel
     equalizer (0.0.11)
     erubi (1.8.0)
@@ -443,7 +443,7 @@ DEPENDENCIES
   devise-encryptable
   devise_invitable
   ed25519
-  email_validator
+  email_validator (~> 1.6.0)
   factory_bot_rails
   faker
   font-awesome-rails

@@ -126,7 +126,9 @@ class Membership < ApplicationRecord
   end
 
   def guest_disclamer_acknowledgement
-    if has_guest && !guest_disclaimer
+    guest_disclaimer = true if has_guest && update_by_staff
+
+    if has_guest && guest_disclaimer == false
       errors.add(:guest_disclaimer, 'must be acknowledged if bringing a guest.')
     end
   end
