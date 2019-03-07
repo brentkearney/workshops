@@ -11,7 +11,7 @@ module Syncable
   attr_writer :event, :local_members
 
   def event
-    @event ||= ::Event.new
+    @event ||= ::Event.new(time_zone: Event.last.time_zone)
   end
 
   def local_members
@@ -40,6 +40,9 @@ module Syncable
       local_membership = local_members.select do |membership|
         membership.person.email == remote_member['Person']['email']
       end.first
+      if !local_membership.nil? && local_membership.person.legacy_id.blank?
+        local_membership.person.legacy_id = remote_member['Person']['legacy_id']
+      end
     end
     local_membership
   end
@@ -261,7 +264,7 @@ module Syncable
   end
 
   def fixtime(val)
-    return DateTime.current if blank_time?(val)
+    return DateTime.current.in_time_zone(@event) if blank_time?(val)
     val
   end
 
