@@ -1,6 +1,8 @@
 $(document).on 'turbolinks:load', ->
   return unless $('.schedule').length > 0
 
+  window.MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
   if $('#earliest_hour').length > 0
     ehour = parseInt( $('#earliest_hour').val(), 10 )
     $('#schedule_start_time_4i option:lt(' + ehour + ')').remove()
@@ -58,10 +60,15 @@ $(document).on 'turbolinks:load', ->
       publish_schedule('false')
 
 
-    $('.item-link').click (event) ->
-      event.preventDefault()
-      desc_id = this.id.replace("link", "description")
-      $('#' + desc_id).fadeToggle()
+  $('.item-link').click (event) ->
+    event.preventDefault()
+    desc_id = this.id.replace("link", "description")
+    icon_id = this.id.replace("link", "icon")
+    $('#' + desc_id).fadeToggle()
+    if $('#' + icon_id).hasClass('fa-toggle-down')
+      $('#' + icon_id).removeClass('fa-toggle-down').addClass('fa-toggle-up')
+    else
+      $('#' + icon_id).removeClass('fa-toggle-up').addClass('fa-toggle-down')
 
 
   if $("body.schedule.new").length > 0 || $("body.schedule.edit").length > 0

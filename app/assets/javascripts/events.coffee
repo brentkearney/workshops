@@ -1,6 +1,8 @@
 $(document).on 'turbolinks:load', ->
   return unless $('.events').length > 0
 
+  window.MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
   if $("body.events.edit").length > 0
     $('#start_date').datetimepicker({
       format: 'YYYY-MM-DD'
@@ -16,3 +18,4 @@ $(document).on 'turbolinks:load', ->
 
     $('#end_date').on 'dp.change', (e) =>
       $('#start_date').data('DateTimePicker').maxDate(e.date);
+
