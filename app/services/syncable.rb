@@ -132,6 +132,9 @@ module Syncable
     person = local
     other_person = Person.find_by("#{mode}": remote["#{mode}"])
     if other_person.blank?
+      # no local record with remote['legacy_id'], so replace the remote
+      # record with the local record (found by email match). If either record
+      # has no legacy_id, or if they match, replace_remote() does nothing.
       replace_remote(Person.new(remote), local) if mode == 'legacy_id'
       person = update_email(local, remote['email']) if mode == 'email'
     else
@@ -213,6 +216,7 @@ module Syncable
 
   def replace_remote(replace, replace_with)
     return if replace.legacy_id.blank? || replace_with.legacy_id.blank?
+    return if replace.legacy_id == replace_with.legacy_id
     ReplacePersonJob.perform_later(replace.legacy_id, replace_with.legacy_id)
   end
 

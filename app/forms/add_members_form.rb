@@ -72,10 +72,8 @@ class AddMembersForm < ComplexForms
     email = data[:email].downcase.strip
     return if email.blank?
     if EmailValidator.valid?(email)
-      Rails.logger.debug "\n\n#{email} is valid email!\n\n"
       find_person(email) || add_new_person(data, i)
     else
-      Rails.logger.debug "\n\n#{email} is not valid email.\n\n"
       errors.add(i.to_s, "E-mail is invalid")
       return
     end
