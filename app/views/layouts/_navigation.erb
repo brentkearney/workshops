@@ -22,6 +22,7 @@
       <ul class="dropdown-menu dropdown-user">
         <% if user_signed_in? %>
           <% if current_user.is_admin? %>
+            <li><%= link_to ' Database Admin', admin_root_path, class: 'fa fa-database fw' %></li>
             <li><%= link_to ' Settings', settings_path, class: 'fa fa-gear fw' %></li>
           <% end %>
           <li><%= link_to ' Change Password', edit_user_registration_path, class: 'fa fa-key fw' %></li>

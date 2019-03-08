@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
- 
+
 
   root 'welcome#index'
 
@@ -84,12 +84,13 @@ Rails.application.routes.draw do
 
   # Admin dashboard
   namespace :admin do
-      
+
     resources :events
     resources :people
     resources :lectures
+    resources :schedules
 
-    root to: "events#index"
+    root to: "people#index"
   end
 
 
