@@ -48,7 +48,7 @@ FactoryBot.define do
       date = Date.today
       date = date + 3.weeks if date.month == 1
       if evaluator.past
-        date = date.prev_year - 2.months
+        date = date.prev_year #- 2.months
         event.start_date = date.prev_week(:sunday)
       elsif evaluator.future
         date = date.next_year

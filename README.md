@@ -16,27 +16,27 @@ Installation instructions are below.
 
 ### Current Features
 * **Sign-ins and sign-ups** for authorized event members, staff, and admin.
-* **Event Invitations** feature sends a unique link to potential participants, inviting them to attend a workshop.
+* **Fine-grained role-based access controls** allows different levels of access privileges for admin, staff, organizers, participants, and public.
+* **Add Members** Staff and Organizers can add members to their workshops.
+* **Event Invitations** Staff and Organizers can click a button to email a unique link to potential participants, inviting them to attend a workshop.
+* **Multiple locations** for events. Each location has its own settings, email templates, forms, etc..
+* **RSVPs** allows invited participants to reply to their invitation with "Yes", "No", "Maybe". Includes a text area to send a personal note to the organizer. If confirming, collects data for hotel reservations, etc., via a web form (unique per location) that is optimized for autofill. Automatically sends confirmation email to confirmed participants, using email templates based on workshop type.
 * **[SparkPost](https://www.sparkpost.com) Integration** for improved email deliverability.
-* **RSVPs** allows invited participants to reply to their invitation with "Yes", "No", "Maybe". Includes a text area to send a personal note to the organizer. If confirming, collects data for hotel reservations, etc., via a web form that is optimized for autofill. Automatically sends confirmation email to confirmed participants, using email templates based on workshop type.
 * **Workshop scheduling**: organizers can enter their workshop schedules, including talks with abstracts/descriptions, and choose when to publish their schedules to the public.
-* **Authenticated JSON API** for [an external video recording system](http://www.birs.ca/facilities/automated-video) to update lecture records in the schedule, based on recordings made.
 * **Default schedule templates** that staff can edit. Defaults get applied to all workshops' schedules which have not yet been edited.
 * **LaTeX formatting** in all text editing areas, via [MathJax](https://www.mathjax.org), for mathematical formulae.
 * **JSON output** of schedules and other event data, for easy display on external websites, [like this](http://www.birs.ca/events/2017/5-day-workshops/17w5030/schedule).
+* **Authenticated JSON API** for [an external video recording system](http://www.birs.ca/facilities/automated-video) to update lecture records in the schedule, based on recordings made.
 * **Email notifications** for staff and organizers when data changes, such as participant RSVPs and schedule updates during currently running workshops.
-* **Multiple locations** for events. Each location has its own settings, email templates, etc..
 * **Event listing navigation** by user's events, future events, past events, events by location, and by year.
 * **Event participant listings** grouped by attendance status (Confirmed, Invited, Declined, etc..), click for more detailed profile views of each participant.
-* **eMail lists** send email to a single address, to have it redistributed to event members.
-* **Fine-grained role-based access controls** for many features allowing different levels of privilege between admin, staff, organizers and participants.
+* **Mail lists** each workshop automatically has mail lists (send one email that is automatically redistributed to a list of addresses) for groups of participants based on their attendance status. i.e. a mail list for confirmed participants, one for invited participants, one for declined participants...
 * **Data imports** Workshop data is imported via calls to an external API, JSON.
 * **Background jobs** to sync event membership data with external data source via API, and to send emails.
 * **Settings in database** Application settings are stored in the database instead of config files, allowing staff and admins to easily change settings with web interface, on the fly.
 
 
 ### Upcoming Features:
-* Staff and Organizers can add members to their workshop (currently participants are added by external program and imported via API).
 * After-event feedback forms - automatically mail participants after an event, with one-click URL for providing feedback on the event.
 * Drag & drop interface for scheduling features.
 * Staff can assign hotel rooms, generate reports for hotel room bookings, and manage other hospitality details for workshop participants.
@@ -66,20 +66,19 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
   ```
   for file in `ls -1 *.example`; do newfile=`echo $file | sed 's/\.example$//'`; cp $file $newfile; done
   ```
-3. Edit docker-compose.yml to set your preferred usernames and passwords in the environment variables. Note the instructions
+3. Edit the lib/tasks/ws.rake file to change default user account information, to set your own credentials for logging into the Workshops web interface. The default accounts are setup by the entrypoint.sh script running: `rake ws:create_admins RAILS_ENV=development`.
+4. Edit docker-compose.yml to set your preferred usernames and passwords in the environment variables. Note the instructions
    at the top for creating data containers, for storing database and ruby gems persistently.
 
    The first time the database container is run, databases and database accounts will be created via the script at
    ./db/pg-init/init-user-db.sh. It uses the environment variables that you set in docker-compose.yml.
-4. Edit the lib/tasks/ws.rake file to change default user account information, to set your own credentials for logging into
-    the Workshops web interface.
 5. If you want your instance to be accessible at a domain, edit nginx.conf.erb to change `server_name YOUR.HOSTNAME.COM;`.
 6. Run `docker-compose up` (or possibly `docker build .` first).
 7. Login to the web interface (http://localhost) with the account you setup in ws.rake, and visit /settings (click the
   drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
 
-After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out some of it, such as
-creating the gemset, adding default settings, and creating admin accounts. Change the `bundle install` to `bundle update`.
+After the first time you run it, you will pobably want to *edit the entrypoint.sh script*, and comment out some of it, such as
+creating the gemset, `rake db:seed`, adding default settings, and creating admin accounts. Change `bundle install` to `bundle update`.
 
 The config files are setup to run Rails in development mode. If you would like to change it to production, edit the entrypoint.sh
 to change all of the `RAILS_ENV=development` statements, and the Passengerfile.json `"environment": "development"` line.

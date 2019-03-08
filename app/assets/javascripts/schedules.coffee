@@ -1,6 +1,8 @@
 $(document).on 'turbolinks:load', ->
   return unless $('.schedule').length > 0
 
+  window.MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
   if $('#earliest_hour').length > 0
     ehour = parseInt( $('#earliest_hour').val(), 10 )
     $('#schedule_start_time_4i option:lt(' + ehour + ')').remove()
@@ -39,33 +41,34 @@ $(document).on 'turbolinks:load', ->
   if /firefox|msie/i.test(navigator.userAgent)
     $('select').removeClass('form-control')
 
-  if $("body.schedule.index").length > 0
-    publish_toggle = $('#publish_schedule')
-    publish_toggle.bootstrapSwitch()
-    publish_toggle.on 'switchChange.bootstrapSwitch', (event,state) ->
-      $.ajax
-        url: '/events/' + $('#event-code').text() + '/schedule/publish_schedule'
-        type: 'POST'
-        dataType: 'html'
-        data :
-          publish_schedule: state
-        success: (data, status, response) ->
-          #alert 'Publishing successful! received: ' + data
-        error: ->
-          alert 'Failed to change publishing status! :('
 
-    $('.item-link').click (event) ->
-      event.preventDefault()
-      desc_id = this.id.replace("link", "description")
-      $('#' + desc_id).fadeToggle()
+  publish_schedule =(state) ->
+    $.ajax
+      url: '/events/' + $('#event-code').text() + '/schedule/publish_schedule'
+      type: 'POST'
+      dataType: 'html'
+      data: { publish_schedule: state }
+      success: (data, status, response) ->
+        #alert 'Publishing successful! received: ' + data + ' resp:' + response
+      error: ->
+        alert 'Failed to change publishing status! :('
 
-      toggle_icon = $('#' + this.id + ' .fa')
-      if toggle_icon.hasClass('fa-toggle-down')
-        toggle_icon.removeClass('fa-toggle-down')
-        toggle_icon.addClass('fa-toggle-up')
-      else
-        toggle_icon.removeClass('fa-toggle-up')
-        toggle_icon.addClass('fa-toggle-down')
+  $('#publish_schedule').change ->
+    if this.checked
+      publish_schedule('true')
+    else
+      publish_schedule('false')
+
+
+  $('.item-link').click (event) ->
+    event.preventDefault()
+    desc_id = this.id.replace("link", "description")
+    icon_id = this.id.replace("link", "icon")
+    $('#' + desc_id).fadeToggle()
+    if $('#' + icon_id).hasClass('fa-toggle-down')
+      $('#' + icon_id).removeClass('fa-toggle-down').addClass('fa-toggle-up')
+    else
+      $('#' + icon_id).removeClass('fa-toggle-up').addClass('fa-toggle-down')
 
 
   if $("body.schedule.new").length > 0 || $("body.schedule.edit").length > 0

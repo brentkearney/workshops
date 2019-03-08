@@ -8,7 +8,8 @@
 class MembershipsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_event, :set_user
-  before_action :set_membership, except: [:index, :new, :create]
+  before_action :set_membership, except: [:index, :new, :create, :add,
+    :process_new]
 
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
@@ -30,9 +31,24 @@ class MembershipsController < ApplicationController
 
   # GET /events/:event_id/memberships/new
   def new
-    @membership = Membership.new
+    @membership = Membership.new(event: @event)
     authorize @membership
   end
+
+  # GET /events/:event_id/memberships/add
+  # POST /events/:event_id/memberships/add
+  def add
+    authorize Membership.new(event: @event)
+    @add_members = AddMembersForm.new(@event, current_user)
+
+    if request.post?
+      @add_members.process(add_params)
+      if @add_members.new_people.empty? && !@add_members.added.empty?
+        redirect_to event_memberships_path(@event), success: 'New members added!'
+      end
+    end
+  end
+
 
   # GET /events/:event_id/memberships/1/edit
   def edit
@@ -130,7 +146,7 @@ class MembershipsController < ApplicationController
     respond_to do |format|
       format.html do
         redirect_to event_memberships_path(@event),
-                    notice: 'Membership was successfully destroyed.'
+                    notice: 'Membership was successfully removed.'
       end
       format.json { head :no_content }
     end
@@ -185,5 +201,10 @@ class MembershipsController < ApplicationController
   def confirm_email_params
     params.require(:email_form).permit(:person_id, :replace_email_code,
                                        :replace_with_email_code)
+  end
+
+  def add_params
+    params.require(:add_members_form).permit(:add_members, :role,
+                   new_people: [:email, :lastname, :firstname, :affiliation])
   end
 end

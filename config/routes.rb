@@ -37,12 +37,9 @@ Rails.application.routes.draw do
       put 'invite/:id' => 'memberships#invite', as: :memberships_invite
       match 'email_change' => 'memberships#email_change', as: :email_change, via: [:get, :post]
       get 'cancel_email_change' =>  'memberships#cancel_email_change', as: :email_cancel
+      match 'add', on: :collection, via: [:get, :post]
+      post 'process_new', on: :collection
     end
-    # put 'memberships/invite/:id' => 'memberships#invite', as: :memberships_invite
-    # match 'memberships/email_change' => 'memberships#email_change', as: :email_change, via: [:get, :post]
-    # get 'memberships/email_cancel' =>  'memberships#email_cancel', as: :email_cancel
-
-
     get 'lectures' => 'lectures#index'
   end
 

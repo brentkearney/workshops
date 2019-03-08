@@ -98,7 +98,7 @@ class SyncPerson
       msg = { problem: 'Unable to create! new ConfirmEmailChange',
               source: 'SyncPerson.create_change_confirmation',
               person: "#{person.name} (id: #{person.id}",
-              replace_with: "#{replace_with.name} (id: #{replace_with.id}",
+              replace_with: "#{replace_with.name} (id: #{replace_with.id})",
               error: e.inspect }
       StaffMailer.notify_sysadmin(nil, msg).deliver_now
       return

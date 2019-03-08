@@ -1,4 +1,4 @@
-# app/models/invitation_checker.rb
+# app/forms/invitation_checker.rb
 #
 # Copyright (c) 2018 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
@@ -6,6 +6,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
+# Works with invitation_form
 class InvitationChecker
   attr_reader :otp, :invitation, :errors
 

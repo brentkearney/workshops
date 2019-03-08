@@ -15,6 +15,7 @@ class Person < ApplicationRecord
   }, through: :memberships, source: :event
   has_one :user, dependent: :destroy
   has_many :invitations, foreign_key: 'invited_by'
+  has_many :lectures
   belongs_to :replace_person, class_name: "ConfirmEmailChange", optional: true
   belongs_to :replace_with, class_name: "ConfirmEmailChange", optional: true
 
@@ -26,7 +27,8 @@ class Person < ApplicationRecord
                     uniqueness: true,
                     email: true
   validates :firstname, :lastname, :updated_by, presence: true
-  validates :gender, :affiliation, presence: true, unless: :member_import
+  validates :gender, presence: true, if: :is_rsvp
+  validates :affiliation, presence: true, unless: :member_import
   validates :gender, format:
                      { with: /\A(M|F|O)\z/, message: " must be 'M','F', or 'O'" },
                      allow_blank: true, unless: :member_import

@@ -65,21 +65,38 @@
       <li id="event-links">
         <a href="#"><i class="fa fa-gears fa-fw"></i> <%= @event.code %> <span class="fa arrow"></span></a>
         <ul class="nav nav-second-level">
+
           <li id="event-details">
             <div class="top-border"></div>
             <%= link_to '<i class="fa fa-book fa-fw"></i> Details'.html_safe, event_path(@event) %>
             <div class="bottom-border"></div>
           </li>
+
           <li id="event-schedule">
             <div class="top-border"></div>
             <%= link_to '<i class="fa fa-calendar fa-fw"></i> Schedule'.html_safe, event_schedule_index_path(@event) %>
             <div class="bottom-border"></div>
           </li>
+
           <li id="event-memberships">
-            <div class="top-border"></div>
-            <%= link_to '<i class="fa fa-users fa-fw"></i> Members'.html_safe, event_memberships_path(@event) %>
-            <div class="bottom-border"></div>
+            <a href="#" id="event-members-link"><i class="fa fa-users fa-fw"></i> Members<span id="locations-arrow" class="fa arrow"></span></a>
+
+            <ul class="nav nav-second-level memberships">
+              <li id="event-members-list">
+                <div class="top-border"></div>
+                <%= link_to '<i class="fa fa-list fa-fw"></i> List Members'.html_safe, event_memberships_path(@event) %>
+                <div class="bottom-border"></div>
+              </li>
+              <% if policy(@event).show_add_members? %>
+              <li id="event-members-add">
+                <div class="top-border"></div>
+                <%= link_to '<i class="fa fa-user-plus fa-fw"></i> Add Members'.html_safe, add_event_memberships_path(@event) %>
+                <div class="bottom-border"></div>
+              </li>
+              <% end %>
+            </ul>
           </li>
+          <!-- /#event-memberships -->
         </ul>
         <!-- /.nav-second-level -->
       </li>

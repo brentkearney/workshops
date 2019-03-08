@@ -1,4 +1,4 @@
-# app/models/email_form.rb
+# app/forms/email_form.rb
 #
 # Copyright (c) 2019 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under

@@ -1,0 +1,11 @@
+<div class="well" id="add-members-success">
+  <h3>
+    These people have been added to your workshop:<br>
+    <small>You can send them invitations in the "List Members" section.</small>
+  </h3>
+  <ol id="added-members">
+  <% @add_members.added.each do |p| %>
+    <li><%= p.name %>, <%= p.email %>, <%= p.affiliation %></li>
+  <% end %>
+  </ol>
+</div>

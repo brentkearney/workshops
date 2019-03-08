@@ -26,8 +26,13 @@ RSpec.describe 'Model validations: Person', type: :model do
     expect(p.valid?).to be_falsey
   end
 
-  it 'requires a gender' do
+  it 'does not require a gender' do
     p = build(:person, gender: '')
+    expect(p.valid?).to be_truthy
+  end
+
+  it 'requires a gender if is_rsvp' do
+    p = build(:person, gender: '', is_rsvp: true)
     expect(p.valid?).to be_falsey
   end
 

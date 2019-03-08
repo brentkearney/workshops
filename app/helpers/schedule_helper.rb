@@ -13,7 +13,7 @@ module ScheduleHelper
     if policy(item).edit?
       link_text = link_to item[:name], event_schedule_edit_path(@event, item), class: link_class
       unless item[:description].blank?
-        link_text += link_to " <i class=\"fa fa-toggle-down fa-fw\"></i>".html_safe, '#', html_options = {class: 'item-link', id: "link-#{item[:id]}"}
+        link_text += link_to " <i class=\"fa fa-toggle-down fa-fw\" id=\"icon-#{item[:id]}\"></i>".html_safe, '#', html_options = {class: 'item-link', id: "link-#{item[:id]}"}
       end
     else
       if item[:description].blank?

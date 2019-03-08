@@ -103,6 +103,100 @@ td.invite-buttons {
   }
 }
 
+#add-members {
+  p {
+    margin: 0.8em 0;
+  }
+
+  .inline-checkbox {
+    margin-top: 10px;
+    margin-left: 5px;
+    p {
+      font-size: 1.2em;
+      display: inline;
+      margin-left: 5px;
+    }
+    .checkbox {
+      margin-bottom: 12px;
+      display: inline;
+    }
+  }
+
+  #add-members-submit {
+    margin-top: 10px;
+  }
+
+  .member-roles {
+    margin-top: 10px;
+    font-size: 1.2em;
+    font-weight: normal;
+  }
+
+  #roles-icon {
+    padding-top: 12px;
+    font-size: 1.8em;
+  }
+
+  ul#about-roles-list {
+    font-size: 1.2em;
+    font-weight: normal;
+    li {
+      margin-bottom: 1.2em;
+      line-height: 1.5em;
+    }
+  }
+}
+
+#add-members-success {
+  margin-bottom: 50px;
+  background: #d7f7d8;
+}
+
+ol#add-members-errors {
+  li {
+    font-size: 12pt;
+  }
+}
+
+ol#added-members {
+  margin: 1em;
+  font-size: 1.2em;
+  li {
+    margin-bottom: 1em;
+  }
+}
+
+table#new-people {
+  td, th {
+    font-size: 1.2em;
+  }
+  th.counter {
+    width: 40px;
+    padding-left: 20px;
+  }
+  td.counter {
+    width: 40px;
+    align: center;
+    valign: middle;
+    vertical-align: center;
+    font-size: 12pt;
+    padding-top: 20px;
+    padding-left: 20px;
+  }
+  td {
+    input[type="text"].has-error {
+      background-color: #ffb3b3;
+    }
+  }
+  td input {
+    margin: 5px;
+    padding: 5px;
+  }
+  td.last-column {
+    padding-right: 20px;
+  }
+}
+
 @media print {
     .no-print { display:none }
     a[href]:after {

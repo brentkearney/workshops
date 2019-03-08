@@ -78,6 +78,10 @@ class EventPolicy
     current_user.super_admin?
   end
 
+  def show_add_members?
+    allow_orgs_and_staff
+  end
+
   def view_attendance_status?(status)
     return true if allow_orgs_and_staff
     if current_user

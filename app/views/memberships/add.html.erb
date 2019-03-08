@@ -1,0 +1,59 @@
+
+
+<h1>Add Members to <%= @event.code %></h1>
+<%= render 'added_members' unless @add_members.added.empty? %>
+<%= form_with model: @add_members, url: add_event_memberships_path(@event),
+                     class: 'form', role: 'form' do |form| %>
+<div class="panel-body" id="add-members">
+  <div class="row">
+    <div class="col-md-12">
+      <% if @add_members.new_people.empty? %>
+        <%= render partial: 'add_members', locals: { f: form } %>
+      <% else %>
+        <%= render partial: 'new_people', locals: { f: form } %>
+      <% end %>
+    </div><!-- /col-md-12 -->
+  </div><!-- /row -->
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="form-inline control-label member-roles pull-left">
+        <%= form.label :role, "Add members with role: " %>
+        <%= show_roles(form, default: @add_members.role) %>
+      </div>
+      <div class="col-md-1">
+        <div id="roles-icon">
+          <a href="#" data-toggle="modal" data-target="#about-roles"><span class="glyphicon glyphicon-question-sign"></span></a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 pull-right">
+      <%= form.submit 'Add These Members', id: 'add-members-submit', data: { disable_with: false },
+                      class: 'btn btn-md btn-default pull-right' %>
+    </div>
+  </div>
+<% end %>
+
+  <!-- About Roles Modal -->
+  <div class="modal fade" id="about-roles" tabindex="-1" role="dialog" aria-labelledby="about-roles" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="about-roles-title">About Member Roles</h3>
+        </div>
+        <div class="modal-body">
+          <ul id="about-roles-list">
+            <li>"<strong>Organizers</strong>" have special access to see all added members (including non-invited and declined ones), edit data, send invitations, and add new members.</li>
+            <li>"<strong>Participants</strong>" are people you plan to invite to participate in your workshop. They can only see other invited members, the workshop description and schedule, and can only edit their own data.</li>
+            <li>"<strong>Backup Participants</strong>" are people who you plan to invite if regular Participants decline your invitation, or cancel. Backup Participants will <em>not</em> be sent invitations when the "Invite All Not Yet Invited Participants" button is clicked. Sending an invitation to a Backup Participant automatically changes their role to Participant.</li>
+            <li>"<strong>Observers</strong>" are people who are willing to attend the workshop without funding. They will pay for their own food and accommodation.</li>
+          </ul>
+          <p>You can change a member's role after they are added.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -42,8 +42,10 @@ class InvitationsController < ApplicationController
     end
 
     unless is_reinvite?(membership)
-      redirect_to event_memberships_path(event),
-        error: 'This event is already full.' and return if event_full?(event)
+      if event_full?(event, [membership])
+        redirect_to event_memberships_path(event),
+          error: 'This event is already full.' and return
+      end
     end
 
     pause_membership_syncing(event)
@@ -79,11 +81,9 @@ class InvitationsController < ApplicationController
       members.each do |membership|
         membership.person.member_import = true # skip validations on save
         send_invitation(membership, current_user.name)
-        sent_to << membership.person.name + ', '
       end
-      sent_to.gsub!(/, \z/, '')
       redirect_to event_memberships_path(event),
-                  success: "Invitations were sent to: #{sent_to}."
+        success: "Invitations were sent to: #{members.size} participants."
     end
   end
 
@@ -94,7 +94,7 @@ class InvitationsController < ApplicationController
   end
 
   def event_full?(event, members=[])
-    event.num_invited_participants + members.count >= event.max_participants
+    event.num_invited_participants + members.count > event.max_participants
   end
 
   def pause_membership_syncing(event)

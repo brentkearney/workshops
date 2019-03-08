@@ -93,6 +93,7 @@ class Event < ApplicationRecord
   def set_sync_time
     def record_timestamps; false; end
     self.sync_time = DateTime.current
+    self.data_import = true # skip short_name validation
     save!
     def record_timestamps; super; end
   end

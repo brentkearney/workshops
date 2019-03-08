@@ -26,8 +26,9 @@
                     <th>Name</th>
                     <% if show_reinvite_buttons?(members.first) %>
                       <th>Invited On</th><th></th>
-                    <% end %>
-                    <% if members.first.attendance == 'Not Yet Invited' %>
+                    <% elsif members.first.attendance == 'Not Yet Invited' %>
+                      <th></th><th></th>
+                    <% else %>
                       <th></th>
                     <% end %>
                     <th class="hidden-xs">Affiliation</th>

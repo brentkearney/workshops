@@ -32,15 +32,32 @@ module MembershipsHelper
     end
   end
 
-  def show_roles(f)
+  def show_roles(f, default: nil)
     disabled_options = []
     if @current_user.is_organizer?(@event)
       disabled_options = ['Contact Organizer', 'Organizer']
     end
 
     f.select :role, Membership::ROLES,
-             { disabled: disabled_options },
+             { disabled: disabled_options, selected: default },
              required: 'true', class: 'form-control'
+  end
+
+  def add_member_errors(add_members)
+    return '' if add_members.errors.empty?
+    errors = add_members.errors
+    msg = "<p><strong>‼️These problems were detected:</strong>\n"
+    msg << "<ol id=\"add-members-errors\">\n"
+    errors.messages.each do |line|
+      msg << "<li value=\"#{line[0].to_s}\">"
+      line[1].each do |prob|
+        msg << "#{prob}, "
+      end
+      msg.chomp!(', ') << ".</li>\n"
+    end
+    msg << "</ol>\n"
+
+    msg << '</p>'
   end
 
   def show_attendances(f)
@@ -85,13 +102,17 @@ module MembershipsHelper
   end
 
   def show_invited_on(member)
-    return unless show_reinvite_buttons?(member)
-    if member.invited_on.blank?
-      return '<td class="rowlink-skip no-print">(not set)</td>'.html_safe
+    column = '<td class="rowlink-skip no-print">'
+    if show_reinvite_buttons?(member)
+      if member.invited_on.blank?
+        column << '(not set)'
+      else
+        column << '<div id="invited-on">(' +
+          member.invited_on.strftime('%Y-%m-%d') + ')</div>'
+      end
     end
-    ('<td class="rowlink-skip no-print"><div id="invited-on">' +
-      member.invited_on.strftime('%Y-%m-%d') +
-      '</div></td>').html_safe
+    column << '</td>'
+    column.html_safe
   end
 
   def show_invite_buttons?(member)
@@ -99,7 +120,7 @@ module MembershipsHelper
   end
 
   def show_reinvite_buttons?(member)
-    policy(@event).send_invitations? &&
+    member.role != 'Observer' && policy(@event).send_invitations? &&
       %w(Invited Undecided).include?(member.attendance)
   end
 
@@ -117,13 +138,16 @@ module MembershipsHelper
   end
 
   def show_reinvite_button(member)
-    return unless show_reinvite_buttons?(member)
-    column = '<td class="rowlink-skip no-print invite-buttons">' +
-      link_to("Resend Invitation", invitations_send_path(member),
+    column = ''
+    if show_reinvite_buttons?(member)
+      column << '<td class="rowlink-skip no-print invite-buttons">'
+      column << link_to("Resend Invitation", invitations_send_path(member),
         data: { confirm: "This will send #{member.person.name}
         an email, re-inviting #{member.person.him} to attend this
         workshop. Are you sure you want to proceed?".squish },
-        class: 'btn btn-sm btn-default') + '</td>'
+        class: 'btn btn-sm btn-default')
+      column << '</td>'
+    end
     column.html_safe
   end
 
