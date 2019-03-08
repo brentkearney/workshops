@@ -102,7 +102,7 @@ class AddMembersForm < ComplexForms
       msg = { problem: 'Unable to save new member',
               source: 'AddMembersForm.add_new_member',
               person: "#{person.name} (id: #{person.id})",
-              membership: membership.pretty_inspect,
+              membership: m.pretty_inspect,
               error: e.pretty_inspect }
       StaffMailer.notify_sysadmin(@event, msg).deliver_now
       return false

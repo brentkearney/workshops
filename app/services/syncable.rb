@@ -216,7 +216,7 @@ module Syncable
 
   def replace_remote(replace, replace_with)
     return if replace.legacy_id.blank? || replace_with.legacy_id.blank?
-    return if replace.legacy_id == replace_with.legacy_id
+    return if replace.legacy_id.to_i == replace_with.legacy_id.to_i
     ReplacePersonJob.perform_later(replace.legacy_id, replace_with.legacy_id)
   end
 

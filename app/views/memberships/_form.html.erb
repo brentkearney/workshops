@@ -216,7 +216,7 @@
 			<%= f.label :role, "Role: " %>
 		</div>
 		<div class="col-sm-3">
-			<%= show_roles(f) %>
+			<%= show_roles(f, default: @membership.role) %>
 		</div>
 		<div class="col-sm-6"></div>
 	</div>
