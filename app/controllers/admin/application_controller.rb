@@ -7,20 +7,25 @@
 module Admin
   class ApplicationController < Administrate::ApplicationController
     before_action :authenticate_user!
-    before_action :authenticate_admin
+    before_action :authorize_access
 
-    def authenticate_admin
-      #staff can access only admin/people dashboard
-      return true if current_user.is_staff? && params[:controller] == 'admin/people'
+    def authorize_access
+      redirect_to root_path, error: 'Unauthorized' unless current_user.is_staff?
+      check_staff_access unless current_user.is_admin?
+    end
 
-      current_user.is_admin? ? true : (redirect_to root_path, notice: 'Not Authorized')
+    def check_staff_access
+      allowed = %w(people events)
+      unless allowed.include?(params[:controller].split('/').last)
+        redirect_to admin_people_path, notice: 'Access denied.'
+      end
     end
 
 
     # Override this value to specify the number of elements to display at a time
     # on index pages. Defaults to 20.
-    # def records_per_page
-    #   params[:per_page] || 20
-    # end
+    def records_per_page
+      params[:per_page] || 55
+    end
   end
 end
