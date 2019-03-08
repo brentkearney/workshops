@@ -66,20 +66,19 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
   ```
   for file in `ls -1 *.example`; do newfile=`echo $file | sed 's/\.example$//'`; cp $file $newfile; done
   ```
-3. Edit docker-compose.yml to set your preferred usernames and passwords in the environment variables. Note the instructions
+3. Edit the lib/tasks/ws.rake file to change default user account information, to set your own credentials for logging into the Workshops web interface. The default accounts are setup by the entrypoint.sh script running: `rake ws:create_admins RAILS_ENV=development`.
+4. Edit docker-compose.yml to set your preferred usernames and passwords in the environment variables. Note the instructions
    at the top for creating data containers, for storing database and ruby gems persistently.
 
    The first time the database container is run, databases and database accounts will be created via the script at
    ./db/pg-init/init-user-db.sh. It uses the environment variables that you set in docker-compose.yml.
-4. Edit the lib/tasks/ws.rake file to change default user account information, to set your own credentials for logging into
-    the Workshops web interface.
 5. If you want your instance to be accessible at a domain, edit nginx.conf.erb to change `server_name YOUR.HOSTNAME.COM;`.
 6. Run `docker-compose up` (or possibly `docker build .` first).
 7. Login to the web interface (http://localhost) with the account you setup in ws.rake, and visit /settings (click the
   drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
 
-After the first time you run it, you will pobably want to edit the entrypoint.sh script, and comment out some of it, such as
-creating the gemset, adding default settings, and creating admin accounts. Change the `bundle install` to `bundle update`.
+After the first time you run it, you will pobably want to *edit the entrypoint.sh script*, and comment out some of it, such as
+creating the gemset, `rake db:seed`, adding default settings, and creating admin accounts. Change `bundle install` to `bundle update`.
 
 The config files are setup to run Rails in development mode. If you would like to change it to production, edit the entrypoint.sh
 to change all of the `RAILS_ENV=development` statements, and the Passengerfile.json `"environment": "development"` line.
