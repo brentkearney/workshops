@@ -138,7 +138,7 @@ def create_schedule_template(year)
     {event: event, lecture_id: nil, start_time: (t + 5.days).change(hour: 7, min: 0), end_time: (t + 5.days).change(hour: 9, min: 0), name: "Breakfast", description: "", location: "Dining Room", updated_by: "db seed", staff_item: true},
     {event: event, lecture_id: nil, start_time: (t + 5.days).change(hour: 10, min: 0), end_time: (t + 5.days).change(hour: 10, min: 30), name: "Coffee Break", description: "", location: "Main Building Foyer", updated_by: "db seed", staff_item: true},
     {event: event, lecture_id: nil, start_time: (t + 5.days).change(hour: 11, min: 30), end_time: (t + 5.days).change(hour: 12, min: 0), name: "Checkout by Noon", description: "5-day workshop participants are welcome to use EO facilities until 3 pm on Friday, although participants are still required to checkout of the guest rooms by 12 noon.", location: "Front Desk", updated_by: "db seed", staff_item: true},
-    {event: event, lecture_id: nil, start_time: (t + 2.days).change(hour: 12, min: 0), end_time: (t + 2.days).change(hour: 13, min: 30), name: "Lunch", description: "", location: "Dining Room", updated_by: "db seed", staff_item: true}
+    {event: event, lecture_id: nil, start_time: (t + 5.days).change(hour: 12, min: 0), end_time: (t + 5.days).change(hour: 13, min: 30), name: "Lunch", description: "", location: "Dining Room", updated_by: "db seed", staff_item: true}
   ])
   event
 end

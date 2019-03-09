@@ -76,8 +76,10 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
 6. Run `docker-compose up` (or possibly `docker build .` first).
 7. Login to the web interface (http://localhost) with the account you setup in ws.rake, and visit /settings (click the
   drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
+8. Optional: if you would like to seed the database with fake events and random data, checkout the (bottom of the) `db/seed.rb` file.
+  To run it, get a shell in the container (i.e. `docker exec -it ws bash` if your container name is "ws"), and run: `rake db:seed`.
 
-After the first time you run it, you will pobably want to *edit the entrypoint.sh script*, and comment out some of it, such as
+After the first time you run it, you will pobably want to **edit the entrypoint.sh script**, and comment out some of it, such as
 creating the gemset, `rake db:seed`, adding default settings, and creating admin accounts. Change `bundle install` to `bundle update`.
 
 The config files are setup to run Rails in development mode. If you would like to change it to production, edit the entrypoint.sh
