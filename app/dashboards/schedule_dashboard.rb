@@ -11,8 +11,8 @@ class ScheduleDashboard < Administrate::BaseDashboard
     event: Field::BelongsTo,
     lecture: Field::BelongsTo,
     id: Field::Number,
-    start_time: Field::DateTime,
-    end_time: Field::DateTime,
+    start_time: Field::DateTime.with_options(format: "%Y-%m-%d @ %H:%M"),
+    end_time: Field::DateTime.with_options(format: "%H:%M"),
     name: Field::String,
     description: Field::Text,
     location: Field::String,
@@ -30,18 +30,20 @@ class ScheduleDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = [
-    :event,
-    :lecture,
     :id,
+    :event,
+    :name,
     :start_time,
+    :end_time,
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = [
+    :id,
+    :name,
     :event,
     :lecture,
-    :id,
     :start_time,
     :end_time,
     :name,
@@ -75,7 +77,7 @@ class ScheduleDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how schedules are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(schedule)
-  #   "Schedule ##{schedule.id}"
-  # end
+  def display_resource(schedule)
+    "#{schedule.start_time.strftime("%Y-%m-%d %H:%M")}"
+  end
 end

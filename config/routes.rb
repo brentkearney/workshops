@@ -84,12 +84,11 @@ Rails.application.routes.draw do
 
   # Admin dashboard
   namespace :admin do
-
     resources :events
     resources :people
     resources :lectures
     resources :schedules
-
+    resources :users
     root to: "people#index"
   end
 

@@ -9,9 +9,9 @@ class PersonDashboard < Administrate::BaseDashboard
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
     #memberships: Field::HasMany,
-    #events: Field::HasMany,
-    replace_person: Field::BelongsTo.with_options(class_name: "ConfirmEmailChange"),
-    replace_with: Field::BelongsTo.with_options(class_name: "ConfirmEmailChange"),
+    events: Field::HasMany,
+    #replace_person: Field::BelongsTo.with_options(class_name: "ConfirmEmailChange"),
+    #replace_with: Field::BelongsTo.with_options(class_name: "ConfirmEmailChange"),
     id: Field::Number,
     lastname: Field::String,
     firstname: Field::String,
@@ -61,10 +61,10 @@ class PersonDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = [
     #:memberships,
-    #:events,
     #:replace_person,
     #:replace_with,
-    #:id,
+    :id,
+    :legacy_id,
     :lastname,
     :firstname,
     :salutation,
@@ -90,11 +90,11 @@ class PersonDashboard < Administrate::BaseDashboard
     :phd_year,
     :biography,
     :research_areas,
-    :legacy_id,
     :updated_by,
     :created_at,
     :updated_at,
     :grant_id,
+    :events,
   ].freeze
 
   # FORM_ATTRIBUTES
@@ -137,6 +137,6 @@ class PersonDashboard < Administrate::BaseDashboard
   # across all pages of the admin dashboard.
   #
    def display_resource(person)
-     "#{person.lastname+", "+ person.lastname}"
+     "#{person.lastname+", "+ person.firstname}"
    end
 end

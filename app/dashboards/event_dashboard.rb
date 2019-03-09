@@ -8,16 +8,16 @@ class EventDashboard < Administrate::BaseDashboard
   # which determines how the attribute is displayed
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
-    memberships: Field::HasMany,
+    #memberships: Field::HasMany,
     members: Field::HasMany.with_options(class_name: "Person"),
-    schedules: Field::HasMany,
+    #schedules: Field::HasMany,
     lectures: Field::HasMany,
     id: Field::Number,
     code: Field::String,
     name: Field::Text,
     short_name: Field::String,
-    start_date: Field::DateTime,
-    end_date: Field::DateTime,
+    start_date: Field::DateTime.with_options(format: "%Y-%m-%d"),
+    end_date: Field::DateTime.with_options(format: "%Y-%m-%d"),
     event_type: Field::String,
     location: Field::String,
     description: Field::Text,
@@ -43,18 +43,17 @@ class EventDashboard < Administrate::BaseDashboard
   COLLECTION_ATTRIBUTES = [
     :id,
     :code,
-    :short_name,
+    :name,
+    :location,
     :start_date
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = [
-    :memberships,
-    :members,
-    :schedules,
-    :lectures,
-    #:id,
+    #:memberships,
+    #:schedules,
+    :id,
     :code,
     :name,
     :short_name,
@@ -75,6 +74,8 @@ class EventDashboard < Administrate::BaseDashboard
     :publish_schedule,
     :confirmed_count,
     :sync_time,
+    :lectures,
+    :members
   ].freeze
 
   # FORM_ATTRIBUTES
@@ -109,6 +110,6 @@ class EventDashboard < Administrate::BaseDashboard
   # across all pages of the admin dashboard.
   #
    def display_resource(event)
-     " #{event.short_name}"
+     "#{event.code}"
    end
 end

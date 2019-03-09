@@ -13,7 +13,7 @@ class LectureDashboard < Administrate::BaseDashboard
     schedule: Field::HasOne,
     id: Field::Number,
     title: Field::String,
-    start_time: Field::DateTime,
+    start_time: Field::DateTime.with_options(format: "%Y-%m-%d %H:%M"),
     end_time: Field::DateTime,
     abstract: Field::Text,
     notes: Field::Text,
@@ -42,19 +42,19 @@ class LectureDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = [
+    :id,
     :event,
     :person,
+    :start_time,
     :schedule,
-    :id,
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = [
+    :id,
     :event,
     :person,
-    :schedule,
-    :id,
     :title,
     :start_time,
     :end_time,
@@ -77,6 +77,7 @@ class LectureDashboard < Administrate::BaseDashboard
     :cmo_license,
     :keywords,
     :legacy_id,
+    :schedule,
   ].freeze
 
   # FORM_ATTRIBUTES
@@ -85,7 +86,6 @@ class LectureDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = [
     :event,
     :person,
-    #:schedule,
     :title,
     :start_time,
     :end_time,
@@ -106,12 +106,13 @@ class LectureDashboard < Administrate::BaseDashboard
     :cmo_license,
     :keywords,
     :legacy_id,
+    :schedule,
   ].freeze
 
   # Overwrite this method to customize how lectures are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(lecture)
-  #   "Lecture ##{lecture.id}"
-  # end
+  def display_resource(lecture)
+    "#{lecture.title}"
+  end
 end
