@@ -10,14 +10,16 @@ module Admin
     before_action :authorize_access
 
     def authorize_access
-      redirect_to root_path, error: 'Unauthorized' unless current_user.is_staff?
+      unless current_user.is_staff?
+        redirect_to root_path, notice: 'Access denied.' and return
+      end
       check_staff_access unless current_user.is_admin?
     end
 
     def check_staff_access
       allowed = %w(people events)
       unless allowed.include?(params[:controller].split('/').last)
-        redirect_to admin_people_path, notice: 'Access denied.'
+        redirect_to admin_people_path, notice: 'Access denied.' and return
       end
     end
 

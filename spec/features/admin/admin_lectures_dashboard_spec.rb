@@ -15,7 +15,7 @@ describe 'Lectures Admin Dashboard', type: :feature do
   	@member_user = create(:user,email: person.email,person: person, role: 0)
     @staff_user = create(:user, :staff)
     @admin_user = create(:user, :admin)
-    @super_admin_user = create(:user, :super_admin)  
+    @super_admin_user = create(:user, :super_admin)
   end
 
   after(:each) do
@@ -40,8 +40,8 @@ describe 'Lectures Admin Dashboard', type: :feature do
     end
 
     it "should redirect to root path" do
-      expect(page).to have_current_path(root_path)
-      expect(page).to have_content("Not Authorized")
+      expect(current_path).to eq(events_future_path).or eq(root_path)
+      expect(page).to have_content("Access denied")
     end
   end
 
@@ -52,7 +52,8 @@ describe 'Lectures Admin Dashboard', type: :feature do
     end
 
     it "should redirect to root path" do
-      expect(page).to have_current_path(events_future_path(@member_user.location))
+      expect(page).to have_current_path(admin_people_path)
+      expect(page).to have_content("Access denied")
     end
   end
 
