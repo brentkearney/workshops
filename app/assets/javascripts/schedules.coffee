@@ -86,10 +86,10 @@ $(document).on 'turbolinks:load', ->
 
     datediff = end_time.getTime() - start_time.getTime()
 
-    $('#schedule_start_time_4i').on 'change', (e) =>
+    $('#schedule_start_time_4i').on 'change', (e) ->
       update_end_time(datediff)
 
-    $('#schedule_start_time_5i').on 'change', (e) =>
+    $('#schedule_start_time_5i').on 'change', (e) ->
       update_end_time(datediff)
 
     update_end_time = (datediff) ->

@@ -25,10 +25,10 @@ $(document).on 'turbolinks:load', ->
     defaultDate: departure_date
   })
 
-  $('#arrival').on 'dp.change', (e) =>
+  $('#arrival').on 'dp.change', (e) ->
     $('#arrival_date').val(e.date.format('YYYY-MM-DD'));
 
-  $('#departure').on 'dp.change', (e) =>
+  $('#departure').on 'dp.change', (e) ->
     $('#departure_date').val(e.date.format('YYYY-MM-DD'));
 
   $('#rsvp_membership_has_guest').change ->

@@ -7,15 +7,15 @@ $(document).on 'turbolinks:load', ->
   $('div.sidebar').find('*').removeClass('active')
 
   $('a#event-locations-link').click ->
-    $('li#event-locations').each (index, element) =>
+    $('li#event-locations').each (index, element) ->
       $(element).removeClass('active')
 
   $('a#event-years-link').click ->
-    $('li#event-years').each (index, element) =>
+    $('li#event-years').each (index, element) ->
       $(element).removeClass('active')
 
   $('a#event-members-link').click ->
-    $('li#event-memberships').each (index, element) =>
+    $('li#event-memberships').each (index, element) ->
       $(element).removeClass('active')
 
     $('span#locations-arrow').toggleClass('arrow')
@@ -23,22 +23,22 @@ $(document).on 'turbolinks:load', ->
 
   path = window.location.pathname
   if path == '/events'
-      $('li#all-events').addClass('active')
+    $('li#all-events').addClass('active')
   else if path == '/events/my_events'
-      $('li#my-events').addClass('active')
+    $('li#my-events').addClass('active')
   else if path.match(/events\/past/)
-      $('li#past-events').addClass('active')
+    $('li#past-events').addClass('active')
   else if path.match(/events\/future/)
-      $('li#future-events').addClass('active')
+    $('li#future-events').addClass('active')
   else if path.match(/events\/(.+)\/schedule/)
-      $('li#event-schedule').addClass('active')
+    $('li#event-schedule').addClass('active')
   else if path.match(/events\/(.+)\/memberships/)
-      $('li#event-members-list').addClass('active')
-      if path.match((/events\/(.+)\/memberships\/add/))
-        $('li#event-members-list').removeClass('active')
-        $('li#event-members-add').addClass('active')
+    $('li#event-members-list').addClass('active')
+    if path.match((/events\/(.+)\/memberships\/add/))
+      $('li#event-members-list').removeClass('active')
+      $('li#event-members-add').addClass('active')
   else if path.match(/events\/(.+)$/)
-      $('li#event-details').addClass('active')
+    $('li#event-details').addClass('active')
 
   if path.match(/location/)
     $('span#locations-arrow').toggleClass('arrow')

@@ -13,9 +13,9 @@ $(document).on 'turbolinks:load', ->
       format: 'YYYY-MM-DD'
     })
 
-    $('#start_date').on 'dp.change', (e) =>
+    $('#start_date').on 'dp.change', (e) ->
       $('#end_date').data("DateTimePicker").minDate(e.date);
 
-    $('#end_date').on 'dp.change', (e) =>
+    $('#end_date').on 'dp.change', (e) ->
       $('#start_date').data('DateTimePicker').maxDate(e.date);
 
