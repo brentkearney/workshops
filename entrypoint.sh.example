@@ -49,7 +49,6 @@ echo "Running migrations..."
 rake db:migrate RAILS_ENV=development
 rake db:migrate RAILS_ENV=test
 # rake db:migrate RAILS_ENV=production
-rake db:seed RAILS_ENV=development
 
 # Default settings
 echo

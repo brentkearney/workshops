@@ -80,7 +80,7 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
   To run it, get a shell in the container (i.e. `docker exec -it ws bash` if your container name is "ws"), and run: `rake db:seed`.
 
 After the first time you run it, you will pobably want to **edit the entrypoint.sh script**, and comment out some of it, such as
-creating the gemset, `rake db:seed`, adding default settings, and creating admin accounts. Change `bundle install` to `bundle update`.
+creating the gemset, adding default settings, and creating admin accounts. Change `bundle install` to `bundle update`.
 
 The config files are setup to run Rails in development mode. If you would like to change it to production, edit the entrypoint.sh
 to change all of the `RAILS_ENV=development` statements, and the Passengerfile.json `"environment": "development"` line.
