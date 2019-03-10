@@ -115,7 +115,7 @@ Note that these information might be outdated and the setup might still lead to 
       encoding: unicode
       min_messages: WARNING
       pool: 5
-      host: db
+      host: localhost
       port: 5432
       username: <%= ENV['DB_USER'] %>
       password: <%= ENV['DB_PASS'] %>
