@@ -41,6 +41,8 @@ group :development, :test do
   gem 'spring'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+  # Version requirement due to bug rails/rails#35153
+  gem 'sqlite3', '~> 1.3.6'
 end
 
 group :test do
