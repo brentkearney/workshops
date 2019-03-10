@@ -34,6 +34,7 @@ gem 'wkhtmltopdf-binary'
 gem 'rack-cors', require: 'rack/cors'
 gem 'listen'
 gem 'bootsnap'
+gem 'administrate'
 
 group :development, :test do
   gem 'byebug'

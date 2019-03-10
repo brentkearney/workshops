@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title><%= Rails.application.class.parent_name.titlecase %> DB: <%= content_for(:title).strip.chomp %></title>
+  <%= render "stylesheet" %><!-- administrate stylesheets -->
+  <%= stylesheet_link_tag 'administrate', media: 'all' %>
+  <%= render 'layouts/favicon' %>
+  <%= csrf_meta_tags %>
+
+</head>
+<body class="administrate">
+<div id="wrapper" class="fluid-container">
+  <div id="page-wrapper">
+    <div class="row">
+      <div class="col-lg-12">
+        <header>
+          <h1>Workshops Database Access</h1>
+          <p><%= link_to 'Return to Workshops', welcome_path, data: { turbolinks: false }, class: 'navigation__link' %></p>
+        </header>
+        <!-- Administrate body begin -->
+        <%= render "icons" %>
+
+        <div class="app-container">
+          <%= render "navigation" -%>
+
+          <main class="main-content" role="main">
+            <%= render "flashes" -%>
+            <%= yield %>
+          </main>
+        </div>
+
+        <%= render "javascript" %>
+        <!-- Administrate body end -->
+      </div>
+      <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+  </div>
+  <!-- /#page-wrapper -->
+</div>
+<!-- /#wrapper -->
+</body>
+</html>
