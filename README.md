@@ -51,6 +51,9 @@ Installation instructions are below.
 
 
 ## Installation Instructions:
+
+### Installation via docker-compose (supported)
+
 The application is setup to work in a [Docker](http://www.docker.com) container.
 
 1. Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
@@ -87,6 +90,54 @@ The config files are setup to run Rails in development mode. If you would like t
 to change all of the `RAILS_ENV=development` statements, and the Passengerfile.json `"environment": "development"` line.
 
 It is currently configured to use [Sparkpost](https://www.sparkpost.com) for mail delivery, in production mode. If you're not using Sparkpost, edit the `config/environments/production.rb` file and adjust the [ActionMailer settings](https://guides.rubyonrails.org/v4.0.0/configuring.html#configuring-action-mailer) to your preference.
+
+### Local hacky installation (using sqlite3)
+
+Note that these information might be outdated and the setup might still lead to errors.  We strongly advise you to use PostgreSQL as database backend.
+
+1. Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
+1. Edit the `lib/tasks/ws.rake` file to change default user account information, to set your own credentials for logging into the Workshops web interface.
+1. Adjust `config/database.yml` like the following:
+    default: &default
+      adapter: sqlite3
+      encoding: unicode
+    
+    development:
+      <<: *default
+      database: db/workshops_development.sqlite3
+    
+    test:
+      <<: *default
+      database: workshops_test.sqlite3
+    
+    production:
+      adapter: postgresql
+      encoding: unicode
+      min_messages: WARNING
+      pool: 5
+      host: db
+      port: 5432
+      username: <%= ENV['DB_USER'] %>
+      password: <%= ENV['DB_PASS'] %>
+      database: workshops_production
+
+1. Modify the schema to get rid of 'id: :serial', by calling e.g. (in Linux):
+    sed -i -e 's|, id: :serial||' db/schema.rb
+1. Create the database
+  rails db:schema:load
+    rails db:schema:load
+  (`rails db:migrate` will not work due to unsupported SQL statements)
+1. Setup some default settings and admin account by calling
+    rails ws:init_settings
+    rails ws:create_admins # remember, you changed the credentials earlier
+1. Optionally, populate the database with demo data from `db/seed.rb`
+    rails db:seed
+1. Set environment variables (refer to the end of `docker-compose.yml.example`).
+1. Start the application
+    rails s # short for: rails server
+1. Login to the web interface (http://localhost:3000) with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
+
+**This setup should only be used to run Rails in development mode(for ... development).**
 
 
 ### License:
