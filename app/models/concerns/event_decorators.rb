@@ -135,6 +135,10 @@ module EventDecorators
     Time.current <= start_date.to_time
   end
 
+  def past?
+    end_date.to_time < Time.current
+  end
+
   def url
     event_url = GetSetting.events_url
     event_url << '/' if event_url[-1] != '/'

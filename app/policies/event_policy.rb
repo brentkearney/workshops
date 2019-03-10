@@ -79,6 +79,7 @@ class EventPolicy
   end
 
   def show_add_members?
+    return false if @event.past?
     allow_orgs_and_staff
   end
 

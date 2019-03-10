@@ -133,7 +133,7 @@ td.invite-buttons {
   }
 
   #roles-icon {
-    padding-top: 12px;
+    padding-top: 15px;
     font-size: 1.8em;
   }
 
@@ -164,6 +164,10 @@ ol#added-members {
   li {
     margin-bottom: 1em;
   }
+}
+
+#add-members-button-row {
+  padding-bottom: 20px;
 }
 
 table#new-people {

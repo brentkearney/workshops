@@ -1,6 +1,9 @@
 $(document).on 'turbolinks:load', ->
   return unless $('.memberships').length > 0
 
+  $(".spinner").hide()
+  $('#add-members').show()
+
   arrival_date = $('#arrival_date').val()
   arrival_date or= $('#min_date').val()
 
@@ -31,3 +34,7 @@ $(document).on 'turbolinks:load', ->
         $(field).removeClass('has-error')
       else
         $(field).addClass('has-error')
+
+  $('#add-members-submit').click (e) ->
+    $('#add-members').hide()
+    $(".spinner").show()

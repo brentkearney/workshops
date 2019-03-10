@@ -34,7 +34,25 @@ module PersonDecorators
   end
 
   def him
-    gender == 'M' ? 'him' : 'her'
+    case gender
+    when 'M'
+      return 'him'
+    when 'F'
+      return 'her'
+    else
+      return 'them'
+    end
+  end
+
+  def his_her
+    case gender
+    when 'M'
+      return 'his'
+    when 'F'
+      return 'her'
+    else
+      return 'their'
+    end
   end
 
   def affil
@@ -57,10 +75,6 @@ module PersonDecorators
       formatted_affil << " — #{title}"
     end
     formatted_affil.html_safe
-  end
-
-  def his_her
-    gender == 'M' ? 'his' : 'her'
   end
 
   def uri
