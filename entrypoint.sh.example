@@ -50,14 +50,14 @@ rake db:migrate RAILS_ENV=development
 rake db:migrate RAILS_ENV=test
 # rake db:migrate RAILS_ENV=production
 
-# Default settings
-echo
-echo "Adding default Settings..."
-rake ws:init_settings
-
-echo
-echo "Creating admins..."
 if [ -e lib/tasks/ws.rake ]; then
+  # Default settings
+  echo
+  echo "Adding default Settings..."
+  rake ws:init_settings
+
+  echo
+  echo "Creating admins..."
   rake ws:create_admins RAILS_ENV=development
 fi
 
@@ -65,7 +65,7 @@ echo
 echo "Changing to non-root file permissions..."
 chown -R app:app /usr/local/rvm/gems
 if [ ! -e /home/app/workshops/tmp ]; then
- mkdir /home/app/workshops/tmp
+ mkdir -p /home/app/workshops/tmp
  mkdir -p /home/app/workshops/vendor/cache
 fi
 chown -R app:app /home/app/workshops

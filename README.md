@@ -68,7 +68,8 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
   ```
 3. Edit the lib/tasks/ws.rake file to change default user account information, to set your own credentials for logging into the Workshops web interface. The default accounts are setup by the entrypoint.sh script running: `rake ws:create_admins RAILS_ENV=development`.
 4. Edit docker-compose.yml to set your preferred usernames and passwords in the environment variables. Note the instructions
-   at the top for creating data containers, for storing database and ruby gems persistently.
+   at the top for creating data containers, for storing database and ruby gems persistently. Also add random strings for the
+   environment variables, such as SECRET_KEY_BASE, DEVISE_SECRET_KEY, etc..
 
    The first time the database container is run, databases and database accounts will be created via the script at
    ./db/pg-init/init-user-db.sh. It uses the environment variables that you set in docker-compose.yml.

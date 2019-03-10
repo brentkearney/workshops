@@ -7,6 +7,10 @@ ENV HOME /root
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
 
+# prevent gpg from using IPv6 to connect to keyservers
+RUN mkdir -p ~/.gnupg
+RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
+
 # Yarn package
 RUN curl -sS https://raw.githubusercontent.com/yarnpkg/releases/gh-pages/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
@@ -19,10 +23,11 @@ RUN apt-get update -qq && apt-get dist-upgrade --yes && \
   && apt-get upgrade --fix-missing --yes --allow-remove-essential \
   -o Dpkg::Options::="--force-confold"
 
-RUN apt-get install --yes tzdata udev locales curl git gnupg ca-certificates \
-    gnupg libpq-dev nodejs wget libxrender1 libxext6 libsodium23 \
-    libsodium-dev yarn && apt-get clean && apt-get autoremove --yes && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  RUN apt-get install --yes tzdata udev locales curl git gnupg ca-certificates \
+      libpq-dev nodejs wget libxrender1 libxext6 libsodium23 libsodium-dev yarn \
+      gcc make zlib1g-dev sqlite3 libgmp-dev libc6-dev gcc-multilib g++-multilib \
+      && apt-get clean && apt-get autoremove --yes \
+      && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Use en_CA.utf8 as our locale
 RUN locale-gen en_CA.utf8

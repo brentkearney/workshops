@@ -153,7 +153,6 @@ generate_events(start_year, end_year)
 
 # Create a schedule template event, and add admin user to it
 event = create_schedule_template(start_year)
-admin = User.find_by(role: :admin).person
-unless admin.nil?
-  Membership.create!(event: event, person: admin, role: 'Contact Organizer', attendance: 'Confirmed', updated_by: 'Seed')
+User.where(role: :staff).or(User.where(role: :admin)).or(User.where(role: :super_admin)).each do |u|
+  Membership.create!(event: event, person: u.person, role: 'Organizer', attendance: 'Confirmed', updated_by: 'Seed')
 end
