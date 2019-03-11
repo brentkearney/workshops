@@ -3,9 +3,7 @@
 "Workshops" is software for managing scientific meetings, or small conferences. It is made with [Ruby on Rails](http://rubyonrails.org)
 and released under the GPL-A open-source license. The software is intended to be used by institutions/organizations
 who host workshops. It is used at the
-[Banff International Research Station](https://workshops.birs.ca/events/future) for a limited number of functions: inviting (but not yet adding)
-people to be participants in workshops, managing their online reply to invitations (RSVP), editing member records, rudimentary scheduling functions,
-and simple workshop mailling lists.
+[Banff International Research Station](https://workshops.birs.ca/events/future) for managing workshops.
 
 Contributions to the project are most welcome. If you would like to add features yourself, please
 [let me know](mailto:brentk@birs.ca), and/or submit a Pull Request. Or if you would like to pay for the development of additional features,
@@ -31,7 +29,7 @@ Installation instructions are below.
 * **Event listing navigation** by user's events, future events, past events, events by location, and by year.
 * **Event participant listings** grouped by attendance status (Confirmed, Invited, Declined, etc..), click for more detailed profile views of each participant.
 * **Mail lists** each workshop automatically has mail lists (send one email that is automatically redistributed to a list of addresses) for groups of participants based on their attendance status. i.e. a mail list for confirmed participants, one for invited participants, one for declined participants...
-* **Data imports** Workshop data is imported via calls to an external API.
+* **Data syncing** Workshop data can by synchronized with an external database via calls to an external API.
 * **Background jobs** to sync event membership data with external data source via API, and to send emails.
 * **Settings in database** Application settings are stored in the database instead of config files, allowing staff and admins to easily change settings with web interface, on the fly.
 * **Administrate** a web-based interface to the database tables, provided by Thoughtbot's [Administrate](https://github.com/thoughtbot/administrate) gem. Allows for easy searching, adding, and editing of database records.
