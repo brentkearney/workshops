@@ -15,25 +15,26 @@ please [contact me](mailto:brent@netmojo.ca).
 Installation instructions are below.
 
 ### Current Features
-* **Sign-ins and sign-ups** for authorized event members, staff, and admin.
-* **Fine-grained role-based access controls** allows different levels of access privileges for admin, staff, organizers, participants, and public.
+* **Sign-ins and sign-ups** for staff and admin users, and invited workshop participants.
+* **Fine-grained, role-based access controls** allows different levels of access privileges for admin, staff, organizers, participants, and public. (Uses [Pundit](https://github.com/varvet/pundit).)
 * **Add Members** Staff and Organizers can add members to their workshops.
-* **Event Invitations** Staff and Organizers can click a button to email a unique link to potential participants, inviting them to attend a workshop.
-* **Multiple locations** for events. Each location has its own settings, email templates, forms, etc..
-* **RSVPs** allows invited participants to reply to their invitation with "Yes", "No", "Maybe". Includes a text area to send a personal note to the organizer. If confirming, collects data for hotel reservations, etc., via a web form (unique per location) that is optimized for autofill. Automatically sends confirmation email to confirmed participants, using email templates based on workshop type.
+* **Event Invitations** Staff and Organizers can click a button to send invitation emails to potential participants. The emails contain a unique link, giving them access to the built-in RSVP system.
+* **RSVPs** allows invited participants to reply to their invitation with "Yes", "No", "Maybe". Includes a text area to send a personal note to the organizer. If confirming, collects data for hotel reservations, etc., via a web form (unique per location) that is optimized for autofill. Automatically sends a confirmation email to confirmed participants, using email templates based on workshop type. Email notifications are also sent to staff and organizers.
 * **[SparkPost](https://www.sparkpost.com) Integration** for improved email deliverability.
+* **Multiple locations** for events. Each location has its own settings, email templates, forms, etc..
 * **Workshop scheduling**: organizers can enter their workshop schedules, including talks with abstracts/descriptions, and choose when to publish their schedules to the public.
-* **Default schedule templates** that staff can edit. Defaults get applied to all workshops' schedules which have not yet been edited.
-* **LaTeX formatting** in all text editing areas, via [MathJax](https://www.mathjax.org), for mathematical formulae.
+* **Default schedule templates** Staff may edit a special "template" schedule that gets applied to all events who do not yet have a schedule. Certain schedule items can be "locked", so that organizers cannot change them without staff permission.
 * **JSON output** of schedules and other event data, for easy display on external websites, [like this](http://www.birs.ca/events/2017/5-day-workshops/17w5030/schedule).
 * **Authenticated JSON API** for [an external video recording system](http://www.birs.ca/facilities/automated-video) to update lecture records in the schedule, based on recordings made.
+* **LaTeX formatting** in all text editing areas, via [MathJax](https://www.mathjax.org), for mathematical formulae.
 * **Email notifications** for staff and organizers when data changes, such as participant RSVPs and schedule updates during currently running workshops.
 * **Event listing navigation** by user's events, future events, past events, events by location, and by year.
 * **Event participant listings** grouped by attendance status (Confirmed, Invited, Declined, etc..), click for more detailed profile views of each participant.
 * **Mail lists** each workshop automatically has mail lists (send one email that is automatically redistributed to a list of addresses) for groups of participants based on their attendance status. i.e. a mail list for confirmed participants, one for invited participants, one for declined participants...
-* **Data imports** Workshop data is imported via calls to an external API, JSON.
+* **Data imports** Workshop data is imported via calls to an external API.
 * **Background jobs** to sync event membership data with external data source via API, and to send emails.
 * **Settings in database** Application settings are stored in the database instead of config files, allowing staff and admins to easily change settings with web interface, on the fly.
+* **Administrate** a web-based interface to the database tables, provided by Thoughtbot's [Administrate](https://github.com/thoughtbot/administrate) gem. Allows for easy searching, adding, and editing of database records.
 
 
 ### Upcoming Features:
@@ -41,7 +42,6 @@ Installation instructions are below.
 * Drag & drop interface for scheduling features.
 * Staff can assign hotel rooms, generate reports for hotel room bookings, and manage other hospitality details for workshop participants.
 * Task scheduler, to allow automated performance of tasks such as reminder emails for participants to RSVP, after event feedback requests, etc.
-* Staff and admin can create new events (currently they're imported via API).
 * Admin users can manage other users (add/remove/change passwords, etc) - currently they can only change their own passwords.
 * When organizers schedule a participant to give a talk, members optionally get notified with a link to fill in the talk title and abstract.
 * Interface for managing Lectures, so participants can easily view all of the talks they've recorded, sign consent forms, add slides files, update abstracts.
@@ -52,7 +52,7 @@ Installation instructions are below.
 
 ## Installation Instructions:
 
-### Installation via docker-compose (supported)
+### Installation with Docker & PostgreSQL (recommended; alternative below)
 
 The application is setup to work in a [Docker](http://www.docker.com) container.
 
@@ -91,25 +91,29 @@ to change all of the `RAILS_ENV=development` statements, and the Passengerfile.j
 
 It is currently configured to use [Sparkpost](https://www.sparkpost.com) for mail delivery, in production mode. If you're not using Sparkpost, edit the `config/environments/production.rb` file and adjust the [ActionMailer settings](https://guides.rubyonrails.org/v4.0.0/configuring.html#configuring-action-mailer) to your preference.
 
-### Local hacky installation (using sqlite3)
 
-Note that these information might be outdated and the setup might still lead to errors.  We strongly advise you to use PostgreSQL as database backend.
+### Alternative installation, with SQLite3
+
+This installation method assumes Ruby + Rails are installed on your local machine, and uses SQLite3 for the database.
 
 1. Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
-1. Edit the `lib/tasks/ws.rake` file to change default user account information, to set your own credentials for logging into the Workshops web interface.
-1. Adjust `config/database.yml` like the following:
+
+2. Edit the `lib/tasks/ws.rake` file to change default user account information, to set your own credentials for logging into the Workshops web interface.
+
+3. Adjust `config/database.yml` like the following:
+```
     default: &default
       adapter: sqlite3
       encoding: unicode
-    
+
     development:
       <<: *default
       database: db/workshops_development.sqlite3
-    
+
     test:
       <<: *default
       database: workshops_test.sqlite3
-    
+
     production:
       adapter: postgresql
       encoding: unicode
@@ -120,24 +124,28 @@ Note that these information might be outdated and the setup might still lead to 
       username: <%= ENV['DB_USER'] %>
       password: <%= ENV['DB_PASS'] %>
       database: workshops_production
+```
 
-1. Modify the schema to get rid of 'id: :serial', by calling e.g. (in Linux):
-    sed -i -e 's|, id: :serial||' db/schema.rb
-1. Create the database
-  rails db:schema:load
-    rails db:schema:load
+4. Modify the schema to get rid of 'id: :serial', by calling e.g. (in Linux):
+    `sed -i -e 's|, id: :serial||' db/schema.rb`
+
+5. Create the database:
+  `rails db:schema:load`
   (`rails db:migrate` will not work due to unsupported SQL statements)
-1. Setup some default settings and admin account by calling
-    rails ws:init_settings
-    rails ws:create_admins # remember, you changed the credentials earlier
-1. Optionally, populate the database with demo data from `db/seed.rb`
-    rails db:seed
-1. Set environment variables (refer to the end of `docker-compose.yml.example`).
-1. Start the application
-    rails s # short for: rails server
-1. Login to the web interface (http://localhost:3000) with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
 
-**This setup should only be used to run Rails in development mode(for ... development).**
+6. Setup some default settings and admin account by calling
+    `rails ws:init_settings`
+    `rails ws:create_admins` # remember, you changed the credentials earlier
+
+7. Optionally, populate the database with demo data from `db/seed.rb`
+    rails db:seed
+
+8. Set environment variables (refer to the end of `docker-compose.yml.example`).
+
+9. Start the application
+    `rails s # short for: rails server`
+
+10. Login to the web interface (http://localhost:3000) with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
 
 
 ### License:
