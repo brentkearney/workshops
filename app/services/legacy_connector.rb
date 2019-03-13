@@ -75,7 +75,8 @@ class LegacyConnector
   def add_member(membership:, event_code:, person:, updated_by:)
     remote_membership = membership.attributes.merge(
       workshop_id: event_code,
-      person:      person.as_json,
+      member_id: membership.id,
+      person:      person.as_json.merge(new_id: person.id),
       updated_by:  updated_by
     )
     remote_membership = update_booleans(remote_membership)

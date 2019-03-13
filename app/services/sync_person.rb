@@ -69,10 +69,11 @@ class SyncPerson
       return @person
     end
 
-    # if the names match, replace the new with the old
     if names_match(other_person.name, @person.name)
-      replace_person(replace: @person, replace_with: other_person)
-      @person = other_person
+      merge_person_records(@person, other_person)
+      p = Person.find_by_id(@person.id) || Person.find_by_id(other_person.id)
+      p.email = @new_email
+      @person = p
     else
       create_change_confirmation(@person, other_person)
     end
