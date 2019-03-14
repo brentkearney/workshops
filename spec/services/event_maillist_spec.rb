@@ -11,7 +11,7 @@ describe 'EventMaillist' do
   let(:params) do
   {
     to: ['event_code@example.com'],
-    from: 'Webmaster <webmaster@example.net>',
+    from: 'Webby Webmaster <webmaster@example.net>',
     subject: 'Testing email processing',
     text: 'A Test Message.',
     Date: "Tue, 25 Sep 2018 16:17:17 -0600"

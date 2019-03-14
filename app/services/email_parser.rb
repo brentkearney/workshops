@@ -8,11 +8,28 @@
 class EmailParser
   attr_accessor :text_body, :html_body, :inline_attachments, :person
 
-  def initialize(email, list_name)
+  def initialize(email, list_name, event)
     @email = email
     @list_name = list_name
+    @event = event
+    @person_from = construct_from_address
+  end
+
+  def construct_from_address
+    from = @email.from[:full]
     person = Person.find_by_email(@email.from[:email].downcase.strip)
-    @person_name = person.nil? ? @email.from[:full] : person.name
+    from = show_email_or_name(from, person) if person
+    from
+  end
+
+  def show_email_or_name(from, person)
+    membership = person.memberships.where(event: @event).first
+    if (membership && membership.share_email) || @event.staff.include?(person)
+      from = %Q("#{person.name}" <#{person.email}>)
+    else
+      from = person.name
+    end
+    from
   end
 
   def parse
@@ -24,7 +41,7 @@ class EmailParser
   end
 
   def prepare_text(text_body)
-    prelude = "From #{@person_name} to #{@list_name} on #{@email.headers['Date']}:"
+    prelude = "From #{@person_from} to #{@list_name} on #{@email.headers['Date']}:"
     prelude << "\n" + '-' * 70 + "\n\n"
 
     if text_body.blank?
@@ -37,7 +54,7 @@ class EmailParser
 
   def prepare_html(html_body)
     unless html_body.blank?
-      prelude = "<p>From #{@person_name} to #{@list_name} on #{@email.headers['Date']}:</p>\n"
+      prelude = "<p>From #{@person_from} to #{@list_name} on #{@email.headers['Date']}:</p>\n"
       prelude << "<hr width=\"100%\" />\n\n"
 
       if html_body.include?('<body')

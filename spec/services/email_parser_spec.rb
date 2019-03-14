@@ -7,10 +7,11 @@
 require 'rails_helper'
 
 describe 'EmailParser' do
+  let(:event) { create(:event) }
   let(:params) do
   {
     to: ['event_code@example.com'],
-    from: 'Webmaster <webmaster@example.net>',
+    from: 'Webby Webmaster <webmaster@example.net>',
     subject: 'Testing email processing',
     text: 'A Test Message.',
     html: '<html><body><p>A Test Message.</p></body></html>',
@@ -20,11 +21,12 @@ describe 'EmailParser' do
 
   before do
     @from_person = create(:person, email: 'webmaster@example.net',
-                                   firstname: 'Webmaster')
-    @ep = EmailParser.new(subject, '18w6660@example.com')
+                                   firstname: 'Webby', lastname: 'Webmaster')
+    create(:membership, person: @from_person, event: event, share_email: false)
+    @ep = EmailParser.new(subject, "#{event.code}@example.com", event)
   end
 
-  let(:prelude) { "From #{@from_person.name} to 18w6660@example.com" }
+  let(:prelude) { "From #{@from_person.name} to #{event.code}@example.com" }
 
   subject { Griddler::Email.new(params) }
 
@@ -52,7 +54,8 @@ describe 'EmailParser' do
   it 'empty text_body returns just the prelude' do
     new_params = params
     new_params[:text] = ''
-    ep = EmailParser.new(Griddler::Email.new(new_params), '18w6660@example.com')
+    ep = EmailParser.new(Griddler::Email.new(new_params),
+                         "#{event.code}@example.com", event)
     text_body = ep.parse[:text_body]
     expect(text_body).to include(prelude)
   end
@@ -67,10 +70,41 @@ describe 'EmailParser' do
     np = params
     np[:html] = '<div dir=\"ltr\">Just a test<div><br></div></div>'
     email = Griddler::Email.new(np)
-    ep = EmailParser.new(email, '18w6660@example.com')
+    ep = EmailParser.new(email, "#{event.code}@example.com", event)
     html_body = ep.parse[:html_body]
 
     expect(html_body).to include('Just a test')
+    expect(html_body).to include(prelude)
+  end
+
+  it "prelude includes the sender's email, if they choose to share it" do
+    membership = @from_person.memberships.last
+    membership.share_email = true
+    membership.save
+
+    ep = EmailParser.new(subject, "#{event.code}@example.com", event)
+    text_body = ep.parse[:text_body]
+    html_body = ep.parse[:html_body]
+
+    prelude = %Q(From "#{@from_person.name}" <#{@from_person.email}> to
+                  #{event.code}@example.com).squish
+    expect(text_body).to include(prelude)
+    expect(html_body).to include(prelude)
+  end
+
+  it "prelude includes the sender's email, if they are a staff member" do
+    membership = @from_person.memberships.last
+    membership.destroy
+    create(:user, person: @from_person, email: @from_person.email,
+                  role: :staff, location: event.location)
+
+    ep = EmailParser.new(subject, "#{event.code}@example.com", event)
+    text_body = ep.parse[:text_body]
+    html_body = ep.parse[:html_body]
+
+    prelude = %Q(From "#{@from_person.name}" <#{@from_person.email}> to
+                  #{event.code}@example.com).squish
+    expect(text_body).to include(prelude)
     expect(html_body).to include(prelude)
   end
 end

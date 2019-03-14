@@ -39,6 +39,10 @@ class MembershipsController < ApplicationController
   # POST /events/:event_id/memberships/add
   def add
     authorize Membership.new(event: @event)
+    unless policy(@event).allow_add_members?
+      redirect_to event_memberships_path(@event), error: 'Access denied.'
+    end
+
     @add_members = AddMembersForm.new(@event, current_user)
 
     if request.post?

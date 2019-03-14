@@ -22,7 +22,8 @@ describe 'EmailProcessor' do
 
   let(:event) { create(:event) }
   let(:person) { create(:person) }
-  let(:membership) { create(:membership, event: event) }
+  let(:membership) { create(:membership, event: event, person: person) }
+  # let(:membership) { create(:membership, event: event) }
   let(:organizer) { create(:membership, event: event, role: 'Contact Organizer') }
 
   it '.initialize' do

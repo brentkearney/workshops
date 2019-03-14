@@ -87,7 +87,7 @@
                 <%= link_to '<i class="fa fa-list fa-fw"></i> List Members'.html_safe, event_memberships_path(@event) %>
                 <div class="bottom-border"></div>
               </li>
-              <% if policy(@event).show_add_members? %>
+              <% if policy(@event).allow_add_members? %>
               <li id="event-members-add">
                 <div class="top-border"></div>
                 <%= link_to '<i class="fa fa-user-plus fa-fw"></i> Add Members'.html_safe, add_event_memberships_path(@event) %>

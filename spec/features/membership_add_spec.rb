@@ -11,6 +11,9 @@ require 'rails_helper'
 describe 'Membership#add', type: :feature do
   before do
     @event = create(:event_with_members)
+    @event.start_date = (Date.current + 1.month).beginning_of_week(:sunday)
+    @event.end_date = @event.start_date + 5.days
+    @event.save
     organizer = @event.memberships.where("role='Contact Organizer'").first
     @org_user = create(:user, email: organizer.person.email,
                              person: organizer.person)
@@ -89,6 +92,25 @@ describe 'Membership#add', type: :feature do
       visit add_event_memberships_path(@event)
       expect(current_path).to eq(add_event_memberships_path(@event))
       logout(@user)
+    end
+
+    it 'hides if the event is in the past' do
+      @event.start_date = (Date.current - 1.month).beginning_of_week(:sunday)
+      @event.end_date = @event.start_date + 5.days
+      @event.save
+
+      login_as @org_user, scope: :user
+      visit event_memberships_path(@event)
+      expect(page).not_to have_link("Add Members")
+
+      visit add_event_memberships_path(@event)
+      expect(current_path).to eq(event_memberships_path(@event))
+      expect(page).to have_text('Access denied')
+
+      @event.start_date = (Date.current + 1.month).beginning_of_week(:sunday)
+      @event.end_date = @event.start_date + 5.days
+      @event.save
+      logout(@org_user)
     end
   end
 

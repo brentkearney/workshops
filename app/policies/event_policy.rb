@@ -78,7 +78,7 @@ class EventPolicy
     current_user.super_admin?
   end
 
-  def show_add_members?
+  def allow_add_members?
     return false if @event.past?
     allow_orgs_and_staff
   end

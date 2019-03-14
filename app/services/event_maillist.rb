@@ -16,7 +16,7 @@ class EventMaillist
   def send_message
     subject = @email.subject
     subject = "[#{@event.code}] #{subject}" unless subject.include?(@event.code)
-    email_parts = EmailParser.new(@email, @destination).parse
+    email_parts = EmailParser.new(@email, @destination, @event).parse
 
     message = {
       location: @event.location,
