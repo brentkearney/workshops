@@ -1,6 +1,6 @@
 # See: https://github.com/phusion/passenger-docker
-# Latest image versions: https://github.com/phusion/passenger-docker/blob/master/Changelog.md
-FROM phusion/passenger-ruby25:1.0.0
+# Latest image versions: https://github.com/phusion/passenger-docker/blob/master/CHANGELOG.md
+FROM phusion/passenger-ruby26:latest
 
 ENV HOME /root
 
@@ -55,6 +55,7 @@ WORKDIR $APP_HOME
 RUN rm docker-compose.yml
 RUN rm Dockerfile
 RUN touch config/app.yml
+RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
 RUN chown app -R ./
 
 EXPOSE 80 443

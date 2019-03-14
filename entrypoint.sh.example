@@ -21,28 +21,28 @@ echo
 echo "Create gemset..."
 gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
 /usr/bin/curl -sSL https://get.rvm.io | bash -s stable
-/usr/local/rvm/bin/rvm gemset create ruby-2.5.3
-/usr/local/rvm/bin/rvm gemset use ruby-2.5.3@global
+/usr/local/rvm/bin/rvm gemset create ruby-2.6.2
+/usr/local/rvm/bin/rvm gemset use ruby-2.6.2@global
 /usr/local/rvm/bin/rvm cleanup all
 /usr/local/rvm/bin/rvm reload
 
 echo
 echo "Installing latest bundler..."
-/usr/local/rvm/bin/rvm-exec 2.5.3 gem update --system
-/usr/local/rvm/bin/rvm-exec 2.5.3 gem install bundler
-# /usr/local/rvm/bin/rvm-exec 2.5.3 gem install rubygems-bundler
+/usr/local/rvm/bin/rvm-exec 2.6.2 gem update --system
+/usr/local/rvm/bin/rvm-exec 2.6.2 gem install bundler
+# /usr/local/rvm/bin/rvm-exec 2.6.2 gem install rubygems-bundler
 
 # echo
 # echo "Bundle update rails..."
-# RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.3 bundle update rails
+# RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.6.2 bundle update rails
 
 echo
 echo "Bundle install..."
-RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.3 bundle install
+RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.6.2 bundle install
 
 # echo
 # echo "Bundle update..."
-# RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.5.3 bundle update
+# RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.6.2 bundle update
 
 echo
 echo "Running migrations..."

@@ -109,6 +109,7 @@ class EventPolicy
   end
 
   def send_invitations?
+    return false if current_user.nil?
     return false if event.start_date < Date.current
     return true if allow_staff_and_admins
     current_user.is_organizer?(event)
