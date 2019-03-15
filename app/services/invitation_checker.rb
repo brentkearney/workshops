@@ -34,41 +34,28 @@ class InvitationChecker
     invitation.is_a?(Invitation) ? invitation.event : nil
   end
 
-  def check_legacy_database
-    invitation = nil
-    response = LegacyConnector.new.check_rsvp(@otp)
-
+  def check_response_errors(response)
     @errors.add(:Invitation, response['denied']) if response['denied']
     @errors.add(:Event, 'No event associated') if response['event_code'].blank?
     @errors.add(:Person, 'No person associated') if response['legacy_id'].blank?
+  end
 
-    unless @errors.any?
-      event = Event.find(response['event_code'])
-      if event.nil?
-        @errors.add(:Event, 'Error finding event record')
-        return nil
-      end
+  def check_legacy_database
+    response = LegacyConnector.new.check_rsvp(@otp)
+    check_response_errors(response)
+    return if @errors.any?
 
-      if !event.nil? && event.start_date > Date.current
-        SyncEventMembersJob.perform_now(event.id)
-        sleep 1
-      end
+    event = Event.find(response['event_code'])
+    @errors.add(:Event, 'Error finding event record') and return if event.nil?
+    SyncEventMembersJob.perform_now(event.id) if event.start_date > Date.current
 
-      person = Person.where(legacy_id: response['legacy_id'].to_i).first
-      if person.nil?
-        @errors.add(:Person, 'Error finding person record')
-        return nil
-      end
+    prsn = Person.where(legacy_id: response['legacy_id'].to_i).first
+    @errors.add(:Person, 'Error finding person record') and return if prsn.nil?
 
-      membership = Membership.where(person: person, event: event).first
-      if membership.nil?
-        @errors.add(:Membership, 'Error finding event membership')
-        return nil
-      else
-        invitation = create_local_invitation(membership)
-      end
-    end
-    invitation
+    mbr = Membership.where(person: prsn, event: event).first
+    @errors.add(:Membership, 'Error finding membership') and return if mbr.nil?
+
+    create_local_invitation(mbr)
   end
 
   def validate(invitation)

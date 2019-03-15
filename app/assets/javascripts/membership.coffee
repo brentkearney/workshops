@@ -24,7 +24,7 @@ $(document).on 'turbolinks:load', ->
     defaultDate: departure_date
   })
 
-  $('#new-people tr').find('.person-data').each (i, field) =>
+  $('#new-people tr').find('.person-data').each (i, field) ->
     if field.value.length == 0
       $(field).addClass('has-error')
 
