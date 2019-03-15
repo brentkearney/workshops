@@ -9,9 +9,11 @@ require 'rails_helper'
 RSpec.describe Lecture, type: :model do
   before :each do
     @event = build(:event)
+    @event_start = DateTime.parse((@event.start_date + 1.days).to_s)
+    @event_end = DateTime.parse((@event.end_date).to_s)
     @lecture = build(:lecture, event: @event,
-      start_time: (@event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
-      end_time: (@event.start_date + 1.days).to_time.change({ hour: 10, min: 0}),
+      start_time: @event_start.change({ hour: 9, min: 0}),
+      end_time: @event_start.change({ hour: 10, min: 0}),
       person: create(:person))
   end
 
@@ -77,35 +79,36 @@ RSpec.describe Lecture, type: :model do
 
   it 'is invalid if the start time is outside of the event\'s dates' do
     expect(@lecture).to be_valid
-    @lecture.start_time = (@event.start_date - 2.days).to_time
+    @lecture.start_time = @event_start - 2.days
     expect(@lecture).not_to be_valid
     expect(@lecture.errors).to include(:start_time)
 
-    @lecture.start_time = (@event.start_date + 1.days).to_time
+    @lecture.start_time = @event_start + 1.days
+    @lecture.end_time = @event_start + 1.days + 1.hour
     expect(@lecture).to be_valid
 
-    @lecture.start_time = (@event.end_date + 1.days).to_time
+    @lecture.start_time = @event_end + 1.days
     expect(@lecture).not_to be_valid
-    expect(@lecture.errors).to include(:start_time)
+    expect(@lecture.errors).to include(:end_time)
   end
 
   it 'is invalid if the end time is outside of the event\'s dates' do
     expect(@lecture).to be_valid
-    @lecture.end_time = (@event.end_date + 1.days + 11.hours).to_s(:db)
+    @lecture.end_time = (@event_end + 1.days + 11.hours).to_s(:db)
     expect(@lecture).not_to be_valid
     expect(@lecture.errors).to include(:end_time)
   end
 
   it 'is invalid if the end time is before the start time' do
     expect(@lecture).to be_valid
-    @lecture.start_time = (@event.start_date + 2.days).to_time
-    @lecture.end_time = (@event.start_date + 1.days).to_time
+    @lecture.start_time = @event_start + 2.days
+    @lecture.end_time = @event_start + 1.days
     expect(@lecture).not_to be_valid
     expect(@lecture.errors).to include(:end_time)
   end
 
   it 'is invalid if the end time is equal to the start time (causes infinite loop!)' do
-    lecture = build(:lecture, event: @event, start_time: @event.start_date.at_midday, end_time: @event.start_date.at_midday)
+    lecture = build(:lecture, event: @event, start_time: @event_start.at_midday, end_time: @event_start.at_midday)
 
     expect(lecture).not_to be_valid
     expect(lecture.errors.full_messages).to eq(['End time - must be greater than start time'])
