@@ -69,7 +69,7 @@ RSpec.describe WelcomeController, type: :controller do
 
         it 'excludes past events from memberships list' do
           person.memberships.delete_all
-          past_membership = create(:membership, person: person, event: @pe)
+          create(:membership, person: person, event: @pe)
           current_membership = create(:membership, person: person, event: @ce)
           future_membership = create(:membership, person: person, event: @fe)
 
@@ -85,7 +85,7 @@ RSpec.describe WelcomeController, type: :controller do
           end
 
           it 'excludes from @memberships where attendance="Declined"' do
-            declined_membership = create(:membership, person: person, event: @ce, attendance: 'Declined', role: 'Participant')
+            create(:membership, person: person, event: @ce, attendance: 'Declined', role: 'Participant')
             confirmed_membership = create(:membership, person: person, event: @fe, attendance: 'Confirmed', role: 'Participant')
 
             get :index
@@ -106,7 +106,7 @@ RSpec.describe WelcomeController, type: :controller do
         context 'role="Backup Participant"' do
           it 'excludes from @memberships' do
             person.memberships.delete_all
-            backup_membership = create(:membership, person: person, event: @fe, role: 'Backup Participant')
+            create(:membership, person: person, event: @fe, role: 'Backup Participant')
             participant_membership = create(:membership, person: person, event: @ce, role: 'Participant')
 
             get :index
@@ -121,7 +121,7 @@ RSpec.describe WelcomeController, type: :controller do
           end
 
           it 'excludes from @memberships where attendance="Declined"' do
-            declined_membership = create(:membership, person: person, event: @fe, attendance: 'Declined', role: 'Observer')
+            create(:membership, person: person, event: @fe, attendance: 'Declined', role: 'Observer')
             confirmed_membership = create(:membership, person: person, event: @ce, attendance: 'Confirmed', role: 'Observer')
 
             get :index
@@ -130,7 +130,7 @@ RSpec.describe WelcomeController, type: :controller do
           end
 
           it 'excludes from @memberships where attendance="Not Yet Invited"' do
-            nyi_membership = create(:membership, person: person, event: @fe, attendance: 'Not Yet Invited', role: 'Observer')
+            create(:membership, person: person, event: @fe, attendance: 'Not Yet Invited', role: 'Observer')
             confirmed_membership = create(:membership, person: person, event: @ce, attendance: 'Confirmed', role: 'Observer')
 
             get :index
@@ -148,7 +148,7 @@ RSpec.describe WelcomeController, type: :controller do
             recent_event = create(:event, start_date: 1.week.ago.beginning_of_week(:sunday),
                               end_date: 1.week.ago.beginning_of_week(:sunday) + 5.days)
             recent_membership = create(:membership, event: recent_event, person: person)
-            old_membership = create(:membership, event: @pe, person: person) # last year
+            create(:membership, event: @pe, person: person) # last year
 
             get :index
 
