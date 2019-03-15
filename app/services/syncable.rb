@@ -100,7 +100,7 @@ module Syncable
     remote.each_pair do |k, v|
       next if v.blank?
       v = prepare_value(k, v)
-      next if k == 'updated_at'
+      next if k == 'updated_at' && local.updated_at.utc >= v.utc
       v = bool_value(v) if booleans.include?(k)
 
       next if k == 'invited_by' unless v.blank?

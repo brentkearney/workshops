@@ -12,10 +12,10 @@ module EventDecorators
   end
 
   def days
-    day = start_date.to_time.noon
+    day = DateTime.parse(start_date.to_s).noon
     days = [day]
     # Compare date strings so TZ issues don't interfere
-    datestring = end_date.to_time.strftime('%Y%m%d').to_s
+    datestring = DateTime.parse(end_date.to_s).strftime('%Y%m%d').to_s
     until day.strftime('%Y%m%d').to_s == datestring
       day += 1.day
       days << day
@@ -23,7 +23,7 @@ module EventDecorators
     days
   end
 
-  def num_participants
+def num_participants
     memberships.size
   end
 
@@ -127,16 +127,16 @@ module EventDecorators
   end
 
   def current?
-    Time.current >= start_date.to_time && Time.current <=
-      end_date.to_time.change(hour: 23, min: 59)
+    Time.current >= DateTime.parse(start_date.to_s) && Time.current <=
+      DateTime.parse(end_date.to_s).change(hour: 23, min: 59)
   end
 
   def upcoming?
-    Time.current <= start_date.to_time
+    Time.current <= DateTime.parse(start_date.to_s)
   end
 
   def past?
-    end_date.to_time < Time.current
+    DateTime.parse(end_date.to_s) < Time.current
   end
 
   def url

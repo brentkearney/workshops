@@ -71,7 +71,7 @@ class ScheduleItem
     if params[:'latest(4i)'] == '' || new_schedule.latest.nil?
       new_schedule.latest = nil
     else
-      latest = new_schedule.latest.in_time_zone(@event.time_zone)
+      new_schedule.latest.in_time_zone(@event.time_zone)
       the_date[:hour] = new_schedule.latest.strftime('%H').to_i
       the_date[:min] = new_schedule.latest.strftime('%M').to_i
 
@@ -265,7 +265,7 @@ class ScheduleItem
         lecture_length = (item_end - item_start).abs.to_i / 60
         times[lecture_length] += 1
       end
-      mfl, num = times.sort_by{|k, v| v}.last
+      mfl, _num = times.sort_by{|k, v| v}.last
       mfl.minutes
     end
   end

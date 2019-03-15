@@ -25,7 +25,8 @@ describe 'Editing a Schedule Item', type: :feature do
       item = @event.schedules.first
       visit event_schedule_edit_path(@event, item)
 
-      expect(page.has_select?('schedule[day]', with_options: @event.days))
+      event_days = @event.days.map {|day| day.strftime("%A, %B %e") }
+      expect(page.has_select?('schedule[day]', with_options: event_days))
       expect(page.has_select?('Start time2'))
       expect(page).to have_field('schedule_start_time_4i')
       expect(page).to have_field('schedule_end_time_4i')

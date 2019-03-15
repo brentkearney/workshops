@@ -10,7 +10,6 @@ describe 'Users Admin Dashboard', type: :feature do
   before do
   	@event = create(:event)
   	person = create(:person)
-  	membership = create(:membership, event: @event, person: person, role: 'Organizer')
 
   	@member_user = create(:user,email: person.email,person: person, role: 0)
     @staff_user = create(:user, :staff)
