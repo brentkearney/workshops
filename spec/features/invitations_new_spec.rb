@@ -135,7 +135,7 @@ describe 'Invitation#new', type: :feature do
       submit_member_request(@member)
 
       expect(page.body).to have_css('div.alert',
-        text: "The event's organizers have not yet\n              invited you")
+        text: "The event's organizers have not yet invited you")
     end
 
     it 'invited' do

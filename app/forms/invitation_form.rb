@@ -43,38 +43,41 @@ class InvitationForm < ComplexForms
     end
   end
 
+  def no_email_found
+    errors.add(:email, ": We have no record of that email address.
+      Is it possible that we were given a different email address for you?")
+  end
+
+  def no_membership
+    errors.add(:email, ": that e-mail address is not associated to the
+      event you selected. Do you have a different e-mail address that we
+      might have in our records?")
+  end
+
+  def declined_already(e)
+    errors.add(:Membership, ": You have already declined an invitation
+      to this event. Please contact the event's organizers to ask if it
+      is still possible to attend.<br />
+      The contact organizer is: <u>#{organizer(e)}</u>.".squish)
+  end
+
+  def not_invited(e)
+    errors.add(:Membership, ": The event's organizers have not yet
+      invited you. Please contact them if you wish to be invited.<br />
+      The contact organizer is: <u>#{organizer(e)}</u>.".squish)
+  end
+
   def is_member
-    unless errors.any?
-      person = Person.find_by_email(email)
-      if person.nil?
-        errors.add(:email, ": We have no record of that email address.
-          Is it possible that we were given a different email address for you?")
-        return false
-      else
-        e = Event.find(event)
-        @membership = Membership.where(person: person, event: e).first
+    return if errors.any?
+    person = Person.find_by_email(email)
+    no_email_found and return if person.nil?
 
-        if @membership.nil?
-          errors.add(:email, ": that e-mail address is not associated to the
-            event you selected. Do you have a different e-mail address that we
-            might have in our records?")
-          return false
-
-        elsif @membership.attendance == 'Declined'
-          errors.add(:Membership, ": You have already declined an invitation
-            to this event. Please contact the event's organizers to ask if it
-            is still possible to attend.<br />
-            The contact organizer is: <u>#{organizer(e)}</u>.")
-
-          elsif @membership.attendance == 'Not Yet Invited'
-            errors.add(:Membership, ": The event's organizers have not yet
-              invited you. Please contact them if you wish to be invited.<br />
-              The contact organizer is: <u>#{organizer(e)}</u>.")
-        else
-          return true
-        end
-      end
-    end
+    e = Event.find(event)
+    @membership = Membership.where(person: person, event: e).first
+    no_membership and return if @membership.nil?
+    declined_already(e) and return if @membership.attendance == 'Declined'
+    not_invited(e) and return if @membership.attendance == 'Not Yet Invited'
+    return true
   end
 
   def organizer(event)

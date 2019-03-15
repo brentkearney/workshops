@@ -43,7 +43,7 @@ class AddMembersForm < ComplexForms
 
   def organize_params(params)
     data = []
-    if !params['add_members'].blank?
+    unless params['add_members'].blank?
       params['add_members'].each_line do |line|
         parts = line.chomp.split(/,/)
         record = { email: parts[0], lastname: parts[1], firstname: parts[2],
@@ -53,7 +53,7 @@ class AddMembersForm < ComplexForms
       data
     end
 
-    if !params['new_people'].blank?
+    unless params['new_people'].blank?
       params['new_people'].each do |p|
         data << p
       end

@@ -11,7 +11,7 @@ please [contact me](mailto:brent@netmojo.ca).
 
 Installation instructions are below.
 
-### Current Features
+## Current Features
 *  **Sign-ins and sign-ups** for staff and admin users, and invited workshop participants.
 *  **Fine-grained, role-based access controls** allows different levels of access privileges for admin, staff, organizers, participants, and public. (Uses [Pundit](https://github.com/varvet/pundit).)
 *  **Add Members** Staff and Organizers can add members to their workshops.
@@ -33,7 +33,7 @@ Installation instructions are below.
 *  **Settings in database** Application settings are stored in the database instead of config files, allowing staff and admins to easily change settings with web interface, on the fly.
 *  **Administrate** a web-based interface to the database tables, provided by Thoughtbot's [Administrate](https://github.com/thoughtbot/administrate) gem. Allows for easy searching, adding, and editing of database records.
 
-### Upcoming Features:
+## Upcoming Features:
 * After-event feedback forms - automatically mail participants after an event, with one-click URL for providing feedback on the event.
 * Drag & drop interface for scheduling features.
 * Staff can assign hotel rooms, generate reports for hotel room bookings, and manage other hospitality details for workshop participants.
@@ -95,13 +95,13 @@ It is currently configured to use [Sparkpost](https://www.sparkpost.com) for mai
 
 ### Alternative installation, with SQLite3
 
-This installation method assumes Ruby + Rails are installed on your local machine, and uses SQLite3 for the database.
+This installation method assumes Ruby + Rails are installed on your local machine, and uses SQLite3 for the database. YMMV :)
 
-1. Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
+1.  Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
 
-2. Edit the `lib/tasks/ws.rake` file to change default user account information, to set your own credentials for logging into the Workshops web interface.
+2.  Edit the `lib/tasks/ws.rake` file to change default user account information, to set your own credentials for logging into the Workshops web interface.
 
-3. Adjust `config/database.yml` like the following:
+3.  Adjust `config/database.yml` like the following:
   ```
     default: &default
       adapter: sqlite3
@@ -127,28 +127,28 @@ This installation method assumes Ruby + Rails are installed on your local machin
       database: workshops_production
   ```
 
-4. Modify the schema to get rid of 'id: :serial', by calling e.g. (in Linux):
+4.  Modify the schema to get rid of 'id: :serial', by calling e.g. (in Linux):
     `sed -i -e 's|, id: :serial||' db/schema.rb`
 
-5. Create the database:
+5.  Create the database:
   `rails db:schema:load`
   (`rails db:migrate` will not work due to unsupported SQL statements)
 
-6. Setup some default settings and admin account by calling
+6.  Setup some default settings and admin account by calling
     `rails ws:init_settings`
     `rails ws:create_admins` # remember, you changed the credentials earlier
 
-7. Optionally, populate the database with demo data from `db/seed.rb`
+7.  Optionally, populate the database with demo data from `db/seed.rb`
     rails db:seed
 
-8. Set environment variables (refer to the end of `docker-compose.yml.example`).
+8.  Set environment variables (refer to the end of `docker-compose.yml.example`).
 
-9. Start the application
+9.  Start the application
     `rails s # short for: rails server`
 
-10. Login to the web interface (http://localhost:3000) with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
+10. Login to the web interface [http://localhost:3000] with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
 
-### License:
+### License
 Workshops is free software: you can redistribute it and/or modify it under
 the terms of the GNU Affero General Public License as published by the Free
 Software Foundation, version 3 of the License. See the [COPYRIGHT](COPYRIGHT)
