@@ -146,7 +146,7 @@ This installation method assumes Ruby + Rails are installed on your local machin
 9.  Start the application
     `rails s # short for: rails server`
 
-10. Login to the web interface [http://localhost:3000] with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
+10. Login to the web interface http://localhost:3000 with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
 
 ### License
 Workshops is free software: you can redistribute it and/or modify it under

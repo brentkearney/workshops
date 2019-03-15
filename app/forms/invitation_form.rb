@@ -54,17 +54,24 @@ class InvitationForm < ComplexForms
       might have in our records?")
   end
 
-  def declined_already(e)
+  def declined_already(event)
     errors.add(:Membership, ": You have already declined an invitation
       to this event. Please contact the event's organizers to ask if it
       is still possible to attend.<br />
-      The contact organizer is: <u>#{organizer(e)}</u>.".squish)
+      The contact organizer is: <u>#{organizer(event)}</u>.".squish)
   end
 
-  def not_invited(e)
+  def not_invited(event)
     errors.add(:Membership, ": The event's organizers have not yet
       invited you. Please contact them if you wish to be invited.<br />
-      The contact organizer is: <u>#{organizer(e)}</u>.".squish)
+      The contact organizer is: <u>#{organizer(event)}</u>.".squish)
+  end
+
+  def check_membership(event, person)
+    @membership = Membership.where(person: person, event: event).first
+    no_membership and return if @membership.nil?
+    declined_already(event) and return if @membership.attendance == 'Declined'
+    not_invited(event) and return if @membership.attendance == 'Not Yet Invited'
   end
 
   def is_member
@@ -72,11 +79,9 @@ class InvitationForm < ComplexForms
     person = Person.find_by_email(email)
     no_email_found and return if person.nil?
 
-    e = Event.find(event)
-    @membership = Membership.where(person: person, event: e).first
-    no_membership and return if @membership.nil?
-    declined_already(e) and return if @membership.attendance == 'Declined'
-    not_invited(e) and return if @membership.attendance == 'Not Yet Invited'
+    check_membership(Event.find(event), person)
+    return if errors.any?
+
     return true
   end
 
