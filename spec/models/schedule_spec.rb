@@ -9,12 +9,14 @@ require 'rails_helper'
 RSpec.describe 'Model validations: Schedule', type: :model do
   before do
     @event = create(:event)
+    @event_start = DateTime.parse(@event.start_date.to_s).change({ hour: 12 })
+    @event_end = DateTime.parse(@event.end_date.to_s).change({ hour: 17 })
   end
 
   before :each do
     @schedule = create(:schedule, event: @event,
-      start_time: (@event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
-      end_time: (@event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
+      start_time: (@event_start + 1.days).change({ hour: 9, min: 0}),
+      end_time: (@event_start + 1.days).change({ hour: 10, min: 0}))
   end
 
   it 'has valid factory' do
@@ -148,8 +150,8 @@ RSpec.describe 'Model validations: Schedule', type: :model do
 
   it 'is invalid if the end time is outside of the event\'s dates' do
     schedule = build(:schedule, event: @event)
-    schedule.start_time = (@event.end_date - 1.days).to_time.change({ hour: 9, min: 0})
-    schedule.end_time = (@event.end_date + 1.days).to_time.change({ hour: 9, min: 0})
+    schedule.start_time = (@event_end - 1.days).change({ hour: 9, min: 0})
+    schedule.end_time = (@event_end + 1.days).change({ hour: 9, min: 0})
     expect(schedule).not_to be_valid
     expect(schedule.errors).not_to include(:start_time)
     expect(schedule.errors).to include(:end_time)
@@ -172,8 +174,8 @@ RSpec.describe 'Model validations: Schedule', type: :model do
 
   it 'accepts nested attributes for Lecture' do
     lecture = build(:lecture, event: @event,
-      start_time: (@event.start_date + 1.days).to_time.change({ hour: 9, min: 0}),
-      end_time: (@event.start_date + 1.days).to_time.change({ hour: 10, min: 0}))
+      start_time: (@event_start + 1.days).change({ hour: 9, min: 0}),
+      end_time: (@event_start + 1.days).change({ hour: 10, min: 0}))
     @schedule.lecture = lecture
     expect(@schedule).to be_valid
   end
