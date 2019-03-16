@@ -80,9 +80,7 @@ class InvitationForm < ComplexForms
     no_email_found and return if person.nil?
 
     check_membership(Event.find(event), person)
-    return if errors.any?
-
-    return true
+    !errors.any?
   end
 
   def organizer(event)
