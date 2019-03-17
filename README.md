@@ -7,7 +7,7 @@ and released under the GPL-A open-source license. The software is intended to be
 who host workshops. It is used at the
 [Banff International Research Station](https://workshops.birs.ca/events/future) for managing workshops.
 
-Contributions to the project are most welcome. If you would like to add features yourself, please
+Contributions to the project are most welcome. Check out the [Project Page](https://github.com/brentkearney/workshops/projects/1) for whats happening in development now. If you would like to add features yourself, please
 [let me know](mailto:brentk@birs.ca), and/or submit a Pull Request. Or if you would like to pay for the development of additional features,
 please [contact me](mailto:brent@netmojo.ca).
 
@@ -36,8 +36,10 @@ Installation instructions are below.
 *  **Administrate** a web-based interface to the database tables, provided by Thoughtbot's [Administrate](https://github.com/thoughtbot/administrate) gem. Allows for easy searching, adding, and editing of database records.
 
 ## Upcoming Features:
+* E-mail Template Management - an interface for creating, editing, managing various e-mail templates used in the application, to be stored in the database instead of static files. Associate letter templates with types of events, roles of event participants, or other criteria. Schedule automated sending of certain letters to certain groups based on arbitrary conditions.
 * After-event feedback forms - automatically mail participants after an event, with one-click URL for providing feedback on the event.
 * Drag & drop interface for scheduling features.
+* Payment system for accepting credit card or cryptocurrency payments/contributions
 * Staff can assign hotel rooms, generate reports for hotel room bookings, and manage other hospitality details for workshop participants.
 * Task scheduler, to allow automated performance of tasks such as reminder emails for participants to RSVP, after event feedback requests, etc.
 * Admin users can manage other users (add/remove/change passwords, etc) - currently they can only change their own passwords.
@@ -65,9 +67,11 @@ The application is setup to work in a [Docker](http://www.docker.com) container.
   ```
 
   Bash command to copy them all to new names:
+  
     ```
       for file in `ls -1 *.example`; do newfile=`echo $file | sed 's/\.example$//'`; cp $file $newfile; done
     ```
+
 3.  Edit the lib/tasks/ws.rake file to change default user account information, to set your own credentials for logging into the Workshops web interface. The default accounts are setup by the entrypoint.sh script running: `rake ws:create_admins RAILS_ENV=development`.
 
 4.  Edit docker-compose.yml to set your preferred usernames and passwords in the environment variables. Note the instructions
