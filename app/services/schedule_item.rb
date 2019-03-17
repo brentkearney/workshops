@@ -105,8 +105,8 @@ class ScheduleItem
 
     original_item.event.schedules.each do |item|
       if item.name == original_item.name &&
-        item.start_time.to_time.hour == original_item.start_time.to_time.hour &&
-        item.start_time.to_time.min == original_item.start_time.to_time.min
+        item.start_time.hour == original_item.start_time.hour &&
+        item.start_time.min == original_item.start_time.min
 
         item.start_time = item.start_time.change({ hour: updated_item.start_time.hour, min: updated_item.start_time.min })
         item.end_time = item.end_time.change({ hour: updated_item.end_time.hour, min: updated_item.end_time.min })

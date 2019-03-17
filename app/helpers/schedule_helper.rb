@@ -13,13 +13,13 @@ module ScheduleHelper
     if policy(item).edit?
       link_text = link_to item[:name], event_schedule_edit_path(@event, item), class: link_class
       unless item[:description].blank?
-        link_text += link_to " <i class=\"fa fa-toggle-down fa-fw\" id=\"icon-#{item[:id]}\"></i>".html_safe, '#', html_options = {class: 'item-link', id: "link-#{item[:id]}"}
+        link_text += link_to " <i class=\"fa fa-toggle-down fa-fw\" id=\"icon-#{item[:id]}\"></i>".html_safe, '#', { class: 'item-link', id: "link-#{item[:id]}" }
       end
     else
       if item[:description].blank?
         link_text = "<span class=\"#{link_class}\">#{item[:name]}</span>"
       else
-        link_text = link_to "#{item[:name]} <i class=\"fa fa-toggle-down fa-fw\"></i>".html_safe, '#', html_options = {class: "item-link #{link_class}", id: "link-#{item[:id]}"}
+        link_text = link_to "#{item[:name]} <i class=\"fa fa-toggle-down fa-fw\"></i>".html_safe, '#', { class: "item-link #{link_class}", id: "link-#{item[:id]}" }
       end
     end
 
