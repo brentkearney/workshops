@@ -9,15 +9,21 @@ module SettingsHelper
     link_to person.uri, person.uri unless person.url.blank?
   end
 
+  def addr_suffix(field)
+    return "<br>\n" if field =~ /address/
+  end
+
+  def addr_prefix(field)
+    return ', ' if field == 'region'
+    return ' ' if field == 'postal_code'
+    return "<br>\n" if field == 'country'
+  end
+
   def person_address(person)
     address = ''
-    address << person.address1 + "<br />\n" unless person.address1.blank?
-    address << person.address2 + "<br />\n" unless person.address2.blank?
-    address << person.address3 + "<br />\n" unless person.address3.blank?
-    address << person.city unless person.city.blank?
-    address << ', ' + person.region unless person.region.blank?
-    address << '  ' + person.postal_code unless person.postal_code.blank?
-    address << "<br />\n" + person.country unless person.country.blank?
+    %w(address1 address2 address3 city region postal_code country).each do |f|
+      address << addr_prefix(f) << f << addr_suffix(f) unless person.send(f).blank?
+    end
     address
   end
 end
