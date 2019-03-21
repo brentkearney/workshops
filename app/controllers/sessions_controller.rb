@@ -33,5 +33,4 @@ class SessionsController < Devise::SessionsController
     # do you have any memberships where you're either an organizer or NOT not-invited or declined?
     self.resource.person.memberships.where("role LIKE '%Organizer%' OR (attendance != 'Not Yet Invited' AND attendance != 'Declined')").blank?
   end
-
 end

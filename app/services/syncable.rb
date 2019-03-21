@@ -146,7 +146,7 @@ module Syncable
   def update_email(person, email)
     return person if person.email == email
     person.email = email
-    update_user_account(person, person, email)
+    update_user_account(person, person)
     person
   end
 
@@ -193,9 +193,7 @@ module Syncable
       l.update(person: replace_with)
     end
 
-    if User.find_by_person_id(replace_with.id).blank?
-      update_user_account(replace, replace_with, replace_with.email)
-    end
+    update_user_account(replace, replace_with)
 
     # Update legacy database
     replace_remote(replace, replace_with)
@@ -204,11 +202,15 @@ module Syncable
     replace.delete
   end
 
-  def update_user_account(person, replace_with, email)
-    user_account = User.find_by_person_id(person.id)
+  def update_user_account(person, replace_with)
+    user_account = User.find_by_email(replace_with.email) ||
+                   User.find_by_person_id(replace_with.id) ||
+                   User.find_by_email(person.email) ||
+                   User.find_by_person_id(person.id)
+
     unless user_account.nil?
       user_account.person = replace_with
-      user_account.email = email
+      user_account.email = replace_with.email
       user_account.skip_reconfirmation!
       user_account.save
     end
