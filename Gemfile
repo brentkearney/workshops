@@ -35,6 +35,7 @@ gem 'rack-cors', require: 'rack/cors'
 gem 'listen'
 gem 'bootsnap'
 gem 'administrate'
+gem 'graphql'
 
 group :development, :test do
   gem 'byebug'
@@ -71,4 +72,5 @@ group :development do
   #gem 'rbnacl-libsodium'
   gem 'rbnacl', '~> 6.0'
   gem 'bcrypt_pbkdf', '~> 1.0'
+  gem 'graphiql-rails'
 end
