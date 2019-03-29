@@ -1,9 +1,9 @@
 module Types
   class LectureType < Types::BaseObject
     field :id, ID, null: false
+    field :event, Types::EventType, null: false
+    field :person, Types::PersonType, null: false
     field :legacy_id, Int, null: true
-    field :event, [Types::EventType], null: false
-    field :person, [Types::PersonType], null: false
     field :title, String, null: true
     field :start_time, Types::DateTimeType, null: false
     field :end_time, Types::DateTimeType, null: false
