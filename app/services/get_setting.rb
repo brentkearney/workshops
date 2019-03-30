@@ -122,6 +122,13 @@ class GetSetting
     Setting.Locations[location]['Country']
   end
 
+  def self.location_timezone(location)
+    if no_setting("Locations['#{location}']['Timezone']")
+      location = default_location
+    end
+    Setting.Locations[location]['Timezone']
+  end
+
   def self.default_location
     Setting.Locations.first.first
   end
