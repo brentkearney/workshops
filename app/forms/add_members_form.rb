@@ -36,7 +36,7 @@ class AddMembersForm < ComplexForms
       else
         errors.delete(:"#{i}")
         i -= 1
-        @added << person if add_new_member(person, @role)
+        @added << person if add_new_member(person, @role, pdata)
       end
     end
   end
@@ -90,22 +90,27 @@ class AddMembersForm < ComplexForms
     person
   end
 
-  def add_new_member(person, role)
+  def add_new_member(person, role, pdata)
     return true if @event.members.include?(person)
+
     begin
       @event.set_sync_time
       m = Membership.new(event: @event, person: person, role: role,
                          updated_by: @current_user.name, update_remote: true)
-      m.save
-    rescue ActiveRecord::RecordInvalid => e
-      errors.add(:"0", e.message)
-      msg = { problem: 'Unable to save new member',
+
+      person.affiliation = pdata[:affiliation] if person.affiliation.blank?
+
+      unless m.valid?
+        errors.add(:"0", m.errors.full_messages)
+        msg = { problem: 'Unable to save new member',
               source: 'AddMembersForm.add_new_member',
               person: "#{person.name} (id: #{person.id})",
               membership: m.pretty_inspect,
-              error: e.pretty_inspect }
-      StaffMailer.notify_sysadmin(@event, msg).deliver_now
-      return false
+              error: m.errors.full_messages }
+        StaffMailer.notify_sysadmin(@event, msg).deliver_now
+        return false
+      end
+      m.save
     end
   end
 

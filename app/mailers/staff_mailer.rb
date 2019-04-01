@@ -51,7 +51,7 @@ class StaffMailer < ApplicationMailer
                 "[#{event.code}] (#{event.location}) error"
               end
 
-    @message = error.inspect
+    @message = error.pretty_inspect
     mail(to: to_email, subject: subject, template_name: 'notify_sysadmin')
   end
 
