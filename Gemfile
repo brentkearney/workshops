@@ -36,6 +36,7 @@ gem 'listen'
 gem 'bootsnap'
 gem 'administrate'
 gem 'graphql'
+gem 'devise-jwt', '~> 0.5.9'
 
 group :development, :test do
   gem 'byebug'

@@ -26,7 +26,6 @@ module Mutations
         args[:time_zone] = GetSetting.location_timezone(args[:location])
       end
       args[:updated_by] = 'Workshops API' if args[:updated_by].blank?
-      Rails.logger.debug "\n\nAddEvent args:\n#{args.pretty_inspect}\n\n"
       Event.create!(args)
     end
   end
