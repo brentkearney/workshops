@@ -13,7 +13,7 @@
           </div><!-- /panel-heading -->
           <div class="panel-body">
             <div class="row" id="profile-affil"><%= @person.affil_with_title %></div>
-            <% if policy(@membership).show_email_address? %>
+            <% if policy(@membership).use_email_addresses? || policy(@membership).show_email_address? %>
             <div class="row" id="profile-email"><%= mail_to @person.email %></div>
             <% end %>
 

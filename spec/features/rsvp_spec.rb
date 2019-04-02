@@ -136,7 +136,7 @@ describe 'RSVP', type: :feature do
 
       visit rsvp_otp_path(@invitation.code)
 
-      expect(page).to have_text('Error finding event membership')
+      expect(page).to have_text('Error finding membership')
     end
 
     it 'non-existent person record' do

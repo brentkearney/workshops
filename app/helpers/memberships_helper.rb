@@ -152,7 +152,7 @@ module MembershipsHelper
   end
 
   def add_bottom_buttons(status)
-    return unless policy(@event).view_email_addresses?
+    return unless policy(@event).show_email_buttons?(status)
     content = '<div class="no-print" id="email-members">'
     content << add_email_buttons(status)
     if status == 'Not Yet Invited' && spots_left && policy(@event).send_invitations?
@@ -187,26 +187,23 @@ module MembershipsHelper
 
   def show_email(member)
     column = ''
-    if policy(@event).view_email_addresses?
-      if member.shares_email?
-        column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
-          mail_to(member.person.email, '<span class="glyphicon glyphicon-envelope"></span>'.html_safe, :title => "#{member.person.email}", subject: "[#{@event.code}] ") +
+    if policy(member).show_email_address?
+      column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
+        mail_to(member.person.email, '<span class="glyphicon glyphicon-envelope"></span>'.html_safe,
+          title: "#{member.person.email}", subject: "[#{@event.code}] ") +
           '</td><td class="hidden-xs hidden-sm rowlink-skip no-print">' +
           mail_to(member.person.email, member.person.email, subject: "[#{@event.code}] ") +
           '</td>'
-      else
-        if policy(@event).use_email_addresses?
+    elsif policy(member).use_email_addresses?
           column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
             mail_to(member.person.email, '<span class="glyphicon glyphicon-lock"></span>'.html_safe, :title => "E-mail not shared with other members", subject: "[#{@event.code}] ") +
             '</td><td class="hidden-xs hidden-sm rowlink-skip no-print">' +
             mail_to(member.person.email, '[not shared]', :title => "E-mail not shared with other members", subject: "[#{@event.code}] ") +
             '</td>'
-        else
-          column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
-            '<a title="E-mail not shared" class="glyphicon glyphicon-lock"></a></td>' +
-            '<td class="hidden-xs hidden-sm rowlink-skip">[not shared]</td>'
-        end
-      end
+    else
+      column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
+        '<a title="E-mail not shared" class="glyphicon glyphicon-lock"></a></td>' +
+        '<td class="hidden-xs hidden-sm rowlink-skip">[not shared]</td>'
     end
     column.html_safe
   end

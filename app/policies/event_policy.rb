@@ -39,11 +39,11 @@ class EventPolicy
   end
 
   def update?
-    allow_orgs_and_staff
+    organizers_and_staff
   end
 
   def edit?
-    allow_orgs_and_staff
+    organizers_and_staff
   end
 
   def may_edit
@@ -68,7 +68,7 @@ class EventPolicy
 
   def show?
     if event.template
-      allow_staff_and_admins
+      staff_and_admins
     else
       true
     end
@@ -80,53 +80,41 @@ class EventPolicy
 
   def allow_add_members?
     return false if @event.past?
-    allow_orgs_and_staff
+    organizers_and_staff
   end
 
   def view_attendance_status?(status)
-    return true if allow_orgs_and_staff
+    return true if organizers_and_staff
     if current_user
       ['Confirmed', 'Invited', 'Undecided'].include?(status)
     end
   end
 
-  def view_email_addresses?
-    if current_user
-      current_user.is_member?(event) || current_user.is_admin? || staff_at_location
-    end
-  end
-
   def show_email_buttons?(status)
-    return true if allow_orgs_and_staff
+    return true if organizers_and_staff
     member_of_event? && status == 'Confirmed'
-  end
-
-  # Allow the use of emails when they are not shared by the member
-  def use_email_addresses?
-    if current_user
-      current_user.is_organizer?(event) || allow_staff_and_admins
-    end
   end
 
   def send_invitations?
     return false if current_user.nil?
     return false if event.start_date < Date.current
-    return true if allow_staff_and_admins
+    return true if staff_and_admins
     current_user.is_organizer?(event)
   end
 
   def sync?
     if event.end_date >= Date.today && !event.template
-      allow_orgs_and_staff unless Rails.env.test?
+      organizers_and_staff unless Rails.env.test?
     end
   end
 
   def view_details?
-    view_email_addresses?
+    return false if current_user.nil?
+    member_of_event? || staff_and_admins
   end
 
   def event_staff?
-    allow_staff_and_admins
+    staff_and_admins
   end
 
   private
@@ -136,12 +124,12 @@ class EventPolicy
     current_user.staff? && current_user.location == event.location
   end
 
-  def allow_staff_and_admins
+  def staff_and_admins
     return false unless current_user
     current_user.is_admin?  || staff_at_location
   end
 
-  def allow_orgs_and_staff
+  def organizers_and_staff
     return false unless current_user
     current_user.is_organizer?(event) || current_user.is_admin?  || staff_at_location
   end

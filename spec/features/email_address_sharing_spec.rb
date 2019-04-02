@@ -24,8 +24,24 @@ describe 'Email address sharing', type: :feature do
     end
   end
 
+  def shows_invited_emails
+    @event.memberships.where(attendance: 'Invited')
+          .or(@event.memberships.where(attendance: 'Undecided'))
+          .each do |membership|
+      expect(page.body).to include(membership.person.email)
+    end
+  end
+
   def does_not_show_member_emails
     @event.memberships.where(attendance: 'Confirmed').each do |membership|
+      expect(page.body).not_to include(membership.person.email)
+    end
+  end
+
+  def does_not_show_invited_emails
+    @event.memberships.where(attendance: 'Invited')
+          .or(@event.memberships.where(attendance: 'Undecided'))
+          .each do |membership|
       expect(page.body).not_to include(membership.person.email)
     end
   end
@@ -39,6 +55,13 @@ describe 'Email address sharing', type: :feature do
     @unshared2 = @event.memberships.where(attendance: 'Confirmed', role: 'Participant').second
     expect(@unshared2.person).not_to eq(@user.person)
     @unshared2.share_email = false
+    @unshared2.save
+  end
+
+  def reshare_those_emails
+    @unshared1.share_email = true
+    @unshared1.save
+    @unshared2.share_email = true
     @unshared2.save
   end
 
@@ -61,6 +84,7 @@ describe 'Email address sharing', type: :feature do
 
     it 'does not show member email addresses' do
       does_not_show_member_emails
+      does_not_show_invited_emails
     end
   end
 
@@ -72,6 +96,7 @@ describe 'Email address sharing', type: :feature do
 
     it 'does not show member email addresses' do
       does_not_show_member_emails
+      does_not_show_invited_emails
     end
   end
 
@@ -94,6 +119,11 @@ describe 'Email address sharing', type: :feature do
 
       expect(page.body).not_to include(@unshared1.person.email)
       expect(page.body).not_to include(@unshared2.person.email)
+      reshare_those_emails
+    end
+
+    it 'hides emails of unconfirmed members' do
+      does_not_show_invited_emails
     end
   end
 
@@ -106,8 +136,9 @@ describe 'Email address sharing', type: :feature do
       visit event_memberships_path(@event)
     end
 
-    it 'shows member email addresses' do
+    it 'shows confirmed, invited, and undecided email addresses' do
       shows_member_emails
+      shows_invited_emails
     end
 
     it 'hides emails of those who choose not to share, but still adds mailto: links' do
@@ -117,6 +148,7 @@ describe 'Email address sharing', type: :feature do
 
       visit event_memberships_path(@event)
       hides_emails_but_links_to_them
+      reshare_those_emails
     end
   end
 
@@ -129,8 +161,9 @@ describe 'Email address sharing', type: :feature do
       visit event_memberships_path(@event)
     end
 
-    it 'does not show member email addresses' do
+    it 'does not show member or invited email addresses' do
       does_not_show_member_emails
+      does_not_show_invited_emails
     end
   end
 
@@ -140,12 +173,13 @@ describe 'Email address sharing', type: :feature do
       login_as @non_member_user, scope: :user
     end
 
-    it 'shows member email addresses if staff location matches event location' do
+    it 'shows member & invited email addresses if staff location matches event location' do
       @non_member_user.location = @event.location
       @non_member_user.save!
 
       visit event_memberships_path(@event)
       shows_member_emails
+      shows_invited_emails
     end
 
     it 'hides emails of those who choose not to share, but still adds mailto: links' do
@@ -155,14 +189,16 @@ describe 'Email address sharing', type: :feature do
 
       visit event_memberships_path(@event)
       hides_emails_but_links_to_them
+      reshare_those_emails
     end
 
-    it 'does not show member email addresses if staff location does not match event location' do
+    it 'does not show member or invited email addresses if staff location does not match event location' do
       @non_member_user.location = 'Elsewhere'
       @non_member_user.save!
 
       visit event_memberships_path(@event)
       does_not_show_member_emails
+      does_not_show_invited_emails
     end
   end
 
@@ -172,9 +208,10 @@ describe 'Email address sharing', type: :feature do
       login_as @non_member_user, scope: :user
     end
 
-    it 'shows member email addresses' do
+    it 'shows member and invited email addresses' do
       visit event_memberships_path(@event)
       shows_member_emails
+      shows_invited_emails
     end
 
     it 'hides emails of those who choose not to share, but still adds mailto: links' do
