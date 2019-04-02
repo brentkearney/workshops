@@ -87,6 +87,7 @@ class Membership < ApplicationRecord
   end
 
   def arrival_and_departure_dates
+    return true if attendance == 'Declined'
     w = event
     unless arrival_date.blank?
       if arrival_date.to_date > w.end_date.to_date

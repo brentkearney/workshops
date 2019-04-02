@@ -88,6 +88,14 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@membership.valid?).to be_truthy
   end
 
+  it 'arrival and departure validations skipped if attendance is Declined' do
+    @membership.update_by_staff = false
+    @membership.arrival_date = @event.start_date - 1.days
+    @membership.departure_date = @event.end_date + 1.days
+    @membership.attendance = 'Declined'
+    expect(@membership.valid?).to be_truthy
+  end
+
   it 'is valid with nil arrival and departure dates' do
     @membership.arrival_date = nil
     expect(@membership.valid?).to be_truthy
