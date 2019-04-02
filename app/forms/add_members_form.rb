@@ -36,7 +36,7 @@ class AddMembersForm < ComplexForms
       else
         errors.delete(:"#{i}")
         i -= 1
-        @added << person if add_new_member(person, @role, pdata)
+        @added << person if add_new_member(person, @role)
       end
     end
   end
@@ -72,7 +72,7 @@ class AddMembersForm < ComplexForms
     email = data[:email].downcase.strip
     return if email.blank?
     if EmailValidator.valid?(email)
-      find_person(email) || add_new_person(data, i)
+      find_person(data) || add_new_person(data, i)
     else
       errors.add(i.to_s, "E-mail is invalid")
       return
@@ -90,16 +90,13 @@ class AddMembersForm < ComplexForms
     person
   end
 
-  def add_new_member(person, role, pdata)
+  def add_new_member(person, role)
     return true if @event.members.include?(person)
 
     begin
       @event.set_sync_time
       m = Membership.new(event: @event, person: person, role: role,
                          updated_by: @current_user.name, update_remote: true)
-
-      person.affiliation = pdata[:affiliation] if person.affiliation.blank?
-
       unless m.valid?
         errors.add(:"0", m.errors.full_messages)
         msg = { problem: 'Unable to save new member',
@@ -114,8 +111,14 @@ class AddMembersForm < ComplexForms
     end
   end
 
-  def find_person(email)
-    Person.find_by_email(email) || find_remote_person(email)
+  def find_person(data)
+    email = data[:email]
+    person = Person.find_by_email(email) || find_remote_person(email)
+    return if person.nil?
+    person.affiliation = data[:affiliation] if person.affiliation.blank?
+    person.lastname = data[:lastname] if person.lastname.blank?
+    person.firstname = data[:firstname] if person.firstname.blank?
+    person
   end
 
   def find_remote_person(email)
