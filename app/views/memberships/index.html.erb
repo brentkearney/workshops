@@ -32,7 +32,7 @@
                       <th></th>
                     <% end %>
                     <th class="hidden-xs">Affiliation</th>
-                    <% if policy(@event).view_email_addresses? %>
+                    <% if policy(@event).show_email_buttons?(status) %>
                         <th class="hidden-md hidden-lg" align="middle">Email</th>
                         <th class="hidden-xs hidden-sm">E-mail</th>
                     <% end %>

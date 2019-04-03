@@ -92,7 +92,7 @@ class EventPolicy
 
   def show_email_buttons?(status)
     return true if organizers_and_staff
-    member_of_event? && status == 'Confirmed'
+    status == 'Confirmed' && current_user.is_confirmed_member?(event)
   end
 
   def send_invitations?

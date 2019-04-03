@@ -97,14 +97,19 @@ class MembershipPolicy
   end
 
   def is_member_and_shared
-    @current_user.is_member?(@event) && @membership.share_email &&
-          @membership.attendance == 'Confirmed'
+    @current_user.is_confirmed_member?(@event) && @membership.share_email &&
+      @membership.attendance == 'Confirmed'
   end
 
   # Allow the use of emails when they are not shared by the member
   def use_email_addresses?
     return false if @current_user.nil?
     organizer_and_staff
+  end
+
+  def show_not_shared?
+    return false if @current_user.nil?
+    @current_user.is_confirmed_member?(@event) && !@membership.share_email
   end
 
   def edit_person?

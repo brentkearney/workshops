@@ -42,6 +42,11 @@ class User < ApplicationRecord
       AND attendance != 'Not Yet Invited'").count > 0
   end
 
+  def is_confirmed_member?(event)
+    person.memberships.where("event_id=#{event.id}
+      AND attendance = 'Confirmed'").count > 0
+  end
+
   def name
     person.name
   end

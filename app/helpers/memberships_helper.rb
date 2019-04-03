@@ -200,7 +200,7 @@ module MembershipsHelper
             '</td><td class="hidden-xs hidden-sm rowlink-skip no-print">' +
             mail_to(member.person.email, '[not shared]', :title => "E-mail not shared with other members", subject: "[#{@event.code}] ") +
             '</td>'
-    else
+    elsif policy(member).show_not_shared?
       column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
         '<a title="E-mail not shared" class="glyphicon glyphicon-lock"></a></td>' +
         '<td class="hidden-xs hidden-sm rowlink-skip">[not shared]</td>'

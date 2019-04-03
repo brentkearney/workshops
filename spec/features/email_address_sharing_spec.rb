@@ -100,16 +100,17 @@ describe 'Email address sharing', type: :feature do
     end
   end
 
-  context 'As a logged-in user who is a member of the event' do
+  context 'As a logged-in user who is a confirmed member of the event' do
     before do
       @user.member!
       @member.role = 'Participant'
+      @member.attendance = 'Confirmed'
       @member.save
       login_as @user, scope: :user
       visit event_memberships_path(@event)
     end
 
-    it 'shows member email addresses' do
+    it 'shows confirmed member email addresses' do
       shows_member_emails
     end
 
@@ -127,10 +128,84 @@ describe 'Email address sharing', type: :feature do
     end
   end
 
+  context 'As an Invited member of the event' do
+    before do
+      @user.member!
+      @member.role = 'Participant'
+      @member.attendance = 'Invited'
+      @member.save
+      login_as @user, scope: :user
+      visit event_memberships_path(@event)
+    end
+
+    it 'hides member email addresses' do
+      does_not_show_member_emails
+      does_not_show_invited_emails
+    end
+  end
+
+  context 'As an Undecided member of the event' do
+    before do
+      @user.member!
+      @member.role = 'Participant'
+      @member.attendance = 'Undecided'
+      @member.save
+      login_as @user, scope: :user
+      visit event_memberships_path(@event)
+    end
+
+    it 'hides member email addresses' do
+      does_not_show_member_emails
+      does_not_show_invited_emails
+    end
+  end
+
+  context 'As an Declined member of the event' do
+    before do
+      @user.member!
+      @member.role = 'Participant'
+      @member.attendance = 'Undecided'
+      @member.save
+      login_as @user, scope: :user
+      visit event_memberships_path(@event)
+    end
+
+    it 'hides member email addresses' do
+      does_not_show_member_emails
+      does_not_show_invited_emails
+    end
+  end
+
   context 'As an organizer of the event' do
     before do
       membership = @user.person.memberships.where(event: @event).first
       membership.role = 'Organizer'
+      membership.save
+      login_as @user, scope: :user
+      visit event_memberships_path(@event)
+    end
+
+    it 'shows confirmed, invited, and undecided email addresses' do
+      shows_member_emails
+      shows_invited_emails
+    end
+
+    it 'hides emails of those who choose not to share, but still adds mailto: links' do
+      unshare_some_emails
+      @non_member_user.location = @event.location
+      @non_member_user.save!
+
+      visit event_memberships_path(@event)
+      hides_emails_but_links_to_them
+      reshare_those_emails
+    end
+  end
+
+  context 'As an organizer of the event who is Declined' do
+    before do
+      membership = @user.person.memberships.where(event: @event).first
+      membership.role = 'Organizer'
+      membership.attendance = 'Declined'
       membership.save
       login_as @user, scope: :user
       visit event_memberships_path(@event)
