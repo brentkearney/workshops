@@ -26,7 +26,32 @@ class Api::V1::LecturesController < Api::V1::BaseController
     end
   end
 
+  # GET /api/v1/todays_lectures/date.json
+  def todays_lectures
+    lectures = Lecture.where("start_time >= ? AND end_time <= ? AND room = '#{@room}'",
+                  DateTime.current.beginning_of_day, DateTime.current.end_of_day)
+                  .order(:start_time)
+    schedules = Schedule.where(lecture_id: lectures.pluck(:id))
+
+    data = []
+    lectures.each do |lecture|
+      schedule = schedules.select {|s| s.lecture_id == lecture.id}.first
+      start_time = schedule.nil? ? '' : schedule.start_time
+      end_time = schedule.nil? ? '' : schedule.end_time
+      # lecture time (updated by recording system) may differ from its sheduled time
+      scheduled_for = { start_time: start_time, end_time: end_time }
+      data << { lecture: lecture, scheduled_for: scheduled_for }
+    end
+
+    respond_to do |format|
+      format.json do
+        render json: data.to_json
+      end
+    end
+  end
+
   def method_missing(method_name, *arguments, &block)
+    Rails.logger.debug "\n\nAPI received unimplemented method: #{method_name}, args: #{arguments.pretty_inspect}\n\n"
     go_away
     super
   end
@@ -38,6 +63,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
   private
 
   def find_lecture
+    return if request.request_method == 'GET'
     @lecture = nil
     go_away && return unless valid_parameters?
 

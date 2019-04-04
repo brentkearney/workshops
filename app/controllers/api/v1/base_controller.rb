@@ -29,7 +29,13 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def parse_request
-    @json = JSON.parse(request.body.read)
+    if request.request_method == 'GET' && action_name == 'todays_lectures'
+      @json = request.headers.env
+      @room = todays_lectures_params
+      @json['lecture'] = 'payload type placeholder'
+    else
+      @json = JSON.parse(request.body.read)
+    end
   end
 
   def unauthorized
@@ -38,5 +44,9 @@ class Api::V1::BaseController < ApplicationController
 
   def unavailable
     head :service_unavailable
+  end
+
+  def todays_lectures_params
+    params.require(:room)
   end
 end

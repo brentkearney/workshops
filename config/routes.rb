@@ -77,6 +77,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       patch 'lectures' => 'lectures#update'
       put 'lectures' => 'lectures#update'
+      get 'todays_lectures/:room' => 'lectures#todays_lectures'
       post 'events' => 'events#create'
       post 'events/sync' => 'events#sync'
     end

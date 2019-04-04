@@ -7,21 +7,21 @@
 require 'rails_helper'
 require 'factory_bot_rails'
 
-describe Api::V1::LecturesController do
-  context '#update' do
-    before do
-      @event = create(:event)
-      @lecture = create(:lecture, event: @event)
-      create(:schedule, lecture: @lecture, event: @event)
-      key = Setting.Site['LECTURES_API_KEY']
-      @payload = {
-          api_key: key,
-          lecture_id: @lecture.id,
-          event_id: @event.code,
-          lecture: { title: 'A new title', tweeted: true }
-      }
-    end
+describe Api::V1::LecturesController, type: :request do
+  before do
+    @event = create(:event, start_date: Date.yesterday)
+    @lecture = create(:lecture, event: @event)
+    create(:schedule, lecture: @lecture, event: @event)
+    @api_key = Setting.Site['LECTURES_API_KEY']
+    @payload = {
+        api_key: @api_key,
+        lecture_id: @lecture.id,
+        event_id: @event.code,
+        lecture: { title: 'A new title', tweeted: true }
+    }
+  end
 
+  context '#update' do
     it 'authenticates with the correct api key' do
       put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_successful
@@ -72,6 +72,57 @@ describe Api::V1::LecturesController do
       @payload.delete(:lecture)
       put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_bad_request
+    end
+  end
+
+  context '#todays_lectures' do
+    context 'authentication test' do
+      it 'authenticates with api key in the request header' do
+        get "/api/v1/todays_lectures/#{ERB::Util.url_encode(@lecture.room)}.json", headers: { 'api_key' => @api_key }
+        expect(response).to be_successful
+      end
+    end
+
+    context 'stub authentication' do
+      before do
+        allow_any_instance_of(Api::V1::LecturesController).to receive(:authenticated?).and_return(true)
+        allow_any_instance_of(Api::V1::BaseController).to receive(:authenticate_user_from_token!).and_return(true)
+        start_time = (@event.start_date + 1.days).to_time
+                                               .in_time_zone(@event.time_zone)
+                                               .change({ hour:11, min:0})
+        end_time = start_time + 1.hour
+        3.times do
+          lecture = create(:lecture, event: @event, start_time: start_time, end_time: end_time)
+          create(:schedule, lecture: lecture, event: @event, start_time: start_time, end_time: end_time)
+          start_time = end_time + 1.hour
+          end_time = start_time + 1.hour
+        end
+      end
+
+      it 'returns the lecture schedule for the given day' do
+        get "/api/v1/todays_lectures/#{ERB::Util.url_encode(@lecture.room)}.json"
+        json = JSON.parse(response.body)
+
+        Lecture.all.each do |lecture|
+          record = json.select {|item| item['lecture']['id'].to_i == lecture.id }.first
+          expect(record['lecture']['title']).to eq(lecture.title)
+          expect(record['scheduled_for']['start_time']).to eq(record['lecture']['start_time'])
+        end
+      end
+
+      it 'sets scheduled_for times to empty strings if no schedule item found' do
+        schedule = Schedule.where(lecture_id: @lecture.id).first
+        expect(schedule).not_to be_nil
+        schedule.delete
+        expect(Lecture.find_by_id(@lecture.id)).not_to be_blank
+
+        get "/api/v1/todays_lectures/#{ERB::Util.url_encode(@lecture.room)}.json"
+        json = JSON.parse(response.body)
+        lecture = json.select {|j| j['lecture']['id'].to_i == @lecture.id }.first
+
+        expect(lecture['scheduled_for']['start_time']).to be_empty
+        expect(lecture['scheduled_for']['end_time']).to be_empty
+      end
     end
   end
 end
