@@ -13,6 +13,7 @@ class SessionsController < Devise::SessionsController
 
     if self.resource.person_id.nil?
       set_flash_message(:error, :has_no_person_record)
+      StaffMailer.notify_sysadmin(nil, { error: 'User has no associated person record', user: resource.inspect })
       sign_out(resource)
       respond_to_on_destroy
     elsif self.resource.role == 'member' && inactive_participant(resource)
