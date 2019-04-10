@@ -26,11 +26,10 @@ class Api::V1::LecturesController < Api::V1::BaseController
     end
   end
 
-  # GET /api/v1/todays_lectures/date.json
-  def todays_lectures
-    lectures = Lecture.where("start_time >= ? AND end_time <= ? AND room = '#{@room}'",
-                  DateTime.current.beginning_of_day, DateTime.current.end_of_day)
-                  .order(:start_time)
+  # GET /api/v1/lectures_on_date/room/date.json
+  def lectures_on
+    lectures = Lecture.where(start_time: @date.beginning_of_day..@date.end_of_day)
+                       .where(room: @room).order(:start_time)
     schedules = Schedule.where(lecture_id: lectures.pluck(:id))
 
     data = []
@@ -40,7 +39,16 @@ class Api::V1::LecturesController < Api::V1::BaseController
       end_time = schedule.nil? ? '' : schedule.end_time
       # lecture time (updated by recording system) may differ from its sheduled time
       scheduled_for = { start_time: start_time, end_time: end_time }
-      data << { lecture: lecture, scheduled_for: scheduled_for }
+
+      extras = {
+        event_code: lecture.event.code,
+        firstname: lecture.person.firstname,
+        lastname: lecture.person.lastname,
+        affil: lecture.person.affiliation
+      }
+      lecture_attribs = lecture.attributes.merge(extras)
+
+      data << { lecture: lecture_attribs, scheduled_for: scheduled_for }
     end
 
     respond_to do |format|
@@ -51,12 +59,11 @@ class Api::V1::LecturesController < Api::V1::BaseController
   end
 
   def method_missing(method_name, *arguments, &block)
-    Rails.logger.debug "\n\nAPI received unimplemented method: #{method_name}, args: #{arguments.pretty_inspect}\n\n"
     go_away
     super
   end
 
-  def respond_to_missing?
+  def respond_to_missing?(method_name, *arguments)
     super
   end
 

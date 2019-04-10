@@ -1,3 +1,4 @@
+
 # Copyright (c) 2016 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
@@ -75,10 +76,10 @@ describe Api::V1::LecturesController, type: :request do
     end
   end
 
-  context '#todays_lectures' do
+  context '#lectures_on' do
     context 'authentication test' do
       it 'authenticates with api key in the request header' do
-        get "/api/v1/todays_lectures/#{ERB::Util.url_encode(@lecture.room)}.json", headers: { 'api_key' => @api_key }
+        get "/api/v1/lectures_on/2019-04-10/#{ERB::Util.url_encode(@lecture.room)}.json", headers: { 'HTTP_API_KEY' => @api_key }
         expect(response).to be_successful
       end
     end
@@ -97,10 +98,11 @@ describe Api::V1::LecturesController, type: :request do
           start_time = end_time + 1.hour
           end_time = start_time + 1.hour
         end
+        @date = @lecture.start_time.strftime("%Y-%m-%d")
       end
 
       it 'returns the lecture schedule for the given day' do
-        get "/api/v1/todays_lectures/#{ERB::Util.url_encode(@lecture.room)}.json"
+        get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@lecture.room)}.json"
         json = JSON.parse(response.body)
 
         Lecture.all.each do |lecture|
@@ -116,7 +118,7 @@ describe Api::V1::LecturesController, type: :request do
         schedule.delete
         expect(Lecture.find_by_id(@lecture.id)).not_to be_blank
 
-        get "/api/v1/todays_lectures/#{ERB::Util.url_encode(@lecture.room)}.json"
+        get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@lecture.room)}.json"
         json = JSON.parse(response.body)
         lecture = json.select {|j| j['lecture']['id'].to_i == @lecture.id }.first
 

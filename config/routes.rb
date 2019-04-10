@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-
-
   root 'welcome#index'
 
   # Devise (login/logout)
@@ -77,7 +75,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       patch 'lectures' => 'lectures#update'
       put 'lectures' => 'lectures#update'
-      get 'todays_lectures/:room' => 'lectures#todays_lectures'
+      get 'lectures_on/:date/:room' => 'lectures#lectures_on'
       post 'events' => 'events#create'
       post 'events/sync' => 'events#sync'
     end

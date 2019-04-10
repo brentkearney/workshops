@@ -29,10 +29,13 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def parse_request
-    if request.request_method == 'GET' && action_name == 'todays_lectures'
-      @json = request.headers.env
-      @room = todays_lectures_params
+    if request.request_method == 'GET' && action_name == 'lectures_on'
+      @json = {}
+      @json['api_key'] = request.headers.env['HTTP_API_KEY']
       @json['lecture'] = 'payload type placeholder'
+
+      @date = DateTime.parse(lectures_params.first)
+      @room = lectures_params.last
     else
       @json = JSON.parse(request.body.read)
     end
@@ -46,7 +49,7 @@ class Api::V1::BaseController < ApplicationController
     head :service_unavailable
   end
 
-  def todays_lectures_params
-    params.require(:room)
+  def lectures_params
+    params.require([:date, :room])
   end
 end
