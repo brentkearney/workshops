@@ -127,4 +127,45 @@ describe Api::V1::LecturesController, type: :request do
       end
     end
   end
+
+  context '#lecture_data' do
+    context 'authentication test' do
+      it 'authenticates with api key in the request header' do
+        get "/api/v1/lecture_data/#{@lecture.id}.json", headers: { 'HTTP_API_KEY' => @api_key }
+        expect(response).to be_successful
+      end
+    end
+
+    context 'stub authentication' do
+      before do
+        allow_any_instance_of(Api::V1::LecturesController).to receive(:authenticated?).and_return(true)
+        allow_any_instance_of(Api::V1::BaseController).to receive(:authenticate_user_from_token!).and_return(true)
+        get "/api/v1/lecture_data/#{@lecture.id}.json"
+        @json = JSON.parse(response.body)
+        puts "#{@json.pretty_inspect}"
+      end
+
+      it 'returns a complete lecture record' do
+        @lecture.attributes.each do |key, value|
+          next if key =~ /_time|_at/
+          expect(@json['lecture'][key]).to eq(value)
+        end
+      end
+
+      it 'returns person correspondance info' do
+        expect(@json['person']['salutation']).to eq(@lecture.person.salutation)
+        expect(@json['person']['firstname']).to eq(@lecture.person.firstname)
+        expect(@json['person']['lastname']).to eq(@lecture.person.lastname)
+        expect(@json['person']['email']).to eq(@lecture.person.email)
+      end
+
+      it 'returns essential event information' do
+        expect(@json['event']['code']).to eq(@lecture.event.code)
+        expect(@json['event']['name']).to eq(@lecture.event.name)
+        expect(@json['event']['event_type']).to eq(@lecture.event.event_type)
+        expect(@json['event']['start_date']).to eq(@lecture.event.date)
+        expect(@json['event']['location']).to eq(@lecture.event.location)
+      end
+    end
+  end
 end

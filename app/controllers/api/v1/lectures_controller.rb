@@ -26,6 +26,36 @@ class Api::V1::LecturesController < Api::V1::BaseController
     end
   end
 
+  # GET /api/v1/lecture/id.json
+  def lecture_data
+    data = {}
+    lecture = Lecture.find_by_id(@lecture_id)
+    unless lecture.blank?
+      person = {
+        salutation: lecture.person.salutation,
+        firstname: lecture.person.firstname,
+        lastname: lecture.person.lastname,
+        email: lecture.person.email,
+        legacy_id: lecture.person.legacy_id
+      }
+      event = {
+        code: lecture.event.code,
+        name: lecture.event.name,
+        event_type: lecture.event.event_type,
+        start_date: lecture.event.start_date,
+        end_date: lecture.event.end_date,
+        location: lecture.event.location
+      }
+      data = { lecture: lecture.attributes, person: person, event: event }
+    end
+
+    respond_to do |format|
+      format.json do
+        render json: data.to_json
+      end
+    end
+  end
+
   # GET /api/v1/lectures_on_date/room/date.json
   def lectures_on
     lectures = Lecture.where(start_time: @date.beginning_of_day..@date.end_of_day)

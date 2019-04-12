@@ -75,7 +75,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       patch 'lectures' => 'lectures#update'
       put 'lectures' => 'lectures#update'
-      get 'lectures_on/:date/:room' => 'lectures#lectures_on'
+      get 'lecture_data/:id' => 'lectures#lecture_data', as: :lecture_data
+      get 'lectures_on/:date/:room' => 'lectures#lectures_on', as: :lectures_on
       post 'events' => 'events#create'
       post 'events/sync' => 'events#sync'
     end
