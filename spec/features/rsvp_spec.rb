@@ -346,8 +346,13 @@ describe 'RSVP', type: :feature do
         fill_in 'email_form_person_email', with: 'new@email.com'
         click_button('Continue')
 
-        expect(Person.find_by_id(person.id)).to be_nil
-        expect(Membership.find(@membership.id).person).to eq(other_person)
+        person = Person.find_by_id(person.id)
+        other_person = Person.find_by_id(other_person.id)
+        expect(other_person).to be_nil unless person.nil?
+        expect(person).to be_nil unless other_person.nil?
+
+        merged_person = person.nil? ? other_person : person
+        expect(Membership.find(@membership.id).person).to eq(merged_person)
         expect(current_path).to eq(rsvp_yes_path(@invitation.code))
       end
     end
