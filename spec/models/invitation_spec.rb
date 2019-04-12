@@ -49,11 +49,19 @@ RSpec.describe 'Model validations: Invitation', type: :model do
   end
 
   it 'updates membership fields when sending invites' do
-    membership = create(:membership, attendance: 'Not Yet Invited')
+    event = build(:event)
+    membership = create(:membership, event: event, update_by_staff: true,
+                        attendance: 'Not Yet Invited',
+                        role: 'Backup Participant',
+                        arrival_date: event.start_date - 1.day,
+                        departure_date: event.end_date + 1.day)
     create(:invitation, membership: membership, invited_by: 'Foo').send_invite
 
     expect(membership.invited_by).to eq('Foo')
     expect(membership.invited_on).not_to be_nil
     expect(membership.attendance).to eq('Invited')
+    expect(membership.role).to eq('Participant')
+    expect(membership.arrival_date).to be_nil
+    expect(membership.departure_date).to be_nil
   end
 end
