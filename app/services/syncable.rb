@@ -185,7 +185,7 @@ module Syncable
         Invitation.where(membership: m).each do |i|
           i.update(membership: replace_with_membership)
         end
-        m.delete!
+        m.delete
       end
     end
 
