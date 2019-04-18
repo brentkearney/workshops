@@ -7,6 +7,11 @@ and released under the GPL-A open-source license. The software is intended to be
 who host workshops. It is used at the
 [Banff International Research Station](https://workshops.birs.ca/events/future) for managing workshops.
 
+You may see a demo here:
+https://wsdemo.netmojo.ca
+login: sysadmin@wsdemo.ca
+password: Secret Password for Demo
+
 Contributions to the project are most welcome. Check out the [Project Page](https://github.com/brentkearney/workshops/projects/1) for whats happening in development now. If you would like to add features yourself, please
 [let me know](mailto:brentk@birs.ca), and/or submit a Pull Request. Or if you would like to pay for the development of additional features,
 please [contact me](mailto:brent@netmojo.ca).
