@@ -9,7 +9,9 @@ who host workshops. It is used at the
 
 You may see a demo here:
 https://wsdemo.netmojo.ca
+
 login: sysadmin@wsdemo.ca
+
 password: Secret Password for Demo
 
 Contributions to the project are most welcome. Check out the [Project Page](https://github.com/brentkearney/workshops/projects/1) for whats happening in development now. If you would like to add features yourself, please
