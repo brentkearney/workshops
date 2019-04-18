@@ -79,12 +79,12 @@ class Invitation < ApplicationRecord
     membership.sent_invitation = true
     membership.invited_by = invited_by
     membership.invited_on = DateTime.current
-    membership.arrival_date = nil
-    membership.departure_date = nil
     membership.update_remote = true
     membership.person.member_import = true
     if membership.attendance == 'Not Yet Invited'
       membership.attendance = 'Invited'
+      membership.arrival_date = nil
+      membership.departure_date = nil
       membership.role = 'Participant' if membership.role == 'Backup Participant'
       membership.updated_by = invited_by
     end

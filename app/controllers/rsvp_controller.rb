@@ -122,6 +122,7 @@ class RsvpController < ApplicationController
     if params[:otp].blank?
       redirect_to invitations_new_path
     else
+      # Returns an Invitation object, if one is found with given otp
       @invitation = InvitationChecker.new(otp_params).invitation
     end
   end
