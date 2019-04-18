@@ -28,27 +28,32 @@ class LegacyConnector
 
   # get a list of events within a given date range
   def list_events(from_date, to_date)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/event_list",
                                params: { year1: from_date, year2: to_date }))
   end
 
   # get data for specific events
   def get_event_data(event_id)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/event_data/#{event_id}"))
   end
 
   # get event data for given year
   def get_event_data_for_year(year)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/event_data_for_year/#{year}"))
   end
 
   # get membership data for an event
   def get_members(event)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/members/#{event.code}"))
   end
 
   # get a member record data
   def get_member(membership)
+    return if @rest_url.blank?
     mbr = { event_id: membership.event.code,
             person_id: membership.person.legacy_id }
     JSON.parse((RestClient.get "#{@rest_url}/get_member", params: mbr))
@@ -56,16 +61,19 @@ class LegacyConnector
 
   # get a person record data
   def get_person(legacy_id)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/get_person/#{legacy_id}"))
   end
 
   # search legacy db for person by email
   def search_person(email)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/search_person/#{email}"))
   end
 
   # add or update person record
   def add_person(person)
+    return if @rest_url.blank?
     JSON.parse((RestClient.post "#{@rest_url}/add_person",
                                 person.to_json,
                                 content_type: :json, accept: :json))
@@ -73,6 +81,7 @@ class LegacyConnector
 
   # add new member to event
   def add_member(membership:, event_code:, person:, updated_by:)
+    return if @rest_url.blank?
     remote_membership = membership.attributes.merge(
       workshop_id: event_code,
       member_id: membership.id,
@@ -89,6 +98,7 @@ class LegacyConnector
 
   # add new members to event
   def add_members(event_code:, members:, updated_by:)
+    return if @rest_url.blank?
     responses = []
     members.each do |member|
       person = member.person.attributes.merge(updated_by: membership.updated_by)
@@ -101,6 +111,7 @@ class LegacyConnector
 
   # update membership & person record
   def update_member(membership_id)
+    return if @rest_url.blank?
     member = Membership.find_by_id(membership_id)
     member.updated_at = member.updated_at
                               .in_time_zone('Pacific Time (US & Canada)')
@@ -136,15 +147,18 @@ class LegacyConnector
 
   # get an events lectures
   def get_lectures(event_id)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/event_lectures/#{event_id}"))
   end
 
   def get_lecture(legacy_id)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/get_lecture/#{legacy_id}"))
   end
 
   # get legacy_id of a given lecture
   def get_lecture_id(lecture)
+    return if @rest_url.blank?
     day = lecture.start_time.strftime('%Y-%m-%d')
     u = "#{@rest_url}/new_lecture_id/#{lecture.event.code}/#{day}/#{lecture.id}"
     lecture_hash = JSON.parse((RestClient.get u))
@@ -153,6 +167,7 @@ class LegacyConnector
 
   # add a lecture
   def add_lecture(lecture)
+    return if @rest_url.blank?
     event_id = lecture.event.code
     lecture.person_id = lecture.person.legacy_id
     url = "#{@rest_url}/add_lecture/#{event_id}"
@@ -161,19 +176,23 @@ class LegacyConnector
   end
 
   def delete_lecture(lecture_id)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/delete_lecture/#{lecture_id}"))
   end
 
   def delete_member(membership)
+    return if @rest_url.blank?
     url = "#{@rest_url}/delete_membership/#{membership['event_id']}"
     RestClient.post url, membership.to_json, content_type: :json, accept: :json
   end
 
   def check_rsvp(otp)
+    return if @rest_url.blank?
     JSON.parse((RestClient.get "#{@rest_url}/check_rsvp/#{otp}"))
   end
 
   def replace_person(replace_legacy_id, replace_with_legacy_id)
+    return if @rest_url.blank?
     return if replace_legacy_id == replace_with_legacy_id
     replace = {
       person_to_replace: replace_legacy_id,
