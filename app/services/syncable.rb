@@ -171,7 +171,7 @@ module Syncable
 
   def convert_to_time(v)
     return Time.at(v) if v.is_a?(Integer)
-    DateTime.parse(v.to_s).in_time_zone(@event.time_zone)
+    DateTime.parse(v.to_s).in_time_zone(event.time_zone)
   end
 
   def replace_person(replace: other_person, replace_with: person)
