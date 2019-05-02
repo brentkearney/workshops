@@ -17,7 +17,7 @@ module MembershipsHelper
       start_date -= 7.days
       end_date += 7.days
     end
-    dates = ['', start_date]
+    dates = [start_date]
     dates << dates.last + 1.day while dates.last != end_date
     dates
   end
