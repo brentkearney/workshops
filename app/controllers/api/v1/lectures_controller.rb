@@ -29,12 +29,13 @@ class Api::V1::LecturesController < Api::V1::BaseController
   # GET /api/v1/lecture/id.json
   def lecture_data
     data = {}
-    lecture = Lecture.find_by_id(@lecture_id)
+    lecture = Lecture.find_by_id(@lecture_id) || Lecture.find_by_legacy_id(@lecture_id)
     unless lecture.blank?
       person = {
         salutation: lecture.person.salutation,
         firstname: lecture.person.firstname,
         lastname: lecture.person.lastname,
+        affiliation: lecture.person.affiliation,
         email: lecture.person.email,
         legacy_id: lecture.person.legacy_id
       }

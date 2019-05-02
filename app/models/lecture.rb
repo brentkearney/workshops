@@ -19,7 +19,6 @@ class Lecture < ApplicationRecord
   validate :ends_after_begins, unless: :missing_data
   validate :times_use_event_timezone, unless: :missing_data
   validate :times_within_event, unless: :missing_data
-  validate :times_overlap, unless: :missing_data
 
   # app/models/concerns/schedule_helpers.rb
   include ScheduleHelpers
