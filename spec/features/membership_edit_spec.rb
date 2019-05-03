@@ -389,7 +389,6 @@ describe 'Membership#edit', type: :feature do
       end
 
       legit_dates.map! { |d| d.strftime('%Y-%m-%d') }
-      legit_dates << ''
 
       expect(page).to have_select 'membership_arrival_date', options: legit_dates
     end
