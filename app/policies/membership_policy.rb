@@ -52,10 +52,15 @@ class MembershipPolicy
   end
 
   def organizer_fields
-    [:id, :event_id, :person_id, :share_email, :role, :attendance, :org_notes,
-     person_attributes: [:id, :salutation, :firstname, :lastname, :email, :url,
+    if member_self?
+      all_fields - [:id, :event_id, :person_id, :room, :reviewed, :billing,
+        :staff_notes, :has_guest, :guest_disclaimer]
+    else
+      [:id, :event_id, :person_id, :share_email, :role, :attendance, :org_notes,
+      person_attributes: [:id, :salutation, :firstname, :lastname, :email, :url,
                          :affiliation, :department, :title, :research_areas,
                          :biography]]
+    end
   end
 
   def all_fields
