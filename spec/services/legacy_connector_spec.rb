@@ -116,13 +116,27 @@ describe "LegacyConnector", type: :feature do
     expect(returned_person['legacy_id']).to eq(31337)
   end
 
-  it '#search_person' do
-    stub_rest_client(:get, person)
+  context '#search_person' do
+    it 'removes non-ascii characters from given email string' do
+      non_ascii_email = "\u00A0test@testing.ca"
+      ascii_email = 'test@testing.ca'
+      allow(RestClient).to receive(:get).and_return(person.to_json)
 
-    returned_person = @lc.search_person('test@testing.ca')
+      @lc.search_person(non_ascii_email)
 
-    expect(returned_person).to be_an_instance_of(Hash)
-    expect(returned_person["lastname"]).to eq(person.lastname)
+      rest_url = Setting.Site['legacy_api']
+      ascii_url = rest_url + "/search_person/#{ascii_email}"
+      expect(RestClient).to have_received(:get).with(ascii_url)
+    end
+
+    it 'returns a Hash of person data' do
+      stub_rest_client(:get, person)
+
+      returned_person = @lc.search_person('test@testing.ca')
+
+      expect(returned_person).to be_an_instance_of(Hash)
+      expect(returned_person["lastname"]).to eq(person.lastname)
+    end
   end
 
   it '#add_person' do

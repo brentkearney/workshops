@@ -68,6 +68,7 @@ class LegacyConnector
   # search legacy db for person by email
   def search_person(email)
     return if @rest_url.blank?
+    email = email.remove_non_ascii
     JSON.parse((RestClient.get "#{@rest_url}/search_person/#{email}"))
   end
 

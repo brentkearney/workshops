@@ -12,4 +12,8 @@ class String
     parts = split('.')
     parts.first.to_i.send(parts.last)
   end
+
+  def remove_non_ascii(replace_with="")
+    self.gsub(/\P{ASCII}/, replace_with)
+  end
 end
