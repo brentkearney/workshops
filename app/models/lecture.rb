@@ -7,6 +7,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Lecture < ApplicationRecord
+  attr_accessor :from_api
   belongs_to :event
   belongs_to :person
   has_one :schedule, dependent: :destroy
@@ -19,6 +20,7 @@ class Lecture < ApplicationRecord
   validate :ends_after_begins, unless: :missing_data
   validate :times_use_event_timezone, unless: :missing_data
   validate :times_within_event, unless: :missing_data
+  validate :times_overlap, unless: [:missing_data, :from_api]
 
   # app/models/concerns/schedule_helpers.rb
   include ScheduleHelpers

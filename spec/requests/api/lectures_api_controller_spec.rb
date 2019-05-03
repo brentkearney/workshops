@@ -74,6 +74,22 @@ describe Api::V1::LecturesController, type: :request do
       put "/api/v1/lectures.json", params: @payload.to_json
       expect(response).to be_bad_request
     end
+
+    it 'skips overlapping times validation' do
+      other_lecture = create(:lecture,
+                                event: @event,
+                                start_time: @lecture.start_time + 1.hour,
+                                end_time: @lecture.end_time + 1.hour)
+      updates = {
+        start_time: @lecture.start_time + 10.minutes,
+        end_time: @lecture.end_time + 10.minutes
+      }
+      payload = @payload.merge(lecture_id: other_lecture.id, lecture: updates)
+
+      put "/api/v1/lectures.json", params: payload.to_json
+
+      expect(response).to be_successful
+    end
   end
 
   context '#lectures_on' do
@@ -142,7 +158,6 @@ describe Api::V1::LecturesController, type: :request do
         allow_any_instance_of(Api::V1::BaseController).to receive(:authenticate_user_from_token!).and_return(true)
         get "/api/v1/lecture_data/#{@lecture.id}.json"
         @json = JSON.parse(response.body)
-        puts "#{@json.pretty_inspect}"
       end
 
       it 'returns a complete lecture record' do

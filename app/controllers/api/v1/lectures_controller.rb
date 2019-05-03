@@ -13,6 +13,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
   def update
     @json['lecture']['updated_by'] = 'Automated Video System'
     @lecture.assign_attributes(@json['lecture'])
+    @lecture.from_api = true
 
     respond_to do |format|
       if @lecture.save
