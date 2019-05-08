@@ -13,7 +13,7 @@ class Lecture < ApplicationRecord
   has_one :schedule, dependent: :destroy
 
   before_save :clean_data, :strip_html
-  after_save :update_legacy_db, unless :local_only
+  after_save :update_legacy_db, unless: :local_only
   before_destroy :delete_from_legacy_db
 
   validates :event, :person, :title, :start_time, :end_time, :room, :updated_by, presence: true

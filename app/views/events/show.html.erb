@@ -58,7 +58,9 @@
     <% end %>
     <tr>
       <td align="right">Event Webpage:</td>
-      <td colspan="3"><%= link_to @event.url, @event.url %></td>
+      <td align="left"><%= link_to @event.url, @event.url %></td>
+      <td align="right">Subject Areas:</td>
+      <td align="left"><%= @event.subjects %></td>
     </tr>
      </tbody>
    </table>

@@ -57,7 +57,8 @@ class Api::V1::LecturesController < Api::V1::BaseController
         start_date: lecture.event.start_date,
         end_date: lecture.event.end_date,
         location: lecture.event.location,
-        time_zone: lecture.event.time_zone
+        time_zone: lecture.event.time_zone,
+        subjects: lecture.event.subjects
       }
       data = { lecture: lecture.attributes, person: person, event: event }
     end

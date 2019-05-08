@@ -3,6 +3,7 @@
 <%= form_for [@event, @membership],
 						 html: { class: "form-horizontal", role: "form" } do |f| %>
 <fieldset>
+<%= f.hidden_field :updated_by, value: @current_user.person.name %>
 <% if policy(@membership).edit_person? %>
 <div class="form-group">
 	<div class="col-sm-9 lead">
