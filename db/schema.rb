@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_11_225548) do
+ActiveRecord::Schema.define(version: 2019_05_08_175656) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 2019_01_11_225548) do
     t.boolean "publish_schedule", default: false
     t.integer "confirmed_count", default: 0, null: false
     t.datetime "sync_time"
+    t.string "subjects"
     t.index ["code"], name: "index_events_on_code", unique: true
   end
 
@@ -92,6 +93,8 @@ ActiveRecord::Schema.define(version: 2019_01_11_225548) do
     t.string "cmo_license"
     t.string "keywords"
     t.integer "legacy_id"
+    t.string "watch_url"
+    t.string "video_url"
     t.index ["event_id"], name: "index_lectures_on_event_id"
     t.index ["person_id"], name: "index_lectures_on_person_id"
   end
