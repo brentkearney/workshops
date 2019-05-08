@@ -7,13 +7,13 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Lecture < ApplicationRecord
-  attr_accessor :from_api
+  attr_accessor :from_api, :local_only
   belongs_to :event
   belongs_to :person
   has_one :schedule, dependent: :destroy
 
   before_save :clean_data, :strip_html
-  after_save :update_legacy_db
+  after_save :update_legacy_db, unless :local_only
   before_destroy :delete_from_legacy_db
 
   validates :event, :person, :title, :start_time, :end_time, :room, :updated_by, presence: true

@@ -8,10 +8,19 @@
 class Api::V1::LecturesController < Api::V1::BaseController
   before_action :authenticated?, :find_lecture
   respond_to :json
+  require 'uri'
 
   # PATCH/PUT /api/v1/lectures/1.json
   def update
     @json['lecture']['updated_by'] = 'Automated Video System'
+
+    unless @json['lecture']['archiving_license'].blank?
+      @json['lecture']['archiving_license'] = URI.decode(@json['lecture']['archiving_license'])
+    end
+    unless @json['lecture']['hosting_license'].blank?
+      @json['lecture']['hosting_license'] = URI.decode(@json['lecture']['hosting_license'])
+    end
+
     @lecture.assign_attributes(@json['lecture'])
     @lecture.from_api = true
 
@@ -37,6 +46,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
         firstname: lecture.person.firstname,
         lastname: lecture.person.lastname,
         affiliation: lecture.person.affiliation,
+        academic_status: lecture.person.academic_status,
         email: lecture.person.email,
         legacy_id: lecture.person.legacy_id
       }
@@ -46,7 +56,8 @@ class Api::V1::LecturesController < Api::V1::BaseController
         event_type: lecture.event.event_type,
         start_date: lecture.event.start_date,
         end_date: lecture.event.end_date,
-        location: lecture.event.location
+        location: lecture.event.location,
+        time_zone: lecture.event.time_zone
       }
       data = { lecture: lecture.attributes, person: person, event: event }
     end
