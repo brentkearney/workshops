@@ -20,12 +20,16 @@ class Lecture < ApplicationRecord
   validate :ends_after_begins, unless: :missing_data
   validate :times_use_event_timezone, unless: :missing_data
   validate :times_within_event, unless: :missing_data
-  validate :times_overlap, unless: [:missing_data, :from_api]
+  validate :times_overlap, unless: [:missing_data, :from_api, :in_the_past]
 
   # app/models/concerns/schedule_helpers.rb
   include ScheduleHelpers
 
   private
+
+  def in_the_past
+    DateTime.current > end_time
+  end
 
   def strip_html
     self.title = ActionController::Base.helpers.strip_tags(title)

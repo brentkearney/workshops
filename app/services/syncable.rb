@@ -125,7 +125,7 @@ module Syncable
         if k == 'legacy_id' || k == 'email'
           local = resolve_duplicates(local, remote, k)
         else
-          local.send("#{k}=", v) unless local.updated_at >= remote_updated
+          local.send("#{k}=", v) unless local.updated_at > remote_updated
         end
       end
     end

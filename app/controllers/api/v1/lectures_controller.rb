@@ -23,6 +23,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
     @lecture.assign_attributes(@json['lecture'])
     @lecture.from_api = true
+    @lecture.local_only = false
 
     respond_to do |format|
       if @lecture.save
