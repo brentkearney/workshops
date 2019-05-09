@@ -127,13 +127,12 @@ describe "SyncMembers" do
 
     it 'fills in blank fields, sets Backup Participant attendance to "Not Yet Invited"' do
       SyncMembers.new(@eventm)
-      member = Event.find(@eventm.id).memberships.last
 
-      expect(member.person.updated_by).to eq('FactoryBot')
+      member = Event.find(@eventm.id).memberships.last
+      expect(member.person.updated_by).to eq('Workshops importer')
       expect(member.person.updated_at).not_to be_nil
       expect(member.updated_by).to eq('Workshops importer')
       expect(member.updated_at).not_to be_nil
-      expect(member.replied_at).to be_nil
       expect(member.role).to eq('Backup Participant')
       expect(member.attendance).to eq('Not Yet Invited')
     end
@@ -533,25 +532,6 @@ describe "SyncMembers" do
         SyncMembers.new(membership.event)
 
         expect(Event.find(membership.event.id).memberships.last.staff_notes).to eq('Hi')
-      end
-
-      it 'updates staff_notes even if local record is newer' do
-        membership = @eventm.memberships.last
-        membership.updated_at = DateTime.now
-        membership.staff_notes = nil
-        membership.arrival_date = membership.event.start_date + 1.day
-        membership.save
-
-        lc = FakeLegacyConnector.new
-        changes = { m: membership, sn: 'change is inevitable', updated_at: DateTime.yesterday }
-        allow(lc).to receive(:get_members).with(membership.event)
-                      .and_return(lc.get_members_with_changed_membership(changes))
-        expect(LegacyConnector).to receive(:new).and_return(lc)
-
-        SyncMembers.new(membership.event)
-        updated = Membership.find(membership.id)
-        expect(updated.staff_notes).to eq('change is inevitable')
-        expect(updated.arrival_date).to eq(membership.event.start_date + 1.day)
       end
     end
   end

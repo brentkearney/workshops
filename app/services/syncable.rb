@@ -66,6 +66,7 @@ module Syncable
 
   def find_and_update_person(remote_person)
     local_person = get_local_person(remote_person)
+
     if local_person.blank?
       new_person = update_record(Person.new, remote_person)
       local_person = save_person(new_person)
@@ -89,22 +90,22 @@ module Syncable
     fields
   end
 
+  def local_is_newer?(local, remote)
+    rupdated = prepare_value('updated_at', remote['updated_at'])
+    return true if rupdated.nil?
+    local.updated_at >= rupdated
+  end
+
   # local record, remote hash
   def update_record(local, remote)
-    remote_updated = remote['updated_at']
-    if remote_updated.blank?
-      remote_updated = DateTime.new(1970,1,30)
-    else
-      remote_updated = convert_to_time(remote['updated_at'])
-    end
     local.updated_at = DateTime.new(1970,1,1) if local.updated_at.blank?
     local.updated_by = 'Workshops Import' if local.updated_by.blank?
+    return local if local_is_newer?(local, remote)
 
     booleans = boolean_fields(local)
     remote.each_pair do |k, v|
       next if v.blank?
       v = prepare_value(k, v)
-      next if k == 'updated_at' && local.updated_at.utc >= v.utc
       v = bool_value(v) if booleans.include?(k)
 
       next if k == 'invited_by' unless v.blank?
@@ -117,7 +118,6 @@ module Syncable
         end
       end
       next if k == 'invited_on'
-      local.staff_notes = v if k == 'staff_notes'
 
       unless local.send(k).eql? v
         # if its an email change, User account may also need updating
@@ -125,7 +125,7 @@ module Syncable
         if k == 'legacy_id' || k == 'email'
           local = resolve_duplicates(local, remote, k)
         else
-          local.send("#{k}=", v) unless local.updated_at > remote_updated
+          local.send("#{k}=", v)
         end
       end
     end
@@ -164,19 +164,20 @@ module Syncable
   end
 
   def prepare_value(k, v)
-    v = v.to_i if k.eql? 'legacy_id'
-    if k.to_s.include?('_date') || k.to_s.include?('_at')
+    v = v.to_i if k.include? '_id'
+    if k.to_s.include?('_at')
       v = nil if v == '0000-00-00 00:00:00'
       v = convert_to_time(v) unless v.nil?
     end
-    v = v.utc if v && k.to_s.include?('_at')
     v = v.strip if v.respond_to? :strip
     v
   end
 
   def convert_to_time(v)
+    Time.zone = ActiveSupport::TimeZone.new(event.time_zone)
     return Time.at(v) if v.is_a?(Integer)
-    DateTime.parse(v.to_s).in_time_zone(event.time_zone)
+    return v.in_time_zone(event.time_zone) if v.is_a?(Time) || v.is_a?(DateTime)
+    Time.parse(v.to_s)
   end
 
   def replace_person(replace: other_person, replace_with: person)

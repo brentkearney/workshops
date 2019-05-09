@@ -39,9 +39,7 @@ class FakeLegacyConnector
   end
 
   def search_person(email)
-    Rails.logger.debug "search_person received email: #{email}\n"
-    person = build(:person, email: email).attributes
-    Rails.logger.debug "returning person: #{person.pretty_inspect}\n\n"
+    build(:person, email: email).attributes
   end
 
   def replace_person(replace, replace_with)
@@ -205,7 +203,7 @@ class FakeLegacyConnector
         'address2' => nil, 'address3' => nil, 'city' => nil, 'region' => nil,
         'country' => nil, 'postal_code' => nil, 'academic_status' => nil,
         'department' => nil, 'title' => nil, 'phd_year' => nil, 'url' => nil,
-        'research_areas' => nil, 'updated_at' => Time.now, 'biography' => nil,
+        'research_areas' => nil, 'updated_at' => updated_at, 'biography' => nil,
         'legacy_id' => m.person.legacy_id, 'emergency_contact' => nil,
         'emergency_phone' => nil, 'updated_by' => 'FakeLegacyConnector'
       },

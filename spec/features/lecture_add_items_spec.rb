@@ -13,7 +13,7 @@ describe "Adding a Lecture Item to the Schedule", type: :feature do
     authenticate_user(@staff_user, :staff)
     @user.staff!
 
-    @event = create(:event, time_zone: 'Auckland')
+    @event = create(:event, start_date: Date.current + 1.month, time_zone: 'Auckland')
     @user.location = @event.location
     @user.save!
     create(:schedule, event: @event)

@@ -147,13 +147,13 @@ describe 'Membership#add', type: :feature do
       person = Person.find_by_email(email)
       person.destroy unless person.nil?
 
-      np = build(:person, email: email)
+      np = build(:person, email: email, updated_at: DateTime.current)
       allow(@lc).to receive(:search_person).with(email).and_return(np.attributes)
 
       fill_in 'add_members_form[add_members]', with: email
       click_button 'Add These Members'
 
-      expect(@lc).to have_received(:search_person)
+      expect(@lc).to have_received(:search_person).with(email)
       new_person = Person.find_by_email(email)
       expect(new_person).not_to be_nil
       expect(page).to have_text('New members added')
