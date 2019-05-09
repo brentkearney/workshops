@@ -42,7 +42,7 @@ class MembershipPolicy
     when 'member'
       return organizer_fields if organizer?
       return [] unless member_self?
-      all_fields - [:id, :event_id, :person_id, :role, :room,
+      all_fields - [:id, :event_id, :person_id, :role, :room, :room_notes,
                     :attendance, :reviewed, :billing, :special_info,
                     :staff_notes, :org_notes, :own_accommodation, :has_guest,
                     :guest_disclaimer]
@@ -65,7 +65,7 @@ class MembershipPolicy
 
   def all_fields
     [:id, :event_id, :person_id, :share_email, :role, :attendance,
-     :arrival_date, :departure_date, :reviewed, :billing, :room,
+     :arrival_date, :departure_date, :reviewed, :billing, :room, :room_notes,
      :special_info, :staff_notes, :org_notes, :own_accommodation, :has_guest,
      :guest_disclaimer, :share_email, :share_email_hotel,
      person_attributes: [:salutation, :firstname, :lastname, :email, :phone,
@@ -73,7 +73,7 @@ class MembershipPolicy
                          :academic_status, :research_areas, :biography, :id,
                          :address1, :address2, :address3, :city, :region,
                          :postal_code, :country, :phd_year, :emergency_contact,
-                         :emergency_phone]]
+                         :emergency_phone, :grant_id]]
   end
 
   def index?

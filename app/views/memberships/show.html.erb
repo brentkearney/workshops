@@ -171,6 +171,10 @@
                 <strong>Hotel Room:</strong>
                 <%= @membership.room %>
               </div>
+              <div class="row" id="profile-room_notes">
+                <strong>Room notes:</strong>
+                <%= @membership.room_notes %>
+              </div>
             <% end %>
             <div class="row" id="profile-has-guest">
               <strong>Has Guest:</strong> <%= @membership.has_guest ? 'Yes' : 'No' %>

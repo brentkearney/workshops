@@ -166,11 +166,12 @@ RSpec.describe 'Model validations: Membership', type: :model do
     end
 
     before do
-      @event.start_date = Date.current + 1.day
+      @event.start_date = Date.current + 1.month
       @event.end_date = @event.start_date + 5.days
       @event.save
       @membership.attendance = 'Confirmed'
       @membership.has_guest = false
+      @membership.update_by_staff = false
       @membership.own_accommodation = false
       @membership.special_info = 'None.'
       @membership.updated_by = @membership.person.name
@@ -203,7 +204,7 @@ RSpec.describe 'Model validations: Membership', type: :model do
   end
 
   it 'includes changed fields & updated_by in change notice' do
-    @event.start_date = Date.current + 1.day
+    @event.start_date = Date.current + 1.month
     @event.end_date = @event.start_date + 5.days
     @event.save
     @membership.attendance = 'Confirmed'

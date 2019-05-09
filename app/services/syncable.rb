@@ -91,8 +91,12 @@ module Syncable
 
   # local record, remote hash
   def update_record(local, remote)
-    remote_updated = prepare_value('updated_at', remote['updated_at'])
-    remote_updated = DateTime.new(1970,1,30) if remote_updated.blank?
+    remote_updated = remote['updated_at']
+    if remote_updated.blank?
+      remote_updated = DateTime.new(1970,1,30)
+    else
+      remote_updated = convert_to_time(remote['updated_at'])
+    end
     local.updated_at = DateTime.new(1970,1,1) if local.updated_at.blank?
     local.updated_by = 'Workshops Import' if local.updated_by.blank?
 
@@ -113,6 +117,7 @@ module Syncable
         end
       end
       next if k == 'invited_on'
+      local.staff_notes = v if k == 'staff_notes'
 
       unless local.send(k).eql? v
         # if its an email change, User account may also need updating

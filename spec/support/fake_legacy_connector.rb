@@ -194,7 +194,8 @@ class FakeLegacyConnector
     }]
   end
 
-  def get_members_with_changed_membership(m: membership, sn: staff_notes)
+  def get_members_with_changed_membership(m: membership, sn: staff_notes,
+    updated_at: updated_at)
     [{
       'Person' => {
         'lastname' => m.person.lastname, 'firstname' => m.person.firstname,
@@ -213,7 +214,7 @@ class FakeLegacyConnector
         'attendance' => m.attendance, 'role' => m.role,
         'replied_at' => m.replied_at, 'updated_by' => 'FakeLegacyConnector',
         'staff_notes' => sn, 'reviewed' => true, 'room' => 'CH1234',
-        'billing' => 'OK', 'updated_at' => Time.now
+        'billing' => 'OK', 'updated_at' => updated_at
       }
     }]
   end

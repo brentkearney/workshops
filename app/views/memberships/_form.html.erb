@@ -303,6 +303,15 @@
 
 	<div class="form-group">
 		<div class="col-sm-3 control-label">
+			<%= f.label :room_notes, "Room notes: " %>
+		</div>
+		<div class="col-sm-9">
+			<%= f.text_area :room_notes, class: 'form-control' %>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-3 control-label">
 			<%= f.label :own_accommodation, "Own Accommodation:" %>
 		</div>
 		<div class="col-sm-9">

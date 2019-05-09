@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_08_175656) do
+ActiveRecord::Schema.define(version: 2019_05_08_232806) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -125,6 +125,7 @@ ActiveRecord::Schema.define(version: 2019_05_08_175656) do
     t.string "invited_by"
     t.datetime "invited_on"
     t.boolean "share_email_hotel"
+    t.string "room_notes"
     t.index ["event_id"], name: "index_memberships_on_event_id"
     t.index ["person_id"], name: "index_memberships_on_person_id"
   end

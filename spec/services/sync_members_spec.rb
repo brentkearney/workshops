@@ -519,15 +519,39 @@ describe "SyncMembers" do
 
     context 'with a local membership' do
       it 'updates the local membership' do
-        reset_dates
         membership = @eventm.memberships.last
+        membership.staff_notes = nil
+        membership.updated_at = DateTime.yesterday
+        membership.save
+
         lc = FakeLegacyConnector.new
-        allow(lc).to receive(:get_members).with(membership.event).and_return(lc.get_members_with_changed_membership(m: membership, sn: 'Hi'))
+        changes = { m: membership, sn: 'Hi', updated_at: DateTime.now }
+        allow(lc).to receive(:get_members).with(membership.event)
+                      .and_return(lc.get_members_with_changed_membership(changes))
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         SyncMembers.new(membership.event)
 
         expect(Event.find(membership.event.id).memberships.last.staff_notes).to eq('Hi')
+      end
+
+      it 'updates staff_notes even if local record is newer' do
+        membership = @eventm.memberships.last
+        membership.updated_at = DateTime.now
+        membership.staff_notes = nil
+        membership.arrival_date = membership.event.start_date + 1.day
+        membership.save
+
+        lc = FakeLegacyConnector.new
+        changes = { m: membership, sn: 'change is inevitable', updated_at: DateTime.yesterday }
+        allow(lc).to receive(:get_members).with(membership.event)
+                      .and_return(lc.get_members_with_changed_membership(changes))
+        expect(LegacyConnector).to receive(:new).and_return(lc)
+
+        SyncMembers.new(membership.event)
+        updated = Membership.find(membership.id)
+        expect(updated.staff_notes).to eq('change is inevitable')
+        expect(updated.arrival_date).to eq(membership.event.start_date + 1.day)
       end
     end
   end

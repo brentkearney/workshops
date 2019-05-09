@@ -99,6 +99,7 @@ describe 'Membership#edit', type: :feature do
     fill_in 'membership_billing', with: 'SOS'
     uncheck 'membership_own_accommodation'
     fill_in 'membership_room', with: 'AB 123'
+    fill_in 'membership_room_notes', with: 'Night-owl'
     expect(page).to have_field('membership_has_guest', checked: false)
     check 'membership_has_guest'
     fill_in 'membership_special_info', with: 'Very.'
@@ -112,6 +113,7 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).to have_css('div#profile-billing', text: 'SOS')
     expect(page.body).to have_css('div#profile-gender', text: 'O')
     expect(page.body).to have_css('div#profile-room', text: 'AB 123')
+    expect(page.body).to have_css('div#profile-room_notes', text: 'Night-owl')
     expect(page.body).to have_css('div#profile-has-guest', text: 'Yes')
     expect(page.body).to have_css('div#profile-special-info', text: 'Very.')
     expect(page.body).to have_css('div#profile-staff-notes', text: 'Beware.')
