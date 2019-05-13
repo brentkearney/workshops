@@ -177,7 +177,12 @@ module Syncable
     Time.zone = ActiveSupport::TimeZone.new(event.time_zone)
     return Time.at(v) if v.is_a?(Integer)
     return v.in_time_zone(event.time_zone) if v.is_a?(Time) || v.is_a?(DateTime)
-    Time.parse(v.to_s)
+    begin
+      time = Time.parse(v.to_s)
+    rescue ArgumentError
+      time = nil
+    end
+    time
   end
 
   def replace_person(replace: other_person, replace_with: person)
