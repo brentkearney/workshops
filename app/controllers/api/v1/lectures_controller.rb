@@ -73,8 +73,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
   # GET /api/v1/lectures_on_date/room/date.json
   def lectures_on
-    lectures = Lecture.where(start_time: @date.beginning_of_day..@date.end_of_day)
-                       .where(room: @room).order(:start_time)
+    lectures = Lecture.on(@date, @room)
     schedules = Schedule.where(lecture_id: lectures.pluck(:id))
 
     data = []

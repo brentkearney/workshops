@@ -34,7 +34,7 @@ class Api::V1::BaseController < ApplicationController
       @json['api_key'] = request.headers.env['HTTP_API_KEY']
       @json['lecture'] = 'payload type placeholder'
       if action_name == 'lectures_on'
-        @date = DateTime.parse(lectures_on_params.first)
+        @date = Date.parse(lectures_on_params.first)
         @room = lectures_on_params.last
       elsif action_name == 'lecture_data'
         @lecture_id = lecture_data_params

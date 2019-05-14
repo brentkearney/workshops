@@ -5,15 +5,38 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class LecturesController < ApplicationController
-  before_action :set_event, :set_time_zone
+  before_action :set_event, :set_time_zone, except: [:today, :current]
   before_action :set_lecture, only: [:update, :destroy]
-  before_action :authenticate_user!, except: [:index]
+  before_action :authenticate_user!, except: [:index, :today, :current]
 
   # GET /events/:event_id/lectures
   # GET /events/:event_id/lectures.json
   def index
     redirect_to event_schedule_index_path(@event) if request.format.html?
     @lectures = @event.lectures.includes(:person).order(:start_time)
+  end
+
+  # GET /lectures/today/room.rss
+  def today
+    @lectures = GetLectures.new(room_param).todays_lectures
+    @schedule_url = events_future_url
+    unless @lectures.empty?
+      @schedule_url = event_schedule_index_url(@lectures.last.event)
+      @room = @lectures.first.room
+    end
+
+    redirect_to @schedule_url if request.format.html?
+  end
+
+  # GET /lectures/current/room.rss
+  def current
+    @lecture = GetLectures.new(room_param).current
+    @schedule_url = events_future_url
+    unless @lecture.blank?
+      @schedule_url = event_schedule_index_url(@lecture.event)
+      @room = @lecture.room
+    end
+    redirect_to @schedule_url if request.format.html?
   end
 
   # POST /lectures
@@ -66,5 +89,9 @@ class LecturesController < ApplicationController
 
   def lecture_params
     params.require(:lecture).permit(:event_id, :person_id, :title, :start_time, :end_time, :abstract, :notes, :filename, :room, :publish, :tweeted, :hosting_license, :archiving_license, :hosting_release, :archiving_release, :authors, :copyright_owners, :publication_details, :keywords, :updated_by)
+  end
+
+  def room_param
+    params.require(:room)
   end
 end

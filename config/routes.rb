@@ -92,7 +92,10 @@ Rails.application.routes.draw do
     root to: "people#index"
   end
 
-
   # Maillists
   post "/maillist" => 'griddler/authentication#incoming'
+
+  # Lectures RSS
+  get '/lectures/today/:room' => 'lectures#today', as: :todays_lectures
+  get '/lectures/current/:room' => 'lectures#current', as: :current_lecture
 end
