@@ -6,48 +6,66 @@
 
 # Returns scheduled lectures, for RSS feeds
 class GetLectures
-  attr_reader :todays_lectures
+  #attr_reader :todays_lectures
 
   def initialize(room)
     @room = room
-    @todays_lectures = lectures_on(Date.current)
-    unless @todays_lectures.empty?
-      @time_zone = @todays_lectures.first.event.time_zone
-      @tolerance = calculate_tolerance(@todays_lectures)
-    end
   end
 
-  def lectures_on(date)
+  def self.on(date, room = @room)
     Lecture.where(start_time: date.beginning_of_day..date.end_of_day)
-                         .where(room: @room).order(:start_time)
+                         .where(room: room).order(:start_time)
+  end
+
+  def lectures_on(date, room = @room)
+    GetLectures.on(date, room)
+  end
+
+  def todays_lectures
+    lectures_on(Date.current)
+  end
+
+  def find_timezone
+    lecture = Lecture.where(room: @room).first
+    return lecture.event.time_zone unless lecture.nil?
+    GetSetting.default_timezone
   end
 
   # Nearest talk to present time, within tolerance range
   def current
-    now = Time.current.in_time_zone(@time_zone)
+    time_zone = find_timezone
+    now = Time.current.in_time_zone(time_zone)
+    lectures = todays_lectures
+    tolerance = calculate_tolerance(lectures)
 
-    lectures = {}
-    @todays_lectures.each do |lecture|
+    lecture_ids = {}
+    lectures.each do |lecture|
       next unless lecture.filename.blank? # skip if already recorded
-      lecture_time = lecture.start_time.in_time_zone(@time_zone)
-      next if lecture_time < now - @tolerance
-      next if lecture_time > now + @tolerance
-      lectures[ lecture.id ] = (lecture_time.to_i - now.to_i).abs
+      lecture_time = lecture.start_time.in_time_zone(time_zone)
+      next if lecture_time < now - tolerance
+      next if lecture_time > now + tolerance
+      lecture_ids[ lecture.id ] = (lecture_time.to_i - now.to_i).abs
     end
-    return '' if lectures.empty?
-    Lecture.find(lectures.key(lectures.values.min))
+    return '' if lecture_ids.empty?
+    lectures.select {|l| l.id == lecture_ids.key(lecture_ids.values.min) }.last
   end
 
   # returns the first lecture in the next 15 days
   def next
-    now = Time.current.in_time_zone(@time_zone) - @tolerance
-    (0..15).each do |n|
-      day = DateTime.current + n.days
+    time_zone = find_timezone
+    lectures = todays_lectures
+    now = Time.current.in_time_zone(time_zone) - calculate_tolerance(lectures)
+    lecture = lectures.select {|l| l.start_time.in_time_zone(time_zone) > now }.first
+    return lecture unless lecture.blank?
+
+    (1..15).each do |n|
+      day = DateTime.current.in_time_zone(time_zone) + n.days
       lectures_on(day).each do |lecture|
-        lecture_time = lecture.start_time.in_time_zone(@time_zone)
+        lecture_time = lecture.start_time.in_time_zone(time_zone)
         return lecture if lecture_time > now
       end
     end
+    nil
   end
 
   # Set tolerance to half of the average time of talks today, plus 1 minute

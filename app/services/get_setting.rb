@@ -131,6 +131,10 @@ class GetSetting
     setting.blank? ? '' : setting
   end
 
+  def self.default_timezone
+    Setting.Locations.first.second['Timezone']
+  end
+
   # Emails set in Settings.Site
   def self.site_email(email_setting)
     email = site_setting(email_setting)

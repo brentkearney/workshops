@@ -40,7 +40,8 @@ class Api::V1::LecturesController < Api::V1::BaseController
   # GET /api/v1/lecture/id.json
   def lecture_data
     data = {}
-    lecture = Lecture.find_by_id(@lecture_id) || Lecture.find_by_legacy_id(@lecture_id)
+    # Use legacy_id primarily, until legacy system is fully depreciated
+    lecture = Lecture.find_by_legacy_id(@lecture_id) || Lecture.find_by_id(@lecture_id)
     unless lecture.blank?
       person = {
         salutation: lecture.person.salutation,
@@ -73,7 +74,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
   # GET /api/v1/lectures_on_date/room/date.json
   def lectures_on
-    lectures = Lecture.on(@date, @room)
+    lectures = GetLectures.on(@date, @room)
     schedules = Schedule.where(lecture_id: lectures.pluck(:id))
 
     data = []
