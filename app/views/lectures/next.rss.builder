@@ -1,18 +1,15 @@
+xml.xml :version => "1.0", :encoding => "UTF-8"
 xml.rss :version => "2.0" do
-  xml.title "Upcoming Lecture"
-  xml.description "Next scheduled lecture in #{@room}."
-  xml.link @schedule_url
+  xml.channel do
+    xml.title "Upcoming Lecture"
+    xml.link @schedule_url
+    xml.description "Next scheduled lecture in #{@room}."
 
-  unless @lecture.blank?
-    xml.item do
-      xml.title @lecture.title
-      xml.speaker @lecture.person.name
-      xml.affiliation @lecture.person.affiliation
-      xml.start_time @lecture.start_time
-      xml.end_time @lecture.end_time
-      xml.description @lecture.abstract
+    unless @lecture.blank?
+      xml.item do
+        xml.title "#{@lecture.start_time.strftime("%b %-d %H:%M")} to #{@lecture.end_time.strftime("%H:%M %z")}"
+        xml.description "#{@lecture.person.name}, #{@lecture.person.affiliation}\n#{@lecture.title}"
+      end
     end
-  else
-    xml.notice "No upcoming lecture found."
   end
 end

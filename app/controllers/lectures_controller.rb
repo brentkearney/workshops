@@ -85,7 +85,7 @@ class LecturesController < ApplicationController
 
     def schedule_url_and_room(lecture)
       schedule_url = events_future_url
-      room = ''
+      room = room_param
       unless lecture.blank?
         lecture = lecture.first unless lecture.is_a?(Lecture)
         schedule_url = event_schedule_index_url(lecture.event)
