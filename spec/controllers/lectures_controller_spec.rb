@@ -77,11 +77,51 @@ RSpec.describe LecturesController, type: :controller do
 
       it 'produces emtpy feed if no current lecture' do
         Lecture.destroy_all
-        get :today, params: { room: @room, format: 'rss' }
+        get :current, params: { room: @room, format: 'rss' }
 
         expect(response.status).to eq(200)
-        expect(assigns(:lectures)).to be_empty
+        expect(assigns(:lectures)).to be_blank
       end
+    end
+  end
+
+  context 'next' do
+    before do
+      @event = create(:event, current: true)
+      start_time = Time.now + 2.hours
+      end_time = start_time + 40.minutes
+      @lecture = create(:lecture, event: @event, start_time: start_time,
+                               end_time: end_time)
+      @room = @lecture.room
+    end
+
+    it 'assigns @lecture' do
+      get :next, params: { room: @room, format: 'rss' }
+
+      expect(response.status).to eq(200)
+      expect(assigns(:lecture)).to eq(@lecture)
+    end
+
+    it 'redirects html format requests to schedule index page' do
+      get :next, params: { room: @room, format: 'html' }
+
+      expect(response.status).to eq(302)
+      expect(subject).to redirect_to(event_schedule_index_url(@event))
+    end
+
+    it 'renders RSS XML' do
+      get :next, params: { room: @room, format: 'rss' }
+
+      expect(response).to render_template('lectures/next')
+      expect(response.content_type).to eq("application/rss+xml")
+    end
+
+    it 'produces emtpy feed if no current lecture' do
+      Lecture.destroy_all
+      get :next, params: { room: @room, format: 'rss' }
+
+      expect(response.status).to eq(200)
+      expect(assigns(:lectures)).to be_blank
     end
   end
 end

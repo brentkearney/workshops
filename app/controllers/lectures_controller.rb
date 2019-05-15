@@ -5,9 +5,9 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class LecturesController < ApplicationController
-  before_action :set_event, :set_time_zone, except: [:today, :current]
+  before_action :set_event, :set_time_zone, except: [:today, :current, :next]
   before_action :set_lecture, only: [:update, :destroy]
-  before_action :authenticate_user!, except: [:index, :today, :current]
+  before_action :authenticate_user!, except: [:index, :today, :current, :next]
 
   # GET /events/:event_id/lectures
   # GET /events/:event_id/lectures.json
@@ -19,25 +19,24 @@ class LecturesController < ApplicationController
   # GET /lectures/today/room.rss
   def today
     @lectures = GetLectures.new(room_param).todays_lectures
-    @schedule_url = events_future_url
-    unless @lectures.empty?
-      @schedule_url = event_schedule_index_url(@lectures.last.event)
-      @room = @lectures.first.room
-    end
-
+    @schedule_url, @room = schedule_url_and_room(@lectures)
     redirect_to @schedule_url if request.format.html?
   end
 
   # GET /lectures/current/room.rss
   def current
     @lecture = GetLectures.new(room_param).current
-    @schedule_url = events_future_url
-    unless @lecture.blank?
-      @schedule_url = event_schedule_index_url(@lecture.event)
-      @room = @lecture.room
-    end
+    @schedule_url, @room = schedule_url_and_room(@lecture)
     redirect_to @schedule_url if request.format.html?
   end
+
+  # GET /lectures/next/room.rss
+  def next
+    @lecture = GetLectures.new(room_param).next
+    @schedule_url, @room = schedule_url_and_room(@lecture)
+    redirect_to @schedule_url if request.format.html?
+  end
+
 
   # POST /lectures
   # POST /lectures.json
@@ -83,6 +82,18 @@ class LecturesController < ApplicationController
   end
 
   private
+
+    def schedule_url_and_room(lecture)
+      schedule_url = events_future_url
+      room = ''
+      unless lecture.blank?
+        lecture = lecture.first unless lecture.is_a?(Lecture)
+        schedule_url = event_schedule_index_url(lecture.event)
+        room = lecture.room
+      end
+      [schedule_url, room]
+    end
+
     def set_lecture
       @lecture = Lecture.find_by_id(params[:id])
     end

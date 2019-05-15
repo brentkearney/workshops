@@ -98,4 +98,5 @@ Rails.application.routes.draw do
   # Lectures RSS
   get '/lectures/today/:room' => 'lectures#today', as: :todays_lectures
   get '/lectures/current/:room' => 'lectures#current', as: :current_lecture
+  get '/lectures/next/:room' => 'lectures#next', as: :next_lecture
 end

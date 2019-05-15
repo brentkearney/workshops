@@ -13,4 +13,6 @@ xml.rss :version => "2.0" do
       xml.description lecture.abstract
     end
   end
+
+  xml.notice "No lectures scheduled today." if @lectures.blank?
 end
