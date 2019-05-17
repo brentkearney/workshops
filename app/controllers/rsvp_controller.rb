@@ -112,7 +112,7 @@ class RsvpController < ApplicationController
   def update_and_redirect(rsvp:)
     @invitation.organizer_message = @organizer_message
     membership = @invitation.membership
-    @invitation.send(rsvp)
+    @invitation.send(rsvp) # sent to Invitation model
 
     redirect_to rsvp_feedback_path(membership.id), success: 'Your attendance
       status was successfully updated. Thanks for your reply!'.squish
