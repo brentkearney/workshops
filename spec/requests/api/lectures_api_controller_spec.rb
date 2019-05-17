@@ -12,6 +12,7 @@ describe Api::V1::LecturesController, type: :request do
   before do
     @event = create(:event, start_date: Date.yesterday)
     @lecture = create(:lecture, event: @event)
+    @room = @lecture.room
     create(:schedule, lecture: @lecture, event: @event)
     @api_key = Setting.Site['LECTURES_API_KEY']
     @payload = {
@@ -95,7 +96,8 @@ describe Api::V1::LecturesController, type: :request do
   context '#lectures_on' do
     context 'authentication test' do
       it 'authenticates with api key in the request header' do
-        get "/api/v1/lectures_on/2019-04-10/#{ERB::Util.url_encode(@lecture.room)}.json", headers: { 'HTTP_API_KEY' => @api_key }
+        get "/api/v1/lectures_on/2019-04-10/#{ERB::Util.url_encode(@room)}.json",
+            headers: { 'HTTP_API_KEY' => @api_key }
         expect(response).to be_successful
       end
     end
@@ -118,7 +120,7 @@ describe Api::V1::LecturesController, type: :request do
       end
 
       it 'returns the lecture schedule for the given day' do
-        get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@lecture.room)}.json"
+        get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@room)}.json"
         json = JSON.parse(response.body)
 
         Lecture.all.each do |lecture|
@@ -134,12 +136,76 @@ describe Api::V1::LecturesController, type: :request do
         schedule.delete
         expect(Lecture.find_by_id(@lecture.id)).not_to be_blank
 
-        get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@lecture.room)}.json"
+        get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@room)}.json"
         json = JSON.parse(response.body)
         lecture = json.select {|j| j['lecture']['id'].to_i == @lecture.id }.first
 
         expect(lecture['scheduled_for']['start_time']).to be_empty
         expect(lecture['scheduled_for']['end_time']).to be_empty
+      end
+    end
+  end
+
+  context '#current & #next' do
+    context 'authentication test' do
+      it 'lectures_current with api key authenticates' do
+        get "/api/v1/lectures_current/#{ERB::Util.url_encode(@room)}.json",
+            headers: { 'HTTP_API_KEY' => @api_key }
+        expect(response).to be_successful
+      end
+
+      it 'lectures_next with api key authenticates' do
+        get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json",
+            headers: { 'HTTP_API_KEY' => @api_key }
+        expect(response).to be_successful
+      end
+    end
+
+    context 'stub authentication' do
+      before do
+        allow_any_instance_of(Api::V1::LecturesController).to receive(:authenticated?).and_return(true)
+        allow_any_instance_of(Api::V1::BaseController).to receive(:authenticate_user_from_token!).and_return(true)
+      end
+
+      it 'authenticates' do
+        get "/api/v1/lectures_current/#{ERB::Util.url_encode(@room)}.json"
+        expect(response).to be_successful
+        get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json"
+        expect(response).to be_successful
+      end
+
+      it 'returns an empty hash if there is no current lecture' do
+        get "/api/v1/lectures_current/#{ERB::Util.url_encode(@room)}.json"
+        json = JSON.parse(response.body)
+        expect(json).to eq({})
+      end
+
+      it 'returns an empty hash if there is no next lecture' do
+        get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json"
+        json = JSON.parse(response.body)
+        expect(json).to eq({})
+      end
+
+      it 'returns the current lecture, if there is one' do
+        @lecture.start_time = Time.current - 10.minutes
+        @lecture.end_time = Time.current + 10.minutes
+        @lecture.save
+
+        get "/api/v1/lectures_current/#{ERB::Util.url_encode(@room)}.json"
+        json = JSON.parse(response.body)
+
+        expect(json['title']).to eq(@lecture.title)
+      end
+
+      it 'returns the next lecture, if there is one' do
+        @lecture.start_time = Time.current + 60.minutes
+        @lecture.end_time = Time.current + 90.minutes
+        @lecture.save
+
+        get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json"
+        json = JSON.parse(response.body)
+
+        expect(json['title']).to eq(@lecture.title)
       end
     end
   end

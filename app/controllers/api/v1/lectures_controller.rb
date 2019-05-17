@@ -79,26 +79,42 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
     data = []
     lectures.each do |lecture|
+      # scheduled time may differ from (actual) lecture time
       schedule = schedules.select {|s| s.lecture_id == lecture.id}.first
       start_time = schedule.nil? ? '' : schedule.start_time
       end_time = schedule.nil? ? '' : schedule.end_time
-      # lecture time (updated by recording system) may differ from its sheduled time
       scheduled_for = { start_time: start_time, end_time: end_time }
 
-      extras = {
-        event_code: lecture.event.code,
-        firstname: lecture.person.firstname,
-        lastname: lecture.person.lastname,
-        affil: lecture.person.affiliation
-      }
-      lecture_attribs = lecture.attributes.merge(extras)
-
+      lecture_attribs = compose_data(lecture)
       data << { lecture: lecture_attribs, scheduled_for: scheduled_for }
     end
 
     respond_to do |format|
       format.json do
         render json: data.to_json
+      end
+    end
+  end
+
+
+  # GET /api/v1/current/room.json
+  def current
+    lecture = GetLectures.new(@room).current
+
+    respond_to do |format|
+      format.json do
+        render json: compose_data(lecture).to_json
+      end
+    end
+  end
+
+  # GET /api/v1/next/room.json
+  def next
+    lecture = GetLectures.new(@room).next
+
+    respond_to do |format|
+      format.json do
+        render json: compose_data(lecture).to_json
       end
     end
   end
@@ -113,6 +129,17 @@ class Api::V1::LecturesController < Api::V1::BaseController
   end
 
   private
+
+  def compose_data(lecture)
+    return {} if lecture.blank?
+    extras = {
+      event_code: lecture.event.code,
+      firstname: lecture.person.firstname,
+      lastname: lecture.person.lastname,
+      affil: lecture.person.affiliation
+    }
+    lecture.attributes.merge(extras)
+  end
 
   def find_lecture
     return if request.request_method == 'GET'

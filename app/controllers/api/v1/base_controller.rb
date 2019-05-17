@@ -38,6 +38,8 @@ class Api::V1::BaseController < ApplicationController
         @room = lectures_on_params.last
       elsif action_name == 'lecture_data'
         @lecture_id = lecture_data_params
+      else
+        @room = current_next_params
       end
     else
       @json = JSON.parse(request.body.read)
@@ -58,5 +60,9 @@ class Api::V1::BaseController < ApplicationController
 
   def lecture_data_params
     params.require(:id)
+  end
+
+  def current_next_params
+    params.require(:room)
   end
 end
