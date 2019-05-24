@@ -146,7 +146,7 @@ describe Api::V1::LecturesController, type: :request do
     end
   end
 
-  context '#current & #next' do
+  context '#current, #next, #last' do
     context 'authentication test' do
       it 'lectures_current with api key authenticates' do
         get "/api/v1/lectures_current/#{ERB::Util.url_encode(@room)}.json",
@@ -172,6 +172,8 @@ describe Api::V1::LecturesController, type: :request do
         expect(response).to be_successful
         get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json"
         expect(response).to be_successful
+        get "/api/v1/lectures_last/#{ERB::Util.url_encode(@room)}.json"
+        expect(response).to be_successful
       end
 
       it 'returns an empty hash if there is no current lecture' do
@@ -181,6 +183,12 @@ describe Api::V1::LecturesController, type: :request do
       end
 
       it 'returns an empty hash if there is no next lecture' do
+        get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json"
+        json = JSON.parse(response.body)
+        expect(json).to eq({})
+      end
+
+      it 'returns an empty hash if there is no last lecture (of the day)' do
         get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json"
         json = JSON.parse(response.body)
         expect(json).to eq({})
@@ -206,6 +214,20 @@ describe Api::V1::LecturesController, type: :request do
         json = JSON.parse(response.body)
 
         expect(json['title']).to eq(@lecture.title)
+      end
+
+      it 'returns the last lecture of the day, if there is one' do
+        @lecture.start_time = Time.current + 60.minutes
+        @lecture.end_time = Time.current + 90.minutes
+        @lecture.save
+        other_lecture = create(:lecture, event: @lecture.event,
+                                start_time: Time.current + 120.minutes,
+                                end_time: Time.current + 150.minutes)
+
+        get "/api/v1/lectures_last/#{ERB::Util.url_encode(@room)}.json"
+        json = JSON.parse(response.body)
+
+        expect(json['title']).to eq(other_lecture.title)
       end
     end
   end

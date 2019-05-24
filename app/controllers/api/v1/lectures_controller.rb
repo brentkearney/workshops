@@ -119,6 +119,17 @@ class Api::V1::LecturesController < Api::V1::BaseController
     end
   end
 
+  # GET /api/v1/last/room.json
+  def last
+    lecture = GetLectures.new(@room).last
+
+    respond_to do |format|
+      format.json do
+        render json: compose_data(lecture).to_json
+      end
+    end
+  end
+
   def method_missing(method_name, *arguments, &block)
     go_away
     super
@@ -136,7 +147,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
       event_code: lecture.event.code,
       firstname: lecture.person.firstname,
       lastname: lecture.person.lastname,
-      affil: lecture.person.affiliation
+      affiliation: lecture.person.affiliation
     }
     lecture.attributes.merge(extras)
   end

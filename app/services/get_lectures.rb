@@ -6,8 +6,6 @@
 
 # Returns scheduled lectures, for RSS feeds
 class GetLectures
-  #attr_reader :todays_lectures
-
   def initialize(room)
     @room = room
   end
@@ -66,6 +64,12 @@ class GetLectures
       end
     end
     nil
+  end
+
+  # returns the last lecture of the day
+  def last(date = Date.today)
+    Lecture.where(start_time: date.beginning_of_day..date.end_of_day)
+                         .where(room: @room).order(:start_time).last
   end
 
   # Set tolerance to half of the average time of talks today, plus 1 minute
