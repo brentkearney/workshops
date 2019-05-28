@@ -173,7 +173,7 @@ class LegacyConnector
     lecture.person_id = lecture.person.legacy_id
     url = "#{@rest_url}/add_lecture/#{event_id}"
     RestClient.post url, lecture.to_json, content_type: :json, accept: :json
-    get_lecture_id(lecture)
+    get_lecture_id(lecture) unless lecture.local_only
   end
 
   def delete_lecture(lecture_id)
