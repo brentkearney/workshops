@@ -50,6 +50,8 @@ class ConfirmEmailMailer < ApplicationMailer
     to_email = %Q("#{person.name}" <#{person.email}>)
     subject = "BIRS email change confirmation"
 
-    mail(to: to_email, subject: subject, template_name: mode)
+    data = { skip_suppression: true }
+
+    mail(to: to_email, subject: subject, sparkpost_data: data, template_name: mode)
   end
 end

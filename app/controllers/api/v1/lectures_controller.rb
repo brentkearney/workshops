@@ -143,6 +143,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
   def compose_data(lecture)
     return {} if lecture.blank?
+
     extras = {
       event_code: lecture.event.code,
       firstname: lecture.person.firstname,

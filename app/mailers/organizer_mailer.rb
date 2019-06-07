@@ -61,6 +61,7 @@ class OrganizerMailer < ApplicationMailer
 
     data = {
       template_id: 'rsvp-notice',
+      skip_suppression: true,
       substitution_data: sub_data
     }
 

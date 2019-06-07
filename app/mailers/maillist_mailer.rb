@@ -47,7 +47,9 @@ class MaillistMailer < ApplicationMailer
       end
     end
 
-    mail(to: recipient, from: from, subject: subject) do |format|
+    data = { skip_suppression: true }
+
+    mail(to: recipient, from: from, subject: subject, sparkpost_data: data) do |format|
       format.html { render html: @html_body.html_safe } unless @html_body.blank?
       format.text { render text: @text_body }
     end
