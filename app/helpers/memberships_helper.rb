@@ -63,7 +63,7 @@ module MembershipsHelper
   def show_attendances(f)
     if policy(@membership).edit_attendance?
       f.select :attendance, policy(@membership).attendance_options,
-               class: 'form-control'
+                { selected: @membership.attendance }, class: 'form-control'
     else
       @membership.attendance
     end
