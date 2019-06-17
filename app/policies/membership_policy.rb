@@ -76,6 +76,21 @@ class MembershipPolicy
                          :emergency_phone, :grant_id]]
   end
 
+  def attendance_options
+    return Membership::ATTENDANCE if staff_and_admins
+    if organizer?
+      case @membership.attendance
+      when 'Not Yet Invited', 'Declined'
+        return ['Not Yet Invited', 'Declined']
+      when 'Invited', 'Undecided'
+        return ['Invited', 'Undecided', 'Declined']
+      when 'Confirmed'
+        return ['Confirmed', 'Undecided', 'Declined']
+      end
+    end
+    [@membership.attendance]
+  end
+
   def index?
     true
   end

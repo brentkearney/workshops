@@ -45,7 +45,6 @@ class RsvpForm < ComplexForms
   end
 
   def accommodation_intro
-    # default = "BIRS will book a free hotel room for you, <strong>unless you select the "I will book my own accommodation" option.</strong> If you select that option, you must book your own accommodation and pay for it."
     default = 'We will book free accommodation for you, unless you select the option to arrange & pay for your own accommodation'
     (GetSetting.rsvp_accommodation_intro(@event.location) || default).html_safe
   end

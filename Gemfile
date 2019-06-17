@@ -59,6 +59,7 @@ group :production do
 end
 
 group :development do
+  gem 'rubocop-rails'
   gem 'web-console'
   gem 'pronto'
   gem 'pronto-rubocop'

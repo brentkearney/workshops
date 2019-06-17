@@ -512,39 +512,39 @@ describe 'Membership#edit', type: :feature do
     it 'allows changing from Confirmed to Undecided or Declined' do
       expect(@participant.attendance).to eq('Confirmed')
       select = find(:select, 'membership_attendance')
-      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
-      expect(select).to have_selector(:option, 'Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Undecided', disabled: false)
-      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Declined', disabled: false)
+      expect(select).to have_selector(:option, 'Confirmed')
+      expect(select).not_to have_selector(:option, 'Invited')
+      expect(select).to have_selector(:option, 'Undecided')
+      expect(select).not_to have_selector(:option, 'Not Yet Invited')
+      expect(select).to have_selector(:option, 'Declined')
     end
 
-    it 'allows changing from Invited to Declined' do
+    it 'allows changing from Invited to Declined or Undecided' do
       @participant.attendance = 'Invited'
       @participant.save
 
       visit edit_event_membership_path(@event, @participant)
 
       select = find(:select, 'membership_attendance')
-      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
-      expect(select).to have_selector(:option, 'Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Undecided', disabled: true)
-      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Declined', disabled: false)
+      expect(select).not_to have_selector(:option, 'Confirmed')
+      expect(select).to have_selector(:option, 'Invited')
+      expect(select).to have_selector(:option, 'Undecided')
+      expect(select).not_to have_selector(:option, 'Not Yet Invited')
+      expect(select).to have_selector(:option, 'Declined')
     end
 
-    it 'allows changing from Undecided to Declined' do
+    it 'allows changing from Undecided to Declined or Invited' do
       @participant.attendance = 'Undecided'
       @participant.save
 
       visit edit_event_membership_path(@event, @participant)
 
       select = find(:select, 'membership_attendance')
-      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
-      expect(select).to have_selector(:option, 'Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Undecided', disabled: true)
-      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Declined', disabled: false)
+      expect(select).not_to have_selector(:option, 'Confirmed')
+      expect(select).to have_selector(:option, 'Invited')
+      expect(select).to have_selector(:option, 'Undecided')
+      expect(select).not_to have_selector(:option, 'Not Yet Invited')
+      expect(select).to have_selector(:option, 'Declined')
     end
 
     it 'allows changing from Not Yet Invited to Declined' do
@@ -554,25 +554,23 @@ describe 'Membership#edit', type: :feature do
       visit edit_event_membership_path(@event, @participant)
 
       select = find(:select, 'membership_attendance')
-      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
-      expect(select).to have_selector(:option, 'Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Undecided', disabled: true)
-      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Declined', disabled: false)
+      expect(select).not_to have_selector(:option, 'Confirmed')
+      expect(select).not_to have_selector(:option, 'Undecided')
+      expect(select).to have_selector(:option, 'Not Yet Invited')
+      expect(select).to have_selector(:option, 'Declined')
     end
 
-    it 'disallows changing from Declined' do
+    it 'allows changing from Declined to Not Yet Invited' do
       @participant.attendance = 'Declined'
       @participant.save
 
       visit edit_event_membership_path(@event, @participant)
 
       select = find(:select, 'membership_attendance')
-      expect(select).to have_selector(:option, 'Confirmed', disabled: true)
-      expect(select).to have_selector(:option, 'Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Undecided', disabled: true)
-      expect(select).to have_selector(:option, 'Not Yet Invited', disabled: true)
-      expect(select).to have_selector(:option, 'Declined', disabled: true)
+      expect(select).not_to have_selector(:option, 'Confirmed')
+      expect(select).not_to have_selector(:option, 'Undecided')
+      expect(select).to have_selector(:option, 'Not Yet Invited')
+      expect(select).to have_selector(:option, 'Declined')
     end
 
     it 'disallows changing of travel dates' do

@@ -40,7 +40,7 @@ module MembershipsHelper
 
     f.select :role, Membership::ROLES,
              { disabled: disabled_options, selected: default },
-             required: 'true', class: 'form-control'
+             class: 'form-control'
   end
 
   def add_member_errors(add_members)
@@ -62,19 +62,8 @@ module MembershipsHelper
 
   def show_attendances(f)
     if policy(@membership).edit_attendance?
-      disabled_options = Membership::ATTENDANCE
-      if @current_user.is_organizer?(@event)
-        if @membership.attendance =~ /Invited|Undecided/
-          disabled_options -= ['Declined']
-        elsif @membership.attendance == 'Confirmed'
-          disabled_options -= ['Undecided', 'Declined']
-        end
-      else
-        disabled_options = [] unless @current_user.member?
-      end
-      f.select :attendance, Membership::ATTENDANCE,
-               { disabled: disabled_options },
-                 required: 'true', class: 'form-control'
+      f.select :attendance, policy(@membership).attendance_options,
+               class: 'form-control'
     else
       @membership.attendance
     end
