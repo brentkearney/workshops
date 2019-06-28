@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead of :exception.
   protect_from_forgery with: :exception, unless: :json_request?
+  protect_from_forgery with: :null_session, if: :json_request?
   skip_before_action :verify_authenticity_token, if: :json_request?
   rescue_from ActionController::InvalidAuthenticityToken, with: :invalid_auth_token
 
@@ -43,7 +44,6 @@ class ApplicationController < ActionController::Base
   end
 
   def invalid_auth_token
-    Rails.logger.debug "\n\nInvalid auth token invoked!\n\n"
     redirect_to sign_in_path, error: 'Login invalid or expired'
   end
 

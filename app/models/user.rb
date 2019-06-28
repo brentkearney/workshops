@@ -56,7 +56,7 @@ class User < ApplicationRecord
 
   def generate_jwt
     JWT.encode({ id: id,
-                exp: 60.days.from_now.to_i },
+                exp: 5.days.from_now.to_i },
                Rails.env.devise.jwt.secret_key)
   end
 
