@@ -9,6 +9,14 @@ Devise.setup do |config|
   # config.secret_key = '4f6f0ca69ee14d956c408ec00af4ef3723dae4d112aed95fcf9984e20e6b4ce0739928b319d994d575640405ec09d6a3b74289d73b16dad7237ff4a00ed72272'
   config.secret_key = ENV['DEVISE_SECRET_KEY']
 
+  # https://github.com/waiting-for-dev/devise-jwt
+  config.jwt do |jwt|
+    jwt.secret = ENV['DEVISE_JWT_SECRET_KEY']
+    jwt.dispatch_requests = [ ['POST', %r{^/users/sign_in$}] ]
+    jwt.expiration_time = 1.day.to_i
+    jwt.request_formats = { user: [:json] }
+  end
+
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
@@ -80,7 +88,7 @@ Devise.setup do |config|
   # Notice that if you are skipping storage for all authentication paths, you
   # may want to disable generating routes to Devise's sessions controller by
   # passing skip: :sessions to `devise_for` in your config/routes.rb
-  config.skip_session_storage = [:http_auth]
+  config.skip_session_storage = [:http_auth, :params_auth] # params_auth for JWT
 
   # By default, Devise cleans up the CSRF token on authentication to
   # avoid CSRF token fixation attacks. This means that, when using AJAX

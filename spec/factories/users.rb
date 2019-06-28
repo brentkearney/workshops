@@ -12,6 +12,7 @@ FactoryBot.define do
     f.password_confirmation { password }
     f.confirmed_at { Time.now }
     f.location { 'EO' }
+    f.jti { SecureRandom.uuid }
 
     trait :staff do
       role { 'staff' }

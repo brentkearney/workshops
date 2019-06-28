@@ -82,6 +82,7 @@ Rails.application.routes.draw do
       get 'lectures_last/:room' => 'lectures#last', as: :lectures_last
       post 'events' => 'events#create'
       post 'events/sync' => 'events#sync'
+      # mount_devise_token_auth_for 'User', at: 'auth'
     end
   end
 

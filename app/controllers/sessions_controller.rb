@@ -12,19 +12,20 @@ class SessionsController < Devise::SessionsController
     self.resource = warden.authenticate!(auth_options)
 
     if self.resource.person_id.nil?
-      set_flash_message(:error, :has_no_person_record)
       StaffMailer.notify_sysadmin(nil, { error: 'User has no associated person record', user: resource.inspect })
-      sign_out(resource)
-      respond_to_on_destroy
+      self.destroy
+      set_flash_message(:error, :has_no_person_record)
     elsif self.resource.role == 'member' && inactive_participant(resource)
+      self.destroy
       set_flash_message(:error, :has_no_memberships)
-      sign_out(resource)
-      respond_to_on_destroy
     else
       set_flash_message!(:notice, :signed_in)
       sign_in(resource_name, resource)
       yield resource if block_given?
-      respond_with resource, location: after_sign_in_path_for(resource)
+      respond_with resource, location: after_sign_in_path_for(resource) do |format|
+        #format.json {render json: resource }
+        format.json {render json: { success: true, jwt: current_token, response: "Authentication successful" }}
+      end
     end
   end
 
@@ -33,5 +34,9 @@ class SessionsController < Devise::SessionsController
   def inactive_participant(resource)
     # do you have any memberships where you're either an organizer or NOT not-invited or declined?
     self.resource.person.memberships.where("role LIKE '%Organizer%' OR (attendance != 'Not Yet Invited' AND attendance != 'Declined')").blank?
+  end
+
+  def current_token
+    request.env['warden-jwt_auth.token']
   end
 end

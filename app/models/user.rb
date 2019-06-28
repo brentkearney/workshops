@@ -1,15 +1,17 @@
 # app/models/user.rb
 #
-# Copyright (c) 2018 Banff International Research Station.
+# Copyright (c) 2019 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
 class User < ApplicationRecord
+  include Devise::JWT::RevocationStrategies::JTIMatcher
   devise :registerable, :database_authenticatable,
          :recoverable, :rememberable, :trackable, :validatable,
-         :lockable, :confirmable, :invitable
+         :lockable, :confirmable, :invitable,
+         :jwt_authenticatable, jwt_revocation_strategy: self
 
   validates :email, presence: true, email: true
   validates :person, presence: true
@@ -18,10 +20,11 @@ class User < ApplicationRecord
   belongs_to :person, inverse_of: :user
 
   enum role: [:member, :staff, :admin, :super_admin]
-  after_initialize :set_default_role, if: :new_record?
+  after_initialize :set_defaults, if: :new_record?
 
-  def set_default_role
+  def set_defaults
     role ||= :member
+    jti ||= SecureRandom.uuid
   end
 
   def is_admin?
@@ -49,6 +52,12 @@ class User < ApplicationRecord
 
   def name
     person.name
+  end
+
+  def generate_jwt
+    JWT.encode({ id: id,
+                exp: 60.days.from_now.to_i },
+               Rails.env.devise.jwt.secret_key)
   end
 
 end
