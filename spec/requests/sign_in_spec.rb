@@ -11,14 +11,13 @@ RSpec.describe 'Sign-in', type: :request do
 
   before do
     @user = create(:user)
-    event = create(:event)
-    create(:membership, event: event, person: @user.person)
+    @event = create(:event_with_members)
+    create(:membership, event: @event, person: @user.person)
 
     headers = {'Accept' => 'application/json',
       'Content-Type' => 'application/json'
     }
     @params = {
-      auth_headers: Devise::JWT::TestHelpers.auth_headers(headers, @user),
       user: {
         email: @user.email,
         password: @user.password
@@ -28,19 +27,21 @@ RSpec.describe 'Sign-in', type: :request do
 
   context 'Without auth_headers' do
     it 'provides Authorization token with valid credentials' do
+      # 'Accept' => 'application/json',
+      # 'Content-Type' => 'application/json',
       params = {
-        'Accept' => 'application/json',
-        'Content-Type' => 'application/json',
         user: {
           email: @user.email,
-          password: @user.password
+          password: 'foo' + @user.password
         }
       }
       post url, params: params
 
-      puts "\nparams: #{@params.inspect}\n"
+      puts "\nparams: #{@response.pretty_inspect}\n"
+      puts "\nresponse.request.methods: #{@response.request.methods}\n"
 
-      expect(response.header['Authorization']).to match(/Bearer/)
+
+      expect(response.cookies['_workshops_session']).not_to be_nil
     end
 
     it 'does not provide Authorization token with invalid credentials' do

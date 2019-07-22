@@ -8,9 +8,7 @@
 
 class ApiUser < User
   include Devise::JWT::RevocationStrategies::JTIMatcher
-  devise :database_authenticatable,
-         :recoverable, :rememberable, :trackable, :validatable,
-         :lockable, :jwt_authenticatable, jwt_revocation_strategy: self
+  devise :jwt_authenticatable, jwt_revocation_strategy: self
 
   validates :jti, presence: true
   validate :staff?

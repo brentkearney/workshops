@@ -7,8 +7,11 @@
 class SessionsController < Devise::SessionsController
   respond_to :html
 
-  # POST /resource/sign_in
+  # POST /sign_in
   def create
+    Rails.logger.debug "\n\nRequest format: #{request.format}\n"
+    Rails.logger.debug "\nParams: #{params.inspect}\n"
+
     self.resource = warden.authenticate!(auth_options)
 
     if self.resource.person_id.nil?

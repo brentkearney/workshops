@@ -6,10 +6,7 @@ Warden::JWTAuth.configure do |config|
                                ['POST', %r{^/api/login\.json$}]
                              ]
   config.revocation_requests = [
-                                 ['DELETE', %r{^/logout$}],
-                                 ['DELETE', %r{^/logout\.json$}]
+                                 ['DELETE', %r{^/api/logout$}],
+                                 ['DELETE', %r{^/api/logout\.json$}]
                                ]
-   # TODO: authorize scope :api_user for staff users only
-   # from log: Attempting to authenticate with {:scope=>:api_user, :recall=>"api/sessions#new"}...
-
 end

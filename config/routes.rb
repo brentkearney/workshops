@@ -4,11 +4,11 @@ Rails.application.routes.draw do
   # Devise (login/logout)
   devise_for :users, defaults: { format: :html },
                          path: '',
-                   path_names: { sign_up: 'register' }
+                   path_names: { sign_up: 'register' },
+                  controllers: { sessions: 'sessions' }
   devise_scope :user do
     get 'sign_in', to: 'devise/sessions#new'
     get 'register', to: 'devise/registrations#new'
-    # get 'register', to: 'devise/registrations#new', as: :new_api_user_registration
     delete 'sign_out', to: 'devise/sessions#destroy'
     get 'confirmation/sent', to: 'confirmations#sent'
     patch 'users/confirmation', to: 'confirmations#create'

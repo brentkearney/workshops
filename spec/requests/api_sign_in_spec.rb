@@ -64,14 +64,16 @@ RSpec.describe 'API Sign-in', type: :request do
         'Accept' => 'application/json'
       }
 
-      puts "new params: #{auth_headers.inspect}\n"
       memberships_url = event_memberships_url(@event) + '.json'
       get memberships_url, params: {}, headers: auth_headers
-      puts "\nResponse from 'get #{memberships_url}':\n#{response.pretty_inspect}\n\n"
+
       expect(response.status).to eq(200)
+      member = @event.memberships.first
+      expect(response.body).to include(member.staff_notes)
+      expect(response.body).to include(member.person.email)
     end
 
-    it 'does not provide Authorization token for non-staff users' do
+    it 'does not provide access for non-staff users' do
       @user.member!
       params = {
         'Accept' => 'application/json',
@@ -83,8 +85,18 @@ RSpec.describe 'API Sign-in', type: :request do
       }
       post url, params: params
 
-      # puts "\n#{response.header.pretty_inspect}\n"
-      expect(response.header['Authorization']).to be_nil
+      auth_token = response.header['Authorization']
+      auth_headers = {
+        'Authorization' => auth_token,
+        'Accept' => 'application/json'
+      }
+
+      memberships_url = event_memberships_url(@event) + '.json'
+      get memberships_url, params: {}, headers: auth_headers
+
+      expect(response.status).to eq(302)
+      member = @event.memberships.first
+      expect(response.body).not_to include(member.person.email)
 
       @user.staff!
     end
