@@ -7,20 +7,17 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class User < ApplicationRecord
-  include Devise::JWT::RevocationStrategies::JTIMatcher
   devise :registerable, :database_authenticatable,
          :recoverable, :rememberable, :trackable, :validatable,
-         :lockable, :confirmable, :invitable,
-         :jwt_authenticatable, jwt_revocation_strategy: self
+         :lockable, :confirmable, :invitable
 
   validates :email, presence: true, email: true
   validates :person, presence: true
   validates :location, presence: true, if: :staff?
-
+  before_create :set_defaults
   belongs_to :person, inverse_of: :user
-
   enum role: [:member, :staff, :admin, :super_admin]
-  after_initialize :set_defaults, if: :new_record?
+
 
   def set_defaults
     role ||= :member
@@ -53,11 +50,4 @@ class User < ApplicationRecord
   def name
     person.name
   end
-
-  def generate_jwt
-    JWT.encode({ id: id,
-                exp: 5.days.from_now.to_i },
-               Rails.env.devise.jwt.secret_key)
-  end
-
 end

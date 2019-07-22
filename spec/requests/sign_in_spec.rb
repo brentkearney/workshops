@@ -38,6 +38,8 @@ RSpec.describe 'Sign-in', type: :request do
       }
       post url, params: params
 
+      puts "\nparams: #{@params.inspect}\n"
+
       expect(response.header['Authorization']).to match(/Bearer/)
     end
 

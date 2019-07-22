@@ -6,7 +6,8 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class MembershipsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, unless: :json_request?
+  before_action :authenticate_api_user!, if: :json_request?
   before_action :set_event, :set_user
   before_action :set_membership, except: [:index, :new, :create, :add,
     :process_new]
@@ -14,6 +15,9 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
   def index
+    Rails.logger.debug "\n\nRequest format: #{request.format}\n"
+    Rails.logger.debug "\nParams: #{params.inspect}\n"
+
     SyncMembers.new(@event) if policy(@event).sync?
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)

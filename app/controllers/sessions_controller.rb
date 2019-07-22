@@ -5,7 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class SessionsController < Devise::SessionsController
-  respond_to :json
+  respond_to :html
 
   # POST /resource/sign_in
   def create
@@ -22,10 +22,7 @@ class SessionsController < Devise::SessionsController
       set_flash_message!(:notice, :signed_in)
       sign_in(resource_name, resource)
       yield resource if block_given?
-      respond_with resource, location: after_sign_in_path_for(resource) do |format|
-        #format.json {render json: resource }
-        format.json {render json: { success: true, jwt: current_token, response: "Authentication successful" }}
-      end
+      respond_with resource, location: after_sign_in_path_for(resource)
     end
   end
 
@@ -34,9 +31,5 @@ class SessionsController < Devise::SessionsController
   def inactive_participant(resource)
     # do you have any memberships where you're either an organizer or NOT not-invited or declined?
     self.resource.person.memberships.where("role LIKE '%Organizer%' OR (attendance != 'Not Yet Invited' AND attendance != 'Declined')").blank?
-  end
-
-  def current_token
-    request.env['warden-jwt_auth.token']
   end
 end
