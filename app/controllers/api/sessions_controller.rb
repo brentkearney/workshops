@@ -5,6 +5,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Api::SessionsController < Devise::SessionsController
+  skip_before_action :verify_signed_out_user
   respond_to :json
 
   # POST /api/login
@@ -22,7 +23,6 @@ class Api::SessionsController < Devise::SessionsController
 
     if resource.staff?
       sign_in(resource_name, resource)
-      yield resource if block_given?
       respond_with resource, location: after_sign_in_path_for(resource) do |format|
         format.json { render json: { success: true, jwt: current_token,
                                     response: "Authentication successful" } }
@@ -32,6 +32,20 @@ class Api::SessionsController < Devise::SessionsController
       sign_out(resource)
       render status: 401, json: { message: "Staff access only." } and return
     end
+  end
+
+  # DELETE /api/logout
+  def destroy
+    token = params['Authorization'].split('Bearer ').last
+    secret = ENV['DEVISE_JWT_SECRET_KEY']
+    u = JWT.decode(token, secret, true, algorithm: 'HS256', verify_jti: true)[0]
+    user = ApiUser.find_by_jti(u['jti'])
+
+    super if user.blank?
+    revoke_token(user)
+    sign_out(user)
+    set_flash_message!(:success, :signed_out)
+    render status: 200, json: { message: "Signed out." }
   end
 
   private
