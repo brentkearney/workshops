@@ -46,7 +46,7 @@ describe 'Events Admin Dashboard', type: :feature do
     end
 
     it "should redirect to root path" do
-      expect(page).to have_current_path('/users/sign_in')
+      expect(page).to have_current_path(sign_in_path)
       expect(page).to have_content("You need to sign in or sign up before continuing")
     end
   end

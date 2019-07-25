@@ -5,10 +5,15 @@ Rails.application.routes.draw do
   devise_for :users, defaults: { format: :html },
                          path: '',
                    path_names: { sign_up: 'register' },
-                  controllers: { sessions: 'sessions' }
+                  controllers: {
+                    sessions: 'sessions',
+                    registrations: 'registrations',
+                    confirmations: 'confirmations'
+                  }
   devise_scope :user do
     get 'sign_in', to: 'devise/sessions#new'
     get 'register', to: 'devise/registrations#new'
+    post 'register', to: 'devise/registrations#create'
     delete 'sign_out', to: 'devise/sessions#destroy'
     get 'confirmation/sent', to: 'confirmations#sent'
     patch 'users/confirmation', to: 'confirmations#create'

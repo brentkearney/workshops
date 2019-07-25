@@ -20,8 +20,8 @@ class User < ApplicationRecord
 
 
   def set_defaults
-    role ||= :member
-    jti ||= SecureRandom.uuid
+    self.role ||= :member
+    self.jti ||= SecureRandom.uuid
   end
 
   def is_admin?

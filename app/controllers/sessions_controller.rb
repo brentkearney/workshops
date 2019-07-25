@@ -9,9 +9,6 @@ class SessionsController < Devise::SessionsController
 
   # POST /sign_in
   def create
-    Rails.logger.debug "\n\nRequest format: #{request.format}\n"
-    Rails.logger.debug "\nParams: #{params.inspect}\n"
-
     self.resource = warden.authenticate!(auth_options)
 
     if self.resource.person_id.nil?

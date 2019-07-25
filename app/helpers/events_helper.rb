@@ -22,6 +22,7 @@ module EventsHelper
 
   def event_list_title
     title = ''
+    return title if controller_name == 'registrations'
     case request.path
     when '/events'
       title = 'All'

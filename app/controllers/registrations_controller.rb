@@ -5,27 +5,19 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RegistrationsController < Devise::RegistrationsController
-
   def create
-    if valid_email?
-      person = Person.find_by_email(user_email)
-      if person.nil?
-        redirect_to register_path, error: 'We have no record of that email address. Please check our correspondence with you, to see what email address is in the To: field.'
-      else
-        membership = person.memberships.where("(role LIKE '%Org%') OR
-                                          (attendance != 'Not Yet Invited' AND
-                                           attendance != 'Declined')").first
-        if membership.nil?
-          redirect_to register_path, error: 'We have no records of pending event invitations for you. Please contact the event organizer.'
-        else
-          params[:user][:person_id] = person.id
-          super
-        end
-      end
-    else
-      redirect_to register_path, error: 'You must enter a valid e-mail address.'
-    end
+    invalid_email_redirect and return unless valid_email?
+    person = Person.find_by_email(user_email)
+    no_person_redirect and return if person.blank?
+
+    membership = person.memberships.where("(role LIKE '%Org%') OR
+          (attendance != 'Not Yet Invited' AND attendance != 'Declined')").first
+    not_invited_redirect and return if membership.blank?
+
+    params[:user][:person_id] = person.id
+    super
   end
+
 
   protected
 
@@ -34,6 +26,18 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   private
+
+  def not_invited_redirect
+    redirect_to register_path, error: 'We have no records of pending event invitations for you. Please contact the event organizer.'
+  end
+
+  def no_person_redirect
+    redirect_to register_path, error: 'We have no record of that email address. Please check our correspondence with you, to see what email address is in the To: field.'
+  end
+
+  def invalid_email_redirect
+    redirect_to register_path, error: 'You must enter a valid e-mail address.'
+  end
 
   def sign_up_params
     params.require(:user).permit(:person_id, :email, :password, :password_confirmation)

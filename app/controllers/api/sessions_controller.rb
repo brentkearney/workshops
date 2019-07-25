@@ -36,19 +36,21 @@ class Api::SessionsController < Devise::SessionsController
 
   # DELETE /api/logout
   def destroy
-    token = params['Authorization'].split('Bearer ').last
-    secret = ENV['DEVISE_JWT_SECRET_KEY']
-    u = JWT.decode(token, secret, true, algorithm: 'HS256', verify_jti: true)[0]
-    user = ApiUser.find_by_jti(u['jti'])
-
-    super if user.blank?
+    super and return if params['Authorization'].blank?
+    user = ApiUser.find_by_jti(decode_token)
+    super and return if user.blank?
     revoke_token(user)
-    sign_out(user)
-    set_flash_message!(:success, :signed_out)
-    render status: 200, json: { message: "Signed out." }
+    super
   end
 
   private
+
+  def decode_token
+    token = params['Authorization'].split('Bearer ').last
+    secret = ENV['DEVISE_JWT_SECRET_KEY']
+    JWT.decode(token, secret, true, algorithm: 'HS256',
+      verify_jti: true)[0]['jti']
+  end
 
   def revoke_token(user)
     user.update_column(:jti, generate_jti)

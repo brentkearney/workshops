@@ -85,15 +85,15 @@ RSpec.describe 'API Sign-in', type: :request do
     expect(response.body).to include(member.person.email)
   end
 
-  it 'does not provide access for non-staff users' do
+  it 'does not provide access to personal info for non-staff users' do
     @user.member!
 
     memberships_url = event_memberships_url(@event) + '.json'
     get memberships_url, params: {}, headers: auth_headers
 
-    expect(response.status).to eq(302)
     member = @event.memberships.first
     expect(response.body).not_to include(member.person.email)
+    expect(response.body).to include(member.person.name)
 
     @user.staff!
   end
@@ -101,9 +101,6 @@ RSpec.describe 'API Sign-in', type: :request do
   it 'logout destroys auth token and denies further access' do
     headers = auth_headers
     delete api_logout_path, params: headers
-
-    expect(response.status).to eq(200)
-    expect(response.body).to include("Signed out")
 
     memberships_url = event_memberships_url(@event) + '.json'
     get memberships_url, params: {}, headers: headers
