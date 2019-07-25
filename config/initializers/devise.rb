@@ -15,7 +15,7 @@ Devise.setup do |config|
     jwt.dispatch_requests = [ ['POST', %r{^/api/login$}], ['POST', %r{^/api/login.json$}] ]
     jwt.revocation_requests = [ ['DELETE', %r{^/api/logout$}], ['DELETE', %r{^/api/logout.json$}] ]
     jwt.expiration_time = 1.day.to_i
-    jwt.request_formats = { user: [:html], api_user: [nil, :json] }
+    jwt.request_formats = { api_user: [nil, :json] }
   end
 
   # ==> Mailer Configuration

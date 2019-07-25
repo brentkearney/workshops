@@ -7,15 +7,12 @@
 require 'rails_helper'
 
 RSpec.describe 'API Sign-in', type: :request do
-  let(:url) { '/api/login' }
+  let(:url) { new_api_user_session_path }
 
   before do
     @user = create(:user, role: :staff)
     @event = create(:event_with_members)
-  end
-
-  def auth_headers
-    params = {
+    @valid_params = {
       'Accept' => 'application/json',
       'Content-Type' => 'application/json',
       api_user: {
@@ -23,24 +20,19 @@ RSpec.describe 'API Sign-in', type: :request do
         password: @user.password
       }
     }
-    post url, params: params
-
-    auth_token = response.header['Authorization']
-    auth_headers = {
-      'Authorization' => auth_token,
-      'Accept' => 'application/json'
-    }
   end
 
-  it 'rejects html requests' do
-    params = {
+  it 'returns an Authorization token, given valid credentials' do
+    post url, params: @valid_params
+
+    expect(response.header['Authorization']).to match(/Bearer/)
+  end
+
+  it 'does not return an Authorization token for html requests' do
+    params = @valid_params.merge(
       'Accept' => 'text/html',
       'Content-Type' => 'text/html',
-      user: {
-        email: @user.email,
-        password: @user.password
-      }
-    }
+    )
 
     post '/api/login.html', params: params
 
@@ -49,65 +41,13 @@ RSpec.describe 'API Sign-in', type: :request do
   end
 
   it 'does not provide Authorization token with invalid credentials' do
-    params = {
-      'Accept' => 'application/json',
-      'Content-Type' => 'application/json',
+    params = @valid_params.merge(
       api_user: {
-        email: @user.email,
         password: 'foo'
       }
-    }
+    )
     post url, params: params
     expect(response.header['Authorization']).to be_blank
-  end
-
-  it 'Given valid credentials, returns an Authorization token' do
-    params = {
-      'Accept' => 'application/json',
-      'Content-Type' => 'application/json',
-      api_user: {
-        email: @user.email,
-        password: @user.password
-      }
-    }
-    post url, params: params
-
-    expect(response.header['Authorization']).to match(/Bearer/)
-  end
-
-  it 'Authorization token can be used to access protected resources' do
-    memberships_url = event_memberships_url(@event) + '.json'
-    get memberships_url, params: {}, headers: auth_headers
-
-    expect(response.status).to eq(200)
-    member = @event.memberships.first
-    expect(response.body).to include(member.staff_notes)
-    expect(response.body).to include(member.person.email)
-  end
-
-  it 'does not provide access to personal info for non-staff users' do
-    @user.member!
-
-    memberships_url = event_memberships_url(@event) + '.json'
-    get memberships_url, params: {}, headers: auth_headers
-
-    member = @event.memberships.first
-    expect(response.body).not_to include(member.person.email)
-    expect(response.body).to include(member.person.name)
-
-    @user.staff!
-  end
-
-  it 'logout destroys auth token and denies further access' do
-    headers = auth_headers
-    delete api_logout_path, params: headers
-
-    memberships_url = event_memberships_url(@event) + '.json'
-    get memberships_url, params: {}, headers: headers
-
-    expect(response.status).to eq(302)
-    member = @event.memberships.first
-    expect(response.body).not_to include(member.person.email)
   end
 end
 

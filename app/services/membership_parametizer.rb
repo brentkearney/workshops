@@ -45,6 +45,7 @@ class MembershipParametizer
     person = Person.find(@membership.person_id)
     person.assign_attributes(@person_data)
     return unless person.changed?
+    @person_data = person.attributes
     data_massage
     @membership.update_remote = true
     @form_data['person_attributes'] = @person_data
@@ -58,7 +59,7 @@ class MembershipParametizer
   end
 
   def email_update
-    new_email = @person_data.delete(:email)
+    new_email = @person_data.delete('email')
     sync = SyncPerson.new(@membership.person, new_email)
     if sync.has_conflict?
       create_email_change_confirmation(sync) ||
@@ -94,8 +95,8 @@ class MembershipParametizer
   end
 
   def update_gender?
-    if person_data['gender'].nil? || !policy(@membership).edit_personal_info?
-      person_data['gender'] = Person.find(@membership.person_id).gender
+    if @person_data['gender'].blank? || !policy(@membership).edit_personal_info?
+      @person_data['gender'] = Person.find(@membership.person_id).gender
     end
   end
 

@@ -15,9 +15,6 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
   def index
-    Rails.logger.debug "\n\nRequest format: #{request.format}\n"
-    Rails.logger.debug "\nParams: #{params.inspect}\n"
-
     SyncMembers.new(@event) if policy(@event).sync?
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
@@ -91,6 +88,7 @@ class MembershipsController < ApplicationController
     authorize @membership
     member_params = MembershipParametizer.new(@membership, membership_params,
                                               @current_user)
+
     respond_to do |format|
       if @membership.update(member_params.data)
         format.html do
