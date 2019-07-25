@@ -18,10 +18,8 @@ describe 'Post-login Welcome Page', type: :feature do
   end
 
   def sign_in_as(user)
-    visit sign_in_path
-    fill_in 'Email', with: user.email
-    fill_in 'Password', with: 'secret123456'
-    click_button 'Sign in'
+    login_as user, scope: :user
+    visit welcome_path
   end
 
   def expect_current_and_upcoming
@@ -48,12 +46,6 @@ describe 'Post-login Welcome Page', type: :feature do
 
     after(:each) do
       @user.logout
-    end
-
-    it 'redirects to the welcome path' do
-      sign_in_as @user
-
-      expect(current_path).to eq(welcome_path)
     end
 
     it "shows the user's current and upcoming workshops" do
@@ -114,6 +106,18 @@ describe 'Post-login Welcome Page', type: :feature do
       expect(page.body).not_to include("#{membership.event.name}")
 
       membership.destroy!
+    end
+
+    it 'forwards users with no current events to Future Events' do
+      @user.member!
+      @user.person.memberships.destroy_all
+      event = create(:event, past: true)
+      create(:membership, person: @user.person, event: event,
+         attendance: 'Confirmed')
+
+      sign_in_as @user
+
+      expect(current_path).to eq(events_future_path)
     end
   end
 

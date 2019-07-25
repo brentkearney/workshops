@@ -57,6 +57,7 @@ RUN rm Dockerfile
 RUN touch config/app.yml
 RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
 RUN chown app -R ./
+RUN echo 'PATH=$PATH:./bin' >> ~/.bash_profile
 
 EXPOSE 80 443
 ADD entrypoint.sh /sbin/

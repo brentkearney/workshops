@@ -28,7 +28,7 @@ en:
       success: "Successfully authenticated from %{kind} account."
     passwords:
       no_token: "You can't access this page without coming from a password reset email. If you do come from a password reset email, please make sure you used the full URL provided."
-      send_instructions: "You will receive an email with instructions on how to reset your password in a few minutes."
+      send_instructions: "We sent you an email with a link to reset your password. Please check spam/junk folders if it isn't in your Inbox."
       send_paranoid_instructions: "If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes."
       updated: "Your password has been changed successfully. You are now signed in."
       updated_not_active: "Your password has been changed successfully."
@@ -46,6 +46,8 @@ en:
       already_signed_out: "Signed out successfully."
       has_no_person_record: 'This account has no associated person record.'
       has_no_memberships: 'This account is not associated to any events.'
+      api_user:
+        staff_only: 'Only staff accounts allowed API access.'
     unlocks:
       send_instructions: "You will receive an email (check spam/junk mail folders) with instructions for how to unlock your account in a few minutes."
       send_paranoid_instructions: "If your account exists, you will receive an email with instructions for how to unlock it in a few minutes."

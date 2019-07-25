@@ -2,17 +2,21 @@ Rails.application.routes.draw do
   root 'welcome#index'
 
   # Devise (login/logout)
-  devise_for :users, path_names: { sign_up: 'register', sign_in: 'sign_in' },
-                     controllers: { registrations: 'registrations',
-                                    sessions: 'sessions',
-                                    confirmations: 'confirmations' }
-
+  devise_for :users, defaults: { format: :html },
+                         path: '',
+                   path_names: { sign_up: 'register' },
+                  controllers: {
+                    sessions: 'sessions',
+                    registrations: 'registrations',
+                    confirmations: 'confirmations'
+                  }
   devise_scope :user do
-    get 'sign_in' => 'devise/sessions#new'
-    get 'register' => 'devise/registrations#new'
-    delete 'sign_out' => 'devise/sessions#destroy'
-    get 'confirmation/sent' => 'confirmations#sent'
-    patch 'users/confirmation' => 'confirmations#create'
+    get 'sign_in', to: 'devise/sessions#new'
+    get 'register', to: 'devise/registrations#new'
+    post 'register', to: 'devise/registrations#create'
+    delete 'sign_out', to: 'devise/sessions#destroy'
+    get 'confirmation/sent', to: 'confirmations#sent'
+    patch 'users/confirmation', to: 'confirmations#create'
   end
 
   # Post-login welcome page
@@ -72,6 +76,15 @@ Rails.application.routes.draw do
 
   # API
   namespace :api do
+    devise_for :users, defaults: { format: :json }, class_name: 'ApiUser',
+                           skip: [:registrations, :invitations, :passwords, :confirmations, :unlocks],
+                           path: '', path_names: { sign_in: 'login', sign_out: 'logout' }
+
+    devise_scope :user do
+      get 'login', to: 'devise/sessions#new'
+      delete 'logout', to: 'devise/sessions#destroy'
+    end
+
     namespace :v1 do
       patch 'lectures' => 'lectures#update'
       put 'lectures' => 'lectures#update'

@@ -6,7 +6,8 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class MembershipsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, unless: :json_request?
+  before_action :authenticate_api_user!, if: :json_request?
   before_action :set_event, :set_user
   before_action :set_membership, except: [:index, :new, :create, :add,
     :process_new]
@@ -87,6 +88,7 @@ class MembershipsController < ApplicationController
     authorize @membership
     member_params = MembershipParametizer.new(@membership, membership_params,
                                               @current_user)
+
     respond_to do |format|
       if @membership.update(member_params.data)
         format.html do

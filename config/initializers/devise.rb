@@ -6,8 +6,17 @@ Devise.setup do |config|
   # confirmation, reset password and unlock tokens in the database.
   # Devise will use the `secret_key_base` on Rails 4+ applications as its `secret_key`
   # by default. You can change it below and use your own secret key.
-  # config.secret_key = '4f6f0ca69ee14d956c408ec00af4ef3723dae4d112aed95fcf9984e20e6b4ce0739928b319d994d575640405ec09d6a3b74289d73b16dad7237ff4a00ed72272'
+  # config.secret_key = 'Example: 09d6a3b74289d73b16dad7237ff4a00ed72272...'
   config.secret_key = ENV['DEVISE_SECRET_KEY']
+
+  # https://github.com/waiting-for-dev/devise-jwt
+  config.jwt do |jwt|
+    jwt.secret = ENV['DEVISE_JWT_SECRET_KEY']
+    jwt.dispatch_requests = [ ['POST', %r{^/api/login$}], ['POST', %r{^/api/login.json$}] ]
+    jwt.revocation_requests = [ ['DELETE', %r{^/api/logout$}], ['DELETE', %r{^/api/logout.json$}] ]
+    jwt.expiration_time = 1.day.to_i
+    jwt.request_formats = { api_user: [nil, :json] }
+  end
 
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
@@ -80,7 +89,7 @@ Devise.setup do |config|
   # Notice that if you are skipping storage for all authentication paths, you
   # may want to disable generating routes to Devise's sessions controller by
   # passing skip: :sessions to `devise_for` in your config/routes.rb
-  config.skip_session_storage = [:http_auth]
+  config.skip_session_storage = [:http_auth] #, :params_auth]
 
   # By default, Devise cleans up the CSRF token on authentication to
   # avoid CSRF token fixation attacks. This means that, when using AJAX
@@ -276,7 +285,7 @@ Devise.setup do |config|
   # should add them to the navigational formats lists.
   #
   # The "*/*" below is required to match Internet Explorer requests.
-  config.navigational_formats = ['*/*', :html]
+  config.navigational_formats = ['*/*', :html, :json]
 
   # The default HTTP method used to sign out a resource. Default is :delete.
   config.sign_out_via = :delete
@@ -293,6 +302,11 @@ Devise.setup do |config|
   # config.warden do |manager|
   #   manager.intercept_401 = false
   #   manager.default_strategies(scope: :user).unshift :some_external_strategy
+  # end
+
+  # Only give auth tokens to certain users
+  # config.warden do |manager|
+  #   manager.default_stategies(scope: :api_user).unshift :api_login_strategy
   # end
 
   # ==> Mountable engine configurations

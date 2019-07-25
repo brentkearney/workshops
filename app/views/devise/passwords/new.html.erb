@@ -1,14 +1,14 @@
 <div class="authform">
-  <%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :post, :role => 'form'}) do |f| %>
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, role: 'form' }) do |f| %>
       <h3>Password Reset</h3>
       <p>Enter your email address:</p>
-      <%= devise_error_messages! %>
+      <%= render "devise/shared/error_messages", resource: resource %>
       <div class="well well-sm ">
         <%= f.label :email %>
         <div class="form-group">
-        <%= f.email_field :email, :autofocus => true, class: 'form-control' %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'form-control' %>
         </div>
-      <%= f.submit 'Reset Password', :class => 'button right' %>
+      <%= f.submit 'Reset Password', class: 'button right' %>
       </div>
   <% end %>
 </div>

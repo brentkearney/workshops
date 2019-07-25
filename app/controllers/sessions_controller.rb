@@ -5,21 +5,19 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class SessionsController < Devise::SessionsController
-  respond_to :json
+  respond_to :html
 
-  # POST /resource/sign_in
+  # POST /sign_in
   def create
     self.resource = warden.authenticate!(auth_options)
 
     if self.resource.person_id.nil?
-      set_flash_message(:error, :has_no_person_record)
       StaffMailer.notify_sysadmin(nil, { error: 'User has no associated person record', user: resource.inspect })
-      sign_out(resource)
-      respond_to_on_destroy
+      self.destroy
+      set_flash_message(:error, :has_no_person_record)
     elsif self.resource.role == 'member' && inactive_participant(resource)
+      self.destroy
       set_flash_message(:error, :has_no_memberships)
-      sign_out(resource)
-      respond_to_on_destroy
     else
       set_flash_message!(:notice, :signed_in)
       sign_in(resource_name, resource)

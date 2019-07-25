@@ -1,12 +1,12 @@
 <div class="authform">
-  <%= form_for(resource, :as => resource_name, :url => confirmation_path(resource_name), :html => { :role => 'form'}) do |f| %>
+  <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, role: 'form' }) do |f| %>
       <h3>E-mail Validation</h3>
-      <%= devise_error_messages! %>
+      <%= render "devise/shared/error_messages", resource: resource %>
       <div class="form-group">
         <%= f.label :email %>
-        <%= f.email_field :email, autofocus: true, value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email), class: 'form-control' %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email), class: 'form-control' %>
       </div>
-      <%= f.submit 'Confirm e-mail address', :class => 'button right' %>
+      <%= f.submit 'Confirm e-mail address', class: 'button right' %>
   <% end %>
 </div>
 

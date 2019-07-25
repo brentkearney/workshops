@@ -35,6 +35,7 @@ gem 'rack-cors', require: 'rack/cors'
 gem 'listen'
 gem 'bootsnap'
 gem 'administrate'
+gem 'devise-jwt', '~> 0.5.9'
 
 group :development, :test do
   gem 'byebug'

@@ -91,6 +91,7 @@ class EventPolicy
   end
 
   def show_email_buttons?(status)
+    return false if current_user.nil?
     return true if organizers_and_staff
     status == 'Confirmed' && current_user.is_confirmed_member?(event)
   end

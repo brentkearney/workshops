@@ -1,6 +1,6 @@
 # app/models/user.rb
 #
-# Copyright (c) 2018 Banff International Research Station.
+# Copyright (c) 2019 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.
@@ -14,14 +14,14 @@ class User < ApplicationRecord
   validates :email, presence: true, email: true
   validates :person, presence: true
   validates :location, presence: true, if: :staff?
-
+  before_create :set_defaults
   belongs_to :person, inverse_of: :user
-
   enum role: [:member, :staff, :admin, :super_admin]
-  after_initialize :set_default_role, if: :new_record?
 
-  def set_default_role
-    role ||= :member
+
+  def set_defaults
+    self.role ||= :member
+    self.jti ||= SecureRandom.uuid
   end
 
   def is_admin?
@@ -50,5 +50,4 @@ class User < ApplicationRecord
   def name
     person.name
   end
-
 end

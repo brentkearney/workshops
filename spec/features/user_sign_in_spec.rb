@@ -8,18 +8,11 @@ require 'rails_helper'
 
 describe 'SignIn', type: :feature do
   before do
-    @person = create(:person)
     @password = Faker::Internet.password(12)
-    @user = create(:user, password: @password, password_confirmation:
-      @password, person: @person)
-    @user.confirmed_at = Time.now
-    @user.save
-    expect(@user).to be_valid
-    expect(@user.person).to eq(@person)
-
-    @event = create(:event)
-    @membership = create(:membership, event: @event, person: @person,
-                                      attendance: 'Invited')
+    @user = create(:user, password: @password, password_confirmation: @password)
+    @person = @user.person
+    @membership = create(:membership, person: @person, attendance: 'Confirmed')
+    @event = @membership.event
   end
 
   before :each do
@@ -28,13 +21,14 @@ describe 'SignIn', type: :feature do
   end
 
   def fill_in_form
-    fill_in 'Email', with: @user.email
-    fill_in 'Password', with: @password
+    fill_in 'user_email', with: @user.email
+    fill_in 'user_password', with: @password
     click_button 'Sign in'
   end
 
   it 'Allows a user to login with email and password' do
     fill_in_form
+    # puts page.body
     expect(page.body).to have_text('Signed in successfully')
   end
 
@@ -126,4 +120,3 @@ describe 'SignIn', type: :feature do
     expect(current_path).to eq(events_future_path)
   end
 end
-
