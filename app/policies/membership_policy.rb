@@ -67,13 +67,14 @@ class MembershipPolicy
     [:id, :event_id, :person_id, :share_email, :role, :attendance,
      :arrival_date, :departure_date, :reviewed, :billing, :room, :room_notes,
      :special_info, :staff_notes, :org_notes, :own_accommodation, :has_guest,
-     :guest_disclaimer, :share_email, :share_email_hotel,
+     :guest_disclaimer, :share_email, :share_email_hotel, :updated_by,
+     :updated_at, :invited_on, :invited_by,
      person_attributes: [:salutation, :firstname, :lastname, :email, :phone,
                          :gender, :affiliation, :department, :title, :url,
                          :academic_status, :research_areas, :biography, :id,
                          :address1, :address2, :address3, :city, :region,
                          :postal_code, :country, :phd_year, :emergency_contact,
-                         :emergency_phone, :grant_id]]
+                         :emergency_phone, :grant_id, :updated_by, :updated_at]]
   end
 
   def attendance_options

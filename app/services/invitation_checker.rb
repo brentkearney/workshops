@@ -45,17 +45,31 @@ class InvitationChecker
     check_response_errors(response)
     return if @errors.any?
 
-    event = Event.find(response['event_code'])
-    @errors.add(:Event, 'Error finding event record') and return if event.nil?
-    SyncEventMembersJob.perform_now(event.id) if event.start_date > Date.current
+    sync_event_members(response['event_code'])
+    person = find_person(response['legacy_id'].to_i) || return
+    membership = find_membership(person, event) || return
+    create_local_invitation(membership)
+  end
 
-    prsn = Person.where(legacy_id: response['legacy_id'].to_i).first
-    @errors.add(:Person, 'Error finding person record') and return if prsn.nil?
-
+  def find_membership(prsn, event)
     mbr = Membership.where(person: prsn, event: event).first
-    @errors.add(:Membership, 'Error finding membership') and return if mbr.nil?
+    @errors.add(:Membership, 'Error finding membership') if mbr.nil?
+    mbr
+  end
 
-    create_local_invitation(mbr)
+  def find_person(person_id)
+    prsn = Person.where(legacy_id: person_id).first ||
+      @errors.add(:Person, 'Error finding person record')
+    prsn
+  end
+
+  def sync_event_members(event_code)
+    event = Event.find(event_code)
+    if event.nil?
+      @errors.add(:Event, 'Error finding event record')
+    elsif event.start_date > Date.current
+      SyncEventMembersJob.perform_now(event.id)
+    end
   end
 
   def validate(invitation)
