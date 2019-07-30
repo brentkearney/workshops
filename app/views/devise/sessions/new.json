@@ -1,1 +1,8 @@
-
+{
+  login_format: {
+    api_user: {
+      email: user@email.edu,
+      password: *******************
+    }
+  }
+}

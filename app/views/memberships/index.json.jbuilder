@@ -1,5 +1,6 @@
 if policy(@memberships['Confirmed'].first).staff_and_admins
-    %w(Confirmed Invited Undecided).each do |status|
+  %w(Confirmed Invited Undecided).each do |status|
+    json.set! status do
       json.array! @memberships[status] do |membership|
         json.person do
             json.lastname membership.person.lastname
@@ -49,13 +50,14 @@ if policy(@memberships['Confirmed'].first).staff_and_admins
         end
       end
     end
+  end
 else
-    json.array! @memberships['Confirmed'] do |membership|
-      json.member do
-        json.role membership.role
-        json.name membership.person.name
-        json.affiliation membership.person.affiliation
-        json.url membership.person.url
-      end
+  json.array! @memberships['Confirmed'] do |membership|
+    json.member do
+      json.role membership.role
+      json.name membership.person.name
+      json.affiliation membership.person.affiliation
+      json.url membership.person.url
     end
+  end
 end

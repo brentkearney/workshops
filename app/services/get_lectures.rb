@@ -58,16 +58,16 @@ class GetLectures
 
     (1..15).each do |n|
       day = DateTime.current.in_time_zone(time_zone) + n.days
-      lectures_on(day).each do |lecture|
-        lecture_time = lecture.start_time.in_time_zone(time_zone)
-        return lecture if lecture_time > now
+      lectures_on(day).each do |dlecture|
+        lecture_time = dlecture.start_time.in_time_zone(time_zone)
+        return dlecture if lecture_time > now
       end
     end
     nil
   end
 
   # returns the last lecture of the day
-  def last(date = Date.today)
+  def last(date = Time.zone.today)
     Lecture.where(start_time: date.beginning_of_day..date.end_of_day)
                          .where(room: @room).order(:start_time).last
   end

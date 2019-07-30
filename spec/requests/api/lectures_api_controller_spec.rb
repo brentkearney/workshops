@@ -94,7 +94,7 @@ describe Api::V1::LecturesController, type: :request do
   end
 
   context '#lectures_on' do
-    context 'authentication test' do
+    context 'authentication with api key' do
       it 'authenticates with api key in the request header' do
         get "/api/v1/lectures_on/2019-04-10/#{ERB::Util.url_encode(@room)}.json",
             headers: { 'HTTP_API_KEY' => @api_key }
@@ -102,7 +102,7 @@ describe Api::V1::LecturesController, type: :request do
       end
     end
 
-    context 'stub authentication' do
+    context 'authenticated connections' do
       before do
         allow_any_instance_of(Api::V1::LecturesController).to receive(:authenticated?).and_return(true)
         allow_any_instance_of(Api::V1::BaseController).to receive(:authenticate_user_from_token!).and_return(true)
@@ -147,7 +147,7 @@ describe Api::V1::LecturesController, type: :request do
   end
 
   context '#current, #next, #last' do
-    context 'authentication test' do
+    context 'authentication with api key' do
       it 'lectures_current with api key authenticates' do
         get "/api/v1/lectures_current/#{ERB::Util.url_encode(@room)}.json",
             headers: { 'HTTP_API_KEY' => @api_key }
@@ -161,13 +161,13 @@ describe Api::V1::LecturesController, type: :request do
       end
     end
 
-    context 'stub authentication' do
+    context 'authenticated connections' do
       before do
         allow_any_instance_of(Api::V1::LecturesController).to receive(:authenticated?).and_return(true)
         allow_any_instance_of(Api::V1::BaseController).to receive(:authenticate_user_from_token!).and_return(true)
       end
 
-      it 'authenticates' do
+      it 'endpoints are authenticated' do
         get "/api/v1/lectures_current/#{ERB::Util.url_encode(@room)}.json"
         expect(response).to be_successful
         get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json"
@@ -233,14 +233,14 @@ describe Api::V1::LecturesController, type: :request do
   end
 
   context '#lecture_data' do
-    context 'authentication test' do
+    context 'authentication with api key' do
       it 'authenticates with api key in the request header' do
         get "/api/v1/lecture_data/#{@lecture.id}.json", headers: { 'HTTP_API_KEY' => @api_key }
         expect(response).to be_successful
       end
     end
 
-    context 'stub authentication' do
+    context 'authorizes requests' do
       before do
         allow_any_instance_of(Api::V1::LecturesController).to receive(:authenticated?).and_return(true)
         allow_any_instance_of(Api::V1::BaseController).to receive(:authenticate_user_from_token!).and_return(true)

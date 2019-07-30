@@ -29,7 +29,7 @@ class InvitationForm < ComplexForms
       ev = Event.find(event)
       if ev.nil?
         errors.add(:event, ": No record of that event.")
-      elsif ev.start_date < Date.today
+      elsif ev.start_date < Time.zone.today
         errors.add(:event, ": Event is in the past.")
       end
     end
@@ -70,8 +70,15 @@ class InvitationForm < ComplexForms
   def check_membership(event, person)
     @membership = Membership.where(person: person, event: event).first
     no_membership and return if @membership.nil?
-    declined_already(event) and return if @membership.attendance == 'Declined'
-    not_invited(event) and return if @membership.attendance == 'Not Yet Invited'
+    valid_membership?(@membership)
+  end
+
+  def valid_membership?(membership)
+    if membership.attendance == 'Declined'
+      declined_already(membership.event)
+      return
+    end
+    not_invited(membership.event) if membership.attendance == 'Not Yet Invited'
   end
 
   def is_member

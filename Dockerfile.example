@@ -1,6 +1,6 @@
 # See: https://github.com/phusion/passenger-docker
 # Latest image versions: https://github.com/phusion/passenger-docker/blob/master/CHANGELOG.md
-FROM phusion/passenger-ruby26:latest
+FROM phusion/passenger-ruby26:1.0.6
 
 ENV HOME /root
 
@@ -35,15 +35,6 @@ ENV LANG en_CA.utf8
 ENV LANGUAGE en_CA:en
 ENV LC_ALL en_CA.utf8
 
-# Upgrade Ruby
-#RUN /usr/local/rvm/bin/rvm remove ruby-2.5.1
-#RUN /usr/local/rvm/bin/rvm install "ruby-2.5.3"
-#RUN bash -lc 'rvm --default use ruby-2.5.3'
-#RUN /usr/local/rvm/bin/rvm all do gem regenerate_binstubs
-#RUN /usr/local/rvm/bin/rvm reload && /usr/local/rvm/bin/rvm repair all
-#RUN /usr/local/rvm/bin/rvm wrapper 2.5.3 --no-prefix --all
-#RUN /usr/local/rvm/bin/rvm wrapper regenerate
-
 # Container uses 999 for docker user
 RUN /usr/sbin/usermod -u 999 app
 
@@ -57,7 +48,6 @@ RUN rm Dockerfile
 RUN touch config/app.yml
 RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
 RUN chown app -R ./
-RUN echo 'PATH=$PATH:./bin' >> ~/.bash_profile
 
 EXPOSE 80 443
 ADD entrypoint.sh /sbin/
@@ -65,4 +55,6 @@ RUN rm entrypoint.sh
 RUN chmod 755 /sbin/entrypoint.sh
 RUN mkdir -p /etc/my_init.d
 RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
+RUN echo 'export PATH=$PATH:./bin:/usr/local/rvm/rubies/ruby-2.6.3/bin' >> /root/.bashrc
+RUN echo 'alias rspec="bundle exec rspec"' >> /root/.bashrc
 ENTRYPOINT ["/sbin/entrypoint.sh"]
