@@ -6,8 +6,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class MembershipsController < ApplicationController
-  before_action :authenticate_user!, unless: :json_request?
-  before_action :authenticate_api_user!, if: :json_request?
+  before_action :authenticate_user!
   before_action :set_event, :set_user
   before_action :set_membership, except: [:index, :new, :create, :add,
     :process_new]

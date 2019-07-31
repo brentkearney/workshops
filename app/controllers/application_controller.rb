@@ -38,7 +38,13 @@ class ApplicationController < ActionController::Base
     @attendance = Membership::ATTENDANCE unless @event.blank?
   end
 
+
+
   private
+
+  def authenticate_user!
+    json_request? ? authenticate_api_user! : super
+  end
 
   def validate_event
     event = params[:event_id] || params[:id]
