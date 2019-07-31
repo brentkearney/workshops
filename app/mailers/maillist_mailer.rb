@@ -23,6 +23,7 @@ class MaillistMailer < ApplicationMailer
   def workshop_maillist(message, recipient)
     location = message[:location]
     from = GetSetting.email(location, 'maillist_from')
+    reply_to = message[:from]
     subject = message[:subject]
     email_parts = message[:email_parts]
     @text_body = email_parts[:text_body]
@@ -49,7 +50,8 @@ class MaillistMailer < ApplicationMailer
 
     data = { skip_suppression: true }
 
-    mail(to: recipient, from: from, subject: subject, sparkpost_data: data) do |format|
+    mail(to: recipient, from: from, reply_to: reply_to,
+         subject: subject, sparkpost_data: data) do |format|
       format.html { render html: @html_body.html_safe } unless @html_body.blank?
       format.text { render text: @text_body }
     end

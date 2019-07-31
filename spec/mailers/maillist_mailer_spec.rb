@@ -56,6 +56,10 @@ RSpec.describe MaillistMailer, type: :mailer do
       expect(@sent_message.from).to eq([email_obj.address])
     end
 
+    it 'Reply-to: is the sender' do
+      expect(@msg[:from]).to include(@sent_message.reply_to.first)
+    end
+
     it 'To: is the given recipient' do
       expect(@sent_message.to).to eq(@sent_message.to_addrs)
     end
