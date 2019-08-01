@@ -27,7 +27,8 @@ RSpec.describe MaillistMailer, type: :mailer do
     before do
       @msg = {
         location: 'EO',
-        from: '"Workshops" <workshops@example.com>',
+        from: '"Email Sender" <sender@domain.com>',
+        to: '"Workshops" <workshops@example.com>',
         subject: '[19w5020] Test subject',
         body: 'This is a test message.',
         email_parts: {
