@@ -6,10 +6,10 @@ if policy(member).staff_and_admins
     json.set! status do
       json.array! @memberships[status] do |membership|
         json.person do
-          json.merge! membership.person.attributes.select { |k,v| person_fields.include? k.to_sym }
+          json.merge! membership.person.attributes.select { |k,_v| person_fields.include? k.to_sym }
         end
         json.membership do
-          json.merge! membership.attributes.select { |k,v| allowed_fields.include? k.to_sym }
+          json.merge! membership.attributes.select { |k,_v| allowed_fields.include? k.to_sym }
         end
       end
     end

@@ -104,7 +104,7 @@ class EventPolicy
   end
 
   def sync?
-    if event.end_date >= Date.today && !event.template
+    if event.end_date >= Time.zone.today && !event.template
       organizers_and_staff unless Rails.env.test?
     end
   end

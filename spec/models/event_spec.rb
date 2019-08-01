@@ -157,6 +157,29 @@ RSpec.describe "Model validations: Event ", type: :model do
       expect(@event.description).to eq('A workshop with whitespace')
     end
 
+    context '.set_sync_time' do
+      it 'updates the sync_time field' do
+        yesterday = DateTime.yesterday
+        @event.sync_time = yesterday
+        @event.save
+
+        @event.set_sync_time
+
+        expect(@event.sync_time).not_to eq(yesterday)
+      end
+
+      it 'sets the data_import attribute' do
+        @event.set_sync_time
+        expect(@event.data_import).to be_truthy
+      end
+
+      it 'does not update the timestamp' do
+        timestamp = Event.find(@event.id).updated_at
+        @event.set_sync_time
+        expect(Event.find(@event.id).updated_at).to eq(timestamp)
+      end
+    end
+
     describe 'Event Scopes' do
       before do
         @past = create(:event, past: true)

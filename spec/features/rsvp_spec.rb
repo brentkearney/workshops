@@ -50,8 +50,8 @@ describe 'RSVP', type: :feature do
 
   context 'Error conditions' do
     it 'past events' do
-      @event.start_date = Date.today.last_year
-      @event.end_date = Date.today.last_year + 5.days
+      @event.start_date = Time.zone.today.last_year
+      @event.end_date = Time.zone.today.last_year + 5.days
       @event.save!
 
       visit rsvp_otp_path(@invitation.code)

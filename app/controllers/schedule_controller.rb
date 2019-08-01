@@ -43,7 +43,7 @@ class ScheduleController < ApplicationController
     authorize Schedule.new(event: @event)
     @day = params[:day].to_date
     new_params = { new_item: true, event_id: @event.id,
-                   start_time: @day.to_time, updated_by: current_user.name }
+                   start_time: @day.in_time_zone, updated_by: current_user.name }
     @schedule = ScheduleItem.new(new_params).schedule
     @members = @event.members
 

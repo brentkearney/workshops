@@ -13,12 +13,12 @@ FactoryBot.define do
   end
   sequence(:start_date, 1) do |n|
     n = 1 if n > 48 # avoid going years into the future
-    date = Date.today.beginning_of_year.advance(weeks: 1)
+    date = Time.zone.today.beginning_of_year.advance(weeks: 1)
     date.advance(weeks: n).beginning_of_week(:sunday)
   end
   sequence(:end_date, 1) do |n|
     n = 1 if n > 48
-    date = Date.today.beginning_of_year.advance(weeks: 1)
+    date = Time.zone.today.beginning_of_year.advance(weeks: 1)
     date.advance(weeks: n, days: 5)
   end
 

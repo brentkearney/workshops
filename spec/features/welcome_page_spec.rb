@@ -57,8 +57,8 @@ describe 'Post-login Welcome Page', type: :feature do
 
     it "excludes the user's past workshops" do
       event = @user.person.events.sample
-      event.start_date = Date.today.prev_year.prev_week(:sunday)
-      event.end_date = Date.today.prev_year.prev_week(:sunday) + 5.days
+      event.start_date = Time.zone.today.prev_year.prev_week(:sunday)
+      event.end_date = Time.zone.today.prev_year.prev_week(:sunday) + 5.days
       event.save!
 
       sign_in_as @user

@@ -179,7 +179,7 @@
         end
 
         it '@events only includes events with appropriate attendance status' do
-          m1 = create(:membership, person: person, event: @past_event, attendance: 'Invited')
+          create(:membership, person: person, event: @past_event, attendance: 'Invited')
           m2 = create(:membership, person: person, event: @event, attendance: 'Confirmed')
           m3 = create(:membership, person: person, event: @future_event, attendance: 'Undecided')
 

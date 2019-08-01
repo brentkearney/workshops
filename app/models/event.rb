@@ -41,10 +41,17 @@ class Event < ApplicationRecord
 
   scope :past, -> { where("end_date < ? AND template = ?",
     Date.current, false).order(:start_date) }
-  scope :future, -> { where("end_date >= ? AND template = ?",
-    Date.current, false).order(:start_date) }
-  scope :year, ->(year) { where("start_date >= '?-01-01' AND end_date <= '?-12-31' AND template = ?", year.to_i, year.to_i, false) }
-  scope :location, ->(location) { where("location = ? AND template = ?", location, false) }
+  scope :future, -> do
+    where("end_date >= ? AND template = ?",
+          Date.current, false).order(:start_date)
+  end
+  scope :year, ->(year) do
+    where("start_date >= '?-01-01' AND end_date <= '?-12-31' AND template = ?",
+           year.to_i, year.to_i, false)
+  end
+  scope :location, ->(location) do
+    where("location = ? AND template = ?", location, false)
+  end
 
   scope :kind, ->(kind) {
     if kind == 'Research in Teams'
@@ -91,11 +98,9 @@ class Event < ApplicationRecord
   end
 
   def set_sync_time
-    def record_timestamps; false; end
     self.sync_time = DateTime.current
     self.data_import = true # skip short_name validation
-    save!
-    def record_timestamps; super; end
+    save(touch: false)
   end
 
   private

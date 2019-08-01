@@ -33,7 +33,7 @@ class MaillistMailer < ApplicationMailer
     unless message[:attachments].blank?
       message[:attachments].each do |ad|
         file = ad.original_filename
-        if inline_attachments[file] != nil
+        unless inline_attachments[file].nil?
           attachments.inline[file] = {
             mime_type: ad.content_type,
             content: File.read(ad.tempfile)

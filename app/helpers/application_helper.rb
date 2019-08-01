@@ -7,23 +7,25 @@
 module ApplicationHelper
 
   def page_title
-    return 'Future Events' if request.path == events_future_path
-    return 'Past Events' if request.path == events_past_path
-    if request.path =~ /(future|past)\/location\/(\w+)\z/
-      return %Q(#{@tense} #{@location} Events)
+    case request.path
+    when events_future_path
+      'Future Events'
+    when events_past_path
+      'Past Events'
+    when /(future|past)\/location\/(\w+)\z/
+      %Q(#{@tense} #{@location} Events)
+    when /events\/year\/(\d{4})/
+      %Q(#{@year} Events)
+    when /year\/(\d{4})\/location/
+      %Q(#{@year} #{@location} Events)
+    when /events\/(\w+)\/schedule/
+      %Q(#{@event.code} Schedule)
+    when /events\/(\w+)\/memberships/
+      %Q(#{@event.code} Members)
+    else
+      return %Q(#{@event.code}: #{@event.name}) unless @event.nil?
+      Setting.Site[:title]
     end
-    return %Q(#{@year} Events) if request.path =~ /events\/year\/(\d{4})/
-    if request.path =~ /year\/(\d{4})\/location/
-      return %Q(#{@year} #{@location} Events)
-    end
-    if request.path =~ /events\/(\w+)\/schedule/
-      return %Q(#{@event.code} Schedule)
-    end
-    if request.path =~ /events\/(\w+)\/memberships/
-      return %Q(#{@event.code} Members)
-    end
-    return %Q(#{@event.code}: #{@event.name}) if @event
-    Setting.Site[:title]
   end
 
 
