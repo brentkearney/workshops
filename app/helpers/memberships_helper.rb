@@ -49,7 +49,7 @@ module MembershipsHelper
     msg = "<p><strong>‼️These problems were detected:</strong>\n"
     msg << "<ol id=\"add-members-errors\">\n"
     errors.messages.each do |line|
-      msg << "<li value=\"#{line[0].to_s}\">"
+      msg << "<li value=\"#{line[0]}\">"
       line[1].each do |prob|
         msg << "#{prob}, "
       end

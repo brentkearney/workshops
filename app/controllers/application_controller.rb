@@ -42,7 +42,8 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def authenticate_user!
+  def authenticate_user!(*args)
+    super and return unless args.blank?
     json_request? ? authenticate_api_user! : super
   end
 

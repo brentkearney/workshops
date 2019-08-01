@@ -13,53 +13,64 @@ class ScheduleNotice
     @event = find_event
   end
 
+  def original_change_notice(original_schedule, publish)
+    %(
+      THIS:
+        Name: #{original_schedule.name}
+        Start time: #{original_schedule.start_time}
+        End time: #{original_schedule.end_time}
+        Location: #{original_schedule.location}
+        Lecture publishing: #{publish}
+        Description: #{original_schedule.description}
+        Updated by: #{original_schedule.updated_by}
+      )
+  end
+
+  def updated_change_notice(updated_schedule, publish)
+    %(
+      CHANGED TO:
+        Name: #{updated_schedule.name}
+        Start time: #{updated_schedule.start_time}
+        End time: #{updated_schedule.end_time}
+        Location: #{updated_schedule.location}
+        Lecture publishing: #{publish}
+        Description: #{updated_schedule.description}
+        Updated by: #{updated_schedule.updated_by}
+        Updated at: #{updated_schedule.updated_at}
+      )
+  end
+
+  def updated_time(original_schedule, changed_similar)
+    return '' unless changed_similar
+    time = original_schedule.start_time.strftime("%H:%M")
+    %(
+    **** All "#{original_schedule.name}" items at #{time} were changed to the new time. ****
+    )
+  end
+
+  def to_publish?(original_lecture, original_schedule)
+    publish = 'N/A'
+    return publish unless original_lecture
+    publish = original_lecture.do_not_publish ? 'OFF' : 'ON'
+    original_schedule.description = original_lecture.abstract
+  end
+
   def update
     original_schedule = args[:original_schedule]
     updated_schedule = args[:updated_schedule]
     original_lecture = args[:original_lecture] || false
     changed_similar = args[:changed_similar] || false
 
-    publish = 'N/A'
-    if original_lecture
-      publish = original_lecture.do_not_publish ? 'OFF' : 'ON'
-      original_schedule.description = original_lecture.abstract
-    end
-
-    change_notice = %(
-    THIS:
-      Name: #{original_schedule.name}
-      Start time: #{original_schedule.start_time}
-      End time: #{original_schedule.end_time}
-      Location: #{original_schedule.location}
-      Lecture publishing: #{publish}
-      Description: #{original_schedule.description}
-      Updated by: #{original_schedule.updated_by}
-    )
+    publish = to_publish?(original_lecture, original_schedule)
+    change_notice = original_change_notice(original_schedule, publish)
 
     unless updated_schedule.lecture_id.blank?
       publish = updated_schedule.lecture.do_not_publish ? 'OFF' : 'ON'
       updated_schedule.description = updated_schedule.lecture.abstract
     end
 
-    change_notice << %(
-    CHANGED TO:
-      Name: #{updated_schedule.name}
-      Start time: #{updated_schedule.start_time}
-      End time: #{updated_schedule.end_time}
-      Location: #{updated_schedule.location}
-      Lecture publishing: #{publish}
-      Description: #{updated_schedule.description}
-      Updated by: #{updated_schedule.updated_by}
-      Updated at: #{updated_schedule.updated_at}
-    )
-
-    if changed_similar
-      time = original_schedule.start_time.strftime("%H:%M")
-      change_notice << %(
-**** All "#{original_schedule.name}" items at #{time} were changed to the new time. ****
-    )
-    end
-
+    change_notice << updated_change_notice(updated_schedule, publish)
+    change_notice << updated_time(original_schedule, changed_similar)
     invoke_mailer(message: change_notice)
   end
 

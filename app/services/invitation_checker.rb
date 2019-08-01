@@ -73,19 +73,38 @@ class InvitationChecker
   end
 
   def validate(invitation)
-    if invitation.nil?
-      @errors.add(:Invitation, 'That invitation code was not found.')
-    end
-    return if invitation.nil?
+    return if nil_invitation?(invitation)
+    check_invitation_expiry(invitation)
+    check_past_event(invitation)
+    check_attendance(invitation)
 
+    unless @errors.empty?
+      @errors.each do |k, v|
+        invitation.errors.add(k.to_sym, v.to_s)
+      end
+    end
+  end
+
+  def check_past_event(invitation)
+    if Time.zone.today > invitation.membership.event.end_date
+      @errors.add(:Event, "You cannot RSVP for past events.")
+    end
+  end
+
+  def check_invitation_expiry(invitation)
     if invitation.expires && DateTime.now > invitation.expires
       @errors.add(:Invitation, 'This invitation code is expired.')
     end
+  end
 
-    if Date.today > invitation.membership.event.end_date
-      @errors.add(:Event, "You cannot RSVP for past events.")
+  def nil_invitation?(invitation)
+    if invitation.nil?
+      @errors.add(:Invitation, 'That invitation code was not found.')
+      return true
     end
+  end
 
+  def check_attendance(invitation)
     case invitation.membership.attendance
     when 'Declined'
       @errors.add(:Membership, "You have already declined an invitation
@@ -95,12 +114,6 @@ class InvitationChecker
     when 'Not Yet Invited'
       @errors.add(:Membership, ": The event's organizers have not yet
         invited you. Please contact them if you wish to be invited.")
-    end
-
-    unless @errors.empty?
-      @errors.each do |k, v|
-        invitation.errors.add(k.to_sym, v.to_s)
-      end
     end
   end
 

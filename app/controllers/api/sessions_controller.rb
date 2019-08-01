@@ -6,15 +6,11 @@
 
 class Api::SessionsController < Devise::SessionsController
   skip_before_action :verify_signed_out_user
+  before_action :check_request_format, only:[:create]
   respond_to :json
 
   # POST /api/login
   def create
-    unless request.format == :json
-      sign_out
-      render status: 406, json: { message: "JSON requests only." } and return
-    end
-
     resource = warden.authenticate!(auth_options)
 
     if resource.blank?
@@ -40,6 +36,13 @@ class Api::SessionsController < Devise::SessionsController
   end
 
   private
+
+  def check_request_format
+    unless request.format == :json
+      sign_out
+      render status: 406, json: { message: "JSON requests only." } and return
+    end
+  end
 
   def sign_out_and_respond(resource)
     revoke_token(resource)
