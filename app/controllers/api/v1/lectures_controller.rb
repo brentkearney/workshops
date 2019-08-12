@@ -183,8 +183,18 @@ class Api::V1::LecturesController < Api::V1::BaseController
     head :bad_request
   end
 
+  def valid_id?(id)
+    return false if id.blank?
+    id.to_i > 0
+  end
+
+  def valid_lecture?(lecture)
+    return false if lecture.blank?
+    lecture.is_a?(Hash)
+  end
+
   def valid_parameters?
-    @json['event_id'] && @json['lecture_id'] && @json.key?('lecture') &&
-      @json['lecture'].is_a?(Hash) && !@json['lecture'].empty?
+    @json['event_id'] && valid_id?(@json['lecture_id']) &&
+      valid_lecture?(@json['lecture'])
   end
 end

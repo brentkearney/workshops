@@ -70,13 +70,44 @@ describe 'Membership#delete', type: :feature do
   end
 
   context 'As an organizer of the event' do
-    it 'allows membership deletion' do
+    before do
       organizer_user = create(:user, email: @organizer.person.email,
                                     person: @organizer.person)
       login_as organizer_user, scope: :user
+    end
+
+    it 'allows membership deletion if Not Yet Invited' do
+      @participant.attendance = 'Not Yet Invited'
+      @participant.save
 
       # need extra JS tests to get around data-confirm
       #allows_delete(@participant)
+
+      visit event_membership_path(@event, @participant)
+
+      expect(page).to have_link('Delete Membership')
+    end
+
+    it 'does not allow membership deletion if NOT Not Yet Invited' do
+      @participant.attendance = 'Invited'
+      @participant.save
+      visit event_membership_path(@event, @participant)
+      expect(page).not_to have_link('Delete Membership')
+
+      @participant.attendance = 'Declined'
+      @participant.save
+      visit event_membership_path(@event, @participant)
+      expect(page).not_to have_link('Delete Membership')
+
+      @participant.attendance = 'Confirmed'
+      @participant.save
+      visit event_membership_path(@event, @participant)
+      expect(page).not_to have_link('Delete Membership')
+
+      @participant.attendance = 'Undecided'
+      @participant.save
+      visit event_membership_path(@event, @participant)
+      expect(page).not_to have_link('Delete Membership')
     end
   end
 end

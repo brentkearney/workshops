@@ -19,6 +19,12 @@ Rails.application.routes.draw do
     patch 'users/confirmation', to: 'confirmations#create'
   end
 
+  # Redirect old urls
+  get '/users/sign_in', to: redirect('/sign_in')
+  get '/users/sign_out', to: redirect('/sign_out')
+  get '/users/confirmation', to: redirect('/confirmation')
+  get '/users/register', to: redirect('/register')
+
   # Post-login welcome page
   get 'welcome' => 'welcome#index'
 

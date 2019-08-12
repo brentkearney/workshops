@@ -438,10 +438,6 @@ describe 'Membership#show', type: :feature do
       expect(page).to have_link 'Edit Membership'
     end
 
-    it 'includes delete button' do
-      expect(page).to have_link 'Delete Membership'
-    end
-
     it 'shows other memberships' do
       visit event_membership_path(@event, @participant)
       expect(page.body).to have_css('div#other-memberships')
@@ -459,6 +455,45 @@ describe 'Membership#show', type: :feature do
       visit event_membership_path(@event, @participant)
       expect(page.body).to have_text(@unconfirmed_membership.event.name)
       m.destroy!
+    end
+
+    context 'if participant is Not Yet Invited' do
+      it 'includes delete button' do
+        @participant.attendance = 'Not Yet Invited'
+        @participant.save
+        visit event_membership_path(@event, @participant)
+        expect(page).to have_link 'Delete Membership'
+      end
+    end
+
+    context 'if participant has already been Invited' do
+      it 'Confirmed: no delete button' do
+        @participant.attendance = 'Confirmed'
+        @participant.save
+        visit event_membership_path(@event, @participant)
+        expect(page).not_to have_link 'Delete Membership'
+      end
+
+      it 'Undecided: no delete button' do
+        @participant.attendance = 'Undecided'
+        @participant.save
+        visit event_membership_path(@event, @participant)
+        expect(page).not_to have_link 'Delete Membership'
+      end
+
+      it 'Invited: no delete button' do
+        @participant.attendance = 'Invited'
+        @participant.save
+        visit event_membership_path(@event, @participant)
+        expect(page).not_to have_link 'Delete Membership'
+      end
+
+      it 'Declined: no delete button' do
+        @participant.attendance = 'Declined'
+        @participant.save
+        visit event_membership_path(@event, @participant)
+        expect(page).not_to have_link 'Delete Membership'
+      end
     end
   end
 

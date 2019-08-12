@@ -142,7 +142,9 @@ class MembershipPolicy
   end
 
   def delete_membership?
-    organizer_and_staff
+    return true if staff_and_admins
+    return false unless organizer?
+    @membership.attendance == 'Not Yet Invited'
   end
 
   def edit_role?

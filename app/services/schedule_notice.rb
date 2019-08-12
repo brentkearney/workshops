@@ -48,11 +48,10 @@ class ScheduleNotice
     )
   end
 
-  def to_publish?(original_lecture, original_schedule)
+  def to_publish?(original_lecture)
     publish = 'N/A'
     return publish unless original_lecture
-    publish = original_lecture.do_not_publish ? 'OFF' : 'ON'
-    original_schedule.description = original_lecture.abstract
+    original_lecture.do_not_publish ? 'OFF' : 'ON'
   end
 
   def update
@@ -61,7 +60,8 @@ class ScheduleNotice
     original_lecture = args[:original_lecture] || false
     changed_similar = args[:changed_similar] || false
 
-    publish = to_publish?(original_lecture, original_schedule)
+    publish = to_publish?(original_lecture)
+    # ?? original_schedule.description = original_lecture.abstract if original_lecture
     change_notice = original_change_notice(original_schedule, publish)
 
     unless updated_schedule.lecture_id.blank?

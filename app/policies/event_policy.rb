@@ -75,7 +75,7 @@ class EventPolicy
   end
 
   def delete?
-    current_user.super_admin?
+    current_user.admin? || current_user.super_admin?
   end
 
   def allow_add_members?

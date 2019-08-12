@@ -49,7 +49,7 @@ end
 group :test do
   gem 'capybara'
   gem 'selenium-webdriver'
-  gem 'faker'
+  gem 'faker', '~> 1.9.6'
   gem 'database_cleaner'
   gem 'rails-controller-testing'
 end

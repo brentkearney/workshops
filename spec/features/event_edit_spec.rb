@@ -27,6 +27,10 @@ describe 'Event Edit Page', type: :feature do
     expect(page.body).not_to have_css('a', text: 'Delete This Event')
   end
 
+  def has_delete_button
+    expect(page.body).to have_css('a', text: 'Delete This Event')
+  end
+
   context 'Not logged-in' do
     it 'denies access' do
       visit edit_event_path(@event)
@@ -166,8 +170,8 @@ describe 'Event Edit Page', type: :feature do
       expect(current_path).to eq(edit_event_path(@event))
     end
 
-    it 'has no Delete button' do
-      has_no_delete_button
+    it 'has Delete button' do
+      has_delete_button
     end
 
     it 'excludes disallowed fields' do
@@ -195,7 +199,7 @@ describe 'Event Edit Page', type: :feature do
     end
 
     it 'has a Delete button' do
-      expect(page.body).to have_css('a', text: 'Delete This Event')
+      has_delete_button
     end
   end
 end
