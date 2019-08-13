@@ -118,8 +118,8 @@ module MembershipsHelper
     if show_invite_buttons?(member) && spots_left
       column << link_to("Send Invitation", invitations_send_path(member),
         data: { confirm: "This will send #{member.person.name}
-        an email, inviting #{member.person.him} to attend this
-        workshop. Are you sure you want to proceed?".squish },
+        a #{member.role} invitation email, asking #{member.person.him} to attend
+        this workshop. Are you sure you want to proceed?".squish },
         class: 'btn btn-sm btn-default')
     end
     column << '</td>'

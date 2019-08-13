@@ -104,7 +104,7 @@ module Syncable
       v = prepare_value(k, v)
       booleans = boolean_fields(local)
       v = bool_value(v) if booleans.include?(k)
-      local.send("#{k}=", v)
+      local.update_column(k.to_s, v) # avoid updating updated_at
     end
     local
   end

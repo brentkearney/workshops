@@ -119,29 +119,31 @@ describe Api::V1::LecturesController, type: :request do
         @date = @lecture.start_time.strftime("%Y-%m-%d")
       end
 
-      it 'returns the lecture schedule for the given day' do
-        get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@room)}.json"
-        json = JSON.parse(response.body)
+      context '/lectures_on/' do
+        it 'returns the lecture schedule for the given day' do
+          get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@room)}.json"
+          json = JSON.parse(response.body)
 
-        Lecture.all.each do |lecture|
-          record = json.select {|item| item['lecture']['id'].to_i == lecture.id }.first
-          expect(record['lecture']['title']).to eq(lecture.title)
-          expect(record['scheduled_for']['start_time']).to eq(record['lecture']['start_time'])
+          Lecture.all.each do |lecture|
+            record = json.select {|item| item['lecture']['id'].to_i == lecture.id }.first
+            expect(record['lecture']['title']).to eq(lecture.title)
+            expect(record['scheduled_for']['start_time']).to eq(record['lecture']['start_time'])
+          end
         end
-      end
 
-      it 'sets scheduled_for times to empty strings if no schedule item found' do
-        schedule = Schedule.where(lecture_id: @lecture.id).first
-        expect(schedule).not_to be_nil
-        schedule.delete
-        expect(Lecture.find_by_id(@lecture.id)).not_to be_blank
+        it 'sets scheduled_for times to empty strings if no schedule item found' do
+          schedule = Schedule.where(lecture_id: @lecture.id).first
+          expect(schedule).not_to be_nil
+          schedule.delete
+          expect(Lecture.find_by_id(@lecture.id)).not_to be_blank
 
-        get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@room)}.json"
-        json = JSON.parse(response.body)
-        lecture = json.select {|j| j['lecture']['id'].to_i == @lecture.id }.first
+          get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@room)}.json"
+          json = JSON.parse(response.body)
+          lecture = json.select {|j| j['lecture']['id'].to_i == @lecture.id }.first
 
-        expect(lecture['scheduled_for']['start_time']).to be_empty
-        expect(lecture['scheduled_for']['end_time']).to be_empty
+          expect(lecture['scheduled_for']['start_time']).to be_empty
+          expect(lecture['scheduled_for']['end_time']).to be_empty
+        end
       end
     end
   end
@@ -176,25 +178,33 @@ describe Api::V1::LecturesController, type: :request do
         expect(response).to be_successful
       end
 
-      it 'returns an empty hash if there is no current lecture' do
+      it "lectures_current returns an empty hash if there isn't one" do
         get "/api/v1/lectures_current/#{ERB::Util.url_encode(@room)}.json"
         json = JSON.parse(response.body)
         expect(json).to eq({})
       end
 
-      it 'returns an empty hash if there is no next lecture' do
+      it 'lectures_next returns an empty hash if there is no next lecture' do
+        @lecture.start_time = Time.current - 2.hours
+        @lecture.end_time = @lecture.start_time + 30.minutes
+        @lecture.save
+
         get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json"
         json = JSON.parse(response.body)
         expect(json).to eq({})
       end
 
-      it 'returns an empty hash if there is no last lecture (of the day)' do
-        get "/api/v1/lectures_next/#{ERB::Util.url_encode(@room)}.json"
+      it 'lectures_last returns an empty hash if there is no last lecture today' do
+        @lecture.start_time = Time.current + 1.day
+        @lecture.end_time = @lecture.start_time + 30.minutes
+        @lecture.save
+
+        get "/api/v1/lectures_last/#{ERB::Util.url_encode(@room)}.json"
         json = JSON.parse(response.body)
         expect(json).to eq({})
       end
 
-      it 'returns the current lecture, if there is one' do
+      it 'lectures_current returns the current lecture, if there is one' do
         @lecture.start_time = Time.current - 10.minutes
         @lecture.end_time = Time.current + 10.minutes
         @lecture.save
@@ -205,7 +215,7 @@ describe Api::V1::LecturesController, type: :request do
         expect(json['title']).to eq(@lecture.title)
       end
 
-      it 'returns the next lecture, if there is one' do
+      it 'lectures_next returns the next lecture, if there is one' do
         @lecture.start_time = Time.current + 60.minutes
         @lecture.end_time = Time.current + 90.minutes
         @lecture.save
@@ -216,7 +226,7 @@ describe Api::V1::LecturesController, type: :request do
         expect(json['title']).to eq(@lecture.title)
       end
 
-      it 'returns the last lecture of the day, if there is one' do
+      it 'lectures_last returns the last lecture of the day, if there is one' do
         @lecture.start_time = Time.current + 60.minutes
         @lecture.end_time = Time.current + 90.minutes
         @lecture.save

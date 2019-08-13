@@ -9,8 +9,10 @@ module PersonHelper
   def street_address(person)
     address = ''
     address += person.address1 + "<br />\n" unless person.address1.blank?
-    address += person.address2 + "<br />\n" unless person.address2.blank?
-    address += person.address3 + "<br />\n" unless person.address3.blank?
+    address += person.address2 + "<br />\n" unless person.address2.blank? ||
+      person.address2 == person.address1
+    address += person.address3 + "<br />\n" unless person.address3.blank? ||
+      person.address3 == person.address1 || person.address3 == person.address2
     address
   end
 
@@ -23,8 +25,7 @@ module PersonHelper
   end
 
   def print_address(person)
-    address = street_address(person)
-    address += city_and_region(person, address)
+    address = city_and_region(person, street_address(person))
     address += "<br />\n" + person.country unless person.country.blank?
     address.html_safe
   end
