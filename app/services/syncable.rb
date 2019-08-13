@@ -96,15 +96,34 @@ module Syncable
     local.updated_at >= rupdated
   end
 
+  # local is newer, but remote may still have data that local is missing
+  def update_missing_data(local, remote)
+    remote.each_pair do |k,v|
+      next if v.blank?
+      next unless local.send(k).blank?
+      v = prepare_value(k, v)
+      booleans = boolean_fields(local)
+      v = bool_value(v) if booleans.include?(k)
+      local.send("#{k}=", v)
+    end
+    local
+  end
+
   # local record, remote hash
   def update_record(local, remote)
     local.updated_at = DateTime.new(1970,1,1) if local.updated_at.blank?
     local.updated_by = 'Workshops Import' if local.updated_by.blank?
-    return local if local_is_newer?(local, remote)
+    return update_missing_data(local, remote) if local_is_newer?(local, remote)
+
+    # resolve duplicate person records with mismatched legacy_id or email
+    # if its a legacy_id change, also update event associations on legacydb
+    # if its an email change, User account may also need updating
+    local = resolve_duplicates(local, remote, 'legacy_id')
+    local = resolve_duplicates(local, remote, 'email')
 
     booleans = boolean_fields(local)
     remote.each_pair do |k, v|
-      next if v.blank?
+      next if k == 'legacy_id' || k == 'email'
       v = prepare_value(k, v)
       v = bool_value(v) if booleans.include?(k)
 
@@ -120,13 +139,7 @@ module Syncable
       next if k == 'invited_on'
 
       unless local.send(k).eql? v
-        # if its an email change, User account may also need updating
-        # if its a legacy_id change, also update event associations on legacydb
-        if k == 'legacy_id' || k == 'email'
-          local = resolve_duplicates(local, remote, k)
-        else
-          local.send("#{k}=", v)
-        end
+        local.send("#{k}=", v)
       end
     end
     local
@@ -135,6 +148,7 @@ module Syncable
   # find duplicate Person records based on email or legacy_id (mode)
   def resolve_duplicates(local, remote, mode)
     person = local
+    return person if remote["#{mode}"].blank?
     other_person = Person.find_by("#{mode}": remote["#{mode}"])
     if other_person.blank?
       # no local record with remote['legacy_id'], so replace the remote
@@ -143,7 +157,9 @@ module Syncable
       replace_remote(Person.new(remote), local) if mode == 'legacy_id'
       person = update_email(local, remote['email']) if mode == 'email'
     else
-      person = merge_person_records(local, other_person)
+      unless local.id == other_person.id
+        person = merge_person_records(local, other_person)
+      end
     end
     person
   end
@@ -166,7 +182,7 @@ module Syncable
   def prepare_value(k, v)
     v = v.to_i if k.include? '_id'
     if k.to_s.include?('_at')
-      v = nil if v == '0000-00-00 00:00:00'
+      v = nil if v == '0000-00-00 00:00:00' || v.blank?
       v = convert_to_time(v) unless v.nil?
     end
     v = v.strip if v.respond_to? :strip

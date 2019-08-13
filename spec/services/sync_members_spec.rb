@@ -185,8 +185,9 @@ describe "SyncMembers" do
     context 'remote person with matching legacy_id' do
       it 'updates the local person with changed fields' do
         updated = DateTime.parse('1970-01-01 00:00:00')
-        local_person = create(:person, lastname: 'Localperson', legacy_id: 666,
-          updated_at: updated)
+        local_person = create(:person, lastname: 'Localperson', updated_at: updated)
+        local_person.legacy_id = 666
+        local_person.save
         updated_fields = { lastname: 'RemotePerson', address1: 'foo' }
         test_update(local_person: local_person, fields: updated_fields)
       end
