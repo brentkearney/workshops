@@ -4,7 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# MembershipChangeNotice prepares membership change notices, sends to StaffMailer
+# MembershipChangeNotice prepares membership change notices, sends to mailers
 class MembershipChangeNotice
   attr_reader :changed, :membership, :event
 
@@ -19,6 +19,7 @@ class MembershipChangeNotice
       notify_coordinator
       notify_staff
     end
+    notify_organizer if @changed.keys.include?('attendance')
   end
 
   # if these fields change, notify staff
@@ -85,5 +86,13 @@ class MembershipChangeNotice
     msg = build_change_message
     return if msg.empty?
     EmailStaffConfirmationNoticeJob.perform_later(membership.id, msg, to)
+  end
+
+  def notify_organizer
+    return if @membership.is_rsvp # Invitation class already sent notice
+    args = { 'attendance_was' => @membership.attendance,
+             'attendance' => @changed['attendance']}
+
+    EmailOrganizerNoticeJob.perform_later(@membership.id, args)
   end
 end

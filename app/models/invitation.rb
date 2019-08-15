@@ -80,6 +80,7 @@ class Invitation < ApplicationRecord
     membership.invited_by = invited_by
     membership.invited_on = DateTime.current
     membership.update_remote = true
+    membership.is_rsvp = true # don't resend organizer notice
     membership.person.member_import = true
     if membership.attendance == 'Not Yet Invited'
       membership.attendance = 'Invited'
@@ -125,6 +126,7 @@ class Invitation < ApplicationRecord
     update_membership_fields(status)
     update_person_fields(status)
     membership.update_remote = true
+    membership.is_rsvp = true
     begin
       membership.save!
     rescue ActiveRecord::RecordInvalid => error

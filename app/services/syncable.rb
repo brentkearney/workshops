@@ -99,12 +99,13 @@ module Syncable
   # local is newer, but remote may still have data that local is missing
   def update_missing_data(local, remote)
     remote.each_pair do |k,v|
-      next if v.blank?
-      next unless local.send(k).blank?
+      next if v.blank? || k == 'legacy_id' || k == 'email'
+      local_value = local.send(k)
+      next unless local_value.blank?
       v = prepare_value(k, v)
       booleans = boolean_fields(local)
       v = bool_value(v) if booleans.include?(k)
-      local.update_column(k.to_s, v) # avoid updating updated_at
+      local.update_column(k.to_s, v) unless v.blank? # avoid updating updated_at
     end
     local
   end
@@ -128,7 +129,7 @@ module Syncable
       v = bool_value(v) if booleans.include?(k)
 
       next if k == 'invited_by' unless v.blank?
-      v = 'Workshops Importer' if k == 'invited_by' && v.blank?
+      v = 'Workshops importer' if k == 'invited_by' && v.blank?
 
       if k == 'invited_on'
         if local.invited_on.blank? || local.invited_on.to_i < v.to_i
@@ -137,10 +138,7 @@ module Syncable
         end
       end
       next if k == 'invited_on'
-
-      unless local.send(k).eql? v
-        local.send("#{k}=", v)
-      end
+      local.send("#{k}=", v)
     end
     local
   end

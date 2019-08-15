@@ -190,31 +190,40 @@ describe 'RSVP', type: :feature do
         @args = { 'attendance_was' => 'Invited',
                   'attendance' => 'Declined',
                   'organizer_message' => '' }
-        allow(EmailOrganizerNoticeJob).to receive(:perform_later)
-        visit rsvp_no_path(@invitation.code)
-        fill_in 'rsvp_organizer_message', with: "Sorry I can't make it!"
-        click_button 'Decline Attendance'
       end
 
       it 'queues background task for emailing organizer with message' do
+        allow(EmailOrganizerNoticeJob).to receive(:perform_later).once
+        visit rsvp_no_path(@invitation.code)
+        fill_in 'rsvp[organizer_message]', with: "Sorry I can't make it!"
+        click_button 'Decline Attendance'
+
         @args['organizer_message'] = "Sorry I can't make it!"
-        expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
+        expect(EmailOrganizerNoticeJob).to have_received(:perform_later).once
           .with(@invitation.membership.id, @args)
       end
 
       it 'says thanks' do
+        visit rsvp_no_path(@invitation.code)
+        click_button 'Decline Attendance'
         expect(page).to have_text('Thank you')
       end
 
       it 'declines membership' do
+        visit rsvp_no_path(@invitation.code)
+        click_button 'Decline Attendance'
         expect(Membership.find(@membership.id).attendance).to eq('Declined')
       end
 
       it 'destroys invitation' do
+        visit rsvp_no_path(@invitation.code)
+        click_button 'Decline Attendance'
         expect(Invitation.where(id: @invitation.id)).to be_empty
       end
 
       it 'forwards to feedback form, with flash message' do
+        visit rsvp_no_path(@invitation.code)
+        click_button 'Decline Attendance'
         expect(current_path).to eq(rsvp_feedback_path(@membership.id))
         expect(page.body).to have_css('div.alert.alert-success.flash', text:
           'Your attendance status was successfully updated. Thanks for your
@@ -222,6 +231,7 @@ describe 'RSVP', type: :feature do
       end
 
       it 'updates legacy database' do
+
         allow(SyncMembershipJob).to receive(:perform_later)
         reset_database
 
@@ -261,23 +271,29 @@ describe 'RSVP', type: :feature do
         @args = { 'attendance_was' => 'Invited',
                   'attendance' => 'Undecided',
                   'organizer_message' => '' }
-        allow(EmailOrganizerNoticeJob).to receive(:perform_later)
-        visit rsvp_maybe_path(@invitation.code)
-        fill_in "rsvp_organizer_message", with: 'I might be there'
-        click_button "Send Reply"
       end
 
       it 'includes message in the organizer notice' do
+        allow(EmailOrganizerNoticeJob).to receive(:perform_later).once
+        visit rsvp_maybe_path(@invitation.code)
+        fill_in "rsvp_organizer_message", with: 'I might be there'
+        click_button "Send Reply"
+
         @args['organizer_message'] = 'I might be there'
-        expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
+        expect(EmailOrganizerNoticeJob).to have_received(:perform_later).once
           .with(@invitation.membership.id, @args)
       end
 
       it 'changes membership attendance to Undecided' do
+        visit rsvp_maybe_path(@invitation.code)
+        click_button "Send Reply"
         expect(Membership.find(@membership.id).attendance).to eq('Undecided')
       end
 
       it 'forwards to feedback form, with flash message' do
+        visit rsvp_maybe_path(@invitation.code)
+        click_button "Send Reply"
+
         expect(current_path).to eq(rsvp_feedback_path(@membership.id))
         expect(page.body).to have_css('div.alert.alert-success.flash', text:
           'Your attendance status was successfully updated. Thanks for your
@@ -285,6 +301,9 @@ describe 'RSVP', type: :feature do
       end
 
       it 'updates legacy database' do
+        visit rsvp_maybe_path(@invitation.code)
+        click_button "Send Reply"
+
         allow(SyncMembershipJob).to receive(:perform_later)
         reset_database
 

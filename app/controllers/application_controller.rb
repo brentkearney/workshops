@@ -21,6 +21,7 @@ class ApplicationController < ActionController::Base
 
   before_action :set_paper_trail_whodunnit
   before_action :set_current_user, if: :json_request?
+  before_action :configure_permitted_parameters, if: :devise_controller?
 
   add_flash_types :warning, :success, :info, :error
 
@@ -91,5 +92,10 @@ class ApplicationController < ActionController::Base
   # Same Pundit policies for api_users
   def set_current_user
     @current_user ||= warden.authenticate(scope: :api_user)
+  end
+
+  def configure_permitted_parameters
+    update_attrs = [:password, :password_confirmation, :current_password]
+    devise_parameter_sanitizer.permit :account_update, keys: update_attrs
   end
 end

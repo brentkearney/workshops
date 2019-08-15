@@ -157,12 +157,16 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@event.confirmed_count).to eq(counter_cache - 1)
   end
 
-  context 'Staff notifications upon participant-updated fields' do
+  context 'Email notifications upon updated fields' do
 
-    def expect_confirmation_notice
+    def expect_confirmation_notice(job_type)
       expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).not_to eq 0
-      recipient = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].last
-      expect(recipient).to eq('confirmation_notices')
+      jobs = []
+      ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job|
+        jobs << job[:job].to_s
+      end
+
+      expect(jobs).to include(job_type)
     end
 
     before do
@@ -181,25 +185,31 @@ RSpec.describe 'Model validations: Membership', type: :model do
     it 'notifies staff if attendance changes to or from confirmed' do
       @membership.attendance = 'Not Yet Invited'
       @membership.save
-      expect_confirmation_notice
+      expect_confirmation_notice('EmailStaffConfirmationNoticeJob')
+    end
+
+    it 'notifies organizer if attendance changes' do
+      @membership.attendance = 'Declined'
+      @membership.save
+      expect_confirmation_notice('EmailOrganizerNoticeJob')
     end
 
     it 'notifies staff if has_guest is changed' do
       @membership.has_guest = true
       @membership.save
-      expect_confirmation_notice
+      expect_confirmation_notice('EmailStaffConfirmationNoticeJob')
     end
 
     it 'notifies staff if own_accommodation is changed' do
       @membership.own_accommodation = true
       @membership.save
-      expect_confirmation_notice
+      expect_confirmation_notice('EmailStaffConfirmationNoticeJob')
     end
 
     it 'notifies staff if special_info is changed' do
       @membership.special_info = 'I only eat meat.'
       @membership.save
-      expect_confirmation_notice
+      expect_confirmation_notice('EmailStaffConfirmationNoticeJob')
     end
   end
 
@@ -215,7 +225,7 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.updated_by = @membership.person.name
     @membership.save
 
-    msg = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:args].second
+    msg = ActiveJob::Base.queue_adapter.enqueued_jobs.first[:args].second
 
     expect(msg.values.first).to eq(['Attendance was "Confirmed" and is now "Declined".'])
     expect(msg.values.second).to eq(@membership.person.name)
@@ -224,8 +234,8 @@ RSpec.describe 'Model validations: Membership', type: :model do
   it 'skips attendance notification if .changed_fields? is untrue' do
     allow_any_instance_of(MembershipChangeNotice).to receive(:changed_fields?)
       .and_return(false)
-    expect(@membership.attendance).to eq('Confirmed')
-    @membership.attendance = 'Not Yet Invited'
+    expect(@membership.special_info).not_to eq('ABC')
+    @membership.special_info = 'ABC'
     @membership.save
 
     expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
@@ -239,8 +249,8 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @event.end_date = new_start + 5.days
     @event.save
 
-    expect(@membership.attendance).to eq('Confirmed')
-    @membership.attendance = 'Not Yet Invited'
+    expect(@membership.special_info).not_to eq('DEF')
+    @membership.special_info = 'DEF'
     @membership.updated_by = @membership.person.name
     @membership.save
 
@@ -258,8 +268,8 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @event.end_date = new_start + 5.days
     @event.save
 
-    expect(@membership.attendance).to eq('Confirmed')
-    @membership.attendance = 'Not Yet Invited'
+    expect(@membership.special_info).not_to eq('GHI')
+    @membership.special_info = 'GHI'
     @membership.updated_by = @membership.person.name
     @membership.save
 
@@ -276,8 +286,8 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @event.end_date = new_start + 5.days
     @event.save
 
-    expect(@membership.attendance).to eq('Confirmed')
-    @membership.attendance = 'Not Yet Invited'
+    expect(@membership.special_info).not_to eq('JKL')
+    @membership.special_info = 'JKL'
     @membership.updated_by = 'Workshops importer'
     @membership.save
 
@@ -290,8 +300,8 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @event.end_date = new_start + 5.days
     @event.save
 
-    expect(@membership.attendance).to eq('Confirmed')
-    @membership.attendance = 'Not Yet Invited'
+    expect(@membership.special_info).not_to eq('MNO')
+    @membership.special_info = 'MNO'
     @membership.save
 
     expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq 0
