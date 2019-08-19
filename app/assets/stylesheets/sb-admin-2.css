@@ -116,7 +116,7 @@ body {
 
 .sidebar .nav-second-level li,
 .sidebar .nav-third-level li {
-    border-bottom: 0!important;
+    border-bottom: 0;
 }
 
 .sidebar .nav-second-level li a {
@@ -288,7 +288,7 @@ table.dataTable thead .sorting:after {
     padding-top: 10px;
     padding-bottom: 10px;
     border: 1px solid #ddd;
-    background-color: #eee!important;
+    background-color: #eee;
 }
 
 .show-grid {

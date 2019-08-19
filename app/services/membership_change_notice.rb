@@ -90,8 +90,8 @@ class MembershipChangeNotice
 
   def notify_organizer
     return if @membership.is_rsvp # Invitation class already sent notice
-    args = { 'attendance_was' => @membership.attendance,
-             'attendance' => @changed['attendance']}
+    args = { 'attendance_was' => @changed['attendance'],
+             'attendance' => @membership.attendance }
 
     EmailOrganizerNoticeJob.perform_later(@membership.id, args)
   end

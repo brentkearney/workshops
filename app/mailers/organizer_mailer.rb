@@ -29,7 +29,7 @@ class OrganizerMailer < ApplicationMailer
       @attendance_msg = %(Changed attendance status from: "#{old_attendance}"
         to "#{new_attendance}".).squish
     end
-    message_to_organizer = args['organizer_message'] || ''
+    message_to_organizer = args['organizer_message']
 
     @member = membership.person
     @event = membership.event

@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   get '/users/sign_out', to: redirect('/sign_out')
   get '/users/confirmation', to: redirect('/confirmation')
   get '/users/register', to: redirect('/register')
+  get '/password', to: redirect('/edit')
 
   # Post-login welcome page
   get 'welcome' => 'welcome#index'

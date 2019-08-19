@@ -34,7 +34,7 @@ module MembershipsHelper
 
   def show_roles(f, default: nil)
     disabled_options = []
-    if @current_user.is_organizer?(@event)
+    if @current_user.is_organizer?(@event) && !@current_user.is_admin?
       disabled_options = ['Contact Organizer', 'Organizer']
     end
 
