@@ -6,7 +6,7 @@
 
 # Returns a hash sorted memberships: { attendance => [memberships] }
 class SortedMembers
-  attr_reader :event, :memberships
+  attr_reader :event
 
   def initialize(event)
     @event = event

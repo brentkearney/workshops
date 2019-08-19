@@ -76,15 +76,24 @@ def add_new_members(event, num)
   end
 end
 
+def random_time(event, attendance)
+  return unless attendance == 'Confirmed'
+  date1 = event.start_date - rand(1..12).months
+  date2 = event.start_date - 1.week
+  Time.at((date2.to_f - date1.to_f)*rand + date1.to_f)
+end
+
 def create_member(event, role, num_people)
   person = Person.offset(rand(num_people)).first
   while event.members.include? person
     person = Person.offset(rand(num_people)).first
   end
   person.member_import = true
+  attendance = Membership::ATTENDANCE.sample
   member_data = {
     role: role,
-    attendance: Membership::ATTENDANCE.sample,
+    attendance: attendance,
+    replied_at: random_time(event, attendance),
     event: event,
     person: person,
     arrival_date: event.start_date,
