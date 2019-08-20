@@ -54,7 +54,7 @@ class EventPolicy
       all_fields
     when 'staff'
       all_fields - %w[code name start_date end_date location event_type
-                       time_zone max_participants template]
+                       time_zone template]
     when 'member'
       if current_user.is_organizer?(event)
         %w[short_name subjects description press_release]
