@@ -41,6 +41,9 @@ class RegistrationsController < Devise::RegistrationsController
 
   def sign_up_params
     params.require(:user).permit(:person_id, :email, :password, :password_confirmation)
+    rescue_from ActionController::ParameterMissing do |e|
+      redirect_to register_path, error: 'There was a problem with your form submission.'
+    end
   end
 
   def account_update_params
