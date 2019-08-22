@@ -1,5 +1,5 @@
 <div class="authform">
-  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, role: 'form' }) do |f| %>
+  <%= form_for(resource, as: resource_name, url: password_path, html: { method: :post, role: 'form' }) do |f| %>
       <h3>Password Reset</h3>
       <p>Enter your email address:</p>
       <%= render "devise/shared/error_messages", resource: resource %>
