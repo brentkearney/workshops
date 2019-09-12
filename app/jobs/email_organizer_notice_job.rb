@@ -10,16 +10,16 @@
 class EmailOrganizerNoticeJob < ApplicationJob
   queue_as :urgent
 
-  rescue_from(SparkPostRails::DeliveryException) do |exception|
-    membership_id = arguments[0]
-    membership = Membership.find_by_id(membership_id)
-    person = membership.person
-    event = membership.event
-    msg = { error: "Error sending RSVP notice to #{event.code} Organizer for
-                   #{person.name}".squish,
-            exception: exception }
-    StaffMailer.notify_sysadmin(nil, msg).deliver_now
-  end
+  # rescue_from(SparkPostRails::DeliveryException) do |exception|
+  #   membership_id = arguments[0]
+  #   membership = Membership.find_by_id(membership_id)
+  #   person = membership.person
+  #   event = membership.event
+  #   msg = { error: "Error sending RSVP notice to #{event.code} Organizer for
+  #                  #{person.name}".squish,
+  #           exception: exception }
+  #   StaffMailer.notify_sysadmin(nil, msg).deliver_now
+  # end
 
   def perform(membership_id, args)
     membership = Membership.find_by_id(membership_id)

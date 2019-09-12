@@ -75,14 +75,11 @@ class InvitationMailer < ApplicationMailer
       # end
     end
 
-    data = { skip_suppression: true }
-
     if File.exist?(text_template_file)
       mail(to: to_email,
            bcc: bcc_email,
            from: from_email,
            subject: subject,
-           sparkpost_data: data,
            template_path: "invitation_mailer/#{@event.location}",
            template_name: @event.event_type) do |format|
         format.text { render text_template }

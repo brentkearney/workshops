@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Email bounces back to senders
+# Invalid maillist email bounces back to senders
 class BounceMailer < ApplicationMailer
   attr_accessor :email_to, :email_from, :email_subject, :email_body,
     :email_date, :webmaster, :subject

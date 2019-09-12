@@ -85,7 +85,6 @@ class MembershipsController < ApplicationController
   # PATCH/PUT /events/:event_id/memberships/1.json
   def update
     authorize @membership
-    old_email = @membership.person.email
     member_params = MembershipParametizer.new(@membership, membership_params,
                                               @current_user)
 

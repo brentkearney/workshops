@@ -48,13 +48,10 @@ class ParticipantMailer < ApplicationMailer
                       'rsvp', "#{@event.location}")
     mail_template = "#{template_path}/#{@event.event_type}.text.erb"
 
-    data = { skip_suppression: true }
-
     if File.exist?(mail_template)
       mail(to: to_email,
            from: from_email,
            subject: subject,
-           sparkpost_data: data,
            template_path: "participant_mailer/rsvp/#{@event.location}",
            template_name: @event.event_type)
     else
