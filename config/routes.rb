@@ -16,7 +16,8 @@ Rails.application.routes.draw do
     post 'register', to: 'devise/registrations#create'
     delete 'sign_out', to: 'devise/sessions#destroy'
     get 'confirmation/sent', to: 'confirmations#sent'
-    patch 'users/confirmation', to: 'confirmations#create'
+    get 'confirmation/:confirmation_token', to: 'confirmations#show'
+    patch 'confirmation', to: 'confirmations#create'
   end
 
   # Redirect old urls
@@ -25,6 +26,7 @@ Rails.application.routes.draw do
   get '/users/confirmation', to: redirect('/confirmation')
   get '/users/register', to: redirect('/register')
   get '/password', to: redirect('/edit')
+  patch 'users/confirmation', to: 'confirmations#create'
 
   # Post-login welcome page
   get 'welcome' => 'welcome#index'

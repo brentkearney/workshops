@@ -5,6 +5,8 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RegistrationsController < Devise::RegistrationsController
+  include ActiveSupport::Rescuable
+
   def create
     invalid_email_redirect and return unless valid_email?
     person = Person.find_by_email(user_email)
@@ -41,9 +43,9 @@ class RegistrationsController < Devise::RegistrationsController
 
   def sign_up_params
     params.require(:user).permit(:person_id, :email, :password, :password_confirmation)
-    rescue_from ActionController::ParameterMissing do |e|
-      redirect_to register_path, error: 'There was a problem with your form submission.'
-    end
+    # rescue_from ActionController::ParameterMissing do |e|
+    #   redirect_to register_path, error: "There was a problem with your form submission."
+    # end
   end
 
   def account_update_params

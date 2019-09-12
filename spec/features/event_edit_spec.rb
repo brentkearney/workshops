@@ -112,8 +112,8 @@ describe 'Event Edit Page', type: :feature do
     before do
       @non_member_user.staff!
       login_as @non_member_user, scope: :user
-      @allowed_fields = %w(short_name description press_release door_code booking_code subjects)
-      @not_allowed_fields = %w(name code max_participants start_date end_date time_zone location template)
+      @allowed_fields = %w(short_name description press_release door_code booking_code subjects max_participants)
+      @not_allowed_fields = %w(name code start_date end_date time_zone location template)
     end
 
     context 'whose location matches the event location' do

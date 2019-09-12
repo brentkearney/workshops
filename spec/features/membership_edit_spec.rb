@@ -22,6 +22,15 @@ describe 'Membership#edit', type: :feature do
     Warden.test_reset!
   end
 
+  def assign_participant_email_to_user
+    @participant.person.email = Faker::Internet.email
+    @participant.save
+    @participant_user.email = @participant.person.email
+    @participant_user.person_id = @participant.person_id
+    @participant_user.skip_reconfirmation!
+    @participant_user.save
+  end
+
   def denies_user_access(member)
     visit edit_event_membership_path(@event, member)
 
@@ -223,14 +232,6 @@ describe 'Membership#edit', type: :feature do
       allows_person_editing(@participant)
     end
 
-    def assign_participant_email_to_user
-      @participant.person.email = Faker::Internet.email
-      @participant.save
-      @participant_user.email = @participant.person.email
-      @participant_user.skip_reconfirmation!
-      @participant_user.save
-    end
-
     it 'changing email signs out user and sends confirmation email' do
       assign_participant_email_to_user
       old_email = @participant.person.email
@@ -264,6 +265,7 @@ describe 'Membership#edit', type: :feature do
 
       click_button 'Update Member'
 
+      expect(Person.find_by_id(other_person.id)).to be_nil
       updated = Membership.find(@participant.id)
       expect(updated.person.email).to eq(new_email)
       expect(updated.person.emergency_contact).to eq('You')
@@ -733,6 +735,73 @@ describe 'Membership#edit', type: :feature do
 
     it 'allows editing of billing info' do
       allows_billing_info_editing(@participant)
+    end
+
+    context 'changing email to one that is already associated to another record' do
+      it 'merges the two Person records, keeping the best data' do
+        assign_participant_email_to_user
+        other_person = create(:person,
+                              firstname: @participant.person.firstname,
+                               lastname: @participant.person.lastname,
+                               biography: nil,
+                               research_areas: nil,
+                               updated_at: DateTime.yesterday,
+                      emergency_contact: 'Me')
+        other_membership = create(:membership, person: other_person)
+        old_email = @participant.person.email
+        new_email = other_person.email
+
+        visit edit_event_membership_path(@event, @participant)
+        fill_in 'membership_person_attributes_email', with: new_email
+        fill_in 'membership_person_attributes_biography', with: 'Yes.'
+        fill_in 'membership_person_attributes_emergency_contact', with: 'You'
+        click_button 'Update Member'
+
+        expect(Person.find_by_id(other_person.id)).to be_nil
+        expect(Person.find_by_email(old_email)).to be_nil
+        updated = Membership.find(@participant.id)
+        expect(updated.person.email).to eq(new_email)
+        expect(updated.person.emergency_contact).to eq('You')
+        expect(updated.person.biography).to eq('Yes.')
+        other_updated = Membership.find(other_membership.id)
+        expect(other_updated).not_to be_nil
+        expect(other_updated.person_id).to eq(@participant.person_id)
+      end
+
+      it 'consolidates User records' do
+        assign_participant_email_to_user
+        other_person = create(:person,
+                              firstname: @participant.person.firstname,
+                               lastname: @participant.person.lastname,
+                              biography: nil,
+                         research_areas: nil,
+                             updated_at: Time.now - 1.year,
+                      emergency_contact: 'Me')
+
+        old_email = @participant.person.email
+        new_email = other_person.email
+        create(:user, person: other_person, email: new_email)
+
+        expect(User.find(@participant_user.id)).not_to be_nil
+        expect(@participant_user.email).to eq(old_email)
+        expect(@participant_user.person_id).to eq(@participant.person_id)
+
+        visit edit_event_membership_path(@event, @participant)
+        fill_in 'membership_person_attributes_email', with: new_email
+        fill_in 'membership_person_attributes_biography', with: 'Yes.'
+        fill_in 'membership_person_attributes_emergency_contact', with: 'You'
+        click_button 'Update Member'
+
+        expect(Person.find_by_id(other_person.id)).to be_nil
+        expect(Person.find_by_email(old_email)).to be_nil
+
+        expect(User.find_by_email(old_email)).to be_nil
+        expect(User.find_by_person_id(other_person.id)).to be_nil
+
+        user = User.find_by_email(new_email)
+        expect(user).not_to be_nil
+        expect(user.person_id).to eq(@participant.person_id)
+      end
     end
   end
 end

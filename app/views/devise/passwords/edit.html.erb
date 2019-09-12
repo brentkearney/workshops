@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-md-4">
       <div class="authform">
-        <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, role: 'form' }) do |f| %>
+        <%= form_for(resource, as: resource_name, url: password_path, html: { method: :put, role: 'form' }) do |f| %>
         <%= render "devise/shared/error_messages", resource: resource %>
         <%= f.hidden_field :reset_password_token %>
         <h3>Please set your password:</h3>

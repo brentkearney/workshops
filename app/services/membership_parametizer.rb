@@ -65,8 +65,8 @@ class MembershipParametizer
       create_email_change_confirmation(sync) ||
         @person_data['email'] = new_email # create validation error
     else
-      update_user_email(new_email) # sends reconfirmation email
       person = sync.change_email
+      update_user_email(new_email) # ensure just one account with new email
       @person_data = person.attributes.merge(@person_data)
       @person_data['id'] = person.id
       @membership.person_id = person.id
@@ -82,12 +82,35 @@ class MembershipParametizer
     @person_data['email'] = @membership.person.email
   end
 
+  def consolidate_users(user_with_id, user_with_email, new_email)
+    if !user_with_id.nil? && !user_with_email.nil?
+      user_with_id.delete
+      user_with_email.person_id = @membership.person_id
+      user_with_email.save
+      return user_with_email
+    end
+
+    if user_with_id.nil?
+      user_with_email.person_id = @membership.person_id
+      user_with_email.save
+      return user_with_email
+    end
+
+    if user_with_email.nil?
+      user_with_id.email = new_email
+      user_with_id.save # sends reconfirmation email
+      return user_with_id
+    end
+  end
+
   def update_user_email(new_email)
-    user = User.find_by_person_id(@membership.person_id)
-    return if user.nil? || user.email == new_email
+    user_with_email = User.find_by_email(new_email)
+    user_with_id = User.find_by_person_id(@membership.person_id)
+
+    return if user_with_id.nil? && user_with_email.nil?
+
+    user = consolidate_users(user_with_id, user_with_email, new_email)
     @user_update = true if @current_user.person_id == user.person_id
-    user.email = new_email
-    user.save
   end
 
   def numeric_phd_year?
