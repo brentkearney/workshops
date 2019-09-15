@@ -54,6 +54,6 @@ web:
     - EMAIL_PORT=25
     - EMAIL_STARTTLS=true
     - MAILGUN_API_KEY=your_key
-    - EMAIL_DOMAIN=postmaster@yourdomain.com
+    - MAILGUN_EMAIL_DOMAIN=postmaster@yourdomain.com
     - CORS_HOSTS="'https://your.corssite1.com', 'https://your.corssite2.com'"
 

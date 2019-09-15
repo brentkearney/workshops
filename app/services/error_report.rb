@@ -34,8 +34,10 @@ class ErrorReport
 
     case "#{@from}"
       when 'SyncMembers'
+        return if errors.blank?
         if errors.has_key?('LegacyConnector')
           error = errors['LegacyConnector'].shift
+          return if error.blank?
           error_message = "Error message:\n"
           unless error.object.nil?
             error_message << error.object.inspect.to_s

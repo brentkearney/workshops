@@ -50,7 +50,6 @@ class SyncMembers
       sync_errors.add(lc,
                       "Unable to retrieve any remote members for #{event.code}")
       sync_errors.send_report
-      raise 'NoResultsError'
     end
     remote_members
   end
@@ -80,6 +79,7 @@ class SyncMembers
   end
 
   def prune_members
+    return if remote_members.empty?
     remote_ids = remote_members.map { |m| m['Person']['legacy_id'].to_i }
     remote_emails = remote_members.map { |m| m['Person']['email'] }
 
