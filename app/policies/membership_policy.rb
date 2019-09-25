@@ -101,6 +101,8 @@ class MembershipPolicy
   end
 
   def edit?
+    return false if @membership.person == @current_user.person &&
+      !@membership.invitation.nil?
     self_organizer_staff
   end
 

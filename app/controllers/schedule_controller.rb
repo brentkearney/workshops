@@ -95,7 +95,7 @@ class ScheduleController < ApplicationController
   def update
     authorize @schedule
     original_item = @schedule.dup
-    original_lecture = original_item.lecture
+    original_lecture = @schedule.lecture.dup
 
     merged_params = ScheduleItem.update(@schedule, schedule_params
                                 .merge(updated_by: current_user.name))

@@ -225,10 +225,10 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'hides invite buttons if workshop has already started' do
-      original_start = @event.start_date
-      original_end = @event.end_date
-      @event.start_date = Date.current - 1.day
-      @event.end_date = Date.current + 4.days
+      original_start = @event.start_date.dup
+      original_end = @event.end_date.dup
+      @event.start_date = Date.current
+      @event.end_date = @event.start_date + 5.days
       @event.save
 
       visit event_memberships_path(@event)

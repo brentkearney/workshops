@@ -1,0 +1,140 @@
+<% if policy(membership).edit_membership? %>
+<h3 id="membership">
+  <%= membership.person.name %>'s <%= @event.code %> Membership Details
+</h3>
+
+  <% if policy(membership).edit_role? %>
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :role, "Role: " %>
+    </div>
+    <div class="col-sm-3">
+      <%= show_roles(f, default: membership.role) %>
+    </div>
+    <div class="col-sm-6"></div>
+  </div>
+  <% end %>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :attendance, "Attendance: " %>
+    </div>
+    <div class="col-sm-3">
+      <%= show_attendances(f) %>
+    </div>
+    <div class="col-sm-6"></div>
+  </div>
+<% end %>
+
+<% if policy(membership).edit_dates? %>
+  <%= f.hidden_field :min_date, id: 'min_date', value: membership.event.start_date %>
+  <%= f.hidden_field :max_date, id: 'max_date', value: membership.event.end_date %>
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :arrival_date, "Arrival Date:" %>
+    </div>
+    <div class="col-sm-3">
+      <%= f.select :arrival_date, date_list, { selected: selected_date('arrival') }, class: "form-control" %>
+    </div>
+    <div class="col-sm-6"></div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :departure_date, "Departure Date:" %>
+    </div>
+    <div class="col-sm-3">
+      <%= f.select :departure_date, date_list, { selected: selected_date }, class: "form-control" %>
+    </div>
+    <div class="col-sm-6"></div>
+  </div>
+<% end %>
+
+<% if policy(membership).organizer_notes? %>
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :org_notes, "Organizer Notes: " %>
+    </div>
+    <div class="col-sm-9">
+      <%= f.text_area :org_notes, class: 'form-control' %>
+    </div>
+  </div>
+<% end %>
+
+<% if policy(membership).edit_hotel? %>
+  <h3 id="hotel">
+    <%= membership.person.name %>'s <%= @event.code %> Hotel & Billing Details
+  </h3>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :reviewed, "Reviewed:" %>
+    </div>
+    <div class="col-sm-9">
+      <%= f.check_box :reviewed, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :billing, "Billing: " %>
+    </div>
+    <div class="col-sm-9">
+      <%= f.text_field :billing, class: 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :room, "Room: " %>
+    </div>
+    <div class="col-sm-9">
+      <%= f.text_field :room, class: 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :room_notes, "Room notes: " %>
+    </div>
+    <div class="col-sm-9">
+      <%= f.text_area :room_notes, class: 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :own_accommodation, "Own Accommodation:" %>
+    </div>
+    <div class="col-sm-9">
+      <%= f.check_box :own_accommodation, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :has_guest, "Has Guest:" %>
+    </div>
+    <div class="col-sm-9">
+      <%= f.check_box :has_guest, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :special_info, "Special Info: " %>
+    </div>
+    <div class="col-sm-9">
+      <%= f.text_area :special_info, class: 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= f.label :staff_notes, "Staff Notes: " %>
+    </div>
+    <div class="col-sm-9">
+      <%= f.text_area :staff_notes, class: 'form-control' %>
+    </div>
+  </div>
+<% end %>
