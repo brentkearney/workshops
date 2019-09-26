@@ -22,7 +22,7 @@ class EventMaillist
       location: @event.location,
       from: @email.from[:full],
       to: @email.to[0][:full],
-      subject: @email.subject,
+      subject: subject,
       email_parts: email_parts,
       attachments: @email.attachments,
     }

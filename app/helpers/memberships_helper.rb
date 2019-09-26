@@ -6,6 +6,11 @@
 
 # Helpers for memberships
 module MembershipsHelper
+
+  def pending_invitation?
+    @current_user.person == @membership.person && !@membership.invitation.nil?
+  end
+
   def event_membership_name(m)
     m.event.code + ': ' + m.event.name + ' (' + m.event.date + ')'
   end

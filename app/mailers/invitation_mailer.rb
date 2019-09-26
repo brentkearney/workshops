@@ -23,7 +23,7 @@ class InvitationMailer < ApplicationMailer
     @person = invitation.membership.person
     @event = invitation.membership.event
     @membership = invitation.membership
-    @rsvp_url = GetSetting.app_url + '/rsvp/' + invitation.code
+    @rsvp_url = invitation.rsvp_url
 
     return if @event.start_date.to_time.to_i < Time.now.to_i
     @event_start = @event.start_date.to_time.strftime('%A, %B %-d')

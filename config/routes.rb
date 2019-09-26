@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   get '/users/register', to: redirect('/register')
   get '/password', to: redirect('/edit')
   patch 'users/confirmation', to: 'confirmations#create'
+  patch 'confirmation.user', to: 'confirmations#create'
 
   # Post-login welcome page
   get 'welcome' => 'welcome#index'

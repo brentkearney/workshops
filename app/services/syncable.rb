@@ -103,6 +103,7 @@ module Syncable
       local_value = local.send(k)
       next unless local_value.blank?
       v = prepare_value(k, v)
+      next if v.nil? && local_value.blank?
       booleans = boolean_fields(local)
       v = bool_value(v) if booleans.include?(k)
       local.update_column(k.to_s, v) unless v.blank? # avoid updating updated_at

@@ -419,6 +419,22 @@ describe 'Membership#edit', type: :feature do
     it 'hides hotel & billing fields' do
       disallows_hotel_fields
     end
+
+    context '... who has not yet responded to an invitation' do
+      before do
+        @invitation = Invitation.new(membership: @participant, invited_by: 'x')
+        @invitation.save
+        visit edit_event_membership_path(@event, @participant)
+      end
+
+      after do
+        @invitation.destroy
+      end
+
+      it 'denies access' do
+        denies_user_access(@participant)
+      end
+    end
   end
 
   context 'As an organizer of the event' do

@@ -396,6 +396,37 @@ describe 'Membership#show', type: :feature do
       visit event_membership_path(@event, @participant)
       expect(page.body).to have_text(@unconfirmed_membership.event.name)
     end
+
+    context '... who has not yet responded to an invitation' do
+      before do
+        @invitation = Invitation.new(membership: @participant, invited_by: 'x')
+        @invitation.save
+        visit event_membership_path(@event, @participant)
+      end
+
+      after do
+        @invitation.destroy
+      end
+
+      it 'does not show membership details' do
+        expect(page.body).not_to have_text(@participant.role)
+        expect(page.body).not_to have_text(@participant.attendance)
+        expect(page.body).not_to have_text(@participant.arrives)
+        expect(page.body).not_to have_text(@participant.departs)
+      end
+
+      it 'does not show hotel & billing details' do
+        does_not_show_hotel_billing(@participant)
+      end
+
+      it 'shows Pending Invitation panel & link to RSVP page' do
+        expect(page.body).to have_text("Pending Invitation")
+        expect(page.body).to have_link('clicking here',
+                                        href: @participant.invitation.rsvp_url)
+        expect(page.body).to have_link('Respond to Invitation',
+                                        href: @participant.invitation.rsvp_url)
+      end
+    end
   end
 
   context 'As an organizer of the event' do

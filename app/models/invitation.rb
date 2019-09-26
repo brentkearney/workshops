@@ -37,6 +37,10 @@ class Invitation < ApplicationRecord
     membership.person
   end
 
+  def rsvp_url
+    GetSetting.app_url + '/rsvp/' + self.code
+  end
+
   def accept
     update_membership('Confirmed')
     EmailParticipantConfirmationJob.perform_later(membership.id)

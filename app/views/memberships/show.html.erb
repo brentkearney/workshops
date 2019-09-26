@@ -34,7 +34,6 @@
               <% end %>
 
               <div class="row" id="profile-address">
-                <strong>Address:</strong><br />
                 <%= print_address(@person) %>
               </div>
 
@@ -96,6 +95,24 @@
     <% if policy(@membership).show_details? %>
     <div class="col-md-6 membership-and-hotel-details">
 
+      <% if pending_invitation? %>
+      <div class="row profile membership-details">
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3>Pending Invitation</h3>
+          </div>
+          <div class="panel-body">
+            <p>You were sent an e-mail inviting you to attend this workshop.</p>
+            <p>Please respond to the invitation to let us know whether or not
+                you will attend, and to update your information.</p>
+            <p>You can respond by following the link sent in the e-mail, or by
+                <%= link_to 'clicking here', @membership.invitation.rsvp_url %>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <% else %>
       <div class="row profile membership-details">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -196,16 +213,20 @@
           <% end %>
         </div><!-- /panel -->
       </div><!-- /row -->
-      <% end %>
+      <% end # if policy(@membership).hotel_and_billing? %>
+      <% end # if pending_invitation? / else %>
 
     </div><!-- /membership-and-hotel-details -->
-    <% end %>
+    <% end # policy(@membership).show_details? %>
 
   </div><!-- master row -->
   <div class="row" id="member-buttons">
     <%= link_to "Back to #{@event.code}", event_memberships_path(@event),
           class: 'btn btn-sm btn-default' %>
-    <% if policy(@membership).edit_membership? %>
+    <% if pending_invitation? %>
+      <%= link_to "Respond to Invitation", @membership.invitation.rsvp_url,
+            class: 'btn btn-sm btn-default' %>
+    <% elsif policy(@membership).edit_membership? %>
       <%= link_to "Edit Membership", edit_event_membership_path(@event, @membership),
             class: 'btn btn-sm btn-default' %>
     <% end %>
