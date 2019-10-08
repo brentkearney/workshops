@@ -66,7 +66,7 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
 
     context 'POST with valid auth token' do
       it 'responds with success' do
-        valid_token = GetSetting.site_setting('SPARKPOST_AUTH_TOKEN')
+        valid_token = GetSetting.site_setting('MAILGUN_API_KEY')
         expect(valid_token).not_to be_empty
         @request.headers["X-MessageSystems-Webhook-Token"] = valid_token
 
@@ -78,7 +78,7 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
 
     context 'POST with valid token but invalid email format' do
       it 'responds with bad request' do
-        valid_token = GetSetting.site_setting('SPARKPOST_AUTH_TOKEN')
+        valid_token = ENV['MAILGUN_API_KEY']
         expect(valid_token).not_to be_empty
         @request.headers["X-MessageSystems-Webhook-Token"] = valid_token
 

@@ -24,11 +24,11 @@ class EmailProcessor
   def extract_recipients
     maillists = []
     invalid_sender = false
-    recipients = @email.to + @email.cc
+    recipients = @email.to + @email.cc + @email.bcc
 
     recipients.each do |recipient|
       to_email = recipient[:email]
-      code = recipient[:token]
+      code = recipient[:token] # part before the @
       group = 'Confirmed'
       code, group = code.split('-') if code =~ /-/
 
@@ -47,9 +47,12 @@ class EmailProcessor
         end
       end
     end
+
     if maillists.empty? && !invalid_sender
       EmailInvalidCodeBounceJob.perform_later(email_params)
+      send_report({ recipients: recipients })
     end
+
     maillists
   end
 
@@ -88,12 +91,13 @@ class EmailProcessor
     event.organizers + event.staff
   end
 
-  def send_report
+  def send_report(other_info = nil)
     msg = {
             problem: 'Mail list submission with invalid sender address',
             email_params: email_params,
             email_object: @email.inspect
           }
+    msg.merge(other_info) unless other_info.nil?
     StaffMailer.notify_sysadmin(@event, msg).deliver_now
   end
 

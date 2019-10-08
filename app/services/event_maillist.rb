@@ -74,8 +74,7 @@ class EventMaillist
     end
 
     resp = MaillistMailer.workshop_maillist(message, recipient).deliver_now!
-
-    if !resp.nil? && resp['total_rejected_recipients'] != 0
+    if !resp.nil? && !resp.errors.empty?
       StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
     end
   end

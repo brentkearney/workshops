@@ -12,7 +12,7 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   private
 
   def unauthorized
-    Rails.logger.debug "\n\nGriddler::AuthenticationController: authorization failed [#{posted_token}].\n\n"
+    Rails.logger.debug "\n\nGriddler::AuthenticationController: authentication failed.\n\n"
     head :unauthorized and return
   end
 
@@ -27,6 +27,7 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   protected
 
   def valid_email_format
+    return true
     if params.key?('_json') && params['_json'].kind_of?(Array)
       if params['_json'][0].key?('msys')
         if params['_json'][0]['msys'].key?('relay_message')
@@ -42,18 +43,24 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   end
 
   def authenticate
-    verify_sparkpost_token || unauthorized
+    verify_token || unauthorized
   end
 
-  def verify_sparkpost_token
-    posted_token == valid_token
+  def verify_token
+    encoded_token == posted_signature
+  end
+
+  def posted_signature
+    params['signature']
   end
 
   def posted_token
-    request.headers["X-MessageSystems-Webhook-Token"]
+    return '' unless params['timestamp'] && params['token']
+    params['timestamp'] + params['token']
   end
 
-  def valid_token
-    GetSetting.site_setting('SPARKPOST_AUTH_TOKEN')
+  def encoded_token
+    digest = OpenSSL::Digest.new('sha256')
+    OpenSSL::HMAC.hexdigest(digest, ENV['MAILGUN_API_KEY'], posted_token)
   end
 end

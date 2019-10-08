@@ -6,11 +6,7 @@ There has been an update in membership for the event:
 
 
 "<%= @member.name %>" <<%= @member.email %>> (<%= @member.affiliation %>)
-<% if @old_attendance == @new_attendance %>
-Attendance status is: <%= @new_attendance %>
-<% else %>
-Changed attendance status from: "<%= @old_attendance %>" to "<%= @new_attendance %>".
-<% end %>
+<%= @attendance_msg %>
 
 <% unless @message_to_organizer.blank? %>
 <%= @member.firstname %> included this message:

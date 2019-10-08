@@ -24,7 +24,7 @@ module ActionMailer
     def deliver(event)
       info do
         recipients = Array(event.payload[:to]).join(', ')
-        "\nSent mail to #{recipients}, Subject: #{event.payload[:subject]}, on #{Time.now} (#{event.duration.round(1)}ms)"
+        "Sent mail to #{recipients}, Subject: #{event.payload[:subject]}, on #{Time.now} (#{event.duration.round(1)}ms)"
       end
 
       debug { remove_attachments(event.payload[:mail]) }

@@ -74,6 +74,14 @@ describe 'EmailProcessor' do
       EmailProcessor.new(email).process
       expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
     end
+
+    it 'does not bounce email if valid address is in the Bcc: field' do
+      params.merge!(bcc: ["#{event.code}@example.com", 'foo@bar.com'])
+      email = Griddler::Email.new(params)
+      allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
+      EmailProcessor.new(email).process
+      expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
+    end
   end
 
   context 'validates sender' do

@@ -39,7 +39,6 @@ RSpec.describe OrganizerMailer, type: :mailer do
       OrganizerMailer.rsvp_notice(@participant, args).deliver_now
       @header = ActionMailer::Base.deliveries.first
       @mail_object = ActionMailer::Base.deliveries.last
-      puts "Data:\n#{ActionMailer::Base.deliveries.last.header.to_s}"
     end
 
     it 'sends email' do
@@ -52,22 +51,19 @@ RSpec.describe OrganizerMailer, type: :mailer do
     end
 
     it "message body includes participant's name & email" do
-      # recipient = @mail_object[:substitution_data][:member_name]
-      # email = @mail_object[:substitution_data][:member_email]
-      header = @mail_object.header.to_s
-      expect(header).to include(@participant.person.name)
-      expect(header).to include(@participant.person.email)
+      body = @mail_object.body.to_s
+      expect(body).to include(@participant.person.name)
+      expect(body).to include(@participant.person.email)
     end
 
     it "message body includes participant's current and previous status" do
-      # msg = @mail_object[:substitution_data][:attendance_msg]
-      expect(msg).to have_text(@participant.attendance_was)
-      expect(msg).to have_text(@participant.attendance)
+      body = @mail_object.body.to_s
+      expect(body).to have_text(@participant.attendance_was)
+      expect(body).to have_text(@participant.attendance)
     end
 
     it 'message body includes message to organizer' do
-      # msg = @mail_object[:substitution_data][:message_to_organizer]
-      expect(msg).to eq('Foo bar')
+      expect(@mail_object.body.to_s).to have_text('Foo bar')
     end
   end
 end

@@ -23,9 +23,9 @@ class OrganizerMailer < ApplicationMailer
   def rsvp_notice(membership, args)
     old_attendance = args['attendance_was'] || 'Invited'
     new_attendance = args['attendance'] || 'Invited'
-    if old_attendance == new_attendance
-      @attendance_msg = "Attendance status is: #{new_attendance}."
-    else
+
+    @attendance_msg = "Attendance status is: #{new_attendance}."
+    unless old_attendance == new_attendance
       @attendance_msg = %(Changed attendance status from: "#{old_attendance}"
         to "#{new_attendance}".).squish
     end

@@ -24,6 +24,7 @@ class LegacyConnector
 
   def initialize
     @rest_url = Setting.Site['legacy_api']
+    @rest_url = nil if ENV['APPLICATION_HOST'].include?('staging')
   end
 
   # get a list of events within a given date range
