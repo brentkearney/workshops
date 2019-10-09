@@ -27,7 +27,9 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   protected
 
   def valid_email_format
-    return true
+    return true if params.key?("X-Mailgun-Incoming")
+
+    # Below is for Sparkpost messages
     if params.key?('_json') && params['_json'].kind_of?(Array)
       if params['_json'][0].key?('msys')
         if params['_json'][0]['msys'].key?('relay_message')
@@ -51,7 +53,7 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   end
 
   def posted_signature
-    params['signature']
+    params['signature'] || 'invalid'
   end
 
   def posted_token

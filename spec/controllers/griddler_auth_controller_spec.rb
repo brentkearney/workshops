@@ -9,6 +9,7 @@ require 'rails_helper'
 RSpec.describe Griddler::AuthenticationController, type: :controller do
 
   def incoming_email
+=begin  message format from Sparkpost:
     {
       "_json" => [{
         "msys" => {
@@ -36,6 +37,34 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
           }
         }
     ]}
+
+    Message from Mailgun:
+=end
+    {
+      "recipient"=>"to_email@example.com",
+      "sender"=>"from_email@example.net",
+      "subject"=>"Testing",
+      "from"=>"From Person <from_email@example.net>",
+      "X-Mailgun-Incoming"=>"Yes",
+      "X-Envelope-From"=>"<from_email@example.net>",
+      "Received"=>"by mailfront22.runbox with esmtpsa  [Authenticated alias (682413)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)\t(Exim 4.90_1)\tid 1iHyxr-00068v-BJ\tfor to_email@example.com; Wed, 09 Oct 2019 01:32:23 +0200",
+      "From"=>"From Person <from_email@example.net>",
+      "Content-Type"=>"text/plain; charset=\"us-ascii\"",
+      "Content-Transfer-Encoding"=>"7bit",
+      "Mime-Version"=>"1.0 (Mac OS X Mail 12.4 \\(3445.104.11\\))",
+      "Subject"=>"Testing",
+      "Message-Id"=>"<9216EE88-3E5F-42FD-A91D-67878145B947@kearneys.ca>",
+      "Date"=>"Tue, 8 Oct 2019 17:32:20 -0600",
+      "To"=>"to_email@example.com",
+      "X-Mailer"=>"Apple Mail (2.3445.104.11)",
+      "message-headers"=>"[[\"X-Mailgun-Incoming\", \"Yes\"], [\"X-Envelope-From\", \"<from_email@example.net>\"], [\"Received\", \"from aibo.runbox.com (aibo.runbox.com [91.220.196.211]) by mxa.mailgun.org with ESMTP id 5d9d1c8e.7f3a14c55538-smtp-in-n02; Tue, 08 Oct 2019 23:32:30 -0000 (UTC)\"], [\"Received\", \"from [10.9.9.204] (helo=mailfront22.runbox)\\tby mailtransmit03.runbox with esmtp (Exim 4.86_2)\\t(envelope-from <from_email@example.net>)\\tid 1iHyxw-0001J1-4C\\tfor to_email@example.com; Wed, 09 Oct 2019 01:32:28 +0200\"], [\"Received\", \"by mailfront22.runbox with esmtpsa  [Authenticated alias (682413)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)\\t(Exim 4.90_1)\\tid 1iHyxr-00068v-BJ\\tfor to_email@example.com; Wed, 09 Oct 2019 01:32:23 +0200\"], [\"From\", \"From Person <from_email@example.net>\"], [\"Content-Type\", \"text/plain; charset=\\\"us-ascii\\\"\"], [\"Content-Transfer-Encoding\", \"7bit\"], [\"Mime-Version\", \"1.0 (Mac OS X Mail 12.4 \\\\(3445.104.11\\\\))\"], [\"Subject\", \"Testing\"], [\"Message-Id\", \"<9216EE88-3E5F-42FD-A91D-67878145B947@kearneys.ca>\"], [\"Date\", \"Tue, 8 Oct 2019 17:32:20 -0600\"], [\"To\", \"to_email@example.com\"], [\"X-Mailer\", \"Apple Mail (2.3445.104.11)\"]]",
+      "timestamp"=>"1570577551",
+      "token"=>"48880e0c50419237cd238322bc8f9a6a16f3d0d59efe608bda",
+      "signature"=>"b20a0cbe1395a770ad2f22fe9fd3cc1c234461f647f8e469479dfb472af706aa",
+      "body-plain"=>"Just testing",
+      "stripped-text"=>"Just testing",
+      "stripped-html"=>"<p>Just testing</p>"
+    }
   end
 
   describe '#incoming' do
@@ -49,7 +78,9 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
 
     context 'POST without auth token' do
       it 'responds with unauthorized' do
-        post :incoming, params: incoming_email
+        mail = incoming_email.dup
+        mail.delete('token')
+        post :incoming, params: mail
 
         expect(response).to be_unauthorized
       end
@@ -57,8 +88,9 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
 
     context 'POST with invalid auth token' do
       it 'responds with unauthorized' do
-        request.env["X-MessageSystems-Webhook-Token"] = 'foo'
-        post :incoming, params: incoming_email
+        mail = incoming_email.dup
+        mail['token'] = 'foo'
+        post :incoming, params: mail
 
         expect(response).to be_unauthorized
       end
@@ -66,10 +98,6 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
 
     context 'POST with valid auth token' do
       it 'responds with success' do
-        valid_token = GetSetting.site_setting('MAILGUN_API_KEY')
-        expect(valid_token).not_to be_empty
-        @request.headers["X-MessageSystems-Webhook-Token"] = valid_token
-
         post :incoming, params: incoming_email
 
         expect(response).to be_successful
@@ -78,11 +106,10 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
 
     context 'POST with valid token but invalid email format' do
       it 'responds with bad request' do
-        valid_token = ENV['MAILGUN_API_KEY']
-        expect(valid_token).not_to be_empty
-        @request.headers["X-MessageSystems-Webhook-Token"] = valid_token
+        mail = incoming_email.dup
+        mail.delete("X-Mailgun-Incoming")
 
-        post :incoming, params: { email: 'Here is my message!' }
+        post :incoming, params: mail
 
         expect(response).to be_a_bad_request
       end

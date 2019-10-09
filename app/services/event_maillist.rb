@@ -74,7 +74,7 @@ class EventMaillist
     end
 
     resp = MaillistMailer.workshop_maillist(message, recipient).deliver_now!
-    if !resp.nil? && !resp.errors.empty?
+    if resp.respond_to?(:code) && resp.code != 200
       StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
     end
   end
