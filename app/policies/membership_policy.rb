@@ -170,6 +170,11 @@ class MembershipPolicy
     staff_and_admins || @membership.person == @current_user.person
   end
 
+  def show_address?
+    return false if @current_user.nil?
+    @current_user.is_admin? || @membership.person == @current_user.person
+  end
+
   def edit_personal_info?
     show_personal_info?
   end

@@ -67,10 +67,7 @@ describe 'Membership#edit', type: :feature do
            from: 'membership_person_attributes_academic_status'
     select 'Other', from: 'membership_person_attributes_gender'
     fill_in 'membership_person_attributes_phone', with: '123-456-7890'
-    fill_in 'membership_person_attributes_address1', with: '1 Infinity Loop'
-    fill_in 'membership_person_attributes_city', with: 'Cupertino'
-    fill_in 'membership_person_attributes_region', with: 'CA'
-    fill_in 'membership_person_attributes_postal_code', with: '95014'
+    fill_in 'membership_person_attributes_country', with: 'USA'
     fill_in 'membership_person_attributes_country', with: 'Zimbabwe'
     fill_in 'membership_person_attributes_emergency_contact', with: 'Mom'
     fill_in 'membership_person_attributes_emergency_phone', with: '1234'
@@ -82,10 +79,24 @@ describe 'Membership#edit', type: :feature do
     expect(person.academic_status).to eq('Undergraduate Student')
     expect(person.gender).to eq('O')
     expect(person.phone).to eq('123-456-7890')
-    expect(person.address1).to eq('1 Infinity Loop')
     expect(person.emergency_contact).to eq('Mom')
     expect(person.emergency_phone).to eq('1234')
     expect(person.phd_year).to eq('1987')
+  end
+
+  def allows_personal_address_editing(member)
+    fill_in 'membership_person_attributes_address1', with: '1 Infinity Loop'
+    fill_in 'membership_person_attributes_city', with: 'Cupertino'
+    fill_in 'membership_person_attributes_region', with: 'CA'
+    fill_in 'membership_person_attributes_postal_code', with: '95014'
+
+    click_button 'Update Member'
+
+    person = Person.find(member.person_id)
+    expect(person.address1).to eq('1 Infinity Loop')
+    expect(person.city).to eq('Cupertino')
+    expect(person.region).to eq('CA')
+    expect(person.postal_code).to eq('95014')
   end
 
   def allows_membership_info_editing(member)
@@ -163,13 +174,16 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).not_to have_field field_name
     expect(page.body).not_to have_field 'membership_person_attributes_gender'
     expect(page.body).not_to have_field 'membership_person_attributes_phone'
+    expect(page.body).not_to have_field 'membership_person_attributes_country'
+  end
+
+  def disallows_personal_address_editing
     expect(page.body).not_to have_field 'membership_person_attributes_address1'
     expect(page.body).not_to have_field 'membership_person_attributes_address2'
     expect(page.body).not_to have_field 'membership_person_attributes_address3'
     expect(page.body).not_to have_field 'membership_person_attributes_city'
     expect(page.body).not_to have_field 'membership_person_attributes_region'
     expect(page.body).not_to have_field 'membership_person_attributes_postal_code'
-    expect(page.body).not_to have_field 'membership_person_attributes_country'
   end
 
   def disallows_hotel_fields
@@ -230,6 +244,10 @@ describe 'Membership#edit', type: :feature do
 
     it 'allows editing of person fields' do
       allows_person_editing(@participant)
+    end
+
+    it 'allows editing of personal address fields' do
+      allows_personal_address_editing(@participant)
     end
 
     it 'changing email signs out user and sends confirmation email' do
@@ -461,6 +479,10 @@ describe 'Membership#edit', type: :feature do
       disallows_personal_info_editing
     end
 
+    it 'disallows editing of personal address' do
+      disallows_personal_address_editing
+    end
+
     it 'allows changing email to one taken by another record with
       the same name'.squish do
       @other_person.firstname = @participant.person.firstname
@@ -640,6 +662,10 @@ describe 'Membership#edit', type: :feature do
       allows_person_editing(@participant)
     end
 
+    it 'disallows editing of personal address' do
+      disallows_personal_address_editing
+    end
+
     it 'allows editing of personal info' do
       allows_personal_info_editing(@participant)
     end
@@ -731,6 +757,10 @@ describe 'Membership#edit', type: :feature do
 
     it 'allows editing of personal info' do
       allows_personal_info_editing(@participant)
+    end
+
+    it 'allows editing of personal address' do
+      allows_personal_address_editing(@participant)
     end
 
     it 'allows editing of arrival & departure dates' do

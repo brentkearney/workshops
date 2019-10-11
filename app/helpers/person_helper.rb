@@ -32,9 +32,15 @@ module PersonHelper
 
   def print_address(person)
     return '' if no_address?(person)
-    address = "<strong>Address:</strong><br />\n"
-    address = city_and_region(person, street_address(person))
-    address += "<br />\n" + person.country unless person.country.blank?
+    if policy(@membership).show_address?
+      address = "<strong>Address:</strong><br />\n"
+      address = city_and_region(person, street_address(person))
+      address += "<br />\n" + person.country unless person.country.blank?
+    else
+      unless person.country.blank?
+        address = "<strong>Country:</strong> #{person.country}<br />\n"
+      end
+    end
     address.html_safe
   end
 

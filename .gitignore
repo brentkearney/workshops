@@ -15,6 +15,7 @@
 /log/*
 !/log/.keep
 /tmp
+vendor/cache/
 
 # private configuration settings
 config/local_env.yml

@@ -146,6 +146,7 @@
     </div>
   </div>
 
+  <% if policy(@membership).show_address? %>
   <div class="form-group">
     <div class="col-sm-3 control-label">
       <%= person.label :address, "Address: " %>
@@ -160,6 +161,16 @@
       <%= person.text_field :country, class: 'form-control', placeholder: 'Country' %>
     </div>
   </div>
+  <% else %>
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= person.label :country, "Country: " %>
+    </div>
+    <div class="col-sm-9">
+      <%= person.text_field :country, class: 'form-control', placeholder: 'Country' %>
+    </div>
+  </div>
+  <% end %>
 
   <div class="form-group">
     <div class="col-sm-3 control-label">

@@ -75,9 +75,7 @@ describe 'Membership#show', type: :feature do
 
   def shows_personal_info(member)
     expect(page.body).to have_css('div#profile-address')
-    expect(page.body).to have_text(member.person.address1)
-    expect(page.body).to have_text(member.person.city)
-    expect(page.body).to have_text(member.person.postal_code)
+    expect(page.body).to have_text(member.person.country)
     expect(page.body).to have_css('div#profile-phd_year')
     expect(page.body).to have_css('div#profile-emergency_contact')
     expect(page.body).to have_css('div#profile-academic-status',
@@ -85,11 +83,24 @@ describe 'Membership#show', type: :feature do
   end
 
   def hides_personal_info(member)
-    expect(page.body).not_to have_css('div#profile-address')
     expect(page.body).not_to have_text(member.person.address1)
     expect(page.body).not_to have_text(member.person.city)
     expect(page.body).not_to have_text(member.person.postal_code)
     expect(page.body).not_to have_css('div#profile-academic-status')
+  end
+
+  def shows_personal_address(member)
+    expect(page.body).to have_css('div#profile-address')
+    expect(page.body).to have_text(member.person.address1)
+    expect(page.body).to have_text(member.person.city)
+    expect(page.body).to have_text(member.person.postal_code)
+    expect(page.body).to have_text(member.person.country)
+  end
+
+  def hides_personal_address(member)
+    expect(page.body).not_to have_text(member.person.address1)
+    expect(page.body).not_to have_text(member.person.city)
+    expect(page.body).not_to have_text(member.person.postal_code)
   end
 
   def shows_details(member)
@@ -184,6 +195,10 @@ describe 'Membership#show', type: :feature do
       hides_personal_info(@organizer)
     end
 
+    it 'excludes personal address' do
+      hides_personal_address(@organizer)
+    end
+
     it 'excludes details' do
       does_not_show_details(@organizer)
     end
@@ -242,6 +257,10 @@ describe 'Membership#show', type: :feature do
 
     it 'excludes personal info' do
       hides_personal_info(@organizer)
+    end
+
+    it 'excludes personal address' do
+      hides_personal_address(@organizer)
     end
 
     it 'excludes details' do
@@ -310,6 +329,10 @@ describe 'Membership#show', type: :feature do
       hides_personal_info(@organizer)
     end
 
+    it 'excludes personal address' do
+      hides_personal_address(@organizer)
+    end
+
     it 'excludes details' do
       does_not_show_details(@organizer)
     end
@@ -355,6 +378,10 @@ describe 'Membership#show', type: :feature do
 
     it 'shows personal info' do
       shows_personal_info(@participant)
+    end
+
+    it 'shows personal address' do
+      shows_personal_address(@participant)
     end
 
     it 'shows details' do
@@ -453,6 +480,10 @@ describe 'Membership#show', type: :feature do
       hides_personal_info(@participant)
     end
 
+    it 'hides personal address' do
+      hides_personal_address(@participant)
+    end
+
     it 'shows details' do
       shows_details(@participant)
     end
@@ -549,6 +580,10 @@ describe 'Membership#show', type: :feature do
       hides_personal_info(@participant)
     end
 
+    it 'excludes personal address' do
+      hides_personal_address(@participant)
+    end
+
     it 'excludes details' do
       does_not_show_details(@participant)
     end
@@ -609,6 +644,10 @@ describe 'Membership#show', type: :feature do
 
     it 'shows personal info' do
       shows_personal_info(@participant)
+    end
+
+    it 'excludes personal address' do
+      hides_personal_address(@participant)
     end
 
     it 'shows details' do
@@ -677,6 +716,10 @@ describe 'Membership#show', type: :feature do
 
     it 'shows personal info' do
       shows_personal_info(@participant)
+    end
+
+    it 'shows personal address' do
+      shows_personal_address(@participant)
     end
 
     it 'shows details' do
