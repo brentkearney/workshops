@@ -38,7 +38,8 @@ class MembershipPolicy
     when 'admin', 'super_admin'
       all_fields
     when 'staff'
-      staff_at_location ? all_fields - [:org_notes] : []
+      staff_at_location ? all_fields - [:org_notes, :address1, :address2,
+        :address3, :city, :region, :postal_code] : []
     when 'member'
       return organizer_fields if organizer?
       return [] unless member_self?
@@ -59,7 +60,8 @@ class MembershipPolicy
       [:id, :event_id, :person_id, :share_email, :role, :attendance, :org_notes,
       person_attributes: [:id, :salutation, :firstname, :lastname, :email, :url,
                          :affiliation, :department, :title, :research_areas,
-                         :biography]]
+                         :biography, :address1, :address2, :address3, :city,
+                         :region, :postal_code]]
     end
   end
 
