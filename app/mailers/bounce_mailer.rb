@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Invalid maillist email bounces back to senders
+# Invalid email bounces back to senders
 class BounceMailer < ApplicationMailer
   attr_accessor :email_to, :email_from, :email_subject, :email_body,
     :email_date, :webmaster, :subject
@@ -49,5 +49,20 @@ class BounceMailer < ApplicationMailer
     email_fields(params)
     @event_code = params[:event_code]
     mail(to: @email_from, from: @webmaster, subject: @subject)
+  end
+
+  def bounced_email(params)
+    @webmaster = GetSetting.site_email('webmaster_email')
+    bounce_address = GetSetting.site_email('bounce_address')
+
+    @email_from = params['from']
+    @email_to = params['recipient']
+    @email_sender = params['original_sender']
+    @email_subject = params['subject']
+    @reason = params['reason']
+    @event_code = params['event_code']
+
+    mail(to: bounce_address, from: @webmaster, cc: @webmaster,
+      subject: 'Bounce notice: ' + @email_subject)
   end
 end

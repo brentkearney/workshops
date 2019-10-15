@@ -60,8 +60,7 @@ class MembershipPolicy
       [:id, :event_id, :person_id, :share_email, :role, :attendance, :org_notes,
       person_attributes: [:id, :salutation, :firstname, :lastname, :email, :url,
                          :affiliation, :department, :title, :research_areas,
-                         :biography, :address1, :address2, :address3, :city,
-                         :region, :postal_code]]
+                         :biography, :country]]
     end
   end
 

@@ -545,7 +545,7 @@ RSpec.describe MembershipsController, type: :controller do
             expect(p2.city).to eq(p1.city)
             expect(p2.region).to eq(p1.region)
             expect(p2.postal_code).to eq(p1.postal_code)
-            expect(p2.country).to eq(p1.country)
+            expect(p2.country).to eq(p2.country)
             expect(p2.phd_year).to eq(p1.phd_year)
             expect(p2.emergency_contact).to eq(p1.emergency_contact)
             expect(p2.emergency_phone).to eq(p1.emergency_phone)

@@ -9,7 +9,16 @@ class Griddler::AuthenticationController < Griddler::EmailsController
     bad_request
   end
 
+  def bounces
+    process_bounce and is_ok if valid_bounce_format
+    bad_request
+  end
+
   private
+
+  def process_bounce
+    EmailBounce.new(params).process
+  end
 
   def unauthorized
     Rails.logger.debug "\n\nGriddler::AuthenticationController: authentication failed.\n\n"
@@ -27,21 +36,12 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   protected
 
   def valid_email_format
-    return true if params.key?("X-Mailgun-Incoming")
+    params.key?("X-Mailgun-Incoming")
+  end
 
-    # Below is for Sparkpost messages
-    if params.key?('_json') && params['_json'].kind_of?(Array)
-      if params['_json'][0].key?('msys')
-        if params['_json'][0]['msys'].key?('relay_message')
-          return true
-        else
-          return false
-        end
-      else
-        return false
-      end
-    end
-    false
+  def valid_bounce_format
+    params.key?('event-data') && params['event-data'].key?('severity') &&
+      params['event-data']['severity'] == 'permanent'
   end
 
   def authenticate

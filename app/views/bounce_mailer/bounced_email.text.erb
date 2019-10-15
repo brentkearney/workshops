@@ -1,0 +1,18 @@
+The message (below) was NOT delivered. The receiving mail server responded:
+
+SMTP error code: <%= @reason['code'] %>
+Description: <%= @reason['description'] %>
+
+You may need to find an alternative e-mail address for this person.
+
+If you need help, please send a message to <%= @webmaster %>.
+
+
+------------------------ Your message below ------------------------
+
+Sent by: <%= @email_sender %>
+Related to: <%= @event_code %>
+
+From: <%= @email_from %>
+To: <%= @email_to %>
+Subject: <%= @email_subject %>

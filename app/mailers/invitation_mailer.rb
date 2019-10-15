@@ -75,6 +75,11 @@ class InvitationMailer < ApplicationMailer
       # end
     end
 
+    headers['X-WS-Mailer'] = {
+      sender: "#{invitation.invited_by}",
+       event: "#{@event.code}"
+    }
+
     if File.exist?(text_template_file)
       mail(to: to_email,
            bcc: bcc_email,

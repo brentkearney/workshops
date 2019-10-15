@@ -120,6 +120,7 @@ Rails.application.routes.draw do
 
   # Maillists
   post "/maillist" => 'griddler/authentication#incoming'
+  post "/bounces" => 'griddler/authentication#bounces'
 
   # Lectures RSS
   get '/lectures/today/:room' => 'lectures#today', as: :todays_lectures
