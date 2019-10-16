@@ -10,7 +10,7 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   end
 
   def bounces
-    process_bounce and is_ok if valid_bounce_format
+    process_bounce and return if valid_bounce_format
     bad_request
   end
 
@@ -18,6 +18,7 @@ class Griddler::AuthenticationController < Griddler::EmailsController
 
   def process_bounce
     EmailBounce.new(params).process
+    is_ok
   end
 
   def unauthorized
@@ -53,12 +54,14 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   end
 
   def posted_signature
-    params['signature'] || 'invalid'
+    params['signature']['signature'] || params['signature'] || 'invalid'
   end
 
   def posted_token
-    return '' unless params['timestamp'] && params['token']
-    params['timestamp'] + params['token']
+    timestamp = params['timestamp'] || params['signature']['timestamp']
+    token = params['token'] || params['signature']['token']
+    return '' unless timestamp && token
+    timestamp + token
   end
 
   def encoded_token

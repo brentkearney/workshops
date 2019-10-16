@@ -55,14 +55,14 @@ class BounceMailer < ApplicationMailer
     @webmaster = GetSetting.site_email('webmaster_email')
     bounce_address = GetSetting.site_email('bounce_address')
 
-    @email_from = params['from']
-    @email_to = params['recipient']
-    @email_sender = params['original_sender']
-    @email_subject = params['subject']
-    @reason = params['reason']
-    @event_code = params['event_code']
+    @email_from = params[:from]
+    @email_to = params[:recipient]
+    @email_sender = params[:original_sender]
+    @email_subject = params[:subject] || 'no subject'
+    @delivery_status = params[:status]
+    @event_code = params[:event_code]
+    subject = 'Bounce notice: ' + @email_subject
 
-    mail(to: bounce_address, from: @webmaster, cc: @webmaster,
-      subject: 'Bounce notice: ' + @email_subject)
+    mail(to: bounce_address, from: @webmaster, cc: @webmaster, subject: subject)
   end
 end

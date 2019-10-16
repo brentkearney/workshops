@@ -10,7 +10,6 @@ class EmailBounce
 
   def initialize(params)
     @params = params
-    Rails.logger.debug "\n\nEmailBounce recieved:\n#{params.pretty_inspect}\n\n"
   end
 
   def process
@@ -22,29 +21,40 @@ class EmailBounce
       original_sender: original_sender,
       from: email_from,
       recipient: original_recipient,
-      subject: subject,
-      reason: params['delivery-status'],
+      subject: message_subject,
+      status: delivery_status,
       event_code: event_code
     }
   end
 
+  def delivery_status
+    {
+             code: params['event-data']['delivery-status']['code'],
+      description: params['event-data']['delivery-status']['description'],
+          message: params['event-data']['delivery-status']['message']
+    }
+
+  end
+
   def original_sender
-    params['message']['headers']['X-WS-Mailer']['sender']
+    return '' unless params['event-data']['message']['headers'].key?('X-WS-Mailer')
+    params['event-data']['message']['headers']['X-WS-Mailer']['sender']
   end
 
   def event_code
-    params['message']['headers']['X-WS-Mailer']['event']
+    return '' unless params['event-data']['message']['headers'].key?('X-WS-Mailer')
+    params['event-data']['message']['headers']['X-WS-Mailer']['event']
   end
 
   def email_from
-    params['message']['headers']['from']
+    params['event-data']['message']['headers']['from']
   end
 
   def original_recipient
-    params['message']['headers']['to']
+    params['event-data']['message']['headers']['to']
   end
 
-  def subject
-    params['message']['headers']['subject']
+  def message_subject
+    params['event-data']['message']['headers']['subject']
   end
 end

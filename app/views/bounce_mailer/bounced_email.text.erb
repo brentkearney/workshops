@@ -1,7 +1,8 @@
 The message (below) was NOT delivered. The receiving mail server responded:
 
-SMTP error code: <%= @reason['code'] %>
-Description: <%= @reason['description'] %>
+SMTP error code: <%= @status[:code] %>
+Description: <%= @status[:description] %>
+Message: <%= @status[:message] %>
 
 You may need to find an alternative e-mail address for this person.
 
