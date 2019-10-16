@@ -3,21 +3,21 @@ The message (below) was NOT delivered. The receiving mail server responded:
 SMTP error code: <%= @status[:code] %>
 Description: <%= @status[:description] %>
 Message: <%= @status[:message] %>
+Domain: <%= @status[:domain] %>
+Mail server: <%= @status[:mxhost] %>
 
-<% unless @email_sender.blank? %>
-Sent by: <%= @email_sender %>
-<% end %>
-<% unless @event_code.blank? %>
-Related to: <%= @event_code %>
-<% end %>
 
 You may need to find an alternative e-mail address for this person.
 
 If you need help, please send a message to <%= @webmaster %>.
 
 
------------------------- Your message below ------------------------
+------------------------ Your message header below ------------------------
 
 From: <%= @email_from %>
 To: <%= @email_to %>
+Date: <%= @email_date %>
 Subject: <%= @email_subject %>
+<% unless @attachments.blank? %>
+Attachments: <%= @attachments %>
+<% end %>

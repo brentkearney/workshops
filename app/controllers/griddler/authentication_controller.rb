@@ -42,9 +42,7 @@ class Griddler::AuthenticationController < Griddler::EmailsController
 
   def valid_bounce_format
     params.key?('event-data') && params['event-data'].key?('severity') &&
-      params['event-data']['severity'] == 'permanent' &&
-      params['event-data'].key?('message') &&
-      params['event-data']['message'].key?('headers')
+      params['event-data']['severity'] == 'permanent'
   end
 
   def authenticate

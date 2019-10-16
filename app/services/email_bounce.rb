@@ -18,12 +18,12 @@ class EmailBounce
 
   def normalized_params
     {
-      original_sender: original_sender,
       from: email_from,
       recipient: original_recipient,
       subject: message_subject,
-      status: delivery_status,
-      event_code: event_code
+      date: message_date,
+      attachments: message_attachments,
+      status: delivery_status
     }
   end
 
@@ -31,30 +31,57 @@ class EmailBounce
     {
              code: params['event-data']['delivery-status']['code'],
       description: params['event-data']['delivery-status']['description'],
-          message: params['event-data']['delivery-status']['message']
+          message: params['event-data']['delivery-status']['message'],
+          mxhost: params['event-data']['delivery-status']['mx-host'],
+          domain: params['event-data']['recipient-domain']
     }
-
   end
 
-  def original_sender
-    return '' unless params['event-data']['message']['headers'].key?('X-WS-Mailer')
-    params['event-data']['message']['headers']['X-WS-Mailer']['sender']
+  def verify_headers
+    params['event-data'].key?('message') &&
+      params['event-data']['message'].key?('headers')
   end
 
-  def event_code
-    return '' unless params['event-data']['message']['headers'].key?('X-WS-Mailer')
-    params['event-data']['message']['headers']['X-WS-Mailer']['event']
+  def headers
+    add_message_param unless verify_headers
+    params['event-data']['message']['headers']
+  end
+
+  def add_message_param
+    params.merge(
+      event-data => {
+        message => {
+         headers => {
+            to: 'unknown',
+            from: 'unknown',
+            subject: 'unknown'
+          }
+        }
+      }
+    )
   end
 
   def email_from
-    params['event-data']['message']['headers']['from']
+    headers['from']
   end
 
   def original_recipient
-    params['event-data']['message']['headers']['to']
+    params['event-data']['recipient']
   end
 
   def message_subject
-    params['event-data']['message']['headers']['subject']
+    headers['subject']
+  end
+
+  def message_date
+    Time.at(params['event-data']['timestamp']).to_formatted_s(:rfc822)
+  end
+
+  def message_attachments
+    files = ''
+    params['event-data']['message']['attachments'].each do |file|
+      files << file['filename'] + ' '
+    end
+    files
   end
 end

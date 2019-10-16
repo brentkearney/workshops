@@ -57,10 +57,10 @@ class BounceMailer < ApplicationMailer
 
     @email_from = params[:from]
     @email_to = params[:recipient]
-    @email_sender = params[:original_sender]
     @email_subject = params[:subject] || 'no subject'
+    @email_date = params[:date]
+    @attachments = params[:attachments]
     @status = params[:status]
-    @event_code = params[:event_code]
     subject = 'Bounce notice: ' + @email_subject
 
     mail(to: bounce_address, from: @webmaster, cc: @webmaster, subject: subject)
