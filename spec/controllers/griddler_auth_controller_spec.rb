@@ -128,12 +128,10 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
               'from' => incoming_email['sender'],
               'to' => incoming_email['recipient'],
               'subject' => incoming_email['subject'],
-              'X-WS-Mailer' => {
-                'sender' => 'From Person',
-                'event' => '19w5055'
-              }
             }
           },
+          'recipient' => incoming_email['recipient'],
+          'timestamp' => 1571198580,
           'delivery-status' => {
             'code' => 550,
             'description' => 'Unable to deliver',

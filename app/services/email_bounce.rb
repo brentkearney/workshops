@@ -19,7 +19,7 @@ class EmailBounce
   def normalized_params
     {
       from: email_from,
-      recipient: original_recipient,
+      recipient: email_recipient,
       subject: message_subject,
       date: message_date,
       attachments: message_attachments,
@@ -65,7 +65,7 @@ class EmailBounce
     headers['from']
   end
 
-  def original_recipient
+  def email_recipient
     params['event-data']['recipient']
   end
 
@@ -74,11 +74,14 @@ class EmailBounce
   end
 
   def message_date
-    Time.at(params['event-data']['timestamp']).to_formatted_s(:rfc822)
+    Time.at(params['event-data']['timestamp'].to_i).to_formatted_s(:rfc822)
   end
 
   def message_attachments
     files = ''
+    return files unless params['event-data'].key?('message') &&
+      params['event-data']['message'].key?('attachments')
+
     params['event-data']['message']['attachments'].each do |file|
       files << file['filename'] + ' '
     end

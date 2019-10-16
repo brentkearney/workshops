@@ -132,12 +132,11 @@ RSpec.describe BounceMailer, type: :mailer do
               'from' => params[:from],
               'to' => params[:to].last,
               'subject' => params[:subject],
-              'X-WS-Mailer' => {
-                'sender' => 'Bob Smith',
-                'event' => event.code
-              }
             }
           },
+          'recipient' => params[:to].last,
+          'severity' => 'permanent',
+          'timestamp' => 1571198580,
           'delivery-status' => {
             'code' => 550,
             'description' => 'Unable to deliver',
@@ -171,9 +170,8 @@ RSpec.describe BounceMailer, type: :mailer do
       expect(@sent_message.subject).to eq(subject)
     end
 
-    it 'Body contains reference to event code, sender, recipient' do
-      expect(@sent_message.body).to include(event.code)
-      expect(@sent_message.body).to include('Bob Smith')
+    it 'Body contains reference to sender and recipient' do
+      expect(@sent_message.body).to include(params[:from])
       expect(@sent_message.body).to include(params[:to].last)
     end
 
