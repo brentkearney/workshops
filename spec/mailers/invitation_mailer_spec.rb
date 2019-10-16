@@ -55,6 +55,11 @@ RSpec.describe InvitationMailer, type: :mailer do
       event_name = @invitation.membership.event.name
       expect(@delivery.text_part).to have_text(event_name)
     end
+
+    it 'headers include the senders name and event code' do
+      expect(@delivery.header).to have_text(@invitation.membership.event.code)
+      expect(@delivery.header).to have_text(@invitation.invited_by)
+    end
   end
 
   describe 'RSVP deadline' do

@@ -122,4 +122,65 @@ RSpec.describe BounceMailer, type: :mailer do
       expect(@sent_message.body).to include(event.code)
     end
   end
+
+  describe '.bounced_email' do
+    let(:bounce_params) do
+      {
+        'event-data' => {
+          'message' => {
+            'headers' => {
+              'from' => params[:from],
+              'to' => params[:to].last,
+              'subject' => params[:subject],
+              'X-WS-Mailer' => {
+                'sender' => 'Bob Smith',
+                'event' => event.code
+              }
+            }
+          },
+          'delivery-status' => {
+            'code' => 550,
+            'description' => 'Unable to deliver',
+            'message' => 'Recipient not found'
+          }
+        }
+      }
+    end
+
+    before do
+      EmailBounce.new(bounce_params).process
+      @sent_message = ActionMailer::Base.deliveries.first
+    end
+
+    it 'sends email' do
+      expect_email_was_sent
+    end
+
+    it 'From: webmaster_email' do
+      from_address = GetSetting.site_email('webmaster_email')
+      expect(@sent_message.from).to include(from_address)
+    end
+
+    it 'To: bounce address from settings' do
+      to_email = GetSetting.site_email('bounce_address')
+      expect(@sent_message.to).to eq([to_email])
+    end
+
+    it 'Subject: Bounce notice + original subject' do
+      subject = 'Bounce notice: ' + params[:subject]
+      expect(@sent_message.subject).to eq(subject)
+    end
+
+    it 'Body contains reference to event code, sender, recipient' do
+      expect(@sent_message.body).to include(event.code)
+      expect(@sent_message.body).to include('Bob Smith')
+      expect(@sent_message.body).to include(params[:to].last)
+    end
+
+    it 'Body contains bounce status messages' do
+      expect(@sent_message.body).to include('550')
+      expect(@sent_message.body).to include('Unable to deliver')
+      expect(@sent_message.body).to include('Recipient not found')
+    end
+  end
 end

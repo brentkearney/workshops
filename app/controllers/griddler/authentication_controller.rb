@@ -5,7 +5,7 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   respond_to :json
 
   def incoming
-    create and return if valid_email_format
+    create and return if valid_incoming_format
     bad_request
   end
 
@@ -36,13 +36,15 @@ class Griddler::AuthenticationController < Griddler::EmailsController
 
   protected
 
-  def valid_email_format
+  def valid_incoming_format
     params.key?("X-Mailgun-Incoming")
   end
 
   def valid_bounce_format
     params.key?('event-data') && params['event-data'].key?('severity') &&
-      params['event-data']['severity'] == 'permanent'
+      params['event-data']['severity'] == 'permanent' &&
+      params[event-data].key?('message') &&
+      params['event-data']['message'].key?('headers')
   end
 
   def authenticate
@@ -54,12 +56,22 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   end
 
   def posted_signature
-    params['signature']['signature'] || params['signature'] || 'invalid'
+    return if params['signature'].nil?
+    return params['signature'] if params['signature'].class == String
+    params['signature']['signature']
   end
 
   def posted_token
-    timestamp = params['timestamp'] || params['signature']['timestamp']
-    token = params['token'] || params['signature']['token']
+    timestamp = token = nil
+
+    if params['timestamp'] && params['signature'].class == String
+      timestamp = params['timestamp']
+      token = params['token']
+    elsif params['signature'] && params['signature']['timestamp']
+      timestamp = params['signature']['timestamp']
+      token = params['signature']['token']
+    end
+
     return '' unless timestamp && token
     timestamp + token
   end
