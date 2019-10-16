@@ -180,5 +180,25 @@ RSpec.describe BounceMailer, type: :mailer do
       expect(@sent_message.body).to include('Unable to deliver')
       expect(@sent_message.body).to include('Recipient not found')
     end
+
+    it 'Functions without "message" in bounce data' do
+      new_params = {
+        'event-data' => {
+          'recipient' => params[:to].last,
+          'severity' => 'permanent',
+          'timestamp' => 1571198580,
+          'delivery-status' => {
+            'code' => 550,
+            'description' => 'Unable to deliver',
+            'message' => 'Message loops back to myself!'
+          }
+        }
+      }
+      EmailBounce.new(new_params).process
+
+      msg = ActionMailer::Base.deliveries.last
+      expect(msg.subject).to eq('Bounce notice: unknown')
+      expect(msg.body).to include('From: unknown')
+    end
   end
 end

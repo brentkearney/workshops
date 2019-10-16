@@ -48,17 +48,16 @@ class EmailBounce
   end
 
   def add_message_param
-    params.merge(
-      event-data => {
-        message => {
-         headers => {
-            to: 'unknown',
-            from: 'unknown',
-            subject: 'unknown'
-          }
+    params['event-data'].merge!(
+      'message' => {
+       'headers' => {
+          'to' => 'unknown',
+          'from' => 'unknown',
+          'subject' => 'unknown'
         }
       }
     )
+    Rails.logger.debug "\n\nParams is now: #{params.inspect}\n\n"
   end
 
   def email_from
