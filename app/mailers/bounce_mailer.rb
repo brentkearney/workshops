@@ -63,6 +63,6 @@ class BounceMailer < ApplicationMailer
     @status = params[:status]
     subject = 'Bounce notice: ' + @email_subject
 
-    mail(to: bounce_address, from: @webmaster, cc: @webmaster, subject: subject)
+    mail(to: bounce_address, from: @webmaster, subject: subject)
   end
 end

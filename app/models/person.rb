@@ -7,7 +7,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Person < ApplicationRecord
-  attr_accessor :is_rsvp, :member_import
+  attr_accessor :is_rsvp, :member_import, :is_organizer_rsvp, :region_required
 
   has_many :memberships, dependent: :destroy
   has_many :events, -> {
@@ -27,7 +27,7 @@ class Person < ApplicationRecord
                     uniqueness: true,
                     email: true
   validates :firstname, :lastname, :updated_by, presence: true
-  validates :gender, presence: true, if: :is_rsvp
+  validates :gender, :country, presence: true, if: :is_rsvp
   validates :affiliation, presence: true, unless: :member_import
   validates :gender, format:
                      { with: /\A(M|F|O)\z/, message: " must be 'M','F', or 'O'" },
@@ -36,8 +36,11 @@ class Person < ApplicationRecord
   validates :address1, :city, :country, :postal_code,
             presence: {
               message: '← address fields cannot be blank'
-            }, if: :is_rsvp
+            }, if: :is_organizer_rsvp
+  validates :region, presence: { message: '← address fields cannot be blank'
+            }, if: :region_required
   validates :phone, :academic_status, presence: true, if: :is_rsvp
+
 
   # app/models/concerns/person_decorators.rb
   include PersonDecorators

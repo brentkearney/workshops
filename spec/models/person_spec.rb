@@ -31,8 +31,13 @@ RSpec.describe 'Model validations: Person', type: :model do
     expect(p.valid?).to be_truthy
   end
 
-  it 'requires a gender if is_rsvp' do
+  it 'requires a gender if :is_rsvp' do
     p = build(:person, gender: '', is_rsvp: true)
+    expect(p.valid?).to be_falsey
+  end
+
+  it 'requires a country if :is_rsvp' do
+    p = build(:person, country: '', is_rsvp: true)
     expect(p.valid?).to be_falsey
   end
 
@@ -59,11 +64,19 @@ RSpec.describe 'Model validations: Person', type: :model do
     expect(person2.errors[:email].first).to eq('has already been taken')
   end
 
-  it 'requires an address only if :is_rsvp' do
+  it 'requires an address only if :is_organizer_rsvp' do
     p = build(:person, address1: '')
     expect(p).to be_valid
 
-    p.is_rsvp = true
+    p.is_organizer_rsvp = true
+    expect(p).not_to be_valid
+  end
+
+  it 'requires a region only if :region_required' do
+    p = build(:person, region: '')
+    expect(p).to be_valid
+
+    p.region_required = true
     expect(p).not_to be_valid
   end
 

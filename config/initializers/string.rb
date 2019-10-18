@@ -10,6 +10,10 @@ class String
   def to_duration
     super unless self =~ /\A\d+\.\w+\z/
     parts = split('.')
+
+    allowed = %w(minute minutes hour hours day days month months year years)
+    super unless allowed.include? parts.last
+
     parts.first.to_i.send(parts.last)
   end
 

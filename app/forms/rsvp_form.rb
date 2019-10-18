@@ -16,13 +16,22 @@ class RsvpForm < ComplexForms
     @membership = invitation.membership
     @person = @membership.person
     @person.is_rsvp = true
+    @person.is_organizer_rsvp = true if @membership.role =~ /Organizer/
+
     @event = @membership.event
     self
+  end
+
+  def north_american_organizer
+    return false unless @membership.role =~ /Organizer/
+    @person.country == 'Canada' || @person.country == 'USA' ||
+      @person.country == 'U.S.A.' || @person.country =~ /United States/
   end
 
   def validate_form(attributes = {})
     @membership.assign_attributes(attributes['membership'])
     @person.assign_attributes(attributes['person'])
+    @person.region_required = true if north_american_organizer
 
     unless @membership.valid?
       @membership.errors.full_messages.each do |key, value|
