@@ -175,6 +175,12 @@
                 <label class="mandatory">Address</label>
                 <% if @rsvp.membership.role =~ /Organizer/ %>
                   <%= render partial: 'mailing_address', locals: { p: p } %>
+                <% else %>
+                <div class="row">
+                  <div class='col-md-4'>
+                  <%= p.text_field :region, class: "form-control", placeholder: 'Region/Province/State', autocomplete: "address-level1" %>
+                  </div>
+                </div>
                 <% end %>
                 <div class="row">
                   <div class='col-md-4'>

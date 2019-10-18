@@ -25,22 +25,25 @@ module PersonHelper
   end
 
   def no_address?(person)
-    person.address1.blank? && person.address2.blank? && person.address3.blank? &&
-      person.city.blank? && person.region.blank? && person.postal_code.blank? &&
-      person.country.blank?
+     person.address1.blank? && person.address2.blank? && person.address3.blank? &&
+      person.city.blank? && person.region.blank? && person.postal_code.blank?
   end
 
   def print_address(person)
-    return '' if no_address?(person)
+    address = ''
+    no_address = no_address?(person)
+    return '' if person.country.blank? && no_address
+
     if policy(@membership).show_address?
-      address = "<strong>Address:</strong><br />\n"
-      address = city_and_region(person, street_address(person))
-      address += "<br />\n" + person.country unless person.country.blank?
-    else
-      unless person.country.blank?
+      if no_address && person.country
         address = "<strong>Country:</strong> #{person.country}<br />\n"
+      elsif !no_address
+        address = "<strong>Address:</strong><br />\n"
+        address = city_and_region(person, street_address(person))
+        address += "<br />\n" + person.country unless person.country.blank?
       end
     end
+
     address.html_safe
   end
 

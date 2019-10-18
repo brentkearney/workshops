@@ -489,6 +489,7 @@ describe 'RSVP', type: :feature do
           expect(page).to have_field('rsvp_person_address3')
           expect(page).to have_field('rsvp_person_city')
           expect(page).to have_field('rsvp_person_region')
+          expect(page).to have_field('rsvp_person_country')
         end
       end
 
@@ -498,7 +499,11 @@ describe 'RSVP', type: :feature do
           expect(page).not_to have_field('rsvp_person_address2')
           expect(page).not_to have_field('rsvp_person_address3')
           expect(page).not_to have_field('rsvp_person_city')
-          expect(page).not_to have_field('rsvp_person_region')
+        end
+
+        it 'has region and country fields' do
+          expect(page).to have_field('rsvp_person_region')
+          expect(page).to have_field('rsvp_person_country')
         end
       end
 
