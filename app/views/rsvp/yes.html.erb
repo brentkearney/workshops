@@ -238,8 +238,8 @@
         <% unless @rsvp.membership.role == 'Contact Organizer' %>
         <div class="row">
           <div class="col-md-12">
-            <h2 class="rsvp-section midpage">Note to the Contact Organizer</h2>
-            <p>The Contact Organizer for the event, <%= @organizer %>, will be
+            <h2 class="rsvp-section midpage">Optional note to the Organizer</h2>
+            <p>The lead Organizer for the event, <%= @organizer %>, will be
               notified that you plan to attend, as soon as you click the
               "Confirm Attendance" button. Would you like to add something to
               the message?</p>
@@ -251,7 +251,7 @@
                value: @organizer_message,
                class: "form-control",
                placeholder:
-                 "Optional: enter a message for the organizer here." %>
+                 "Optional message to the organizer" %>
           </div>
         </div>
         <% end %>
