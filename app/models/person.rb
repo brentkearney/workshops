@@ -37,7 +37,7 @@ class Person < ApplicationRecord
             presence: {
               message: '← address fields cannot be blank'
             }, if: :is_organizer_rsvp
-  validates :region, presence: { message: '← address fields cannot be blank'
+  validates :region, presence: { message: '← region field cannot be blank'
             }, if: :region_required
   validates :phone, :academic_status, presence: true, if: :is_rsvp
 

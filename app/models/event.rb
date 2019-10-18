@@ -41,7 +41,7 @@ class Event < ApplicationRecord
 
   scope :past, -> do
     where("end_date < ? AND template = ?",
-          Date.current, false).order(:start_date)
+          Date.current, false).order(:start_date).limit(100)
   end
   scope :future, -> do
     where("end_date >= ? AND template = ?",

@@ -23,7 +23,7 @@ module EventDecorators
     days
   end
 
-def num_participants
+  def num_participants
     memberships.size
   end
 
