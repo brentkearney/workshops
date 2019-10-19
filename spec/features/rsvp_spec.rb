@@ -607,7 +607,7 @@ describe 'RSVP', type: :feature do
             click_button 'Confirm Attendance'
 
             expect(current_path).to eq(rsvp_yes_path(@invitation.code))
-            failed = 'Person region ← address fields cannot be blank'
+            failed = 'region field cannot be blank'
             expect(page.body).to have_text(failed)
           end
 

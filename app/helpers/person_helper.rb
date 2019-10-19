@@ -25,7 +25,7 @@ module PersonHelper
   end
 
   def no_address?(person)
-     person.address1.blank? && person.address2.blank? && person.address3.blank? &&
+    person.address1.blank? && person.address2.blank? && person.address3.blank? &&
       person.city.blank? && person.region.blank? && person.postal_code.blank?
   end
 
@@ -34,14 +34,12 @@ module PersonHelper
     no_address = no_address?(person)
     return '' if person.country.blank? && no_address
 
-    if policy(@membership).show_address?
-      if no_address && person.country
-        address = "<strong>Country:</strong> #{person.country}<br />\n"
-      elsif !no_address
-        address = "<strong>Address:</strong><br />\n"
-        address = city_and_region(person, street_address(person))
-        address += "<br />\n" + person.country unless person.country.blank?
-      end
+    if !no_address && policy(@membership).show_full_address?
+      address = "<strong>Address:</strong><br />\n"
+      address = city_and_region(person, street_address(person))
+      address += "<br />\n" + person.country unless person.country.blank?
+    elsif person.country && policy(@membership).show_address?
+      address = "<strong>Country:</strong> #{person.country}<br />\n"
     end
 
     address.html_safe
