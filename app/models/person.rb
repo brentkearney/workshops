@@ -7,7 +7,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Person < ApplicationRecord
-  attr_accessor :is_rsvp, :member_import, :is_organizer_rsvp, :region_required
+  attr_accessor :is_rsvp, :member_import, :is_organizer_rsvp
 
   has_many :memberships, dependent: :destroy
   has_many :events, -> {
@@ -38,12 +38,18 @@ class Person < ApplicationRecord
               message: '← address fields cannot be blank'
             }, if: :is_organizer_rsvp
   validates :region, presence: { message: '← region field cannot be blank'
-            }, if: :region_required
+            }, if: :region_required?
   validates :phone, :academic_status, presence: true, if: :is_rsvp
 
 
   # app/models/concerns/person_decorators.rb
   include PersonDecorators
+
+  def region_required?
+    country ||= self.country
+    country == 'Canada' || country == 'USA' ||
+      country == 'U.S.A.' || country =~ /United States/
+  end
 
   def pending_replacement?
     !ConfirmEmailChange.where(replace_person_id: self.id, confirmed: false)

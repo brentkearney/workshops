@@ -174,6 +174,7 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).not_to have_field field_name
     expect(page.body).not_to have_field 'membership_person_attributes_gender'
     expect(page.body).not_to have_field 'membership_person_attributes_phone'
+    expect(page.body).not_to have_field 'membership_person_attributes_region'
     expect(page.body).not_to have_field 'membership_person_attributes_country'
   end
 
@@ -182,7 +183,6 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).not_to have_field 'membership_person_attributes_address2'
     expect(page.body).not_to have_field 'membership_person_attributes_address3'
     expect(page.body).not_to have_field 'membership_person_attributes_city'
-    expect(page.body).not_to have_field 'membership_person_attributes_region'
     expect(page.body).not_to have_field 'membership_person_attributes_postal_code'
   end
 
@@ -645,7 +645,7 @@ describe 'Membership#edit', type: :feature do
       @non_member_user.location = @event.location
       @non_member_user.save
       @participant = create(:membership, event: @event, has_guest: false,
-                                         reviewed: false)
+                            role:'Participant', reviewed: false)
       login_as @non_member_user, scope: :user
     end
 
@@ -662,8 +662,8 @@ describe 'Membership#edit', type: :feature do
       allows_person_editing(@participant)
     end
 
-    it 'disallows editing of personal address' do
-      disallows_personal_address_editing
+    it 'allows editing of personal address' do
+      allows_personal_address_editing(@participant)
     end
 
     it 'allows editing of personal info' do

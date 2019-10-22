@@ -22,6 +22,7 @@ FactoryBot.define do
     f.address1 { Faker::Address.street_address }
     f.city { Faker::Address.city }
     f.postal_code { Faker::Address.postcode }
+    f.region { Faker::Address.state }
     f.country { Faker::Address.country }
     f.legacy_id
     f.biography { Faker::Lorem.paragraph }

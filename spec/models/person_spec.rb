@@ -41,6 +41,19 @@ RSpec.describe 'Model validations: Person', type: :model do
     expect(p.valid?).to be_falsey
   end
 
+  it 'requires a region if country is Canada or USA' do
+    p = build(:person, country: 'Canada', region: nil)
+    expect(p.valid?).to be_falsey
+    p.region = 'ON'
+    expect(p.valid?).to be_truthy
+
+    p.country = 'USA'
+    p.region = ''
+    expect(p.valid?).to be_falsey
+    p.region = 'VA'
+    expect(p.valid?).to be_truthy
+  end
+
   it 'does not require a gender if importing memberships' do
     p = build(:person, gender: '', member_import: true)
     expect(p.valid?).to be_truthy
@@ -69,14 +82,6 @@ RSpec.describe 'Model validations: Person', type: :model do
     expect(p).to be_valid
 
     p.is_organizer_rsvp = true
-    expect(p).not_to be_valid
-  end
-
-  it 'requires a region only if :region_required' do
-    p = build(:person, region: '')
-    expect(p).to be_valid
-
-    p.region_required = true
     expect(p).not_to be_valid
   end
 

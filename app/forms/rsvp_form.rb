@@ -22,15 +22,9 @@ class RsvpForm < ComplexForms
     self
   end
 
-  def canada_or_usa?
-    @person.country == 'Canada' || @person.country == 'USA' ||
-      @person.country == 'U.S.A.' || @person.country =~ /United States/
-  end
-
   def validate_form(attributes = {})
     @membership.assign_attributes(attributes['membership'])
     @person.assign_attributes(attributes['person'])
-    @person.region_required = true if canada_or_usa?
 
     unless @membership.valid?
       @membership.errors.full_messages.each do |key, value|
