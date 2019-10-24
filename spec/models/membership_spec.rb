@@ -127,6 +127,24 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(observer_membership).to be_valid
   end
 
+  it 'is invalid if the number of invited + confirmed observers is greater
+    than max_observers' do
+    observers = @event.memberships.where(role: 'Observer')
+                                 .where.not(attendance: 'Declined')
+                                 .where.not(attendance: 'Not Yet Invited').count
+
+    @event.max_observers = observers + 1
+    @event.save
+
+    new_observer = create(:membership, event: @event,
+                                  attendance: 'Invited', role: 'Observer')
+    expect(new_observer).to be_valid
+
+    new_observer2 = create(:membership, event: @event,
+                                   attendance: 'Invited', role: 'Observer')
+    expect(new_observer2).not_to be_valid
+  end
+
   it 'sets a role automatically, if absent' do
     @membership.role = nil
     @membership.save

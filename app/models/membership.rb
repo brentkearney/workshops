@@ -81,6 +81,7 @@ class Membership < ApplicationRecord
     return if sync_memberships
     return if attendance == 'Declined' || attendance == 'Not Yet Invited'
     return if event_id.nil?
+
     invited = event.num_invited_participants.to_i
     return if event.max_participants.to_i - invited >= 0
     errors.add(:attendance, "- the maximum number of invited participants for
@@ -88,7 +89,12 @@ class Membership < ApplicationRecord
   end
 
   def check_max_observers
-    observers = event.memberships.where(role: 'Observer').count
+    return if sync_memberships
+    return unless role == 'Observer'
+
+    observers = event.memberships.where(role: 'Observer')
+                                 .where.not(attendance: 'Declined')
+                                 .where.not(attendance: 'Not Yet Invited').count
     return if observers <= event.max_observers
     errors.add(:attendance, "- the maximum number of observers for #{event.code}
                 has been reached.".squish)

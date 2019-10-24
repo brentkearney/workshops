@@ -76,9 +76,11 @@
   <div class="col-lg-6">
       <h4 class="event-details">Event Description:</h4>
   </div>
+  <% if(policy(@event).edit?) %>
   <div class="col-lg-6 event-edit-icon">
     <%= link_to ' Edit', edit_event_path(@event), class: 'fa fa-pencil-square-o' %>
   </div>
+  <% end %>
   <div class="col-lg-12">
        <%= get_text(@event.description) %>
   </div>
@@ -88,9 +90,11 @@
   <div class="col-lg-6">
     <h4 class="event-details">Event Press Release:</h4>
   </div>
+  <% if(policy(@event).edit?) %>
   <div class="col-lg-6 event-edit-icon">
     <%= link_to ' Edit', edit_event_path(@event), class: 'fa fa-pencil-square-o' %>
   </div>
+  <% end %>
   <div class="col-lg-12">
     <%= get_text(@event.press_release) %>
   </div>

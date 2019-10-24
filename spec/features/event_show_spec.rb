@@ -51,7 +51,7 @@ describe 'Event Show Page', type: :feature do
   end
 
   def has_no_edit_button
-    expect(page.body).not_to have_link('Edit Event')
+    expect(page.body).not_to have_link('Edit')
     expect(page.body).to have_link('Event Schedule')
   end
 
