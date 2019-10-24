@@ -42,9 +42,7 @@ class InvitationsController < ApplicationController
     end
 
     unless is_reinvite?(membership)
-      members = event.memberships.where.not(role: "Backup Participant")
-                     .where(attendance: "Not Yet Invited")
-      full = event_full?(event, members)
+      full = event_full?(event, [membership])
       if full == :max_participants
         redirect_to event_memberships_path(event),
           error: 'This event is already full.' and return

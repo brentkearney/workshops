@@ -165,5 +165,24 @@ describe 'Membership invitations', type: :feature do
       expect(page).to have_text("You may not invite more than
         #{@event.max_observers} observers".squish)
     end
+
+    it 'does not fail if max_participants is full, but observer is invited' do
+      num_participants = @event.num_invited_participants
+      @event.max_participants = num_participants
+      num_observers = @event.num_invited_observers
+      @event.max_observers = num_observers + 1
+      @event.save!
+
+      @user.admin!
+      login_as @user
+      visit event_memberships_path(@event)
+
+      observer = create(:membership, event: @event, role: 'Observer',
+                                attendance: 'Not Yet Invited')
+      visit invitations_send_path(observer)
+
+      expect(Membership.find(observer.id).attendance).to eq('Invited')
+      expect(page).to have_text("Invitation sent to #{observer.person.name}")
+    end
   end
 end
