@@ -75,10 +75,18 @@
           <%= f.select(:event_type, Setting.Site['event_types'], {}, { class: 'form-control' }) %>
         </div>
       </div>
-      <div class="form-group">
-        <%= f.label :max_participants %>
-        <div style="width: 6em;">
-          <%= f.number_field :max_participants, class: 'form-control' %>
+      <div class="row">
+        <div class="col-md-1 form-group">
+          <%= f.label :max_participants %>
+          <div style="width: 6em;">
+            <%= f.number_field :max_participants, class: 'form-control' %>
+          </div>
+        </div>
+        <div class="col-md-1 form-group">
+          <%= f.label :max_observers %>
+          <div style="width: 6em;">
+            <%= f.number_field :max_observers, class: 'form-control' %>
+          </div>
         </div>
       </div>
       <div class="form-group">

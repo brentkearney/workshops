@@ -32,6 +32,7 @@ FactoryBot.define do
     f.end_date
     f.event_type { '5 Day Workshop' }
     f.max_participants { 42 }
+    f.max_observers { 3 }
     f.location { 'EO' }
     f.time_zone { 'Mountain Time (US & Canada)' }
     f.description { Faker::Lorem.sentence(6) }

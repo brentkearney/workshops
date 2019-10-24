@@ -46,15 +46,9 @@
      <tr>
        <td align="right">Max participants:</td>
        <td><%= @event.max_participants %></td>
-
-       <td align="right">Last updated:</td>
-       <td>
-         <% unless @event.updated_by.blank? %>
-           by <%= @event.updated_by %> on
-         <% end %>
-         <%= @event.updated_at.strftime('%Y-%m-%d @ %H:%M %Z') %>
-       </td>
-      </tr>
+       <td align="right">Max observers:</td>
+       <td><%= @event.max_observers %></td>
+     </tr>
     <% end %>
     <tr>
       <td align="right">Event Webpage:</td>
@@ -62,6 +56,17 @@
       <td align="right">Subject Areas:</td>
       <td align="left"><%= @event.subjects %></td>
     </tr>
+    <% if policy(@event).view_details? %>
+    <tr>
+     <td align="right">Last updated:</td>
+     <td colspan="3">
+       <% unless @event.updated_by.blank? %>
+         by <%= @event.updated_by %> on
+       <% end %>
+       <%= @event.updated_at.strftime('%Y-%m-%d @ %H:%M %Z') %>
+     </td>
+    </tr>
+    <% end %>
      </tbody>
    </table>
  </div>

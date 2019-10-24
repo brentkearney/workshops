@@ -59,7 +59,8 @@ end
       'Country' => 'Canada',
       'Timezone' => 'Mountain Time (US & Canada)',
       'Address' => "123 Example Street\nExampletown, Exampleton",
-      'lock_staff_schedule' => '15.days'
+      'lock_staff_schedule' => '15.days',
+      'max_observers' => 5
     }
   }
 # end

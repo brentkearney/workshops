@@ -40,6 +40,20 @@ describe Api::V1::EventsController do
       expect(Event.find(@event.code)).not_to be_nil
     end
 
+    it 'assigns max_observers to Settings.Location[location][max_observers]' do
+      event = build(:event, max_observers: nil)
+      payload = {
+          api_key: @key,
+          event_id: event.code,
+          event: event.as_json
+      }
+      post "/api/v1/events.json", params: payload.to_json
+      event = Event.find(event.code)
+      max = GetSetting.observers(event.location)
+      expect(max).not_to be_blank
+      expect(event.max_observers).to eq(max)
+    end
+
     it 'given invalid or missing event code, it fails' do
       @payload[:event_id] = 'X'
       post "/api/v1/events.json", params: @payload.to_json

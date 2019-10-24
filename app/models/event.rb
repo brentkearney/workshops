@@ -17,7 +17,7 @@ class Event < ApplicationRecord
   before_save :clean_data
 
   validates :name, :start_date, :end_date, :location, :max_participants,
-            :time_zone, presence: true
+            :time_zone, :max_observers, presence: true
   validates :short_name, presence: true, if: :has_long_name
   validates :event_type, presence: true, if: :check_event_type
   validate :starts_before_ends

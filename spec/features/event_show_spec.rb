@@ -38,6 +38,7 @@ describe 'Event Show Page', type: :feature do
     expect(body).to have_text(@event.short_name)
     expect(body).to have_text("Door Access Code: #{@event.door_code}")
     expect(body).to have_text("Max participants: #{@event.max_participants}")
+    expect(body).to have_text("Max observers: #{@event.max_observers}")
     expect(body).to have_text(@event.booking_code)
   end
 
@@ -46,6 +47,7 @@ describe 'Event Show Page', type: :feature do
     expect(body).not_to have_text("Door Access Code: #{@event.door_code}")
     expect(body).not_to have_text(@event.booking_code)
     expect(body).not_to have_text("Max participants: #{@event.max_participants}")
+    expect(body).not_to have_text("Max observers: #{@event.max_observers}")
   end
 
   def has_no_edit_button

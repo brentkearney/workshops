@@ -1,17 +1,21 @@
 <div class="row">
-  <div class='col-md-12'>
-    <div class="form-group">
-      <% if field_name == 'short_name' %>
-        <%= form.label 'Shorter Event Name to appear on name tags (must be under 68 characters)' %>
-        <%= form.text_field field_name, maxlength: 67, class: 'form-control' %>
-      <% else %>
-        <%= form.label "#{field_name.titleize}" %>
-        <% if %w(description press_release).include?(field_name) %>
-          <%= form.text_area field_name, rows: 12, class: 'form-control' %>
-        <% else %>
-          <%= form.text_field field_name, class: 'form-control' %>
-        <% end %>
-      <% end %>
-    </div>
+  <% if field_name =~ /max_|door/ %>
+    <div class='col-md-2 form-group'>
+  <% else %>
+    <div class='col-md-12 form-group'>
+  <% end %>
+  <% if field_name == 'short_name' %>
+    <%= form.label 'Shorter Event Name to appear on name tags (must be under 68 characters)' %>
+    <%= form.text_field field_name, maxlength: 67, class: 'form-control' %>
+  <% else %>
+    <%= form.label "#{field_name.titleize}" %>
+    <% if %w(description press_release).include?(field_name) %>
+      <%= form.text_area field_name, rows: 12, class: 'form-control' %>
+    <% elsif field_name =~ /max_|door/ %>
+      <%= form.number_field field_name, class: 'form-control' %>
+    <% else %>
+      <%= form.text_field field_name, class: 'form-control' %>
+    <% end %>
+  <% end %>
   </div>
 </div>

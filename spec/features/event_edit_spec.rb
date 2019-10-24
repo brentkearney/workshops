@@ -70,7 +70,8 @@ describe 'Event Edit Page', type: :feature do
       user = create(:user, email: organizer.email, person: organizer)
       login_as user, scope: :user
       @allowed_fields = %w(short_name description press_release subjects)
-      @not_allowed_fields = %w(name code door_code booking_code max_participants start_date end_date)
+      @not_allowed_fields = %w(name code door_code booking_code max_participants
+        max_observers start_date end_date)
       visit edit_event_path(@event)
     end
 
@@ -112,8 +113,10 @@ describe 'Event Edit Page', type: :feature do
     before do
       @non_member_user.staff!
       login_as @non_member_user, scope: :user
-      @allowed_fields = %w(short_name description press_release door_code booking_code subjects max_participants)
-      @not_allowed_fields = %w(name code start_date end_date time_zone location template)
+      @allowed_fields = %w(short_name description press_release door_code
+        booking_code subjects max_participants max_observers)
+      @not_allowed_fields = %w(name code start_date end_date time_zone
+        location template)
     end
 
     context 'whose location matches the event location' do
@@ -161,8 +164,11 @@ describe 'Event Edit Page', type: :feature do
     before do
       @non_member_user.admin!
       login_as @non_member_user, scope: :user
-      @allowed_fields = %w(short_name description press_release door_code booking_code name code max_participants start_date end_date time_zone location subjects)
-      @not_allowed_fields = %w(id updated_by created_at updated_at confirmed_count publish_schedule)
+      @allowed_fields = %w(short_name description press_release door_code
+        booking_code name code max_participants max_observers start_date
+        end_date time_zone location subjects)
+      @not_allowed_fields = %w(id updated_by created_at updated_at
+        confirmed_count publish_schedule)
       visit edit_event_path(@event)
     end
 

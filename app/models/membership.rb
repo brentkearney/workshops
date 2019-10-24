@@ -30,6 +30,7 @@ class Membership < ApplicationRecord
   validate :set_role
   validate :default_attendance
   validate :check_max_participants
+  validate :check_max_observers
   validate :arrival_and_departure_dates
   validate :guest_disclamer_acknowledgement
 
@@ -84,6 +85,13 @@ class Membership < ApplicationRecord
     return if event.max_participants.to_i - invited >= 0
     errors.add(:attendance, "- the maximum number of invited participants for
                #{event.code} has been reached.".squish)
+  end
+
+  def check_max_observers
+    observers = event.memberships.where(role: 'Observer').count
+    return if observers <= event.max_observers
+    errors.add(:attendance, "- the maximum number of observers for #{event.code}
+                has been reached.".squish)
   end
 
   def arrival_and_departure_dates

@@ -46,6 +46,10 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(build(:event, max_participants: nil)).not_to be_valid
   end
 
+  it 'is invalid without max observers' do
+    expect(build(:event, max_observers: nil)).not_to be_valid
+  end
+
   it 'is invalid without a time zone' do
     expect(build(:event, time_zone: nil)).not_to be_valid
   end
