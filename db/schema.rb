@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_26_011110) do
+ActiveRecord::Schema.define(version: 2019_10_22_191531) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,6 +53,7 @@ ActiveRecord::Schema.define(version: 2019_06_26_011110) do
     t.integer "confirmed_count", default: 0, null: false
     t.datetime "sync_time"
     t.string "subjects"
+    t.integer "max_observers", default: 0, null: false
     t.index ["code"], name: "index_events_on_code", unique: true
   end
 

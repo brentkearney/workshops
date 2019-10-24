@@ -1,3 +1,4 @@
+<label class="mandatory">Address</label>
 <div class="row">
   <div class='col-md-12'>
     <%= p.text_field :address1, class: "form-control", placeholder: 'Address line 1', autocomplete: "address-line1" %>
@@ -10,9 +11,12 @@
     <%= p.text_field :city, class: "form-control", placeholder: 'City', autocomplete: "address-level2" %>
   </div>
   <div class='col-md-4'>
-    <%= p.text_field :region, class: "form-control", placeholder: 'Region/Province/State', autocomplete: "address-level1" %>
+    <%= p.text_field :region, class: "form-control", placeholder: 'Region/Province/State', autocomplete: "address-level1 region" %>
   </div>
   <div class='col-md-4'>
     <%= p.text_field :postal_code, class: "form-control", placeholder: 'Postal Code', autocomplete: "postal-code" %>
+  </div>
+  <div class='col-md-4'>
+    <%= p.text_field :country, class: "form-control", placeholder: 'Country', autocomplete: "country-name country" %>
   </div>
 </div>

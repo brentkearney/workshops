@@ -34,11 +34,30 @@ $(document).on 'turbolinks:load', ->
   $('#rsvp_membership_has_guest').change ->
     $('#guest_disclaimer').toggleClass('mandatory');
 
-  if $('#rsvp_person_country').val().toLowerCase() != 'canada'
+  country = $('#rsvp_person_country').val().toLowerCase()
+
+  if country != 'canada'
     $('#canadian-grants').hide();
 
+  if country !in ['canada', 'usa', 'u.s.a.', 'us', 'united states']
+    $('#address-region').hide();
+
+  if country == 'canada'
+    $('#rsvp_person_region')[0].placeholder = 'Province'
+
+  if country in ['usa', 'u.s.a.', 'us', 'united states']
+    $('#rsvp_person_region')[0].placeholder = 'State'
+
   $('#rsvp_person_country').change ->
-    if $('#rsvp_person_country').val().toLowerCase() == 'canada'
+    country = $('#rsvp_person_country').val().toLowerCase()
+    if country == 'canada'
       $('#canadian-grants').show();
+      $('#rsvp_person_region')[0].placeholder = 'Province'
     else
       $('#canadian-grants').hide();
+    if country in ['canada', 'usa', 'u.s.a.', 'us', 'united states']
+      $('#address-region').show();
+    else
+      $('#address-region').hide();
+    if country in ['usa', 'u.s.a.', 'us', 'united states']
+      $('#rsvp_person_region')[0].placeholder = 'State'

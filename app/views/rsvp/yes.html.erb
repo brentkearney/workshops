@@ -172,21 +172,20 @@
                 <%= p.telephone_field :phone, class: "form-control", autocomplete: "tel" %>
               </div>
               <div class="form-group" id="address-fields">
-                <label class="mandatory">Address</label>
                 <% if @rsvp.membership.role =~ /Organizer/ %>
                   <%= render partial: 'mailing_address', locals: { p: p } %>
                 <% else %>
                 <div class="row">
                   <div class='col-md-4'>
-                  <%= p.text_field :region, class: "form-control", placeholder: 'Region/Province/State', autocomplete: "address-level1" %>
+                    <label class="mandatory">Country:</label>
+                    <%= p.text_field :country, class: "form-control", placeholder: 'Country', autocomplete: "country-name country" %>
+                  </div>
+                  <div class='col-md-4' id="address-region">
+                    <label class="mandatory">Region:</label>
+                    <%= p.text_field :region, class: "form-control", placeholder: 'Region/Province/State', autocomplete: "region" %>
                   </div>
                 </div>
                 <% end %>
-                <div class="row">
-                  <div class='col-md-4'>
-                  <%= p.text_field :country, class: "form-control", placeholder: 'Country', autocomplete: "country-name" %>
-                  </div>
-                </div>
               </div>
               <div class="form-group">
                 <%= p.label :emergency_contact, 'Emergency Contact Name' %>

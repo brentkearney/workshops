@@ -44,6 +44,11 @@ class GetSetting
     Setting.Locations[location]['Name']
   end
 
+  def self.observers(location)
+    return location if no_setting("Locations['#{location}']['max_observers']")
+    Setting.Locations[location]['max_observers']
+  end
+
   def self.rsvp_dates_intro(location)
     return false if no_setting("RSVP['#{location}']['arrival_departure_intro']")
     Setting.RSVP[location]['arrival_departure_intro']

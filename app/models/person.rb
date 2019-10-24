@@ -7,7 +7,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Person < ApplicationRecord
-  attr_accessor :is_rsvp, :member_import, :is_organizer_rsvp
+  attr_accessor :is_rsvp, :member_import, :is_organizer_rsvp, :region_required
 
   has_many :memberships, dependent: :destroy
   has_many :events, -> {
@@ -47,8 +47,10 @@ class Person < ApplicationRecord
 
   def region_required?
     country ||= self.country
-    country == 'Canada' || country == 'USA' ||
-      country == 'U.S.A.' || country =~ /United States/
+    return false if country.blank? || member_import
+    c = country.downcase
+    c == 'canada' || c == 'usa' || c == 'u.s.a.' || c == 'us' ||
+      c =~ /united states/
   end
 
   def pending_replacement?

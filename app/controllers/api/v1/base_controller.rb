@@ -42,7 +42,12 @@ class Api::V1::BaseController < ApplicationController
         @room = current_next_params
       end
     else
-      @json = JSON.parse(request.body.read)
+      begin
+        @json = JSON.parse(request.body.read)
+      rescue JSON::ParserError
+        @json = {}
+        head :bad_request
+      end
     end
   end
 
