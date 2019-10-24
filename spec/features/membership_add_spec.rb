@@ -138,8 +138,6 @@ describe 'Membership#add', type: :feature do
       expect(page).to have_text('New members added')
       expect(current_path).to eq(event_memberships_path(@event))
       expect(page).to have_text(@person.lastname)
-
-      #@person.memberships.last.destroy
     end
 
     it 'imports remote records based on email match' do

@@ -32,6 +32,11 @@ module EventDecorators
       OR attendance = 'Confirmed') AND role != 'Observer'").size
   end
 
+  def num_invited_observers
+    memberships.where("(attendance = 'Invited' OR attendance = 'Undecided'
+      OR attendance = 'Confirmed') AND role = 'Observer'").size
+  end
+
   def attendance(status = 'Confirmed', order = 'lastname')
     direction = 'ASC'
 

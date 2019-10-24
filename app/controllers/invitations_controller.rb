@@ -42,9 +42,16 @@ class InvitationsController < ApplicationController
     end
 
     unless is_reinvite?(membership)
-      if event_full?(event, [membership])
+      members = event.memberships.where.not(role: "Backup Participant")
+                     .where(attendance: "Not Yet Invited")
+      full = event_full?(event, members)
+      if full == :max_participants
         redirect_to event_memberships_path(event),
           error: 'This event is already full.' and return
+      elsif full == :max_observers
+        redirect_to event_memberships_path(event),
+          error: "You may not invite more than
+                #{event.max_observers} observers.".squish and return
       end
     end
 
@@ -70,14 +77,19 @@ class InvitationsController < ApplicationController
       redirect_to event_memberships_path(event),
           error: 'There are no Not-Yet-Invited, non-Backup Participants
           to send invitations to.'.squish and return
-    elsif event_full?(event, members)
+    end
+
+    full = event_full?(event, members)
+    if full == :max_participants
       redirect_to event_memberships_path(event),
           error: "You may not invite more than
                   #{event.max_participants} participants.".squish and return
+    elsif full == :max_observers
+      redirect_to event_memberships_path(event),
+          error: "You may not invite more than
+                  #{event.max_observers} observers.".squish and return
     else
       pause_membership_syncing(event)
-      sent_to = ''
-
       members.each do |membership|
         membership.person.member_import = true # skip validations on save
         send_invitation(membership, current_user.name)
@@ -94,7 +106,15 @@ class InvitationsController < ApplicationController
   end
 
   def event_full?(event, members=[])
-    event.num_invited_participants + members.count > event.max_participants
+    invited_participants = members.select { |m| m.role != 'Observer' }.count
+    if event.num_invited_participants + invited_participants > event.max_participants
+      return :max_participants
+    end
+    invited_observers = members.select { |m| m.role == 'Observer' }.count
+    return if invited_observers == 0
+    if event.num_invited_observers + invited_observers > event.max_observers
+      return :max_observers
+    end
   end
 
   def pause_membership_syncing(event)

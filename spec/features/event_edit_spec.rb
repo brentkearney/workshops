@@ -145,6 +145,29 @@ describe 'Event Edit Page', type: :feature do
           expect(page.body).to have_field("event[#{field}]")
         end
       end
+
+      it 'updates fields when submitted' do
+        fill_in 'event_short_name', with: 'New Short Name'
+        fill_in 'event_description', with: 'New Description'
+        fill_in 'event_press_release', with: 'New Press Release'
+        fill_in 'event_door_code', with: '6666'
+        fill_in 'event_booking_code', with: 'NewCode'
+        fill_in 'event_subjects', with: 'New Subjects'
+        fill_in 'event_max_participants', with: '50'
+        fill_in 'event_max_observers', with: '1'
+
+        click_button "Update Event"
+
+        event = Event.find(@event.code)
+        expect(event.short_name).to eq('New Short Name')
+        expect(event.description).to eq('New Description')
+        expect(event.press_release).to eq('New Press Release')
+        expect(event.door_code).to eq(6666)
+        expect(event.booking_code).to eq('NewCode')
+        expect(event.subjects).to eq('New Subjects')
+        expect(event.max_participants).to eq(50)
+        expect(event.max_observers).to eq(1)
+      end
     end
 
     context 'whose location does NOT match the event location' do
@@ -190,6 +213,21 @@ describe 'Event Edit Page', type: :feature do
       @allowed_fields.each do |field|
         expect(page.body).to have_field("event[#{field}]")
       end
+    end
+
+    it 'updates fields when submitted' do
+      fill_in 'event[start_date]', with: '2030-02-02'
+      fill_in 'event[end_date]', with: '2030-02-07'
+      select 'Auckland', from: 'event[time_zone]'
+      select Setting.Locations.keys.last, from: 'event[location]'
+
+      click_button "Update Event"
+
+      event = Event.find(@event.code)
+      expect(event.start_date).to eq(DateTime.parse('2030-02-02'))
+      expect(event.end_date).to eq(DateTime.parse('2030-02-07'))
+      expect(event.time_zone).to eq('Auckland')
+      expect(event.location).to eq(Setting.Locations.keys.last)
     end
   end
 

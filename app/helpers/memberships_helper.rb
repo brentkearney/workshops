@@ -114,7 +114,7 @@ module MembershipsHelper
   end
 
   def show_reinvite_buttons?(member)
-    member.role != 'Observer' && policy(@event).send_invitations? &&
+    policy(@event).send_invitations? &&
       %w(Invited Undecided).include?(member.attendance)
   end
 

@@ -202,6 +202,29 @@ RSpec.describe InvitationsController, type: :controller do
       event.save
     end
 
+    it 'does not allow more observers if the event is already full' do
+      @user.member!
+      original_person = @membership.person
+      @membership.person = @user.person
+      @membership.role = 'Observer'
+      @membership.attendance = 'Not Yet Invited'
+      @membership.save!
+
+      event = @membership.event
+      create(:membership, event: event)
+      event.max_observers = event.num_invited_observers
+      event.save
+
+      get :send_invite, params: { membership_id: @membership.id }
+      expect(flash[:error]).to be_present
+
+      @user.admin!
+      @membership.person = original_person
+      @membership.save
+      event.max_observers = @past.max_observers
+      event.save
+    end
+
     context 'invalid parameter' do
       before do
         get :send_invite, params: { membership_id: '69 ' }
@@ -298,7 +321,7 @@ RSpec.describe InvitationsController, type: :controller do
     end
 
     it 'does not allow if event would be full' do
-      @event.max_participants = @event.num_invited_participants - 1
+      @event.max_participants = @event.num_invited_participants
       @event.save
       2.times do
         create(:membership, event: @event, attendance: 'Not Yet Invited')
@@ -316,6 +339,29 @@ RSpec.describe InvitationsController, type: :controller do
       @membership.person = original_person
       @membership.save
       @event.max_participants = @past.max_participants
+      @event.save
+    end
+
+    it 'does not allow more observers if event would be full' do
+      @event.max_observers = @event.num_invited_observers
+      @event.save
+      2.times do
+        create(:membership, event: @event, attendance: 'Not Yet Invited',
+                            role: 'Observer')
+      end
+      @user.member!
+      original_person = @membership.person
+      @membership.person = @user.person
+      @membership.role = 'Organizer'
+      @membership.save
+
+      get :send_all_invites, params: { event_id: @event.id }
+      expect(flash[:error]).to be_present
+
+      @user.admin!
+      @membership.person = original_person
+      @membership.save
+      @event.max_observers = @past.max_observers
       @event.save
     end
 

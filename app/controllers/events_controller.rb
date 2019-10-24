@@ -195,7 +195,7 @@ class EventsController < ApplicationController
                                   :end_date, :time_zone, :event_type, :location,
                                   :description, :press_release, :door_code,
                                   :max_participants, :booking_code, :subjects,
-                                  :updated_by)
+                                  :updated_by, :max_observers)
   end
 
   def location_params
