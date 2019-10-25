@@ -44,8 +44,13 @@ class GetSetting
     Setting.Locations[location]['Name']
   end
 
-  def self.observers(location)
-    return location if no_setting("Locations['#{location}']['max_observers']")
+  def self.max_participants(location)
+    return 40 if no_setting("Locations['#{location}']['max_participants']")
+    Setting.Locations[location]['max_participants']
+  end
+
+  def self.max_observers(location)
+    return 0 if no_setting("Locations['#{location}']['max_observers']")
     Setting.Locations[location]['max_observers']
   end
 

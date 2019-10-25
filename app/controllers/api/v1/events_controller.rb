@@ -14,7 +14,11 @@ class Api::V1::EventsController < Api::V1::BaseController
     go_away && return unless valid_create_parameters? && event_does_not_exist?
     event = Event.new
     event.assign_attributes(@json['event'])
-    event.max_observers = GetSetting.observers(event.location)
+
+    if event.max_participants.blank? || event.max_participants == 0
+      event.max_participants = GetSetting.max_participants(event.location)
+    end
+    event.max_observers = GetSetting.max_observers(event.location)
 
     respond_to do |format|
       if event.save
