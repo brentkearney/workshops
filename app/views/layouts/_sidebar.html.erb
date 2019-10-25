@@ -93,6 +93,11 @@
                 <%= link_to '<i class="fa fa-user-plus fa-fw"></i> Add Members'.html_safe, add_event_memberships_path(@event) %>
                 <div class="bottom-border"></div>
               </li>
+              <li id="event-members-invite">
+                <div class="top-border"></div>
+                <%= link_to '<i class="fa fa-envelope fa-fw"></i> Invite Members'.html_safe, invite_event_memberships_path(@event) %>
+                <div class="bottom-border"></div>
+              </li>
               <% end %>
             </ul>
           </li>

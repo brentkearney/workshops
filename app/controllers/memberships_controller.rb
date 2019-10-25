@@ -9,7 +9,7 @@ class MembershipsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_event, :set_user
   before_action :set_membership, except: [:index, :new, :create, :add,
-    :process_new]
+    :process_new, :invite]
 
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
@@ -155,6 +155,12 @@ class MembershipsController < ApplicationController
       end
       format.json { head :no_content }
     end
+  end
+
+  # Get /events/:event_id/memberships/invite
+  def invite
+    @membership = Membership.new(event: @event)
+    authorize(@membership)
   end
 
   private

@@ -20,7 +20,7 @@ describe 'Membership#add', type: :feature do
     @participant = @event.memberships.where("role='Participant'").first
   end
 
-  describe 'Visibility of Add Members button, access to page' do
+  describe 'Visibility of Add Members link, access to page' do
     before do
       @user = create(:user)
     end

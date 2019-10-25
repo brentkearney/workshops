@@ -21,6 +21,27 @@ describe 'Membership invitations', type: :feature do
     @user = create(:user)
   end
 
+  describe 'Visibility of Invite Members link, access to page' do
+    it 'hides from and denies access to public users' do
+      visit event_memberships_path(@event)
+      expect(page).not_to have_link("Invite Members")
+
+      visit invite_event_memberships_path(@event)
+      expect(current_path).to eq(user_session_path)
+      expect(page).to have_text('You need to sign in')
+    end
+
+    it 'shows to and allows access to organizer users' do
+      login_as @org_user, scope: :user
+      visit event_memberships_path(@event)
+      expect(page).to have_link("Invite Members")
+
+      click_link("Invite Members")
+      expect(current_path).to eq(invite_event_memberships_path(@event))
+      logout(@org_user)
+    end
+  end
+
   describe 'Send Invitation buttons' do
     it 'are hidden from public users' do
       visit event_memberships_path(@event)
