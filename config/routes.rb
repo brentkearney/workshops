@@ -53,7 +53,7 @@ Rails.application.routes.draw do
       collection do
         match 'add', via: [:get, :post]
         post 'process_new'
-        get 'invite'
+        match 'invite', via: [:get, :post]
       end
     end
     get 'lectures' => 'lectures#index'

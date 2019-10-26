@@ -36,7 +36,12 @@ $(document).on 'turbolinks:load', ->
     $('li#event-members-list').addClass('active')
     if path.match((/events\/(.+)\/memberships\/add/))
       $('li#event-members-list').removeClass('active')
+      $('li#event-members-invite').removeClass('active')
       $('li#event-members-add').addClass('active')
+    if path.match((/events\/(.+)\/memberships\/invite/))
+      $('li#event-members-list').removeClass('active')
+      $('li#event-members-add').removeClass('active')
+      $('li#event-members-invite').addClass('active')
   else if path.match(/events\/(.+)$/)
     $('li#event-details').addClass('active')
 

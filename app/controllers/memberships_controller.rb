@@ -159,8 +159,19 @@ class MembershipsController < ApplicationController
 
   # Get /events/:event_id/memberships/invite
   def invite
-    @membership = Membership.new(event: @event)
-    authorize(@membership)
+    authorize Membership.new(event: @event)
+    unless policy(@event).allow_add_members?
+      redirect_to event_memberships_path(@event), error: 'Access denied.'
+    end
+    @memberships = SortedMembers.new(@event).invited_members
+    @invite_members = InviteMembersForm.new(@event, current_user)
+
+    if request.post?
+      @invite_members.process(invite_params)
+      # if @add_members.new_people.empty? && !@add_members.added.empty?
+        #redirect_to event_memberships_path(@event), success: 'Members invited!'
+      # end
+    end
   end
 
   private
@@ -217,5 +228,9 @@ class MembershipsController < ApplicationController
   def add_params
     params.require(:add_members_form).permit(:add_members, :role,
                    new_people: [:email, :lastname, :firstname, :affiliation])
+  end
+
+  def invite_params
+    params.require(:invite_members_form).reject {|k,v| v == "0"}.keys
   end
 end
