@@ -96,7 +96,7 @@ module MembershipsHelper
   end
 
   def show_invited_on(member)
-    column = '<td class="rowlink-skip no-print">'
+    column = '<td class="rowlink-skip no-print hidden-xs hidden-sm">'
     if show_reinvite_buttons?(member)
       if member.invited_on.blank?
         column << '(not set)'
@@ -149,17 +149,13 @@ module MembershipsHelper
     return unless policy(@event).show_email_buttons?(status)
     content = '<div class="no-print" id="email-members">'
     content << add_email_buttons(status)
-    if status == 'Not Yet Invited' && spots_left && policy(@event).send_invitations?
-      content << ' | ' + link_to("Invite All Not Yet Invited Participants",
-        all_invitations_send_path(@event.id),
-        title: 'Send invitations to all non-Backup members who are Not Yet Invited',
-        data: { confirm: "This will send an email to all Participants (not
-        Backup Participants) who are Not Yet Invited, inviting them to attend
-        this workshop. Are you sure you want to proceed?".squish },
-        class: 'btn btn-sm btn-default')
-    end
     content << "\n</div>\n"
     content.html_safe
+  end
+
+  def invite_button(status)
+    return 'Invite Selected Members' if status == 'Not Yet Invited'
+    "Send Reminder to Selected #{status.titleize} Members"
   end
 
   def spots_left
@@ -192,7 +188,7 @@ module MembershipsHelper
           column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
             mail_to(member.person.email, '<span class="glyphicon glyphicon-lock"></span>'.html_safe, :title => "E-mail not shared with other members", subject: "[#{@event.code}] ") +
             '</td><td class="hidden-xs hidden-sm rowlink-skip no-print">' +
-            mail_to(member.person.email, '[not shared]', :title => "E-mail not shared with other members", subject: "[#{@event.code}] ") +
+            mail_to(member.person.email, '[not shared]', title: "E-mail not shared with other members", subject: "[#{@event.code}] ") +
             '</td>'
     elsif policy(member).show_not_shared?
       column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +

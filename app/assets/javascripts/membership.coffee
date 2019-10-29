@@ -40,19 +40,24 @@ $(document).on 'turbolinks:load', ->
     $(".spinner").show()
 
 
-  # memberships invite page buttons
+  # Memberships invite page buttons
+
+  # Check All
   checkall = (status) ->
     for i,elm of $("." + status)
       elm.checked=true
 
+  # Check None
   checknone = (status) ->
     for i,elm of $("." + status)
       elm.checked=false
 
+  # Invert Selection
   checkinvert = (status) ->
     for i,elm of $("." + status)
       elm.checked = !elm.checked
 
+  # Get attendance status of the Select button clicked
   $('.all-button').click (e) ->
     status = /^(.+)-all$/.exec(e.target.id)[1]
     checkall(status)
@@ -64,3 +69,12 @@ $(document).on 'turbolinks:load', ->
   $('.invert-button').click (e) ->
     status = /^(.+)-invert$/.exec(e.target.id)[1]
     checkinvert(status)
+
+  # Get attendance status of the Submit button clicked
+  $('.submit-button').click (e) ->
+    status = /^(.+)-submit$/.exec(e.target.id)[1]
+    msg = 'This will send all selected Not Yet Invited members an email, inviting them to attend this workshop. Are you sure you want to proceed?'
+    if status != 'not-yet-invited'
+      msg = 'This will send all selected ' + status + ' members an email, reminding them them to respond to the previously sent invitation. Are you sure you want to proceed?'
+
+    return confirm(msg)

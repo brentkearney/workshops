@@ -21,25 +21,25 @@ class SortedMembers
     make_invited_members_hash && sort_by_attendance && sort_by_role_and_name
   end
 
+  def make_hash(member)
+    if @memberships.key? member.attendance
+      @memberships[member.attendance] << member
+    else
+      @memberships[member.attendance] = [member]
+    end
+  end
+
   def make_invited_members_hash
     @event.memberships.includes(:person).each do |m|
       next if %w(Confirmed Declined).include? m.attendance
-      if @memberships.key? m.attendance
-        @memberships[m.attendance] << m
-      else
-        @memberships[m.attendance] = [m]
-      end
+      make_hash(m)
     end
     @memberships
   end
 
   def make_members_hash
     @event.memberships.includes(:person).each do |m|
-      if @memberships.key? m.attendance
-        @memberships[m.attendance] << m
-      else
-        @memberships[m.attendance] = [m]
-      end
+      make_hash(m)
     end
     @memberships
   end

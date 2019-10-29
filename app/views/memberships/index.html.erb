@@ -25,16 +25,14 @@
                     <th>#</th>
                     <th>Name</th>
                     <% if show_reinvite_buttons?(members.first) %>
-                      <th>Invited On</th><th></th>
-                    <% elsif members.first.attendance == 'Not Yet Invited' %>
-                      <th></th><th></th>
+                      <th class="hidden-xs hidden-sm">Invited On</th>
                     <% else %>
-                      <th></th>
+                      <th class="hidden-xs hidden-sm"></th>
                     <% end %>
                     <th class="hidden-xs">Affiliation</th>
                     <% if policy(@event).show_email_buttons?(status) %>
-                        <th class="hidden-md hidden-lg" align="middle">Email</th>
-                        <th class="hidden-xs hidden-sm">E-mail</th>
+                      <th class="hidden-md hidden-lg" align="middle">Email</th>
+                      <th class="hidden-xs hidden-sm">E-mail</th>
                     <% end %>
                     <th class="hidden-xs">Role</th>
                   </tr>

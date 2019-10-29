@@ -157,24 +157,40 @@ class MembershipsController < ApplicationController
     end
   end
 
-  # Get /events/:event_id/memberships/invite
+  # GET|POST /events/:event_id/memberships/invite
   def invite
     authorize Membership.new(event: @event)
-    unless policy(@event).allow_add_members?
+    unless policy(@event).send_invitations?
       redirect_to event_memberships_path(@event), error: 'Access denied.'
     end
     @memberships = SortedMembers.new(@event).invited_members
     @invite_members = InviteMembersForm.new(@event, current_user)
 
-    if request.post?
-      @invite_members.process(invite_params)
-      # if @add_members.new_people.empty? && !@add_members.added.empty?
-        #redirect_to event_memberships_path(@event), success: 'Members invited!'
-      # end
+    return unless request.post?
+    @invite_members.process(invite_params)
+
+    if @invite_members.memberships.empty?
+      redirect_to invite_event_memberships_path(@event),
+        error: 'No members selected to invite.' and return
+    elsif @invite_members.max_participants?
+      redirect_to event_memberships_path(@event),
+          error: "You may not invite more than
+                  #{@event.max_participants} participants.".squish and return
+    elsif @invite_members.max_observers?
+      redirect_to event_memberships_path(@event),
+          error: "You may not invite more than
+                  #{@event.max_observers} observers.".squish and return
+    else
+      @invite_members.send_invitations
+      redirect_to event_memberships_path(@event),
+        success: "Invitations were sent to: #{@invite_members.memberships.size}
+          participants.".squish
     end
   end
 
   private
+
+
 
   def assign_buttons
     organizers = @memberships.values[0].nil? ? '' : select_organizers

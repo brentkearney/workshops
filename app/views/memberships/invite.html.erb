@@ -9,9 +9,9 @@
       </div>
     </div>
 <% else %>
+  <% @memberships.each do |status, members| %>
   <%= form_with model: @invite_members, url: invite_event_memberships_path(@event),
                        class: 'form', role: 'form' do |form| %>
-  <% @memberships.each do |status, members| %>
   <div class="row<%= print_section?(status) %> <%= status.parameterize %>-members">
     <div class="col-lg-12">
       <div class="panel panel-default">
@@ -55,12 +55,13 @@
               <%= button_tag 'Invert Selection', type: 'button', id: "#{status.parameterize.downcase}-invert", class: 'btn btn-sm btn-default invert-button' %>
             </div>
             <div class="col-lg-6 pull-right">
-              <%= form.submit 'Invite Selected Members', id: 'invite-members-submit',
-                    data: { confirm: 'This will send all selected members an email, (re)inviting them to attend
-                      this workshop. Are you sure you want to proceed?'.squish },
-                            class: 'btn btn-sm btn-default pull-right' %>
+              <%= form.submit invite_button(status), id: "#{status.parameterize.downcase}-submit",
+                            class: 'btn btn-sm btn-default submit-button pull-right' %>
 
             </div>
+          </div>
+          <div class="row rowlink-skip no-print limits-message">
+          <%= add_limits_message(status) %>
           </div>
         </div>
         <!-- /.panel-body -->
