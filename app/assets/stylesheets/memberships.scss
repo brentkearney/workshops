@@ -96,11 +96,10 @@ h3#membership, h3#hotel {
   font-style: bold;
 }
 
-td.invite-buttons {
+.invite-buttons {
   vertical-align:middle;
-  a.btn {
-    margin-top: -2px;
-  }
+  margin-bottom: 0;
+  margin-top: -15px;
 }
 
 #add-members {

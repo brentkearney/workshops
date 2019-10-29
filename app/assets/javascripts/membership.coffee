@@ -39,15 +39,28 @@ $(document).on 'turbolinks:load', ->
     $('#add-members').hide()
     $(".spinner").show()
 
-  $('#all-invited').click (e) ->
-    for i,elm of $(".select-invited")
-      elm.checked = true
 
-  $('#reset-invited').click (e) ->
-    for i,elm of $(".select-invited")
-      elm.checked = false
+  # memberships invite page buttons
+  checkall = (status) ->
+    for i,elm of $("." + status)
+      elm.checked=true
 
-  $('#invert-invited').click (e) ->
-    for i,elm of $(".select-invited")
+  checknone = (status) ->
+    for i,elm of $("." + status)
+      elm.checked=false
+
+  checkinvert = (status) ->
+    for i,elm of $("." + status)
       elm.checked = !elm.checked
 
+  $('.all-button').click (e) ->
+    status = /^(.+)-all$/.exec(e.target.id)[1]
+    checkall(status)
+
+  $('.none-button').click (e) ->
+    status = /^(.+)-none$/.exec(e.target.id)[1]
+    checknone(status)
+
+  $('.invert-button').click (e) ->
+    status = /^(.+)-invert$/.exec(e.target.id)[1]
+    checkinvert(status)
