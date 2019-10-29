@@ -38,3 +38,16 @@ $(document).on 'turbolinks:load', ->
   $('#add-members-submit').click (e) ->
     $('#add-members').hide()
     $(".spinner").show()
+
+  $('#all-invited').click (e) ->
+    for i,elm of $(".select-invited")
+      elm.checked = true
+
+  $('#reset-invited').click (e) ->
+    for i,elm of $(".select-invited")
+      elm.checked = false
+
+  $('#invert-invited').click (e) ->
+    for i,elm of $(".select-invited")
+      elm.checked = !elm.checked
+
