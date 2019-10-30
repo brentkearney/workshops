@@ -39,7 +39,13 @@ class InviteMembersForm < ComplexForms
                        invited_by: @current_user.person.name).send_invite
         @invited << membership.person.name
       else
-        Invitation.where(membership: membership).last.send_reminder
+        invite = Invitation.where(membership: membership).last
+        if invite.blank?
+          Invitation.new(membership: membership,
+                         invited_by: @current_user.person.name).send_invite
+        else
+          invite.send_reminder
+        end
         @reminded << membership.person.name
       end
     end
