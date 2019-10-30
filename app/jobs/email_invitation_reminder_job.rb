@@ -6,12 +6,12 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# Initiates InvitationMailer to invite participants
-class EmailInvitationJob < ApplicationJob
+# Initiates InvitationMailer to send invitationr reminder to participants
+class EmailInvitationReminderJob < ApplicationJob
   queue_as :urgent
 
   def perform(invitation_id)
     invitation = Invitation.find_by_id(invitation_id)
-    InvitationMailer.invite(invitation).deliver_now
+    InvitationMailer.reinvite(invitation).deliver_now
   end
 end

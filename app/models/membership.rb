@@ -13,6 +13,7 @@ class Membership < ApplicationRecord
   belongs_to :person
   accepts_nested_attributes_for :person
   has_one :invitation, dependent: :delete
+  serialize :invite_reminders, Hash
 
   after_save :update_counter_cache
   after_update :notify_staff

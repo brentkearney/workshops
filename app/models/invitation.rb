@@ -25,6 +25,11 @@ class Invitation < ApplicationRecord
     EmailInvitationJob.perform_later(id)
   end
 
+  def send_reminder
+    update_reminder
+    EmailInvitationReminderJob.perform_later(id)
+  end
+
   def expire_date
     expires.strftime("%B %-d, %Y")
   end
@@ -95,6 +100,12 @@ class Invitation < ApplicationRecord
     end
     membership.save!
     save
+  end
+
+  def update_reminder
+    reminders = membership.invite_reminders
+    reminders[DateTime.current] = invited_by
+    membership.update_columns(invite_reminders: reminders)
   end
 
   def update_membership_fields(status)

@@ -106,7 +106,7 @@ class MembershipsController < ApplicationController
         end
         format.json do
           render :show, status: :ok,
-                        location: event_membership_path(@event, @membership)
+                        location: event_memberships_path(@event)
         end
       else
         format.html { render :edit }
@@ -159,7 +159,6 @@ class MembershipsController < ApplicationController
 
   # GET|POST /events/:event_id/memberships/invite
   def invite
-    authorize Membership.new(event: @event)
     unless policy(@event).send_invitations?
       redirect_to event_memberships_path(@event), error: 'Access denied.'
     end
@@ -169,22 +168,13 @@ class MembershipsController < ApplicationController
     return unless request.post?
     @invite_members.process(invite_params)
 
-    if @invite_members.memberships.empty?
-      redirect_to invite_event_memberships_path(@event),
-        error: 'No members selected to invite.' and return
-    elsif @invite_members.max_participants?
-      redirect_to event_memberships_path(@event),
-          error: "You may not invite more than
-                  #{@event.max_participants} participants.".squish and return
-    elsif @invite_members.max_observers?
-      redirect_to event_memberships_path(@event),
-          error: "You may not invite more than
-                  #{@event.max_observers} observers.".squish and return
-    else
+    if @invite_members.error_msg.empty?
       @invite_members.send_invitations
       redirect_to event_memberships_path(@event),
-        success: "Invitations were sent to: #{@invite_members.memberships.size}
-          participants.".squish
+        success: @invite_members.success_msg
+    else
+      redirect_to invite_event_memberships_path(@event),
+        error: @invite_members.error_msg
     end
   end
 

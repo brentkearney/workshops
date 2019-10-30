@@ -145,10 +145,10 @@ module MembershipsHelper
     column.html_safe
   end
 
-  def add_bottom_buttons(status)
+  def add_email_buttons(status)
     return unless policy(@event).show_email_buttons?(status)
     content = '<div class="no-print" id="email-members">'
-    content << add_email_buttons(status)
+    content << add_email_button(status)
     content << "\n</div>\n"
     content.html_safe
   end
@@ -162,7 +162,7 @@ module MembershipsHelper
     @event.max_participants - @event.num_invited_participants > 0
   end
 
-  def add_email_buttons(status)
+  def add_email_button(status)
     return '' unless policy(@event).show_email_buttons?(status)
     to_email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
     to_email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
