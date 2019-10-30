@@ -120,7 +120,7 @@ class InvitationMailer < ApplicationMailer
     @organizers.gsub!(/, $/, '')
 
     from_email = GetSetting.rsvp_email(@event.location)
-    subject = "#{@event.location} Workshop Invitation: #{@event.name} (#{@event.code})"
+    subject = "!! #{@event.location} Invitation Reminder: #{@event.name} (#{@event.code}) !!"
     bcc_email = GetSetting.rsvp_email(@event.location)
     bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email =~ /</
     to_email = '"' + @person.name + '" <' + @person.email + '>'

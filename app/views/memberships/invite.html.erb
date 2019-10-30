@@ -1,4 +1,8 @@
-<h1>Invite Members to <%= @event.code %></h1>
+<h1>Invite Members to <%= @event.code %>
+  <small>Reply by date: <%= RsvpDeadline.new(@event.start_date).rsvp_by %>
+    <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><span class="glyphicon glyphicon-question-sign"></span></a></span>
+  </small>
+</h1>
 
 <article>
 <% if @memberships.empty? %>
@@ -75,3 +79,26 @@
   <% end %>
 <% end %>
 </article>
+
+<!-- ? Reply-by Date Modal -->
+<div class="modal fade" id="about-reply-by" tabindex="-1" role="dialog" aria-labelledby="about-reply-by" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="about-roles-title">About the Reply-by Date</h3>
+      </div>
+      <div class="modal-body">
+        <p>Inivations and reminders include a date that we ask participants to answer by. It is set automatically according to the following criteria:</p>
+        <ul>
+          <li>If the event is more than 3 months, 5 days from now, the deadline is 4 weeks from now.</li>
+          <li>If the event is <strong>less</strong> than 3 months, 5 days from now, the deadline is 21 days from now.</li>
+          <li>If the event is less than 2 months from now, the deadline is 10 days from now.</li>
+          <li>If the event is less than 10 days from now, the deadline is the Tuesday before the event.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

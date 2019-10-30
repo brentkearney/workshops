@@ -1,6 +1,6 @@
-# app/jobs/email_invitation_job.rb
+# app/jobs/email_invitation_reminder_job.rb
 #
-# Copyright (c) 2018 Banff International Research Station.
+# Copyright (c) 2019 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
 # Free Software Foundation, version 3 of the License.

@@ -18,7 +18,7 @@ class SortedMembers
   end
 
   def invited_members
-    make_invited_members_hash && sort_by_attendance && sort_by_role_and_name
+    make_invited_members_hash && sort_by_invited && sort_by_role_and_name
   end
 
   def make_hash(member)
@@ -47,6 +47,14 @@ class SortedMembers
   def sort_by_attendance
     sorted = {}
     Membership::ATTENDANCE.each do |status|
+      sorted[status] = @memberships[status] if @memberships.key? status
+    end
+    @memberships = sorted
+  end
+
+  def sort_by_invited
+    sorted = {}
+    ['Not Yet Invited', 'Undecided', 'Invited'].each do |status|
       sorted[status] = @memberships[status] if @memberships.key? status
     end
     @memberships = sorted
