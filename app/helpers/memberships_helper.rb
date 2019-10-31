@@ -111,7 +111,7 @@ module MembershipsHelper
           member.invited_on.strftime('%Y-%m-%d') + ')'
       end
       unless member.invite_reminders.blank?
-        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="focus" data-content="' + parse_reminders(member.invite_reminders) + '"><span class="glyphicon glyphicon-repeat"></span></a></span>'.html_safe
+        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member.invite_reminders) + '"><span class="glyphicon glyphicon-repeat"></span></a></span>'.html_safe
       end
     end
     column << '</td>'
@@ -175,7 +175,7 @@ module MembershipsHelper
     return '' unless policy(@event).show_email_buttons?(status)
     to_email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
     to_email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
-    content = mail_to(to_email, "<i class=\"fa fa-envelope fa-fw\"></i> Email #{status} Members".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members')
+    content = mail_to(to_email, "<i class=\"fa fa-envelope fa-fw\"></i> Email #{status} Members".html_safe, subject: "[#{@event.code}] ", title: "Email #{to_email}", class: 'btn btn-sm btn-default email-members')
 
     if status == 'Confirmed' && !@organizer_emails.blank?
       content << ' | '
