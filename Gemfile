@@ -37,6 +37,7 @@ gem 'listen'
 gem 'bootsnap'
 gem 'administrate'
 gem 'devise-jwt', '~> 0.5.9'
+gem 'popper_js', '~> 1.14.5'
 
 group :development, :test do
   gem 'byebug'

@@ -18,4 +18,5 @@
 //= require sb-admin-2
 //= require moment
 //= require bootstrap-datetimepicker
+//= require popper
 //= require_tree .

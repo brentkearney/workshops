@@ -96,14 +96,32 @@ h3#membership, h3#hotel {
   font-style: bold;
 }
 
+h1#invite-members {
+  margin-bottom: 1em;
+
+  small {
+    font-size: 0.5em;
+    display: block;
+    margin-top: 10px;
+  }
+
+  #rsvp-by-icon {
+    font-size: 0.8em;
+  }
+}
+
 .invite-buttons {
   vertical-align:middle;
   margin-bottom: 0;
   margin-top: -15px;
 }
 
-#rsvp-by-icon {
-  font-size: 0.7em;
+.popover {
+    width: 250px;
+    ul {
+      margin-left: 10px;
+      padding-left: 10px;
+    }
 }
 
 .limits-message {

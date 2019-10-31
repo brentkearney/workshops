@@ -95,14 +95,23 @@ module MembershipsHelper
     invited_by.html_safe
   end
 
+  def parse_reminders(rhash)
+    text = '<ul>'
+    rhash.each {|k,v| text << "<li>On #{k.strftime('%Y-%m-%d %H:%M %Z')}<br>by #{v}</li>"}
+    text << '</ul>'
+  end
+
   def show_invited_on(member)
     column = '<td class="rowlink-skip no-print hidden-xs hidden-sm">'
     if show_reinvite_buttons?(member)
       if member.invited_on.blank?
         column << '(not set)'
       else
-        column << '<div id="invited-on">(' +
-          member.invited_on.strftime('%Y-%m-%d') + ')</div>'
+        column << '(' +
+          member.invited_on.strftime('%Y-%m-%d') + ')'
+      end
+      unless member.invite_reminders.blank?
+        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="focus" data-content="' + parse_reminders(member.invite_reminders) + '"><span class="glyphicon glyphicon-repeat"></span></a></span>'.html_safe
       end
     end
     column << '</td>'

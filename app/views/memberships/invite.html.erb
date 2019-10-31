@@ -1,4 +1,4 @@
-<h1>Invite Members to <%= @event.code %>
+<h1 id="invite-members">Invite Members to <%= @event.code %>
   <small>Reply by date: <%= RsvpDeadline.new(@event.start_date).rsvp_by %>
     <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><span class="glyphicon glyphicon-question-sign"></span></a></span>
   </small>
@@ -32,9 +32,9 @@
                 <th>#</th>
                 <th>Name</th>
                 <% if show_reinvite_buttons?(members.first) %>
-                  <th>Invited On</th>
+                  <th class="hidden-xs hidden-sm">Invited On</th>
                 <% else %>
-                  <th></th>
+                  <th class="hidden-xs hidden-sm"></th>
                 <% end %>
                 <th class="hidden-xs">Affiliation</th>
                 <% if policy(@event).show_email_buttons?(status) %>
@@ -95,6 +95,7 @@
           <li>If the event is less than 2 months from now, the deadline is 10 days from now.</li>
           <li>If the event is less than 10 days from now, the deadline is the Tuesday before the event.</li>
         </ul>
+        <p>If you wish to communicate a different date or any other information to the participants, you should e-mail them directly.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>

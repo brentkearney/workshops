@@ -39,9 +39,9 @@ $(document).on 'turbolinks:load', ->
     $('#add-members').hide()
     $(".spinner").show()
 
+  $('[data-toggle="popover"]').popover()
 
   # Memberships invite page buttons
-
   # Check All
   checkall = (status) ->
     for i,elm of $("." + status)
@@ -70,11 +70,11 @@ $(document).on 'turbolinks:load', ->
     status = /^(.+)-invert$/.exec(e.target.id)[1]
     checkinvert(status)
 
-  # Get attendance status of the Submit button clicked
+  # Get attendance status of the Submit button clicked & display confirmation
   $('.submit-button').click (e) ->
     status = /^(.+)-submit$/.exec(e.target.id)[1]
-    msg = 'This will send all selected Not Yet Invited members an email, inviting them to attend this workshop. Are you sure you want to proceed?'
+    msg = 'This will send all selected Not Yet Invited Members an email, inviting them to attend this workshop. Are you sure you want to proceed?'
     if status != 'not-yet-invited'
-      msg = 'This will send all selected ' + status + ' members an email, reminding them them to respond to the previously sent invitation. Are you sure you want to proceed?'
+      msg = 'This will send all selected ' + status[0].toUpperCase() + status[1..-1] + ' Members an email, reminding them them to respond to the previously sent invitation. Are you sure you want to proceed?'
 
     return confirm(msg)

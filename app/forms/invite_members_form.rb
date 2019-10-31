@@ -43,18 +43,20 @@ class InviteMembersForm < ComplexForms
         if invite.blank?
           Invitation.new(membership: membership,
                          invited_by: @current_user.person.name).send_invite
+          @invited << membership.person.name
         else
           invite.send_reminder
+          @reminded << membership.person.name
         end
-        @reminded << membership.person.name
       end
     end
     add_success_message
   end
 
   def add_success_message
-    @success_msg = "Invitations " and fill_msg(@invited) unless @invited.empty?
-    @success_msg = "Reminders " and fill_msg(@reminded) unless @reminded.empty?
+    @success_msg = ''
+    @success_msg << "Invitations " and fill_msg(@invited) unless @invited.empty?
+    @success_msg << " Reminders " and fill_msg(@reminded) unless @reminded.empty?
   end
 
   def fill_msg(names)
