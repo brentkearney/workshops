@@ -57,3 +57,7 @@
   <% end %>
 <% end %>
 </article>
+
+<% if display_new_feature_notice? %>
+  <%= render partial: 'new_feature_notice' %>
+<% end %>

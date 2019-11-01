@@ -78,3 +78,6 @@ $(document).on 'turbolinks:load', ->
       msg = 'This will send all selected ' + status[0].toUpperCase() + status[1..-1] + ' Members an email, reminding them them to respond to the previously sent invitation. Are you sure you want to proceed?'
 
     return confirm(msg)
+
+  # Display new feature modal
+  $('#new-feature-notice').modal('show');

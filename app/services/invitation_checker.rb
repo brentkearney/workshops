@@ -35,6 +35,10 @@ class InvitationChecker
   end
 
   def check_response_errors(response)
+    if response.blank?
+      @errors.add(:Invitation, 'Invitation code not found')
+      return
+    end
     @errors.add(:Invitation, response['denied']) if response['denied']
     @errors.add(:Event, 'No event associated') if response['event_code'].blank?
     @errors.add(:Person, 'No person associated') if response['legacy_id'].blank?

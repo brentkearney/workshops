@@ -190,4 +190,9 @@ module MembershipsHelper
     ('<div class="no-print" id="limits-message">There ' + "#{isare} #{spots} #{spot_s} left,
       out of a maximum of #{@event.max_participants}. #{unless_cancel}</div>").squish.html_safe
   end
+
+  def display_new_feature_notice?
+    @unread_notice && @current_user.sign_in_count > 1 &&
+      Date.current < Date.parse('2019-11-30') && policy(@event).send_invitations?
+  end
 end
