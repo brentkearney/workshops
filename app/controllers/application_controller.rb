@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   skip_before_action :verify_authenticity_token, if: :json_request?
 
   rescue_from ActionController::InvalidAuthenticityToken, with: :invalid_auth_token
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
   # Authorization module
   include Pundit
@@ -26,9 +27,12 @@ class ApplicationController < ActionController::Base
   add_flash_types :warning, :success, :info, :error
 
   def set_event
-    event_id = validate_event
-    @event = Event.find(event_id) if event_id
-    redirect_to events_path, error: 'Event not found.' if @event.blank?
+    event_id = validate_event_id
+    if event_id.nil?
+      redirect_to events_path, error: 'Invalid event id.'
+    else
+      @event = Event.find(event_id)
+    end
   end
 
   def set_time_zone
@@ -43,14 +47,19 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def not_found
+    redirect_to events_path, error: 'Record not found.'
+  end
+
   def authenticate_user!(*args)
     super and return unless args.blank?
     json_request? ? authenticate_api_user! : super
   end
 
-  def validate_event
-    event = params[:event_id] || params[:id]
-    event if event =~ /\A\d+\Z/ || event =~ /#{Setting.Site['code_pattern']}/
+  def validate_event_id
+    event_id = params[:event_id] || params[:id]
+    (event_id =~ /\A\d+\Z/ ||
+      event_id =~ /#{Setting.Site['code_pattern']}/) ? event_id : nil
   end
 
   def invalid_auth_token

@@ -10,7 +10,7 @@ RSpec.describe MembershipsController, type: :controller do
 
   context 'As an unauthenticated user' do
     before do
-      @event = create(:event)
+      @event = create(:event, future: true)
       @membership = create(:membership, event: @event, role: 'Confirmed')
     end
 
@@ -67,6 +67,24 @@ RSpec.describe MembershipsController, type: :controller do
     describe '#destroy' do
       it 'responds with redirect to sign_in page' do
         delete :destroy, params: { event_id: 1, id: 1 }
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    describe '#invite' do
+      before do
+        @membership = build(:membership, event: @event)
+      end
+
+      it 'GET responds with redirect to sign_in page' do
+        get :invite, params: { event_id: 1 }
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it 'POST responds with redirect to sign_in page' do
+        post :invite, params: { event_id: @event.id, invite_members_form:
+          { "#{@membership.id}": "1" } }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -140,11 +158,26 @@ RSpec.describe MembershipsController, type: :controller do
           expect(flash[:error]).to be_present
         end
       end
+
+      describe '#invite' do
+        it 'GET responds with redirect and error message' do
+          get :invite, params: { event_id: 'foo' }
+          expect(response).to redirect_to(events_path)
+          expect(flash[:error]).to be_present
+        end
+
+        it 'POST responds with redirect and error message' do
+          post :invite, params: { event_id: 1, invite_members_form:{ "12": "1" }}
+
+          expect(response).to redirect_to(events_path)
+          expect(flash[:error]).to be_present
+        end
+      end
     end
 
     context 'with a valid event id' do
       before do
-        @event = create(:event)
+        @event = create(:event,future: true)
         @membership = create(:membership, event: @event, role: 'Confirmed')
       end
 
@@ -269,7 +302,7 @@ RSpec.describe MembershipsController, type: :controller do
 
       describe '#update' do
         before do
-          @event = create(:event)
+          @event = create(:event, future: true)
           @person = create(:person)
           @membership = create(:membership, event: @event, person: @person)
 
@@ -817,6 +850,162 @@ RSpec.describe MembershipsController, type: :controller do
             deletes_membership
           end
         end
+      end
+
+      describe '#invite' do
+        before do
+          @membership = create(:membership, event: @event,
+                                       attendance: 'Not Yet Invited')
+        end
+
+        def denies_access
+          expect(response).to redirect_to(event_memberships_path(@event))
+          expect(flash[:error]).to be_present
+        end
+
+        def denies_get_access
+          get :invite, params: { event_id: @event.id }
+          denies_access
+        end
+
+        def denies_post_access
+          post :invite, params: { event_id: @event.id, invite_members_form:
+                    { "#{@membership.id}": "1" } }
+          denies_access
+        end
+
+        def allows_get_access
+          get :invite, params: { event_id: @event.id }
+          expect(response).to render_template(:invite)
+        end
+
+        def allows_post_access
+          member = create(:membership, attendance: 'Not Yet Invited')
+          post :invite, params: { event_id: @event.id, invite_members_form:
+                    { "#{member.id}": "1" } }
+
+          expect(flash[:success]).to be_present
+          expect(Membership.find(member.id).attendance).to eq('Invited')
+        end
+
+        context 'as role: member' do
+          before do
+            @user.member!
+          end
+
+          it 'GET redirects with error' do
+            denies_get_access
+          end
+
+          it 'POST redirects with error' do
+            denies_post_access
+          end
+        end
+
+        context 'as role: organizer' do
+          before do
+            organizer = create(:membership, role: 'Organizer', event: @event)
+            @user.role = :member
+            @user.person = organizer.person
+            @user.save
+          end
+
+          it 'GET renders invite page' do
+            allows_get_access
+          end
+
+          it 'POST invites member' do
+            allows_post_access
+          end
+        end
+
+        context 'as role: staff, from different location' do
+          before do
+            @user.role = :staff
+            @user.location = 'Elsewhere'
+            @user.save
+          end
+
+          it 'GET redirects with error' do
+            denies_get_access
+          end
+
+          it 'POST redirects with error' do
+            denies_post_access
+          end
+        end
+
+        context 'as role: staff, from same location' do
+          before do
+            @user.role = :staff
+            @user.location = @event.location
+            @user.save
+          end
+
+          it 'GET renders invite page' do
+            allows_get_access
+          end
+
+          it 'POST invites member' do
+            allows_post_access
+          end
+        end
+
+        context 'as role: admin' do
+          before do
+            @user.admin!
+          end
+
+          it 'GET renders invite page' do
+            allows_get_access
+          end
+
+          it 'POST invites member' do
+            allows_post_access
+          end
+
+          it 'does not invite if event is full' do
+            @event.max_participants = @event.num_invited_participants
+            @event.save
+
+            member = create(:membership, attendance: 'Not Yet Invited')
+            post :invite, params: { event_id: @event.id, invite_members_form:
+                      { "#{member.id}": "1" } }
+
+            expect(flash[:error]).to be_present
+            updated_member = Membership.find(member.id)
+            expect(updated_member.attendance).to eq('Not Yet Invited')
+          end
+
+          it 'allows invite to full event if invitee is an Obersver' do
+            @event.max_participants = @event.num_invited_participants
+            @event.save
+
+            member = create(:membership, attendance: 'Not Yet Invited',
+                                               role: 'Observer')
+            post :invite, params: { event_id: @event.id, invite_members_form:
+                      { "#{member.id}": "1" } }
+
+            expect(flash[:success]).to be_present
+            updated_member = Membership.find(member.id)
+            expect(updated_member.attendance).to eq('Invited')
+          end
+
+          it 'does not invite Observer if max_observers is full' do
+            @event.max_observers = @event.num_invited_observers
+            @event.save
+
+            member = create(:membership, attendance: 'Not Yet Invited',
+                                               role: 'Observer')
+            post :invite, params: { event_id: @event.id, invite_members_form:
+                      { "#{member.id}": "1" } }
+
+            expect(flash[:error]).to be_present
+            updated_member = Membership.find(member.id)
+            expect(updated_member.attendance).to eq('Not Yet Invited')
+          end
+        end
+
       end
     end
   end

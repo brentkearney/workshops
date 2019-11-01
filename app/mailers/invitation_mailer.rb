@@ -138,6 +138,8 @@ class InvitationMailer < ApplicationMailer
       sender: "#{invitation.invited_by}",
        event: "#{@event.code}"
     }
+    headers['X-Priority'] = 1
+    headers['X-MSMail-Priority'] = 'High'
 
     if File.exist?(text_template_file)
       mail(to: to_email,

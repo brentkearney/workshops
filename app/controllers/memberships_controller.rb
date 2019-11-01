@@ -160,7 +160,8 @@ class MembershipsController < ApplicationController
   # GET|POST /events/:event_id/memberships/invite
   def invite
     unless policy(@event).send_invitations?
-      redirect_to event_memberships_path(@event), error: 'Access denied.'
+      flash[:error] = 'Access denied.'
+      redirect_to event_memberships_path(@event) and return
     end
     @memberships = SortedMembers.new(@event).invited_members
     @invite_members = InviteMembersForm.new(@event, current_user)
