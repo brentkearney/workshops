@@ -31,7 +31,7 @@
                 <th class="select">Select</th>
                 <th>#</th>
                 <th>Name</th>
-                <% if show_reinvite_buttons?(members.first) %>
+                <% if show_invited_on?(members.first) %>
                   <th class="hidden-xs hidden-sm">Invited On</th>
                 <% else %>
                   <th class="hidden-xs hidden-sm"></th>

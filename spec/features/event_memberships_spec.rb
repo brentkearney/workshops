@@ -80,27 +80,6 @@ describe 'Event Membership Page', type: :feature do
     end
   end
 
-  def shows_invite_buttons
-    @event.memberships.where(attendance: 'Not Yet Invited').each do |member|
-      expect(page.body).to have_link('Send Invitation', href: invitations_send_path(member))
-    end
-    @event.memberships.where(attendance: 'Invited').each do |member|
-      expect(page.body).to have_link('Resend Invitation', href: invitations_send_path(member))
-    end
-  end
-
-  def hides_invite_buttons
-    expect(page.body).not_to have_css('a', text: 'Send Invitation')
-  end
-
-  def shows_reinvite_buttons
-    expect(page.body).to have_css('a', text: 'Resend Invitation')
-  end
-
-  def hides_reinvite_buttons
-    expect(page.body).not_to have_css('a', text: 'Resend Invitation')
-  end
-
   def links_to_confirmed_member_profiles
     @event.memberships.select {|m| m.attendance == 'Confirmed'}.each do |member|
       links_to_profile(member)
@@ -130,8 +109,7 @@ describe 'Event Membership Page', type: :feature do
 
     it 'hides email & invite buttons' do
       hides_all_email_buttons
-      hides_invite_buttons
-      hides_reinvite_buttons
+      expect(page.body).not_to have_link('Invite Members')
     end
   end
 
@@ -148,8 +126,7 @@ describe 'Event Membership Page', type: :feature do
 
     it 'hides email & invite buttons' do
       hides_all_email_buttons
-      hides_invite_buttons
-      hides_reinvite_buttons
+      expect(page.body).not_to have_link('Invite Members')
     end
 
     it 'does not show non-confirmed members' do
@@ -181,8 +158,7 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'hides invite buttons' do
-      hides_invite_buttons
-      hides_reinvite_buttons
+      expect(page.body).not_to have_link('Invite Members')
     end
 
     it 'does not show non-confirmed members' do
@@ -208,20 +184,8 @@ describe 'Event Membership Page', type: :feature do
 
     it 'shows email & invite buttons' do
       shows_all_email_buttons
-      shows_invite_buttons
-      shows_reinvite_buttons
-    end
-
-    it 'hides invite buttons if workshop is full' do
-      @event.max_participants = @event.num_invited_participants
-      @event.save
-
-      visit event_memberships_path(@event)
-
-      hides_invite_buttons
-      shows_reinvite_buttons
-      @event.max_participants = 42
-      @event.save
+      expect(page.body).to have_link('Invite Members',
+        href: invite_event_memberships_path(@event))
     end
 
     it 'hides invite buttons if workshop has already started' do
@@ -233,8 +197,8 @@ describe 'Event Membership Page', type: :feature do
 
       visit event_memberships_path(@event)
 
-      hides_invite_buttons
-      hides_reinvite_buttons
+      expect(page.body).not_to have_link('Invite Members')
+
       @event.start_date = original_start
       @event.end_date = original_end
       @event.save
@@ -270,20 +234,8 @@ describe 'Event Membership Page', type: :feature do
 
       it 'shows email & invite buttons' do
         shows_all_email_buttons
-        shows_invite_buttons
-        shows_reinvite_buttons
-      end
-
-      it 'hides invite buttons if workshop is full' do
-        @event.max_participants = @event.num_invited_participants
-        @event.save
-
-        visit event_memberships_path(@event)
-
-        hides_invite_buttons
-        shows_reinvite_buttons
-        @event.max_participants = 42
-        @event.save
+        expect(page.body).to have_link('Invite Members',
+          href: invite_event_memberships_path(@event))
       end
 
       it "has links to all members' profiles" do
@@ -304,8 +256,7 @@ describe 'Event Membership Page', type: :feature do
 
       it 'hides email buttons' do
         hides_all_email_buttons
-        hides_invite_buttons
-        hides_reinvite_buttons
+        expect(page.body).not_to have_link('Invite Members')
       end
 
       it "has links to Confirmed participants' profiles" do
@@ -327,20 +278,8 @@ describe 'Event Membership Page', type: :feature do
 
     it 'shows email & invite buttons' do
       shows_all_email_buttons
-      shows_invite_buttons
-      shows_reinvite_buttons
-    end
-
-    it 'hides invite buttons if workshop is full' do
-      @event.max_participants = @event.num_invited_participants
-      @event.save
-
-      visit event_memberships_path(@event)
-
-      hides_invite_buttons
-      shows_reinvite_buttons
-      @event.max_participants = 42
-      @event.save
+      expect(page.body).to have_link('Invite Members',
+        href: invite_event_memberships_path(@event))
     end
 
     it "has links to all members' profiles" do

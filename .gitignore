@@ -26,8 +26,10 @@ lib/tasks/birs.rake
 # organization-specific email templates
 app/views/participant_mailer/rsvp/BIRS
 app/views/participant_mailer/rsvp/CMO
+app/views/participant_mailer/rsvp/IAS-H
 app/views/invitation_mailer/BIRS
 app/views/invitation_mailer/CMO
+app/views/invitation_mailer/IAS-H
 lib/assets
 
 # Deployment files

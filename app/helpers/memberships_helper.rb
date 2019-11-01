@@ -101,9 +101,9 @@ module MembershipsHelper
     text << '</ul>'
   end
 
-  def show_invited_on(member)
+  def show_invited_on_date(member)
     column = '<td class="rowlink-skip no-print hidden-xs hidden-sm">'
-    if show_reinvite_buttons?(member)
+    if show_invited_on?(member)
       if member.invited_on.blank?
         column << '(not set)'
       else
@@ -118,40 +118,9 @@ module MembershipsHelper
     column.html_safe
   end
 
-  def show_invite_buttons?(member)
-    member.attendance == 'Not Yet Invited' && policy(@event).send_invitations?
-  end
-
-  def show_reinvite_buttons?(member)
+  def show_invited_on?(member)
     policy(@event).send_invitations? &&
       %w(Invited Undecided).include?(member.attendance)
-  end
-
-  def show_invite_button(member)
-    column = '<td class="rowlink-skip no-print invite-buttons">'
-    if show_invite_buttons?(member) && spots_left
-      column << link_to("Send Invitation", invitations_send_path(member),
-        data: { confirm: "This will send #{member.person.name}
-        a #{member.role} invitation email, asking #{member.person.him} to attend
-        this workshop. Are you sure you want to proceed?".squish },
-        class: 'btn btn-sm btn-default')
-    end
-    column << '</td>'
-    column.html_safe if member.attendance == 'Not Yet Invited'
-  end
-
-  def show_reinvite_button(member)
-    column = ''
-    if show_reinvite_buttons?(member)
-      column << '<td class="rowlink-skip no-print invite-buttons">'
-      column << link_to("Resend Invitation", invitations_send_path(member),
-        data: { confirm: "This will send #{member.person.name}
-        an email, re-inviting #{member.person.him} to attend this
-        workshop. Are you sure you want to proceed?".squish },
-        class: 'btn btn-sm btn-default')
-      column << '</td>'
-    end
-    column.html_safe
   end
 
   def add_email_buttons(status)
@@ -208,7 +177,7 @@ module MembershipsHelper
   end
 
   def add_limits_message(status)
-    return unless show_invite_buttons?(Membership.new(event: @event, attendance: status))
+    return unless status == 'Not Yet Invited'
     spots = @event.max_participants - @event.num_invited_participants
     isare = 'are'
     isare = 'is' if spots == 1

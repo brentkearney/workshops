@@ -30,35 +30,6 @@ class InvitationsController < ApplicationController
     end
   end
 
-  def send_invite
-    membership = Membership.find_by_id(membership_param['membership_id'])
-    redirect_to root_path,
-                error: 'Membership not found.' and return if membership.nil?
-
-    event = membership.event
-    unless policy(event).send_invitations?
-      redirect_to event_memberships_path(event),
-          error: 'Access to this feature is restricted.' and return
-    end
-
-    unless is_reinvite?(membership)
-      full = event_full?(event, [membership])
-      if full == :max_participants
-        redirect_to event_memberships_path(event),
-          error: 'This event is already full.' and return
-      elsif full == :max_observers
-        redirect_to event_memberships_path(event),
-          error: "You may not invite more than
-                #{event.max_observers} observers.".squish and return
-      end
-    end
-
-    pause_membership_syncing(event)
-    send_invitation(membership, current_user.name)
-    redirect_to event_memberships_path(event),
-                success: "Invitation sent to #{membership.person.name}"
-  end
-
   private
 
   def is_reinvite?(membership)
