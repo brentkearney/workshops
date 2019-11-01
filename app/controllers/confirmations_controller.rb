@@ -12,7 +12,16 @@ class ConfirmationsController < Devise::ConfirmationsController
       sign_in(resource) # <= THIS LINE ADDED
       respond_with_navigational(resource){ redirect_to after_confirmation_path_for(resource_name, resource) }
     else
-      respond_with_navigational(resource.errors, status: :unprocessable_entity){ render :new }
+      error_msg = resource.errors.full_messages.first
+      if error_msg == 'Confirmation token is invalid'
+        set_flash_message(:error, :invalid_confirmation_token)
+        redirect_to new_user_registration_path
+      elsif error_msg == 'Email was already confirmed, please try signing in'
+        set_flash_message(:error, :account_already_confirmed)
+        redirect_to sign_in_path
+      else
+        respond_with_navigational(resource.errors, status: :unprocessable_entity){ render :new }
+      end
     end
   end
 

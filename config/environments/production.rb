@@ -81,7 +81,7 @@ Rails.application.configure do
   # Production URL - depreciated?
   config.action_mailer.default_url_options = {
     protocol: 'https',
-    host: 'workshops.birs.ca'
+    host: ENV['APPLICATION_HOST']
   }
 
   if ENV["RAILS_LOG_TO_STDOUT"].present?
