@@ -1,5 +1,5 @@
 <div class="authform">
-  <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, role: 'form' }) do |f| %>
+  <%= form_for(resource, as: resource_name, url: confirmation_path, html: { method: :post, role: 'form' }) do |f| %>
       <h3>E-mail Validation</h3>
       <%= render "devise/shared/error_messages", resource: resource %>
       <div class="form-group">
