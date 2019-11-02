@@ -186,7 +186,7 @@ class MembershipsController < ApplicationController
   def check_read_notice_cookie
     return false unless policy(@event).send_invitations?
     return false if cookies[:read_notice]
-    cookies[:read_notice] = true
+    cookies[:read_notice] = { value: true, expires: 6.months.from_now }
   end
 
   def assign_buttons

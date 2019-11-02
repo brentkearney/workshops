@@ -57,8 +57,10 @@ class InvitationForm < ComplexForms
   def declined_already(event)
     errors.add(:Membership, ": You have already declined an invitation
       to this event. Please contact the event's organizers to ask if it
-      is still possible to attend.<br />
-      The contact organizer is: <u>#{organizer(event)}</u>.".squish)
+      is still possible to attend.
+      The contact organizer is: <u>#{organizer(event)}</u>.<br />
+      You may also contact the #{event.location} Program Coordinator
+      at #{GetSetting.email(event.location, 'program_coordinator')}".squish)
   end
 
   def not_invited(event)
