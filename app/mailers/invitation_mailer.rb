@@ -55,12 +55,12 @@ class InvitationMailer < ApplicationMailer
     # Set email template according to location, type of event, and attendance status
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{@event.location}")
-    template_type = "#{@event.event_type}-#{@membership.attendance}"
+    @template_name = "#{@event.event_type}-#{@membership.attendance}"
 
-    pdf_template_file = "#{template_path}/#{template_type}.pdf.erb"
-    pdf_template = "invitation_mailer/#{@event.location}/#{template_type}.pdf.erb"
-    text_template_file = "#{template_path}/#{template_type}.text.erb"
-    text_template = "invitation_mailer/#{@event.location}/#{template_type}.text.erb"
+    pdf_template_file = "#{template_path}/#{@template_name}.pdf.erb"
+    pdf_template = "invitation_mailer/#{@event.location}/#{@template_name}.pdf.erb"
+    text_template_file = "#{template_path}/#{@template_name}.text.erb"
+    text_template = "invitation_mailer/#{@event.location}/#{@template_name}.text.erb"
 
     if @membership.role == 'Observer'
       text_template_file.gsub!(/\.text/, "-Observer\.text")
@@ -93,7 +93,7 @@ class InvitationMailer < ApplicationMailer
            from: from_email,
            subject: subject,
            template_path: "invitation_mailer/#{@event.location}",
-           template_name: @event.event_type) do |format|
+           template_name: @template_name) do |format|
         format.text { render text_template }
       end
     else
