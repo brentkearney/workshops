@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 class InvitationMailer < ApplicationMailer
-  def invite(invitation)
+  def invite(invitation, template)
     @person = invitation.membership.person
     @event = invitation.membership.event
     @membership = invitation.membership
@@ -55,7 +55,7 @@ class InvitationMailer < ApplicationMailer
     # Set email template according to location, type of event, and attendance status
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{@event.location}")
-    @template_name = "#{@event.event_type}-#{@membership.attendance}"
+    @template_name = "#{@event.event_type}-#{template}"
 
     pdf_template_file = "#{template_path}/#{@template_name}.pdf.erb"
     pdf_template = "invitation_mailer/#{@event.location}/#{@template_name}.pdf.erb"

@@ -137,6 +137,7 @@
     <div class="col-sm-6"></div>
   </div>
 
+  <% if policy(@membership).show_address? %>
   <div class="form-group">
     <div class="col-sm-3 control-label">
       <%= person.label :phone, "Phone: " %>
@@ -145,8 +146,6 @@
       <%= person.text_field :phone, class: 'form-control' %>
     </div>
   </div>
-
-  <% if policy(@membership).show_address? %>
   <div class="form-group">
     <div class="col-sm-3 control-label">
       <%= person.label :address, "Address: " %>

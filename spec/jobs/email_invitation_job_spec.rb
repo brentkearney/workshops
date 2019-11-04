@@ -10,14 +10,15 @@ RSpec.describe EmailInvitationJob, type: :job do
   describe "#perform" do
     it "calls on the InvitationMailer" do
       invitation = double('invitation', id: 9)
+      template = 'Not Yet Invited'
       membership = create(:membership)
       allow(invitation).to receive(:membership).and_return(membership)
       allow(Invitation).to receive(:find_by_id).and_return(invitation)
       allow(InvitationMailer).to receive_message_chain(:invite, :deliver_now)
 
-      described_class.new.perform(membership.id)
+      described_class.new.perform(membership.id, template)
 
-      expect(InvitationMailer).to have_received(:invite).with(invitation)
+      expect(InvitationMailer).to have_received(:invite).with(invitation, template)
     end
   end
 

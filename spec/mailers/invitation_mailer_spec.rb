@@ -13,6 +13,7 @@ RSpec.describe InvitationMailer, type: :mailer do
   end
 
   before :each do
+    @template = 'Not Yet Invited'
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.deliveries = []
@@ -29,7 +30,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     end
 
     before :each do
-      InvitationMailer.invite(@invitation).deliver_now
+      InvitationMailer.invite(@invitation, @template).deliver_now
       @delivery = ActionMailer::Base.deliveries.last
       expect(@delivery).not_to be_nil
     end
@@ -74,7 +75,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       event.end_date = Date.current + 5.months + 5.days
       event.save
 
-      InvitationMailer.invite(@invitation).deliver_now
+      InvitationMailer.invite(@invitation, @template).deliver_now
       delivery = ActionMailer::Base.deliveries.last
 
       rsvp_date = (Date.current + 4.weeks).strftime('%B %-d, %Y')
@@ -87,7 +88,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       event.end_date = Date.current + 8.days + 5.days
       event.save
 
-      InvitationMailer.invite(@invitation).deliver_now
+      InvitationMailer.invite(@invitation, @template).deliver_now
       delivery = ActionMailer::Base.deliveries.last
 
       rsvp_date = event.start_date.prev_week(:tuesday).strftime('%B %-d, %Y')
@@ -100,7 +101,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       event.end_date = Date.current + 3.months + 5.days
       event.save
 
-      InvitationMailer.invite(@invitation).deliver_now
+      InvitationMailer.invite(@invitation, @template).deliver_now
       delivery = ActionMailer::Base.deliveries.last
 
       rsvp_date = (Date.current + 21.days).strftime('%B %-d, %Y')
