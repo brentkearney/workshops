@@ -27,7 +27,7 @@ class Invitation < ApplicationRecord
 
   def send_reminder
     update_reminder
-    EmailInvitationReminderJob.perform_later(id)
+    EmailInvitationJob.perform_later(id)
   end
 
   def expire_date

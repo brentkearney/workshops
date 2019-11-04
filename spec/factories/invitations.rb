@@ -8,5 +8,12 @@ FactoryBot.define do
     expires { nil }
     invited_on { Date.today }
     used_on { nil }
+
+    after :create do |invitation|
+      if invitation.membership.attendance != 'Not Yet Invited'
+        invitation.membership.attendance = 'Not Yet Invited'
+        invitation.membership.save
+      end
+    end
   end
 end

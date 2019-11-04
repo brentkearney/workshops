@@ -20,17 +20,18 @@ RSpec.describe InvitationMailer, type: :mailer do
 
   after(:each) do
     ActionMailer::Base.deliveries.clear
-    Event.destroy_all
   end
 
   describe '.invite' do
     before do
-      @invitation = create(:invitation)
+      membership = create(:membership, attendance: 'Not Yet Invited')
+      @invitation = create(:invitation, membership: membership)
     end
 
     before :each do
       InvitationMailer.invite(@invitation).deliver_now
       @delivery = ActionMailer::Base.deliveries.last
+      expect(@delivery).not_to be_nil
     end
 
     it 'sends email' do

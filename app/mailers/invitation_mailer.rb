@@ -24,92 +24,6 @@ class InvitationMailer < ApplicationMailer
     @event = invitation.membership.event
     @membership = invitation.membership
     @rsvp_url = invitation.rsvp_url
-
-    return if @event.start_date.to_time.to_i < Time.now.to_i
-    @event_start = @event.start_date.to_time.strftime('%A, %B %-d')
-    @event_end = @event.end_date.to_time.strftime('%A, %B %-d, %Y')
-
-    @rsvp_deadline = RsvpDeadline.new(@event.start_date).rsvp_by
-
-    @organizers = ''
-    @event.organizers.each do |org|
-      @organizers << org.name + ' (' + org.affiliation + '), '
-    end
-    @organizers.gsub!(/, $/, '')
-
-    from_email = GetSetting.rsvp_email(@event.location)
-    subject = "#{@event.location} Workshop Invitation: #{@event.name} (#{@event.code})"
-
-    if @event.location == 'IAS-H'
-      subject = "IAS-Hangzhou Workshop Invitation: #{@event.name} (#{@event.code})"
-    end
-
-    bcc_email = GetSetting.rsvp_email(@event.location)
-    bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email =~ /</
-    to_email = '"' + @person.name + '" <' + @person.email + '>'
-
-    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
-      to_email = GetSetting.site_email('webmaster_email')
-    end
-
-    template_path = Rails.root.join('app', 'views', 'invitation_mailer',
-                      "#{@event.location}")
-    pdf_template_file = "#{template_path}/#{@event.event_type}.pdf.erb"
-    pdf_template = "invitation_mailer/#{@event.location}/#{@event.event_type}.pdf.erb"
-    text_template_file = "#{template_path}/#{@event.event_type}.text.erb"
-    text_template = "invitation_mailer/#{@event.location}/#{@event.event_type}.text.erb"
-
-    if @membership.role == 'Observer'
-      text_template_file.gsub!(/\.text/, "-Observer\.text")
-      text_template.gsub!(/\.text/, "-Observer\.text")
-      pdf_template_file = 'no-file'
-    end
-
-    # Create PDF attachment
-    if File.exist?(pdf_template_file)
-      @page_title = "#{@event.location} Invitation Details"
-      pdf_file = WickedPdf.new.pdf_from_string(
-        render_to_string(template: "#{pdf_template}", encoding: "UTF-8",
-          lowquality: false, page_size: 'Letter'))
-      attachments["#{@event.location}-invitation-#{@person.id}.pdf"] = pdf_file
-
-      ## save to a file (for testing)
-      # save_path = Rails.root.join('tmp','invitation.pdf')
-      # File.open(save_path, 'wb') do |file|
-      #   file << pdf_file
-      # end
-    end
-
-    headers['X-WS-Mailer'] = {
-      sender: "#{invitation.invited_by}",
-       event: "#{@event.code}"
-    }
-
-    if File.exist?(text_template_file)
-      mail(to: to_email,
-           bcc: bcc_email,
-           from: from_email,
-           subject: subject,
-           template_path: "invitation_mailer/#{@event.location}",
-           template_name: @event.event_type) do |format|
-        format.text { render text_template }
-      end
-    else
-      error_msg = { problem: 'Participant invitation not sent.',
-                    cause: 'Email template file missing.',
-                    template: text_template_file,
-                    person: @person,
-                    membership: @membership,
-                    invitation: invitation }
-      StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
-    end
-  end
-
-  def reinvite(invitation)
-    @person = invitation.membership.person
-    @event = invitation.membership.event
-    @membership = invitation.membership
-    @rsvp_url = invitation.rsvp_url
     @invitation_date = invitation.invited_on.strftime('%A, %B %-d, %Y')
 
     return if @event.start_date.to_time.to_i < Time.now.to_i
@@ -125,7 +39,11 @@ class InvitationMailer < ApplicationMailer
     @organizers.gsub!(/, $/, '')
 
     from_email = GetSetting.rsvp_email(@event.location)
-    subject = "!! #{@event.location} Invitation Reminder: #{@event.name} (#{@event.code}) !!"
+
+    location = @event.location
+    location = 'IAS-Hangzhou' if location == 'IAS-H'
+    subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
+
     bcc_email = GetSetting.rsvp_email(@event.location)
     bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email =~ /</
     to_email = '"' + @person.name + '" <' + @person.email + '>'
@@ -134,15 +52,38 @@ class InvitationMailer < ApplicationMailer
       to_email = GetSetting.site_email('webmaster_email')
     end
 
+    # Set email template according to location, type of event, and attendance status
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{@event.location}")
-    text_template_file = "#{template_path}/#{@event.event_type}-reminder.text.erb"
-    text_template = "invitation_mailer/#{@event.location}/#{@event.event_type}-reminder.text.erb"
+    template_type = "#{@event.event_type}-#{@membership.attendance}"
 
-    headers['X-WS-Mailer'] = {
-      sender: "#{invitation.invited_by}",
-       event: "#{@event.code}"
-    }
+    pdf_template_file = "#{template_path}/#{template_type}.pdf.erb"
+    pdf_template = "invitation_mailer/#{@event.location}/#{template_type}.pdf.erb"
+    text_template_file = "#{template_path}/#{template_type}.text.erb"
+    text_template = "invitation_mailer/#{@event.location}/#{template_type}.text.erb"
+
+    if @membership.role == 'Observer'
+      text_template_file.gsub!(/\.text/, "-Observer\.text")
+      text_template.gsub!(/\.text/, "-Observer\.text")
+      pdf_template_file = 'no-file'
+    end
+
+    # Create PDF attachment
+    if File.exist?(pdf_template_file)
+      @page_title = "#{location} Invitation Details"
+      pdf_file = WickedPdf.new.pdf_from_string(
+        render_to_string(template: "#{pdf_template}", encoding: "UTF-8",
+          lowquality: false, page_size: 'Letter'))
+      attachments["#{@event.location}-invitation-#{@person.id}.pdf"] = pdf_file
+
+      ## save to a file (for testing)
+      # save_path = Rails.root.join('tmp','invitation.pdf')
+      # File.open(save_path, 'wb') do |file|
+      #   file << pdf_file
+      # end
+    end
+
+    headers['X-BIRS-Sender'] = "#{invitation.invited_by}"
     headers['X-Priority'] = 1
     headers['X-MSMail-Priority'] = 'High'
 
@@ -152,11 +93,11 @@ class InvitationMailer < ApplicationMailer
            from: from_email,
            subject: subject,
            template_path: "invitation_mailer/#{@event.location}",
-           template_name: "#{@event.event_type}-reminder") do |format|
+           template_name: @event.event_type) do |format|
         format.text { render text_template }
       end
     else
-      error_msg = { problem: 'Participant invitation reminder not sent.',
+      error_msg = { problem: 'Participant (re)invitation not sent.',
                     cause: 'Email template file missing.',
                     template: text_template_file,
                     person: @person,

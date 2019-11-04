@@ -20,7 +20,6 @@ class MembershipsController < ApplicationController
     @domain = GetSetting.email(@event.location, 'email_domain')
     assign_buttons if policy(@event).show_email_buttons?('Confirmed')
     @unread_notice = check_read_notice_cookie
-    Rails.logger.debug "\n\n* read notice is: #{@read_notice}\n\n"
   end
 
   # GET /events/:event_id/memberships/1

@@ -202,7 +202,7 @@ describe 'Invite Members', type: :feature do
       end
     end
 
-    it 'sends reminders to selected members' do
+    it 'sends reminders to selected members, updates invite_reminders field' do
       selected = []
       i = 1
       @event.memberships.where(role: 'Participant')

@@ -1,14 +1,12 @@
 Dear <%= @person.dear_name %>,
 
-You are invited to attend the following event, as an observer:
+You are invited to attend the following event:
 
 Workshop: <%= @event.name %> (<%= @event.code %>)
 On: <%= @event.dates(:long) %>
-At: <%= @org_location %>
-URL: <%= @event_url %>
+At: <%= @event.location %>
+URL: <%= @event.url %>
 Organizers: <%= @organizers %>
-
-As you will be an observer participant and not a regular participant, accommodation and meals will not be provided.
 
 Please follow the link below before <%= @rsvp_deadline %> to let us know whether or not you will attend.
 

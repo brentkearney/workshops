@@ -21,10 +21,8 @@ class InviteMembersForm < ComplexForms
   end
 
   def process(membership_ids)
-    Rails.logger.debug "\n\n.process received: #{membership_ids}\n\n"
     membership_ids.each do |id|
       membership = Membership.find(id.to_i)
-      Rails.logger.debug "\t* #{membership.person.name} (#{membership.attendance})\n"
       @memberships << membership
     end
     check_for_errors
