@@ -39,7 +39,9 @@ $(document).on 'turbolinks:load', ->
     $('#add-members').hide()
     $(".spinner").show()
 
+  # Enable tooltips & popovers
   $('[data-toggle="popover"]').popover()
+  $('[data-toggle="tooltip"]').tooltip()
 
   # Memberships invite page buttons
   # Check All

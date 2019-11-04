@@ -78,20 +78,25 @@ module MembershipsHelper
     return ' no-print' unless section == 'Confirmed'
   end
 
-  def show_invited_by?
-    invited_by = ''
-    if @membership.attendance == 'Invited'
-      unless @membership.invited_by.blank?
-        invited_by='
-        <div class="row" id="profile-rsvp-invited">
-          Invited by: ' + @membership.invited_by
-        unless @membership.invited_on.blank?
-          invited_by << ' on '
-          invited_by << @membership.invited_on.in_time_zone(@membership.event.time_zone).to_s
-        end
-        invited_by << '</div>'
+  def format_invited_by(membership)
+    invited_by=''
+    unless membership.invited_by.blank?
+      invited_by = membership.invited_by
+      unless membership.invited_on.blank?
+        invited_by << ' on <br>'
+        tz = membership.event.time_zone
+        invited_by << membership.invited_on.in_time_zone(tz).to_s
       end
     end
+    invited_by
+  end
+
+  def show_invited_by?
+    invited_by = '<div class="row" id="profile-rsvp-invited">Invited by: '
+    if @membership.attendance == 'Invited'
+      format_invited_by(@membership)
+    end
+    invited_by << '</div>'
     invited_by.html_safe
   end
 
@@ -107,8 +112,10 @@ module MembershipsHelper
       if member.invited_on.blank?
         column << '(not set)'
       else
-        column << '(' +
-          member.invited_on.strftime('%Y-%m-%d') + ')'
+        column << '<a class="invitation-dates" data-toggle="tooltip"
+          data-placement="top" data-html="true" title="Invited by ' +
+          format_invited_by(member) + '" >' +
+          member.invited_on.strftime('%Y-%m-%d') + '</a>'
       end
       unless member.invite_reminders.blank?
         column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member.invite_reminders) + '"><span class="glyphicon glyphicon-repeat"></span></a></span>'.html_safe
