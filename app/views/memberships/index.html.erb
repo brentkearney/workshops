@@ -25,11 +25,11 @@
                     <th>#</th>
                     <th>Name</th>
                     <% if show_invited_on?(members.first) %>
-                      <th class="hidden-xs hidden-sm">Invited On</th>
+                    <th>Invited On</th>
                     <% else %>
-                      <th class="hidden-xs hidden-sm"></th>
+                    <th></th>
                     <% end %>
-                    <th class="hidden-xs">Affiliation</th>
+                    <th class="hidden-xs hidden-sm hidden-md">Affiliation</th>
                     <% if policy(@event).show_email_buttons?(status) %>
                       <th class="hidden-md hidden-lg" align="middle">Email</th>
                       <th class="hidden-xs hidden-sm">E-mail</th>

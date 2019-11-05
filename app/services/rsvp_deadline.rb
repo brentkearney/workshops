@@ -22,18 +22,19 @@
 
 # Calculates RSVP deadline for invitation emails
 class RsvpDeadline
-  def initialize(start_date)
+  def initialize(start_date, sent_on = Date.current)
     @start_date = start_date
+    @sent_on = sent_on.to_date
   end
 
   def rsvp_by
-    rsvp_deadline = (Date.current + 4.weeks).strftime('%B %-d, %Y')
-    if seconds_diff(@start_date, Date.current) < 10.days
+    rsvp_deadline = (@sent_on + 4.weeks).strftime('%B %-d, %Y')
+    if seconds_diff(@start_date, @sent_on) < 10.days
       rsvp_deadline = @start_date.prev_week(:tuesday).strftime('%B %-d, %Y')
-    elsif seconds_diff(@start_date, Date.current) < 2.month
-      rsvp_deadline = (Date.current + 10.days).strftime('%B %-d, %Y')
-    elsif seconds_diff(@start_date, Date.current) < (3.months + 5.days)
-      rsvp_deadline = (Date.current + 21.days).strftime('%B %-d, %Y')
+    elsif seconds_diff(@start_date, @sent_on) < 2.month
+      rsvp_deadline = (@sent_on + 10.days).strftime('%B %-d, %Y')
+    elsif seconds_diff(@start_date, @sent_on) < (3.months + 5.days)
+      rsvp_deadline = (@sent_on + 21.days).strftime('%B %-d, %Y')
     end
     rsvp_deadline
   end

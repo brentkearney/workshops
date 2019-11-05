@@ -98,9 +98,6 @@ class EventPolicy
 
   def send_invitations?
     return false if current_user.nil?
-    unless ENV['APPLICATION_HOST'].include?('staging')
-      return false if event.location == 'IAS-H'
-    end
     return false if Date.current + 2.days > event.start_date
     return true if staff_and_admins
     current_user.is_organizer?(event)

@@ -100,25 +100,32 @@ module MembershipsHelper
     invited_by.html_safe
   end
 
-  def parse_reminders(rhash)
+  def parse_reminders(member)
     text = '<ul>'
-    rhash.each {|k,v| text << "<li>On #{k.strftime('%Y-%m-%d %H:%M %Z')}<br>by #{v}</li>"}
+    member.invite_reminders.each do |k,v|
+      rb = RsvpDeadline.new(member.event.start_date, member.invited_on).rsvp_by
+      text << "<li><b>On #{k.strftime('%Y-%m-%d %H:%M %Z')}</b><br>by #{v}.<br>
+              &nbsp;&nbsp;&bull; Reply-by: #{rb}</li>".squish
+    end
     text << '</ul>'
   end
 
   def show_invited_on_date(member)
-    column = '<td class="rowlink-skip no-print hidden-xs hidden-sm">'
+    column = '<td class="rowlink-skip no-print">'
     if show_invited_on?(member)
       if member.invited_on.blank?
         column << '(not set)'
       else
-        column << '<a class="invitation-dates" data-toggle="tooltip"
-          data-placement="top" data-html="true" title="Invited by ' +
-          format_invited_by(member) + '" >' +
-          member.invited_on.strftime('%Y-%m-%d') + '</a>'
+        column << '<a class="invitation-dates" tabindex="0" title="Invitation Sent"
+          role="button" data-toggle="popover" data-placement="top" data-html="true"
+          data-target="#invitations-' + member.id.to_s + '"
+          data-trigger="hover focus" data-content="By ' +
+          format_invited_by(member) + '<br><b>Reply-by date:</b> ' +
+          RsvpDeadline.new(member.event.start_date, member.invited_on).rsvp_by +
+          '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
       end
       unless member.invite_reminders.blank?
-        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member.invite_reminders) + '"><span class="glyphicon glyphicon-repeat"></span></a></span>'.html_safe
+        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"><span class="glyphicon glyphicon-repeat"></span></a></span>'.html_safe
       end
     end
     column << '</td>'
