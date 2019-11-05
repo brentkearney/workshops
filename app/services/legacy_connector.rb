@@ -89,7 +89,8 @@ class LegacyConnector
       workshop_id: event_code,
       member_id: membership.id,
       person:      person.as_json.merge(new_id: person.id),
-      updated_by:  updated_by
+      updated_by:  updated_by,
+      invite_reminders: nil
     )
     remote_membership = update_booleans(remote_membership)
 

@@ -94,7 +94,7 @@ module MembershipsHelper
   def show_invited_by?
     invited_by = '<div class="row" id="profile-rsvp-invited">Invited by: '
     if @membership.attendance == 'Invited'
-      format_invited_by(@membership)
+      invited_by << format_invited_by(@membership)
     end
     invited_by << '</div>'
     invited_by.html_safe

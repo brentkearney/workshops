@@ -186,10 +186,6 @@ class EventsController < ApplicationController
     end
   end
 
-  def set_time_zone
-    Time.zone = @event.time_zone
-  end
-
   def event_params
     params.require(:event).permit(:code, :name, :short_name, :start_date,
                                   :end_date, :time_zone, :event_type, :location,
