@@ -42,6 +42,8 @@ class BounceMailer < ApplicationMailer
   def non_member(params)
     email_fields(params)
     @event_code = params[:event_code]
+    @membership_url = "#{GetSetting.app_url}/events/#{@event_code}/memberships"
+
     mail(to: @email_from, from: @webmaster, subject: @subject)
   end
 
