@@ -15,11 +15,13 @@
     </h4>
   <% end %>
   </header>
+  <div class="invitation-errors">
   <ul>
     <% @invitation.errors.full_messages.each do |message| %>
       <li><%= message.html_safe %></li>
     <% end %>
   </ul>
+  </div>
 </div>
 </section>
 <% end %>
