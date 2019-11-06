@@ -92,11 +92,12 @@ module MembershipsHelper
   end
 
   def show_invited_by?
-    invited_by = '<div class="row" id="profile-rsvp-invited">Invited by: '
-    if @membership.attendance == 'Invited'
+    invited_by = ''
+    unless ['Confirmed', 'Not Yet Invited'].include? @membership.attendance
+      invited_by = '<div class="row" id="profile-rsvp-invited">Invited by: '
       invited_by << format_invited_by(@membership)
+      invited_by << '</div>'
     end
-    invited_by << '</div>'
     invited_by.html_safe
   end
 
