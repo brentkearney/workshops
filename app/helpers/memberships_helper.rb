@@ -101,11 +101,14 @@ module MembershipsHelper
   end
 
   def parse_reminders(member)
+    tz = member.event.time_zone
+
     text = '<ul>'
     member.invite_reminders.each do |k,v|
-      rb = RsvpDeadline.new(member.event.start_date, member.invited_on).rsvp_by
+      start_date = member.event.start_date.in_time_zone(tz)
+      reply_by = RsvpDeadline.new(start_date, k.in_time_zone(tz)).rsvp_by
       text << "<li><b>On #{k.strftime('%Y-%m-%d %H:%M %Z')}</b><br>by #{v}.<br>
-              &nbsp;&nbsp;&bull; Reply-by: #{rb}</li>".squish
+              &nbsp;&nbsp;&bull; Reply-by: #{reply_by}</li>".squish
     end
     text << '</ul>'
   end
@@ -116,12 +119,15 @@ module MembershipsHelper
       if member.invited_on.blank?
         column << '(not set)'
       else
+        tz = member.event.time_zone
+        start_date = member.event.start_date.in_time_zone(tz)
+        invited_on = member.invited_on.in_time_zone(tz)
         column << '<a class="invitation-dates" tabindex="0" title="Invitation Sent"
           role="button" data-toggle="popover" data-placement="top" data-html="true"
           data-target="#invitations-' + member.id.to_s + '"
           data-trigger="hover focus" data-content="By ' +
           format_invited_by(member) + '<br><b>Reply-by date:</b> ' +
-          RsvpDeadline.new(member.event.start_date, member.invited_on).rsvp_by +
+          RsvpDeadline.new(start_date, invited_on).rsvp_by +
           '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
       end
       unless member.invite_reminders.blank?

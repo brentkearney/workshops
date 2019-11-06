@@ -222,7 +222,9 @@ describe 'Invite Members', type: :feature do
       click_button('Send Reminder to Selected Invited Members')
 
       selected.each do |id|
-        expect(Membership.find(id).invite_reminders).not_to be_empty
+        reminders = Membership.find(id).invite_reminders
+        expect(reminders).not_to be_empty
+        expect(reminders.values.last).to eq(@org_user.person.name)
       end
     end
 

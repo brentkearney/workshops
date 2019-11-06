@@ -43,6 +43,7 @@ class InviteMembersForm < ComplexForms
                          invited_by: @current_user.person.name).send_invite
           @invited << membership.person.name
         else
+          invite.invited_by = @current_user.person.name
           invite.send_reminder
           @reminded << membership.person.name
         end

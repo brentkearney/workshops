@@ -14,13 +14,10 @@ RSpec.describe InvitationMailer, type: :mailer do
 
   before :each do
     @template = 'Not Yet Invited'
+    ActionMailer::Base.deliveries.clear
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.deliveries = []
-  end
-
-  after(:each) do
-    ActionMailer::Base.deliveries.clear
   end
 
   describe '.invite' do
@@ -31,7 +28,7 @@ RSpec.describe InvitationMailer, type: :mailer do
 
     before :each do
       InvitationMailer.invite(@invitation, @template).deliver_now
-      @delivery = ActionMailer::Base.deliveries.last
+      @delivery = ActionMailer::Base.deliveries.first
       expect(@delivery).not_to be_nil
     end
 
@@ -46,16 +43,19 @@ RSpec.describe InvitationMailer, type: :mailer do
 
     it "message body includes participant's name" do
       participant_name = @invitation.membership.person.dear_name
-      expect(@delivery.text_part).to have_text(participant_name)
+      body = @delivery.body.empty? ? @delivery.text_part : @delivery.body
+      expect(body).to have_text(participant_name)
     end
 
     it 'message body includes the invitation code' do
-      expect(@delivery.text_part).to have_text(@invitation.code)
+      body = @delivery.body.empty? ? @delivery.text_part : @delivery.body
+      expect(body).to have_text(@invitation.code)
     end
 
     it 'message body contains event name' do
       event_name = @invitation.membership.event.name
-      expect(@delivery.text_part).to have_text(event_name)
+      body = @delivery.body.empty? ? @delivery.text_part : @delivery.body
+      expect(body).to have_text(event_name)
     end
 
     it 'headers include the senders name and event code' do
@@ -67,45 +67,60 @@ RSpec.describe InvitationMailer, type: :mailer do
   describe 'RSVP deadline' do
     before do
       @invitation = create(:invitation)
+      @event = @invitation.membership.event
+      @today = DateTime.current.in_time_zone(@event.time_zone)
     end
 
-    it 'sets date to 4 weeks in advance' do
-      event = @invitation.membership.event
-      event.start_date = Date.current + 5.months
-      event.end_date = Date.current + 5.months + 5.days
-      event.save
+    it 'sets date to 4 weeks in advance of current date' do
+      @event.start_date = @today + 5.months
+      @event.end_date = @event.start_date + 5.days
+      @event.save
 
       InvitationMailer.invite(@invitation, @template).deliver_now
-      delivery = ActionMailer::Base.deliveries.last
+      delivery = ActionMailer::Base.deliveries.first
+      body = delivery.body.empty? ? delivery.text_part : delivery.body
 
-      rsvp_date = (Date.current + 4.weeks).strftime('%B %-d, %Y')
-      expect(delivery.text_part).to have_text("before #{rsvp_date}")
+      rsvp_date = (@today + 4.weeks).strftime('%B %-d, %Y')
+      expect(body).to have_text("before #{rsvp_date}")
     end
 
     it 'sets date to Tuesday before workshop if event is < 10 days away' do
-      event = @invitation.membership.event
-      event.start_date = Date.current + 8.days
-      event.end_date = Date.current + 8.days + 5.days
-      event.save
+      @event.start_date = @today + 8.days
+      @event.end_date = @event.start_date + 5.days
+      @event.save
 
       InvitationMailer.invite(@invitation, @template).deliver_now
-      delivery = ActionMailer::Base.deliveries.last
+      delivery = ActionMailer::Base.deliveries.first
+      body = delivery.body.empty? ? delivery.text_part : delivery.body
 
-      rsvp_date = event.start_date.prev_week(:tuesday).strftime('%B %-d, %Y')
-      expect(delivery.text_part).to have_text("before #{rsvp_date}")
+      rsvp_date = @event.start_date.prev_week(:tuesday).strftime('%B %-d, %Y')
+      expect(body).to have_text("before #{rsvp_date}")
+    end
+
+    it 'sets date to 10 days in advance if event is < 2 months away' do
+      @event.start_date = @today + 1.month + 3.weeks
+      @event.end_date = @event.start_date + 5.days
+      @event.save
+
+      InvitationMailer.invite(@invitation, @template).deliver_now
+      delivery = ActionMailer::Base.deliveries.first
+      body = delivery.body.empty? ? delivery.text_part : delivery.body
+
+      rsvp_date = (@today + 10.days).strftime('%B %-d, %Y')
+      expect(body).to have_text("before #{rsvp_date}")
     end
 
     it 'sets date to 21 days in advance if event is < 3 months, 5 days away' do
-      event = @invitation.membership.event
-      event.start_date = Date.current + 3.months
-      event.end_date = Date.current + 3.months + 5.days
-      event.save
+      @event.start_date = @today + 3.months
+      @event.end_date = @event.start_date + 5.days
+      @event.save
 
       InvitationMailer.invite(@invitation, @template).deliver_now
-      delivery = ActionMailer::Base.deliveries.last
+      delivery = ActionMailer::Base.deliveries.first
+      body = delivery.body.empty? ? delivery.text_part : delivery.body
 
-      rsvp_date = (Date.current + 21.days).strftime('%B %-d, %Y')
-      expect(delivery.text_part).to have_text("before #{rsvp_date}")
+      rsvp_date = (@today + 21.days).strftime('%B %-d, %Y')
+      expect(body).to have_text("before #{rsvp_date}")
     end
   end
 end
