@@ -100,13 +100,18 @@ module MembershipsHelper
     invited_by.html_safe
   end
 
+  def rsvp_by(event_start, invited_on)
+    rsvp_by = RsvpDeadline.new(event_start, invited_on).rsvp_by
+    DateTime.parse(rsvp_by).strftime('%b. %e, %Y')
+  end
+
   def parse_reminders(member)
     tz = member.event.time_zone
 
     text = '<ul>'
     member.invite_reminders.each do |k,v|
       start_date = member.event.start_date.in_time_zone(tz)
-      reply_by = RsvpDeadline.new(start_date, k.in_time_zone(tz)).rsvp_by
+      reply_by = rsvp_by(start_date, k.in_time_zone(tz))
       text << "<li><b>On #{k.strftime('%Y-%m-%d %H:%M %Z')}</b><br>by #{v}.<br>
               &nbsp;&nbsp;&bull; Reply-by: #{reply_by}</li>".squish
     end
@@ -127,7 +132,7 @@ module MembershipsHelper
           data-target="#invitations-' + member.id.to_s + '"
           data-trigger="hover focus" data-content="By ' +
           format_invited_by(member) + '<br><b>Reply-by date:</b> ' +
-          RsvpDeadline.new(start_date, invited_on).rsvp_by +
+          rsvp_by(start_date, invited_on) +
           '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
       end
       unless member.invite_reminders.blank?
