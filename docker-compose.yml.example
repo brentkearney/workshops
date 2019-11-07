@@ -41,6 +41,7 @@ web:
     - DB_USER=db_username
     - DB_PASS=
     - RAILS_ENV=development
+    - NODE_ENV=development
     - RAILS_SERVE_STATIC_FILES=true
     - SECRET_KEY_BASE=
     - SECRET_TOKEN=

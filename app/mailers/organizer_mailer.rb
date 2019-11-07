@@ -36,7 +36,7 @@ class OrganizerMailer < ApplicationMailer
     @organizer = @event.organizer
     @organization = GetSetting.org_name(@event.location)
 
-    from_email = GetSetting.email(location, 'maillist_from')
+    from_email = GetSetting.email(@event.location, 'maillist_from')
     reply_to = GetSetting.rsvp_email(@event.location)
     subject = '[' + @event.code + '] Membership invitation reply'
 
