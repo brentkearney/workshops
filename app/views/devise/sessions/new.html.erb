@@ -19,16 +19,16 @@
         </div>
     <% end -%>
   <% end %>
-</div>
-<div class="row">
-  <div class="col-lg-4">
-    <p class="sign-in-links">Have you registered an account here already?<br>If not, <%= link_to 'Sign-up here', new_registration_path(resource_name), class: 'right' %>.</p>
-  </div>
-</div>
-<%- if devise_mapping.recoverable? %>
   <div class="row">
     <div class="col-lg-4">
-      <p class="sign-in-links">Did you forget your password?<br><%= link_to "Reset password", new_password_path(resource_name) %>.</p>
+      <p class="sign-in-links">Have you registered an account here already?<br>If not, <%= link_to 'Sign-up here', new_registration_path(resource_name), class: 'right' %>.</p>
     </div>
   </div>
-<% end -%>
+  <%- if devise_mapping.recoverable? %>
+    <div class="row">
+      <div class="col-lg-4">
+        <p class="sign-in-links">Did you forget your password?<br><%= link_to "Reset password", new_password_path(resource_name) %>.</p>
+      </div>
+    </div>
+  <% end -%>
+</div>
