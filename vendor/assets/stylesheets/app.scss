@@ -1,0 +1,16 @@
+a.app-header__logo {
+  background-color: white;
+
+  img {
+    height: 48px;
+  }
+}
+
+.login-box-signup {
+  min-height: 420px !important;
+}
+
+.app-login-box {
+  @media(max-width: 480px) { display: none; }
+  align-self: center;
+}

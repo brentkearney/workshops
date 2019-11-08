@@ -20,6 +20,8 @@ Rails.application.routes.draw do
     patch 'confirmation', to: 'confirmations#create'
   end
 
+  resources :vendors, only: :index
+
   # Redirect old urls
   get '/users/sign_in', to: redirect('/sign_in')
   get '/users/sign_out', to: redirect('/sign_out')
