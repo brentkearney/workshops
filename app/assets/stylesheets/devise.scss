@@ -1,6 +1,3 @@
-@import "bootstrap-sprockets";
-@import "bootstrap";
-
 .authform {
   padding-top: 30px;
   max-width: 320px;
@@ -8,8 +5,7 @@
   /* margin: 0 auto; */
 }
 .authform form {
-  @extend .well;
-  @extend .well-lg;
+  @extend .card-body;
   padding-bottom: 40px;
 }
 
@@ -21,7 +17,7 @@
   @extend .btn-primary;
 }
 .authform fieldset {
-  @extend .well;
+  @extend .card-body;
 }
 #error_explanation:not(:empty) {
   @extend .alert;
@@ -33,7 +29,7 @@
 .button-xs {
   @extend .btn;
   @extend .btn-primary;
-  @extend .btn-xs;
+  @extend .btn-sm;
 }
 
 .horizontal-authform {

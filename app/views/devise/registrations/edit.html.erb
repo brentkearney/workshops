@@ -38,7 +38,7 @@
 <% end %>
 <div class="row">
   <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-    <div class="well col-md-12 horizontal-authform">
+    <div class="card card-body bg-light col-md-12 horizontal-authform">
       <h2>Note:</h2>
       We are currently waiting e-mail confirmation for: <%= resource.unconfirmed_email %>.
       The account will not work until this e-mail is confirmed.

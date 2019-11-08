@@ -1,11 +1,11 @@
 <div class="row invitation-box container">
   <div class="col-md-8 col-md-offset-1">
     <%= render 'validation_errors' %>
-    <div class="panel panel-primary" id="email-form">
-      <div class="panel-heading">
-        <span class="panel-title"><h4>Confirm Your E-mail Address</h4></span>
+    <div class="card card-primary" id="email-form">
+      <div class="card-heading">
+        <span class="card-title"><h4>Confirm Your E-mail Address</h4></span>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
       <h1>We're glad you can attend! 🎉<br />
       <small>Is this your preferred email address? If not, please change it.</small></h1>
       <%= form_for @email_form, as: :email_form,
@@ -29,7 +29,7 @@
         </div>
         <% end %><!-- end fields_for -->
       <% end %><!-- end form -->
-      </div><!-- panel-body -->
-    </div><!-- panel email-form -->
+      </div><!-- card-body -->
+    </div><!-- card email-form -->
   </div><!-- col-md-8 -->
 </div><!-- container -->

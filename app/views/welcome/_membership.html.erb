@@ -1,11 +1,11 @@
 <div class="row">
   <div class="col-md-12">
-    <div class="panel panel-primary show">
-      <div class="panel-heading">
-        <h1 class="panel-title event-title"><%= membership.event.name %><br />
+    <div class="card card-primary show">
+      <div class="card-heading">
+        <h1 class="card-title event-title"><%= membership.event.name %><br />
           <small><%= membership.event.code + ' • ' + membership.event.dates(:long) %></small></h1>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
         <div class="row event-status">
           <p>Your role: <em><%= membership.role %></em>, Attendance: <em><%= membership.attendance %></em></p>
         </div>
@@ -21,9 +21,9 @@
         </div>
         <!-- /.row -->
       </div>
-      <!-- /.panel-body -->
+      <!-- /.card-body -->
     </div>
-    <!-- /.panel -->
+    <!-- /.card -->
   </div>
   <!-- /.col-md-12 -->
 </div>

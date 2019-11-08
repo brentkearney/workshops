@@ -1,9 +1,3 @@
-/* Import Twitter Bootstrap */
-@import "bootstrap-sprockets";
-@import "bootstrap";
-@import "bootstrap/theme";
-@import "colours";
-
 body {
   background-color: #fff;
   color: #333;
@@ -176,7 +170,7 @@ footer#page-footer {
 
 }
 
-.panel-footer {
+.card-footer {
   text-align: center;
   vertical-align: middle;
 }

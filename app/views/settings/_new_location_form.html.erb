@@ -1,6 +1,6 @@
-<div role="tabpanel" class="tab-pane" id="NEW">
-  <div class="panel panel-default">
-    <div class="panel-body">
+<div role="tabcard" class="tab-pane" id="NEW">
+  <div class="card card-default">
+    <div class="card-body">
     <h3>Create New Location:</h3>
     <%= setting_form.fields_for @setting.var do |nl_form| %>
       <div class="form-group">
@@ -15,8 +15,8 @@
     </div>
   </div>
 
-  <div class="panel panel-default">
-    <div class="panel-body">
+  <div class="card card-default">
+    <div class="card-body">
     <h3>Delete Location:</h3>
     <%= setting_form.fields_for @setting.var do |dl_form| %>
       <div class="form-group">

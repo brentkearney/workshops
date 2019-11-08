@@ -1,11 +1,11 @@
 <div class="row invitation-box container">
   <div class="col-md-8 col-md-offset-1">
     <%= render 'validation_errors' %>
-    <div class="panel panel-primary" id="yes-form">
-      <div class="panel-heading">
-        <span class="panel-title"><h4>Invitation RSVP: <%= @rsvp.event.code %></h4></span>
+    <div class="card card-primary" id="yes-form">
+      <div class="card-heading">
+        <span class="card-title"><h4>Invitation RSVP: <%= @rsvp.event.code %></h4></span>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
         <h1>Please share your plans, then click the green button.<br>
           <small>You may return any time to update this information.</small>
         </h1>
@@ -279,7 +279,7 @@
           <span id="revisit-note" class="pull-right">You may revisit this page any time
             by <%= link_to 'generating a new invitation link', invitations_new_path(@rsvp.event.code) %>.</span>
 
-          <div class="well">
+          <div class="card card-body bg-light">
             <p><%= @rsvp.privacy_notice %></p>
           </div>
         </div>

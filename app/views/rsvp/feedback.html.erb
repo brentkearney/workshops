@@ -1,10 +1,10 @@
 <div class="row invitation-box container">
   <div class="col-md-8 col-md-offset-1">
-    <div class="panel panel-primary" id="feedback-form">
-      <div class="panel-heading">
-        <span class="panel-title"><h4>RSVP Feedback</h4></span>
+    <div class="card card-primary" id="feedback-form">
+      <div class="card-heading">
+        <span class="card-title"><h4>RSVP Feedback</h4></span>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
         <%= form_tag({controller: 'rsvp', action: 'feedback', method: 'post'},
                      { class: 'form', role: 'form'}) do %>
         <div class="row">
