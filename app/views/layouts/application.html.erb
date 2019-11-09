@@ -11,12 +11,32 @@
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+
+    <!-- MathJax to display math -->
+    <script type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [['$','$'], ['\\(','\\)']],
+              processEscapes: true
+          },
+          TeX: {
+              extensions: ["autobold.js", "AMSmath.js", "AMSsymbols.js"],
+              equationNumbers: { autoNumber: "AMS" }
+          }
+      });
+    </script>
   </head>
-  <body class="app sidebar-mini rtl" data-notice="<%= j notice -%>" data-alert="<%= j alert || devise_error_messages -%>">
+  <body class="app sidebar-mini <%= controller_name %> <%= action_name %>" data-notice="<%= j notice -%>" data-alert="<%= j alert || devise_error_messages -%>">
     <%# Navbar %>
-    <header class="app-header"><a class="app-header__logo" href="<%= root_path -%>"><%= image_tag 'logo.png' %></a>
-      <%# Sidebar toggle button %>
-      <a class="app-sidebar__toggle" href="#" data-toggle="sidebar" aria-label="Hide Sidebar"></a>
+    <header class="app-header">
+      <a class="app-header__logo" href="<%= root_path -%>">
+      <%= image_tag(Setting.Site['logo'], id: 'logo-heading', class: 'pull-left') %>
+      <span id="application-title"><%= Setting.Site['title'] %></span>
+      </a>
+
       <%# Navbar Right Menu %>
       <ul class="app-nav">
         <li class="app-search">
@@ -94,12 +114,36 @@
       </ul>
     </header>
 
+    <%# Flash messages %>
+    <% unless flash.blank? %>
+    <div class="row flash-messages">
+      <%= render 'layouts/flashes' %>
+    </div>
+    <% end %>
+
     <%# Sidebar menu %>
+    <% if user_signed_in? %>
     <%= render 'layouts/sidebar' %>
+    <% end %>
 
     <%# Main body content %>
     <main class="app-content">
+      <% if @event && !@event.name.nil? %>
+          <header>
+            <h3 class="page-header"><%= link_to @event.name, @event %></h3>
+            <div class="page-header-subtitle">
+              <%= image_tag("flags/#{@event.country}.png", height: 22) %>
+              <h4><%= @event.dates(:long) %></h4>
+            </div>
+          </header>
+      <% else %>
+          <% if user_signed_in? %>
+          <h1 class="page-header"><%= event_list_title %></h1>
+          <% end %>
+      <% end %>
     <%= yield %>
     </main>
+    </div>
+    <%= render 'layouts/footer' %>
   </body>
 </html>

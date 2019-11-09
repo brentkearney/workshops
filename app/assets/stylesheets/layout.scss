@@ -1,0 +1,47 @@
+// Top Navbar
+a.app-header__logo {
+  background-color: $primary-color;
+  img {
+    height: 48px;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+  }
+  img#logo-heading {
+    margin: 5px 0px 5px -10px;
+  }
+  #application-title {
+    font-family: sans-serif;
+    font-size: 1em;
+    color: white;
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+
+// Side Navbar
+.app-sidebar {
+  #hide-sidebar {
+    margin-top: -10px;
+    // height: 20px;
+    // border: 1px solid white;
+    text-align: right;
+    width: 100%;
+
+    a {
+      font-size: 1.2em;
+      color: white;
+      margin-right: 8px;
+      text-decoration: none;
+
+      i.hidden {
+        visibility: none;
+      }
+    }
+  }
+}
+
+li.nav-second-level {
+  margin-left: 5%;
+}

@@ -24,6 +24,7 @@ document.addEventListener("turbolinks:load", function() {
   //Activate bootstrip tooltips
   $("[data-toggle='tooltip']").tooltip();
 
+  /* Disable pop-up noitces
   var notice_text = $('body').data('notice');
   if(notice_text) {
     $.notify({
@@ -44,6 +45,7 @@ document.addEventListener("turbolinks:load", function() {
       type: "warning"
     });
   }
+  */
 
   // Login Page Flipbox control
   $('.login-content [data-toggle="flip"]').click(function() {
