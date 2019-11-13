@@ -1,0 +1,24 @@
+<% i=1 %>
+<% members.each do |member| %>
+  <a class="list-group-item list-group-item-action" data-toggle="list" href="#member-<%= member.id %>" role="tab" aria-controls="member-info-<%= member.id %>">
+  <span class="row-counter">#<%= i %></span>
+  <%= member.person.lname %>
+  <% unless member.person.affiliation.blank? %>
+    (<%= member.person.affiliation %>)
+  <% end %>
+  <% if member.role =~ /Organizer|Observer/ %>
+    <p class="mb-1 member-role"><%= member.role %></p>
+  <% end %>
+  </a>
+  <% i += 1 %>
+
+  <div class="tab-content">
+    <div class="tab-pane fade" id="member-<%= member.id %>" role="tabpanel">
+      <h3><%= member.person.lname %> Details</h3>
+      <%= member.role %>
+      <%= member.person.affiliation %><br>
+      <%= member.person.country %><br>
+    </div>
+  </div>
+  <!-- /.tab-content -->
+<% end %>

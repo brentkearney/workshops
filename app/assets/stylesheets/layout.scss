@@ -24,6 +24,7 @@ a.app-header__logo {
 .app-sidebar {
   #hide-sidebar {
     margin-top: -10px;
+    margin-bottom: 50px;
     // height: 20px;
     // border: 1px solid white;
     text-align: right;
@@ -44,4 +45,46 @@ a.app-header__logo {
 
 li.nav-second-level {
   margin-left: 5%;
+}
+
+// Events pages
+.page-header-subtitle {
+  margin-bottom: 15px;
+
+  img {
+    margin-right: 5px;
+    vertical-align: -25%;
+  }
+  h4 {
+    display: inline-block;
+    .small-bullet {
+      font-size: 1.3em;
+    }
+  }
+}
+
+
+// Footer
+.sidebar-mini {
+  margin: 0;
+  padding: 0;
+}
+
+.footer {
+  display: block;
+  float: top;
+  position: absolute;
+  left: -3%;
+  width: 106%;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  .card-footer {
+    font-size: 0.9em;
+  }
+  .powered-by {
+    @extend .pull-right;
+    margin-right: 2%;
+    font-size: 0.8em;
+  }
 }

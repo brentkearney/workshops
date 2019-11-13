@@ -170,11 +170,11 @@ module MembershipsHelper
     return '' unless policy(@event).show_email_buttons?(status)
     to_email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
     to_email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
-    content = mail_to(to_email, "<i class=\"fa fa-envelope fa-fw\"></i> Email #{status} Members".html_safe, subject: "[#{@event.code}] ", title: "Email #{to_email}", class: 'btn btn-sm btn-default email-members')
+    content = mail_to(to_email, "<i class=\"fa fa-envelope fa-fw\"></i> Email #{status} Members".html_safe, subject: "[#{@event.code}] ", title: "Email #{to_email}", class: "btn btn-primary email-members")
 
     if status == 'Confirmed' && !@organizer_emails.blank?
       content << ' | '
-      content << mail_to(@organizer_emails.join(','), "<i class=\"fa fa-envelope fa-fw\"></i> Email Organizers".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members')
+      content << mail_to(@organizer_emails.join(','), "<i class=\"fa fa-envelope fa-fw\"></i> Email Organizers".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-primary email-members')
     end
     content
   end
@@ -203,7 +203,7 @@ module MembershipsHelper
   end
 
   def add_limits_message(status)
-    return unless status == 'Not Yet Invited'
+    # return unless status == 'Not Yet Invited'
     spots = @event.max_participants - @event.num_invited_participants
     isare = 'are'
     isare = 'is' if spots == 1
