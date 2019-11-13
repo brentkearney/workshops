@@ -30,57 +30,9 @@
     </script>
   </head>
   <body class="app sidebar-mini <%= controller_name %> <%= action_name %>" data-notice="<%= j notice -%>" data-alert="<%= j alert || devise_error_messages -%>">
-    <%# Navbar %>
-    <header class="app-header">
-      <a class="app-header__logo" href="<%= root_path -%>">
-      <%= image_tag(Setting.Site['logo'], id: 'logo-heading', class: 'pull-left') %>
-      <span id="application-title"><%= Setting.Site['title'] %></span>
-      </a>
 
-      <%# Navbar Right Menu %>
-      <ul class="app-nav">
-        <li class="app-search">
-          <input class="app-search__input" type="search" placeholder="Search">
-          <button class="app-search__button"><i class="fa fa-search"></i></button>
-        </li>
-        <% if current_user.present? %>
-          <%# User Menu %>
-          <li class="dropdown"><a class="app-nav__item" href="#" data-toggle="dropdown" aria-label="Open Profile Menu"><i class="fa fa-user fa-lg"></i></a>
-            <ul class="dropdown-menu settings-menu dropdown-menu-right">
-              <% if current_user.is_admin? %>
-              <li>
-                <%= link_to settings_path, class: 'dropdown-item' do -%>
-                  <i class="fa fa-cog fa-lg"></i> Settings
-                <% end %>
-              </li>
-              <% end %>
-              <% if current_user.is_staff? %>
-              <li>
-                <%= link_to admin_root_path, class: 'dropdown-item' do -%>
-                  <i class="fa fa-database fa-lg"></i> Database Admin
-                <% end %>
-              </li>
-              <% end %>
-              <li>
-                <%= link_to edit_user_registration_path, class: 'dropdown-item' do -%>
-                  <i class="fa fa-user fa-lg"></i> Change Password
-                <% end %>
-              </li>
-              <li>
-                <%= link_to sign_out_path, method: :delete, class: 'dropdown-item' do %>
-                  <i class="fa fa-sign-out fa-lg"></i> Logout
-                <% end %>
-              </li>
-            </ul>
-          </li>
-        <% else %>
-          <li class="app-login-box">
-            <a class="btn btn-dark" href="<%= new_user_session_path -%>"><%= t('user.sign_in') -%></a>
-            <a class="btn btn-light" href="<%= new_user_registration_path -%>"><%= t('user.sign_up') -%></a>
-          </li>
-        <% end %>
-      </ul>
-    </header>
+    <%# Navbar %>
+    <%= render 'layouts/navigation' %>
 
     <%# Flash messages %>
     <% unless flash.blank? %>
