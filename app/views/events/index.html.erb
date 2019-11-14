@@ -2,7 +2,7 @@
 <table class="table table-striped table-hover" id="events-list">
 	<tbody>
 	<tr>
-		<th><%= image_tag('globe.png', alt: 'Location') %></th></th><th>Code</th><th>Workshop Name</th><th colspan="2"><th>Dates</th><th>Participants</th>
+		<th><%= image_tag('globe.png', alt: 'Location') %></th></th><th>Code</th><th>Workshop Name</th><th colspan="2"><th>Dates</th><th><a title="Confirmed Participants">#</a></th>
 	</tr>
 	<% @events.each do |event| %>
 	<tr>

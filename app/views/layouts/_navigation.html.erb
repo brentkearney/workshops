@@ -1,12 +1,10 @@
-<nav class="app-header navbar">
+<header class="app-header">
   <a class="app-sidebar__toggle" id="mobile-nav" href="#" data-toggle="sidebar" aria-label="Hide Sidebar"></a>
 
-  <div class="navbar-brand">
   <a class="app-header__logo" href="<%= root_path -%>">
-    <%= image_tag(Setting.Site['logo'], id: 'logo-heading', class: 'pull-left') %>
+    <%= image_tag(Setting.Site['logo'], class: 'pull-left') %>
   </a>
-  <span id="application-title"><%= Setting.Site['title'] %></span>
-  </div>
+  <div id="application-title"><%= Setting.Site['title'] %></div>
 
 
   <%# Navbar Right Menu %>
@@ -55,4 +53,4 @@
       </li>
     <% end %>
   </ul>
-</nav>
+</header>

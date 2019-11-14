@@ -1,51 +1,44 @@
 // Top Navbar
 
-nav.app-header {
-  // height: 50px;
-}
+.app-header {
+  @extend .navbar;
+  height: 50px;
+  padding: 0;
+  margin: 0;
 
-.navbar {
   #mobile-nav {
     color: white;
-    overflow-y: auto;
-    /* border: 1px solid green; */
     @extend .app-sidebar__toggle, .d-md-none;
-    max-width: 40px;
-    height: 40px;
+    max-width: 50px;
   }
 
-  .navbar-brand {
-    /* border: 1px solid white; */
-
-    a.app-header__logo {
-      background-color: $primary-color;
-      img {
-        height: 40px;
-        background-color: white;
-        margin: 0;
-        padding: 0;
-      }
-      img#logo-heading {
-        margin: 5px 10px 5px -10px;
-        @extend .d-none, .d-md-block;
-      }
+  a.app-header__logo {
+    @extend .d-none, .d-md-block;
+    max-width: 60px;
+    background-color: $primary-color;
+    img {
+      height: 40px;
+      background-color: white;
+      margin: 5px 10px 5px -10px;
+      padding: 0;
     }
+  }
 
-    #application-title {
-      vertical-align: middle;
-      font-family: sans-serif;
-      font-size: 1.2em;
-      color: white;
-      max-width: 100%;
-      max-height: 100%;
-    }
+  #application-title {
+    line-height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    font-family: sans-serif;
+    font-size: 1.2em;
+    color: white;
+  }
+
+  // User menu
+  ul.app-nav {
   }
 }
 
-// User menu
-ul.app-nav {
-  margin-right: -15px;
-}
+
 
 // Side Navbar
 .app-sidebar__overlay {
@@ -59,20 +52,11 @@ ul.app-nav {
   }
 }
 
-#navbarMenu {
-  display: block;
-}
-
 .app-sidebar {
-  .app-menu__item {
-    @extend .nav-item;
-  }
 
   #hide-sidebar {
-    margin-top: 5px;
+    margin-top: -15px;
     margin-bottom: 50px;
-    // height: 20px;
-    // border: 1px solid white;
     text-align: right;
     width: 100%;
 
@@ -88,7 +72,7 @@ ul.app-nav {
     }
   }
   ul.app-menu {
-    margin-top: -45px;
+    margin-top: -50px;
   }
 }
 
