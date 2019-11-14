@@ -6,6 +6,7 @@
 
 class SessionsController < Devise::SessionsController
   respond_to :html
+  layout "devise"
 
   # POST /sign_in
   def create

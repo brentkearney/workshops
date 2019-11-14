@@ -1,56 +1,47 @@
-.authform {
-  max-width: 320px;
-  margin: 100px auto;
-}
-.authform form {
-  @extend .card-body;
-  padding-bottom: 40px;
-}
-
-.authform .right {
-  /* float: right !important; */
-}
-.authform .button {
-  @extend .btn;
-  @extend .btn-primary;
-}
-.authform fieldset {
-  @extend .card-body;
-}
-#error_explanation:not(:empty) {
-  @extend .alert;
-  @extend .alert-danger;
-}
-#error_explanation h2 {
-  font-size: 16px;
-}
-.button-xs {
-  @extend .btn;
-  @extend .btn-primary;
-  @extend .btn-sm;
+.login-title {
+  margin-bottom: 1.5em;
+  img {
+    margin: auto;
+    background: white;
+    margin-bottom: 1em;
+  }
+  h1 {
+    color: white;
+    font-family: sans-serif;
+  }
 }
 
-.horizontal-authform {
-  @extend .authform;
-  max-width: 620px;
-  padding-left: 30px;
-}
-.horizontal-authform h4 {
-  margin: 1em 0;
+#ws-login-box {
+  box-shadow: 0px 29px 147.5px 102.5px rgba(0, 0, 0, 0.05), 0px 29px 95px;
+  min-height: 420px;
 }
 
-.horizontal-authform fieldset {
-  padding: 0 20px;
+.login-form, .forget-form {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: all 0.5s ease-in-out;
 }
-.horizontal-authform .button {
-  @extend .btn;
-  @extend .btn-primary;
-}
-.sign-in-links {
+
+.btn-container { margin-bottom: 25px; }
+
+#stay-signedin {
   font-size: 0.9em;
-  margin-top: 6px;
-  margin-left: 30px;
 }
-.reg-msg {
-  padding-top: 30px;
+
+#forgot-password {
+  font-size: 0.9em;
+}
+
+#signin-button {
+
+}
+
+#back-to-login {
+  font-size: 0.9em;
 }

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Workshops Sign-in</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+  <body class="app sidebar-mini devise <%= controller_name %> <%= action_name %>" data-notice="<%= j notice -%>" data-alert="<%= j alert || devise_error_messages -%>">
+    <section class="material-half-bg">
+      <div class="cover"></div>
+    </section>
+    <section class="login-content">
+      <div class="login-title">
+        <%= image_tag(Setting.Site['logo'], class: 'img-thumbnail mx-auto d-block') %>
+        <h1><%= page_title %></h1>
+      </div>
+      <%= yield %>
+    </section>
+  </body>
+</html>
