@@ -16,10 +16,10 @@
     <section class="material-half-bg">
       <div class="cover"></div>
     </section>
-    <section class="login-content">
-      <div class="login-title">
-        <%= image_tag(Setting.Site['logo'], class: 'img-thumbnail mx-auto d-block') %>
-        <h1><%= page_title %></h1>
+    <section class="login-content d-flex flex-column">
+      <div class="login-title p-2">
+        <%= image_tag(Setting.Site['logo'], class: 'img-thumbnail mx-auto d-block p-2') %>
+        <h1 class="p-2"><%= page_title %></h1>
       </div>
       <%= yield %>
     </section>

@@ -12,14 +12,18 @@
     </div>
     <div class="form-group">
       <div class="utility">
+        <% if devise_mapping.rememberable? %>
         <div class="animated-checkbox">
           <label>
             <input type="checkbox"><span class="label-text" id="stay-signedin">Stay Signed in</span>
           </label>
         </div>
+        <% end %>
+        <%- if devise_mapping.recoverable? %>
         <p class="semibold-text mb-2" id="forgot-password">
           <a href="#" data-toggle="flip">Forgot Password ?</a>
         </p>
+        <% end %>
       </div>
     </div>
     <div class="form-group btn-container">
@@ -28,6 +32,7 @@
       <% end %>
     </div>
   <% end %>
+  <%- if devise_mapping.recoverable? %>
   <%= form_for(resource, as: resource_name, url: password_path,
                        html: { role: 'form', class: 'forget-form' }) do |f| %>
     <h3 class="login-head"><i class="fa fa-lg fa-fw fa-lock"></i>Forgot Password ?</h3>
@@ -46,4 +51,8 @@
       </p>
     </div>
   <% end %>
+  <% end %>
+
+  <div class="forget-form align-text-bottom" id="registration-link">Have you registered an account?<br>If not, <%= link_to 'Sign-up here', new_registration_path(resource_name) %>.</div>
+
 </div>
