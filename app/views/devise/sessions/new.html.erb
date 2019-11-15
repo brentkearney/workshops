@@ -1,21 +1,24 @@
 <div class="login-box" id="ws-login-box">
   <%= form_for(resource, as: resource_name, url: session_path(resource_name),
-                       html: { role: 'form', class: 'login-form' }) do |f| %>
+        html: { role: 'form', id: 'login-form', class: 'login-form' }) do |f| %>
     <h3 class="login-head"><i class="fa fa-lg fa-fw fa-user"></i>SIGN IN</h3>
     <div class="form-group">
       <%= f.label :email, 'E-MAIL ADDRESS' %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: 'Email', class: 'form-control' %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                      id: 'login-email', class: 'form-control'  %>
     </div>
     <div class="form-group">
       <%= f.label :password %>
-      <%= f.password_field :password, autocomplete: "current-password", placeholder: 'Password', class: 'form-control' %>
+      <%= f.password_field :password, autocomplete: "current-password",
+                placeholder: 'Password', class: 'form-control' %>
     </div>
     <div class="form-group">
       <div class="utility">
         <% if devise_mapping.rememberable? %>
         <div class="animated-checkbox">
           <label>
-            <input type="checkbox"><span class="label-text" id="stay-signedin">Stay Signed in</span>
+            <input type="checkbox">
+            <span class="label-text" id="stay-signedin">Stay Signed in</span>
           </label>
         </div>
         <% end %>
@@ -27,18 +30,20 @@
       </div>
     </div>
     <div class="form-group btn-container">
-      <%= f.button :submit, class: 'btn btn-primary btn-block', id: "signin-button" do %>
+      <%= f.button :submit, class: 'btn btn-primary btn-block',
+                                                      id: "signin-button" do %>
         <i class="fa fa-sign-in fa-lg fa-fw"></i> SIGN IN
       <% end %>
     </div>
   <% end %>
   <%- if devise_mapping.recoverable? %>
   <%= form_for(resource, as: resource_name, url: password_path,
-                       html: { role: 'form', class: 'forget-form' }) do |f| %>
+         html: { role: 'form', id: 'reset-form', class: 'forget-form' }) do |f| %>
     <h3 class="login-head"><i class="fa fa-lg fa-fw fa-lock"></i>Forgot Password ?</h3>
     <div class="form-group">
       <%= f.label :email, 'E-MAIL ADDRESS' %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: 'Email', class: 'form-control' %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email",
+             placeholder: 'Email', id: 'reset-email', class: 'form-control' %>
     </div>
     <div class="form-group btn-container">
       <%= f.button :submit, class: 'btn btn-primary btn-block', id: "reset-button" do %>

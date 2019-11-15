@@ -31,15 +31,16 @@ $(document).on 'turbolinks:load', ->
   update_active =(item_id) ->
     remove_active()
     if !year_location()
-      if item_id.length > 0
+      if item_id
         item = $('#' + item_id)
         expand_menu(item)
         item.addClass('active')
 
 
   $('.treeview-item').click (e) ->
-    if year_location()
-      $(e.target.hash).closest('li').addClass('active')
+    remove_active()
+    year_location()
+    $(e.target).closest('li').addClass('active')
 
   page_class = $('#current-page').attr('class')
   update_active(page_class)
