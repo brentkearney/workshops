@@ -5,12 +5,12 @@
     <div class="col-md-6 personal-details-and-other-memberships">
       <div class="row profile">
         <div class="card card-default">
-          <div class="card-heading">
+          <div class="card-title">
             <h2 id="profile-name"><%= @person.name %></h2>
             <% if @current_user && @current_user.is_admin? %>
             <small>person id: <%= @person.id %>, legacy id: <%= @person.legacy_id %>, membership id: <%= @membership.id %></small>
             <% end %>
-          </div><!-- /card-heading -->
+          </div><!-- /card-title -->
           <div class="card-body">
             <div class="row" id="profile-affil"><%= @person.affil_with_title %></div>
             <% if policy(@membership).use_email_addresses? || policy(@membership).show_email_address? %>
@@ -74,9 +74,9 @@
       <% unless @memberships.empty? %>
       <div class="row profile">
         <div class="card card-default" id="other-memberships">
-          <div class="card-heading">
+          <div class="card-title">
             <h3><%= @person.dear_name %>'s Other Events</h3>
-          </div><!-- /card-heading -->
+          </div><!-- /card-title -->
 
           <ul class="list-group">
           <% @memberships.each do |m| %>
@@ -98,7 +98,7 @@
       <% if pending_invitation? %>
       <div class="row profile membership-details">
         <div class="card card-info">
-          <div class="card-heading">
+          <div class="card-title">
             <h3>Pending Invitation</h3>
           </div>
           <div class="card-body">
@@ -115,9 +115,9 @@
       <% else %>
       <div class="row profile membership-details">
         <div class="card card-default">
-          <div class="card-heading">
+          <div class="card-title">
             <h3><%= @membership.event.code %> Membership Details</h3>
-          </div><!-- /card-heading -->
+          </div><!-- /card-title -->
           <div class="card-body">
             <div class="row" id="profile-role">
               <strong>Role:</strong>
@@ -165,9 +165,9 @@
       <% if policy(@membership).hotel_and_billing? %>
       <div class="row profile hotel-billing">
         <div class="card card-default">
-          <div class="card-heading">
+          <div class="card-title">
             <h3><%= @membership.event.code %> Hotel & Billing Details</h3>
-          </div><!-- /card-heading -->
+          </div><!-- /card-title -->
           <div class="card-body">
             <div class="row" id="profile-reviewed">
              <strong>Reviewed:</strong> <%= @membership.reviewed ? 'Yes' : 'No' %>
