@@ -1,20 +1,16 @@
 <% i=1 %>
 <% members.each do |member| %>
-  <li class="list-group-item">
+  <tr class="<%= member.role.delete(' ').downcase %>-row">
     <% if defined?(f) %>
-    <span class="check-box">
-      <%= f.check_box member.id, class: "#{member.attendance.parameterize.downcase}" %>
-    </span>
+    <td class="select"><%= f.check_box member.id, class: "#{member.attendance.parameterize.downcase}" %></td>
     <% end %>
-    <span class="row-counter">#<%= i %></span>
-    <%= link_to "#{member.person.lname}", event_membership_path(@event, member) %>
-    <% unless member.person.affiliation.blank? %>
-      (<%= member.person.affiliation %>),
-    <% end %>
-    <%= show_invited_on_date(member) %> &lt;<%= show_email(member) %>&gt;
-    <% if member.role =~ /Organizer|Observer/ %>
-    <p class="mb-1 member-role"><%= member.role %></p>
-    <% end %>
-  </li>
+    <td><%= link_to i, event_membership_path(@event, member) %></td>
+    <td class="rowlink-skip"><%= link_to "#{member.person.lname}", event_membership_path(@event, member) %></td>
+    <%= show_invited_on_date(member) %>
+    <td class="hidden-xs hidden-sm hidden-md rowlink-skip"><%= member.person.affiliation %></td>
+    <td class="hidden-md hidden-lg rowlink-skip no-print" align="left">
+      <%= mail_to(member.person.email, member.person.email, subject: "[#{@event.code}] ") %></td>
+    <td class="hidden-xs rowlink-skip no-print"><%= member.role %></td>
+  </tr>
   <% i += 1 %>
 <% end %>

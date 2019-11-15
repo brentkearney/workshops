@@ -36,5 +36,10 @@ $(document).on 'turbolinks:load', ->
         expand_menu(item)
         item.addClass('active')
 
+
+  $('.treeview-item').click (e) ->
+    if year_location()
+      $(e.target.hash).closest('li').addClass('active')
+
   page_class = $('#current-page').attr('class')
   update_active(page_class)

@@ -203,7 +203,7 @@ module MembershipsHelper
   end
 
   def add_limits_message(status)
-    # return unless status == 'Not Yet Invited'
+    return unless status == 'Not Yet Invited'
     spots = @event.max_participants - @event.num_invited_participants
     isare = 'are'
     isare = 'is' if spots == 1

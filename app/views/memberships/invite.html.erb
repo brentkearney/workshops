@@ -16,10 +16,10 @@
   <% @memberships.each do |status, members| %>
   <%= form_with model: @invite_members, url: invite_event_memberships_path(@event),
                        class: 'form', role: 'form' do |form| %>
-  <div class="row<%= print_section?(status) %> <%= status.parameterize %>-members">
+  <div class="members-list row<%= print_section?(status) %> <%= status.parameterize %>-members">
     <div class="col-lg-12">
       <div class="card card-default">
-        <div class="card-heading table-heading">
+        <div class="card-title">
           <%= status %> Members
         </div>
         <!-- /.card-heading -->
@@ -38,7 +38,6 @@
                 <% end %>
                 <th class="hidden-xs hidden-sm hidden-md">Affiliation</th>
                 <% if policy(@event).show_email_buttons?(status) %>
-                    <th class="hidden-md hidden-lg" align="middle">Email</th>
                     <th class="hidden-xs hidden-sm">E-mail</th>
                 <% end %>
                 <th class="hidden-xs">Role</th>
