@@ -1,6 +1,6 @@
 <h1 id="invite-members">Invite Members to <%= @event.code %>
   <small>Reply by date: <%= RsvpDeadline.new(@event.start_date).rsvp_by %>
-    <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><span class="glyphicon glyphicon-question-sign"></span></a></span>
+    <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><i class="fa fa-lg fa-fw fa-question-circle"></i></a></span>
   </small>
 </h1>
 
@@ -51,15 +51,15 @@
           <!-- /.table-responsive -->
           <div class="row rowlink-skip no-print invite-buttons">
             <div class="col-lg-6 pull-left">
-              <%= button_tag 'Select All', type: 'button', id: "#{status.parameterize.downcase}-all", class: "btn btn-sm btn-default all-button" %>
+              <%= button_tag 'Select All', type: 'button', id: "#{status.parameterize.downcase}-all", class: "btn btn-secondary all-button" %>
 
-              <%= button_tag 'Select None', type: 'button', id: "#{status.parameterize.downcase}-none", class: 'btn btn-sm btn-default none-button' %>
+              <%= button_tag 'Select None', type: 'button', id: "#{status.parameterize.downcase}-none", class: 'btn btn-secondary none-button' %>
 
-              <%= button_tag 'Invert Selection', type: 'button', id: "#{status.parameterize.downcase}-invert", class: 'btn btn-sm btn-default invert-button' %>
+              <%= button_tag 'Invert Selection', type: 'button', id: "#{status.parameterize.downcase}-invert", class: 'btn btn-secondary invert-button' %>
             </div>
             <div class="col-lg-6 pull-right">
               <%= form.submit invite_button(status), id: "#{status.parameterize.downcase}-submit",
-                            class: 'btn btn-sm btn-default submit-button pull-right' %>
+                            class: 'btn btn-primary submit-button pull-right' %>
 
             </div>
           </div>

@@ -6,10 +6,11 @@
       <div class="row profile">
         <div class="card card-default">
           <div class="card-title">
-            <h2 id="profile-name"><%= @person.name %></h2>
+            <h2 id="profile-name"><%= @person.name %>
             <% if @current_user && @current_user.is_admin? %>
-            <small>person id: <%= @person.id %>, legacy id: <%= @person.legacy_id %>, membership id: <%= @membership.id %></small>
+            <br><small>person id: <%= @person.id %>, legacy id: <%= @person.legacy_id %>, membership id: <%= @membership.id %></small>
             <% end %>
+            </h2>
           </div><!-- /card-title -->
           <div class="card-body">
             <div class="row" id="profile-affil"><%= @person.affil_with_title %></div>
@@ -222,17 +223,17 @@
   </div><!-- master row -->
   <div class="row" id="member-buttons">
     <%= link_to "Back to #{@event.code}", event_memberships_path(@event),
-          class: 'btn btn-sm btn-default' %>
+          class: 'btn btn-secondary' %> &nbsp; &nbsp;
     <% if pending_invitation? %>
       <%= link_to "Respond to Invitation", @membership.invitation.rsvp_url,
-            class: 'btn btn-sm btn-default' %>
+            class: 'btn btn-secondary' %> &nbsp; &nbsp;
     <% elsif policy(@membership).edit_membership? %>
       <%= link_to "Edit Membership", edit_event_membership_path(@event, @membership),
-            class: 'btn btn-sm btn-default' %>
+            class: 'btn btn-primary' %> &nbsp; &nbsp;
     <% end %>
     <% if policy(@membership).delete_membership? %>
       <%= link_to 'Delete Membership', event_membership_path(@event, @membership),
-            method: :delete, class: 'btn btn-sm btn-default',
+            method: :delete, class: 'btn btn-danger',
             data: { confirm: "Are you sure you want to remove #{@person.name} from #{@event.code}?" } %>
     <% end %>
   </div><!-- /row buttons -->
