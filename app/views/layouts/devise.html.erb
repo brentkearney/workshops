@@ -18,7 +18,9 @@
     </section>
     <section class="login-content d-flex flex-column">
       <div class="login-title p-2">
-        <%= image_tag(Setting.Site['logo'], class: 'img-thumbnail mx-auto d-block p-2') %>
+        <a href="<%= Setting.app_url %>">
+        <%= image_tag(GetSetting.site_setting('logo'), class: 'img-thumbnail mx-auto d-block p-2') %>
+        </a>
         <h1 class="p-2"><%= page_title %></h1>
       </div>
       <%= yield %>

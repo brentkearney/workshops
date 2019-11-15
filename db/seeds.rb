@@ -105,11 +105,11 @@ def create_member(event, role, num_people)
 end
 
 def create_schedule_template(year)
-  event_code = year.to_s[-2..-1] + 'x000'
+  event_code = year.to_s[-2..-1] + 'w0001'
   start_date = Date.new(year,1,7).beginning_of_week(:sunday)
   end_date = start_date + 5.days
 
-  event = Event.find_by_code('event_code') || Event.create!({code: event_code, name: "5 Day Workshop Schedule Template", short_name: "Schedule Template", start_date: start_date, end_date: end_date, event_type: "5 Day Workshop", location: "EO", description: "A template for EO staff to configure the default schedules for 5-Day Workshops at EO.", press_release: "", max_participants: 5, door_code: nil, booking_code: "", updated_by: "db seed", template: true, time_zone: 'Mountain Time (US & Canada)'})
+  event = Event.find_by_code('event_code') || Event.create!({code: event_code, name: "5 Day Workshop Schedule Template", short_name: "Schedule Template", start_date: start_date, end_date: end_date, event_type: "5 Day Workshop", location: "BIRS", description: "A template for BIRS staff to configure the default schedules for 5-Day Workshops at BIRS.", press_release: "", max_participants: 5, door_code: nil, booking_code: "", updated_by: "db seed", template: true, time_zone: 'Mountain Time (US & Canada)'})
 
   t = Time.parse(start_date.to_s)
   Schedule.create!([
@@ -153,15 +153,19 @@ def create_schedule_template(year)
 end
 
 # Generate a bunch of Person records
-generate_people(1000)
+#generate_people(1000)
 
 # Generate 3 years worth of events, populated by random people
-start_year = Time.new.year - 5
-end_year = start_year + 0
-generate_events(start_year, end_year)
+#start_year = Time.new.year - 5
+#end_year = start_year + 0
+#generate_events(start_year, end_year)
 
 # Create a schedule template event, and add admin user to it
+start_year = (Time.new + 6.months).year
+puts "Starting year: #{start_year}"
 event = create_schedule_template(start_year)
+puts "Created event #{event.code}"
 User.where(role: :staff).or(User.where(role: :admin)).or(User.where(role: :super_admin)).each do |u|
+  u.person.update_columns(country: 'France')
   Membership.create!(event: event, person: u.person, role: 'Organizer', attendance: 'Confirmed', updated_by: 'Seed')
 end

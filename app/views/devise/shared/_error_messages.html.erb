@@ -1,4 +1,5 @@
 <% if resource.errors.any? %>
+<div class="devise-errors alert alert-danger" role="alert">
   <div id="error_explanation">
     <h2>
       <%= I18n.t("errors.messages.not_saved",
@@ -12,4 +13,5 @@
       <% end %>
     </ul>
   </div>
+</div>
 <% end %>

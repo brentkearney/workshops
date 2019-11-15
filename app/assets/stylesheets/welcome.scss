@@ -9,8 +9,11 @@
 }
 
 .event-title {
-  font-size: 1.3em;
-  font-weight: bold;
+  color: white;
+  .subtitle {
+    margin-left: 15px;
+    font-size: 0.7em;
+  }
 }
 .your-workshops {
   text-align: right;

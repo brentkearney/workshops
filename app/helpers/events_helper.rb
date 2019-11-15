@@ -21,6 +21,7 @@ module EventsHelper
   end
 
   def event_list_title
+    return @heading unless @heading.blank?
     title = ''
     return title if controller_name == 'registrations'
     case request.path
