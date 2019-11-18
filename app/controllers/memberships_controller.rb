@@ -153,7 +153,7 @@ class MembershipsController < ApplicationController
     respond_to do |format|
       format.html do
         redirect_to event_memberships_path(@event),
-                    notice: 'Membership was successfully removed.'
+                    success: 'Membership was successfully removed.'
       end
       format.json { head :no_content }
     end

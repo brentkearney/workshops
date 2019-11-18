@@ -29,21 +29,22 @@
       });
     </script>
   </head>
-  <body class="app sidebar-mini <%= controller_name %> <%= action_name %>" data-notice="<%= j notice -%>" data-alert="<%= j alert || devise_error_messages -%>">
+  <body class="app sidebar-mini <%= controller_name %> <%= action_name %>" data-notice="<%= j notice -%>"
+    data-alert="<%= j alert || devise_error_messages -%>">
 
     <%# Navbar %>
     <%= render 'layouts/navigation' %>
 
-    <%# Flash messages %>
-    <% unless flash.blank? %>
-    <div class="row flash-messages">
-      <%= render 'layouts/flashes' %>
-    </div>
-    <% end %>
-
     <%# Sidebar menu %>
     <% if user_signed_in? %>
     <%= render 'layouts/sidebar' %>
+    <% end %>
+
+    <%# Flash messages %>
+    <% unless flash.blank? %>
+    <div class="flash-messages notify-alert">
+      <%= render 'layouts/flashes' %>
+    </div>
     <% end %>
 
     <%# Main body content %>

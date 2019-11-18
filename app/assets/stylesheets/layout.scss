@@ -38,7 +38,32 @@
   }
 }
 
+.flash-messages {
+  position: relative;
+  top: 50px;
+  text-align: center;
+  padding: 0;
+  @media(min-width: 768px) { margin-left: $sidebar-width; }
 
+
+
+}
+
+.notify-alert {
+  box-shadow: none;
+  border: 1px;
+  max-width: 99999px;
+  width: 100%;
+
+  .alert {
+    @media(min-width: 768px) { margin-left: -$sidebar-width; }
+    //text-indent: $sidebar-width/2;
+  }
+
+  .alert-notice {
+    @extend .alert-warning;
+  }
+}
 
 // Side Navbar
 .app-sidebar__overlay {
@@ -51,6 +76,8 @@
     z-index: 9;
   }
 }
+
+
 
 .app-sidebar {
 
