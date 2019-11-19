@@ -148,12 +148,13 @@ class MembershipsController < ApplicationController
   def destroy
     authorize @membership
     @membership.updated_by = @current_user.name
+    name = @membership.person.name
     @membership.destroy
 
     respond_to do |format|
       format.html do
         redirect_to event_memberships_path(@event),
-                    success: 'Membership was successfully removed.'
+                    success: "#{name} was successfully removed."
       end
       format.json { head :no_content }
     end

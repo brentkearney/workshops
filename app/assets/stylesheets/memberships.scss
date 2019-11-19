@@ -249,6 +249,19 @@ ol#added-members {
   padding-bottom: 20px;
 }
 
+#new-people-header {
+  h2 {
+    font-size: 1.2em;
+  }
+  small {
+    margin-left: 0.9em;
+    font-size: 0.8em;
+  }
+  p {
+    font-size: 0.8em;
+  }
+}
+
 td.select, th.select {
   text-align: center;
 }

@@ -86,7 +86,7 @@ class ApplicationController < ActionController::Base
 
   # After successful login, redirect to attempted page or welcome page
   def after_sign_in_path_for(_resource)
-    flash[:success] = 'Signed in successfully!' unless flash[:notice]
+    flash[:success] = 'Signed in successfully!' if flash.blank?
     stored_location_for(_resource) || welcome_path
   end
 

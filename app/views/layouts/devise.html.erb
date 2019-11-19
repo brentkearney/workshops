@@ -12,7 +12,16 @@
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
-  <body class="app sidebar-mini devise <%= controller_name %> <%= action_name %>" data-notice="<%= j notice -%>" data-alert="<%= j alert || devise_error_messages -%>">
+  <body class="app devise <%= controller_name %> <%= action_name %>" data-notice="<%= j notice -%>" data-alert="<%= j alert || devise_error_messages -%>">
+
+    <%# Flash messages %>
+
+    <div class="devise-flash">
+      <%= render 'layouts/flashes' %>
+      <%= render 'devise/shared/error_messages' %>
+    </div>
+
+
     <section class="material-half-bg">
       <div class="cover"></div>
     </section>

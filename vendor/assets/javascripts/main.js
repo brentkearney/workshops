@@ -45,7 +45,7 @@ document.addEventListener("turbolinks:load", function() {
       type: "warning"
     });
   }
-  */
+*/
 
   // Login Page Flipbox control
   $('.login-content [data-toggle="flip"]').click(function() {

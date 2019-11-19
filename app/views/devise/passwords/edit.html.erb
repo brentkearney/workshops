@@ -1,14 +1,10 @@
 <div class="login-box" id="ws-login-box">
-  <h3 class="pwchange-head">PASSWORD <i class="fa fa-fw fa-lock"></i> CHANGE</h3>
+  <h3 class="pwchange-head">PASSWORD <i class="fa fa-fw fa-lock"></i> RESET</h3>
 
-  <%= form_for(resource, as: resource_name, url: registration_path(resource_name),
+  <%= form_for(resource, as: resource_name, url: password_path, method: :put,
     html: { role: 'form', id: 'pwchange-form', class: 'login-form' }) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
-
-  <div class="form-group">
-    <%= f.label :current_password, 'Enter your current password:' %>
-    <%= f.password_field :current_password, class: 'form-control' %>
-  </div>
+  <%= f.hidden_field :reset_password_token %>
   <div class="form-group">
     <%= f.label :password, 'New password:' %>
     <%= f.password_field :password, :autocomplete => 'off', class: 'form-control' %>

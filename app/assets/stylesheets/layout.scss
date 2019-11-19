@@ -38,15 +38,13 @@
   }
 }
 
+// Alerts
 .flash-messages {
   position: relative;
   top: 50px;
   text-align: center;
   padding: 0;
   @media(min-width: 768px) { margin-left: $sidebar-width; }
-
-
-
 }
 
 .notify-alert {
@@ -63,6 +61,10 @@
   .alert-notice {
     @extend .alert-warning;
   }
+}
+
+.alert-alert {
+  @extend .alert-success;
 }
 
 // Side Navbar

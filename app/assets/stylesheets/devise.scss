@@ -1,3 +1,26 @@
+.devise-flash {
+  .alert-alert, .alert-error {
+    @extend .alert-danger;
+    text-align: center;
+  }
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.devise-errors {
+  @extend .alert-danger;
+  text-align: center;
+  ul {
+    text-align: left;
+    display: inline-block;
+    width: auto;
+    li {
+      font-size: 1.2em;
+    }
+  }
+}
+
+
 .login-title {
   img {
     margin: auto;
@@ -31,6 +54,14 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transition: all 0.5s ease-in-out;
+}
+
+.newpw-form {
+  padding: 40px;
+}
+
+.confirmation-signup {
+  padding: 20px;
 }
 
 #pwchange-form {
@@ -74,4 +105,20 @@
   text-align: right;
   position: absolute;
   top: 465px;
+}
+
+.signup-head {
+  @extend .login-head;
+}
+
+
+
+.error {
+  box-shadow: 0 3px 10px rgba(0,0,0,.23),0 3px 10px rgba(0,0,0,.16);
+  background-color: lighten(theme-color("danger"), 5);
+  border: 1px solid darken(theme-color("danger"), 5);
+  text-align: middle;
+  font-size: 1.5em;
+  padding: 1em;
+  margin: -20px -20px 0px -20px;
 }
