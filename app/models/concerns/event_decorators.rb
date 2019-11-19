@@ -107,7 +107,7 @@ module EventDecorators
   end
 
   def organizer
-    membership = memberships.where(role: 'Contact Organizer').first
+    membership = memberships.where(role: 'Contact Organizer').last
     membership.blank? ? Person.new(email: '') : membership.person
   end
 
