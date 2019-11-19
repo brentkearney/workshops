@@ -119,6 +119,14 @@ module MembershipsHelper
     text << '</ul>'
   end
 
+  def show_reply_by_date(member)
+    return '' if member.invited_on.blank?
+    tz = member.event.time_zone
+    start_date = member.event.start_date.in_time_zone(tz)
+    invited_on = member.invited_on.in_time_zone(tz)
+    DateTime.parse(rsvp_by(start_date, invited_on)).strftime("%Y-%m-%d")
+  end
+
   def show_invited_on_date(member)
     column = '<td class="rowlink-skip no-print">'
     if show_invited_on?(member)
@@ -137,7 +145,7 @@ module MembershipsHelper
           '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
       end
       unless member.invite_reminders.blank?
-        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"><span class="glyphicon glyphicon-repeat"></span></a></span>'.html_safe
+        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"> &nbsp; <i class="fa fa-md fa-repeat"></i></a></span>'.html_safe
       end
     end
     column << '</td>'
@@ -157,8 +165,9 @@ module MembershipsHelper
     content.html_safe
   end
 
-  def invite_button(status)
+  def invite_button(status, smallscreen = false)
     return 'Invite Selected Members' if status == 'Not Yet Invited'
+    return 'Send Reminders to Selected' if smallscreen
     "Send Reminder to Selected #{status.titleize} Members"
   end
 
