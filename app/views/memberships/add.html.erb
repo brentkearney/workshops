@@ -1,48 +1,49 @@
-
-
-<h1>Add Members to <%= @event.code %></h1>
-<%= render 'added_members' unless @add_members.added.empty? %>
-<%= form_with model: @add_members, url: add_event_memberships_path(@event),
-                     class: 'form', role: 'form' do |form| %>
-<div class="row">
-  <div class="col-md-12">
-    <div class="spinner">
-      <div class="rect1"></div>
-      <div class="rect2"></div>
-      <div class="rect3"></div>
-      <div class="rect4"></div>
-      <div class="rect5"></div>
-    </div>
+<div class="card card-default">
+  <div class="card-title">
+    Add Members to <%= @event.code %>
   </div>
-</div>
-
-<div class="card-body" id="add-members">
+  <%= render 'added_members' unless @add_members.added.empty? %>
+  <%= form_with model: @add_members, url: add_event_memberships_path(@event),
+                       class: 'form', role: 'form' do |form| %>
   <div class="row">
     <div class="col-md-12">
-    <% if @add_members.new_people.empty? %>
-      <%= render partial: 'add_members', locals: { f: form } %>
-    <% else %>
-      <%= render partial: 'new_people', locals: { f: form } %>
-    <% end %>
-    </div><!-- /col-md-12 -->
-  </div><!-- /row -->
-
-  <div class="row" id="add-members-button-row">
-    <div class="col-md-10">
-      <div class="form-group form-inline control-label member-roles pull-left">
-        <%= form.label :role, "Add members with role: " %> &nbsp;
-        <%= show_roles(form, default: @add_members.role) %>
-        <a href="#" data-toggle="modal" data-target="#about-roles"><i class="fa fa-lg fa-fw fa-question-circle"></i></a>
+      <div class="spinner">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
       </div>
     </div>
-    <div class="col-md-2 pull-right">
-      <%= form.submit 'Add These Members', id: 'add-members-submit', data: { disable_with: false },
-                      class: 'btn btn-md btn-default pull-right' %>
-    </div>
-  </div><!-- /row -->
-</div><!-- /card-body -->
+  </div>
 
+  <div class="card-body" id="add-members">
+    <div class="row">
+      <div class="col-md-12">
+      <% if @add_members.new_people.empty? %>
+        <%= render partial: 'add_members', locals: { f: form } %>
+      <% else %>
+        <%= render partial: 'new_people', locals: { f: form } %>
+      <% end %>
+      </div><!-- /col-md-12 -->
+    </div><!-- /row -->
+
+    <div class="row" id="add-members-button-row">
+      <div class="col-md-10">
+        <div class="form-group form-inline control-label member-roles pull-left">
+          <%= form.label :role, "Add members with role: " %> &nbsp;
+          <%= show_roles(form, default: @add_members.role) %>
+          <a href="#" data-toggle="modal" data-target="#about-roles"><i class="fa fa-lg fa-fw fa-question-circle"></i></a>
+        </div>
+      </div>
+      <div class="col-md-2 pull-right">
+        <%= form.submit 'Add These Members', id: 'add-members-submit', data: { disable_with: false },
+                        class: 'btn btn-primary pull-right' %>
+      </div>
+    </div><!-- /row -->
+  </div><!-- /card-body -->
 <% end %>
+</div><!-- /card -->
 
   <!-- About Roles Modal -->
   <div class="modal fade" id="about-roles" tabindex="-1" role="dialog" aria-labelledby="about-roles" aria-hidden="true">
