@@ -8,8 +8,10 @@
   </div>
 <% else %>
   <div id="reply-by">
-    <strong>Reply by date:</strong> <%= RsvpDeadline.new(@event.start_date).rsvp_by %>
-    <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><i class="fa fa-lg fa-fw fa-question-circle"></i></a></span>
+    <span id="reply-by-date">
+      <strong>Reply by date:</strong> <%= RsvpDeadline.new(@event.start_date).rsvp_by %>
+      <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><i class="fa fa-lg fa-fw fa-question-circle"></i></a></span>
+    </span>
     <span class="pull-right" id="limits-message"><%= add_limits_message %></span>
   </div>
 

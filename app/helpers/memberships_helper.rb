@@ -226,7 +226,7 @@ module MembershipsHelper
     spot_s = 'spot' if spots == 1
     unless_cancel = ''
     if spots == 0
-      unless_cancel = 'Unless someone cancels, no more invitations can be sent.'
+      unless_cancel = "<br>\nUnless someone cancels, no more invitations can be sent."
     end
     ('<div class="no-print" id="limits-message">There ' + "#{isare} #{spots} #{spot_s} left:
       #{invited} confirmed + invited / #{@event.max_participants} max. #{unless_cancel}</div>").squish.html_safe

@@ -136,10 +136,19 @@ h3#membership, h3#hotel {
   font-size: 1.2em;
   background-color: white;
   border: 1px solid $light-border;
-  #rsvp-by-icon {
-    font-size: 0.8em;
+  display: flex;
+  justify-content: space-between;
+
+  #reply-by-date {
+    float: left;
+
+    #rsvp-by-icon {
+      font-size: 0.8em;
+    }
   }
+
   #limits-message {
+    float: right;
     font-size: 1em;
   }
 }
