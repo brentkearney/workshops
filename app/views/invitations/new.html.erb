@@ -1,49 +1,30 @@
-<div class="row invitation-box">
-  <div class="col-md-8 col-md-offset-2">
-    <%= render 'validation_errors' %>
-    <div class="card card-primary">
-      <div class="card-title">
-        <span class="card-title"><h2>Request New Event Invitation</h2></span>
-      </div>
-      <div class="card-body">
-
-        <%= form_for @invitation, as: :invitation, url: invitations_create_path,
-                              method: 'post',
-                                html: { class: 'form', role: 'form' } do |f| %>
-        <fieldset>
-        <div class="row">
-          <div class='col-md-12'>
-            <div class="form-group">
-              <p>
-              <%= f.label :event, 'Select the event you were invited to:' %><br />
-              <%= f.collection_select(:event, @events, :code, :options_list,
-                                { include_blank: true, selected: @code }, { class: 'form-control' }) %>
-             </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class='col-md-12'>
-            <div class="form-group">
-              <p>
-              <%= f.label :email, 'Enter your email address:' %><br />
-              <%= f.email_field :email, class: 'form-control' %>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class='col-md-4'>
-            <div class="form-group">
-              <%= f.submit 'Request Invitation', class: 'btn btn-default' %>
-            </div>
-          </div>
-        </div>
-        </fieldset>
-        <% end %>
-      </div>
+<div class="invitation-content">
+  <%= render 'validation_errors' %>
+  <div class="invitation-box">
+  <%= form_for @invitation, as: :invitation, url: invitations_create_path,
+                        method: 'post',
+                          html: { class: 'form', role: 'form' } do |f| %>
+    <h3 class="login-head">
+      <i class="fa fa-lg fa-fw fa-envelope"></i>Request New Event Invitation
+    </h3>
+    <div class="form-group">
+      <%= f.label :event, 'Select the event you were invited to:' %><br />
+      <%= f.collection_select(:event, @events, :code, :options_list,
+                              { include_blank: true, selected: @code },
+                              { class: 'form-control' }) %>
     </div>
+    <div class="form-group">
+      <%= f.label :email, 'E-mail Address' %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                        placeholder: 'email@address.edu', id: 'login-email',
+                        class: 'form-control' %>
+    </div>
+    <div class="form-group btn-container">
+      <%= f.button :submit, class: 'btn btn-primary btn-block',
+                               id: "request-button" do %>
+        <i class="fa fa-sign-in fa-lg fa-fw"></i> Request Invitation
+      <% end %>
+    </div>
+  <% end %>
   </div>
 </div>

@@ -151,6 +151,6 @@ module EventDecorators
   end
 
   def options_list
-    "#{self.date}: [#{self.code}] #{self.name}"
+    "#{self.date}: [#{self.code}] #{self.name}".truncate(55)
   end
 end

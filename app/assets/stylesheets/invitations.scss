@@ -1,6 +1,55 @@
-.invitation-box {
-  margin-top: 5%;
+// Page: Login Material
+
+
+.invitation-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+
+  .invitation-box {
+    padding: 1em;
+    position: relative;
+    min-width: 350px;
+    min-height: 390px;
+    background-color: #fff;
+    box-shadow: 0px 29px 147.5px 102.5px rgba(0, 0, 0, 0.05), 0px 29px 95px 0px rgba(0, 0, 0, 0.16);
+    perspective: 800px;
+    transition: all 0.5s ease-in-out;
+
+    .login-head {
+      margin-top: 0;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    label {
+      color: #666;
+      font-weight: 700;
+    }
+
+    select {
+      max-width: 100%;
+      white-space: pre-wrap;
+
+      option {
+        /* wrap text in compatible browsers */
+        -moz-white-space: pre-wrap;
+        -o-white-space: pre-wrap;
+        white-space: pre-wrap;
+        /* hide text that can't wrap with an ellipsis */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        /* add border after every option */
+        border-bottom: 1px solid #DDD;
+    }
+    }
+  }
 }
+
 
 .invitation-errors ul {
   line-spacing: 1.3em;

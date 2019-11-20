@@ -6,14 +6,15 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class InvitationsController < ApplicationController
+  layout "devise"
+
   def index
     redirect_to invitations_new_path
   end
 
   def new
     @events = future_events
-    @code = Event.find(event_param['id']).code unless event_param.blank?
-    @code ||= ''
+    @code = event_param.blank? ? '' : Event.find(event_param['id']).code
     @invitation = InvitationForm.new
   end
 
