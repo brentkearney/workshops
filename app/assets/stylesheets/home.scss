@@ -15,24 +15,37 @@
     font-size: 0.7em;
   }
 }
+
+.my-events {
+  margin-bottom: 2em;
+}
+
+.btn-group {
+  .btn-primary {
+    margin: 0 10px;
+  }
+}
+
 .your-workshops {
   text-align: right;
   h2 {
     margin-right: 10px;
   }
 }
+
 .event-status {
-  margin-top: -15px;
-  margin-bottom: 20px;
-  background-color: #dddddd;
+  margin-top: -10px;
+  background-color: $background;
+  padding: 1em;
 }
-.event-status p {
-  color: black;
-  margin: 10px;
-  font-size: 0.9em;
-}
+
 .event-buttons {
-  margin: 1em;
+  margin-top: -20px;
+  margin-left: 0px;
+
+  .btn {
+    margin-right: 10px;
+  }
 }
 
 .card-primary .event-date {

@@ -229,7 +229,7 @@ module MembershipsHelper
       unless_cancel = "<br>\nUnless someone cancels, no more invitations can be sent."
     end
     ('<div class="no-print" id="limits-message">There ' + "#{isare} #{spots} #{spot_s} left:
-      #{invited} confirmed + invited / #{@event.max_participants} max. #{unless_cancel}</div>").squish.html_safe
+      #{invited} confirmed & invited / #{@event.max_participants} maximum. #{unless_cancel}</div>").squish.html_safe
   end
 
   def display_new_feature_notice?

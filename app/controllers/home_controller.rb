@@ -4,11 +4,11 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-class WelcomeController < ApplicationController
+class HomeController < ApplicationController
   before_action :set_attendance
   before_action :authenticate_user!
 
-  # GET / or /welcome
+  # GET / or /home
   def index
     if staff_at_location?
       redirect_to events_future_path(current_user.location) and return
