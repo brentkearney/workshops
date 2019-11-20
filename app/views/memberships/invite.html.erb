@@ -1,18 +1,18 @@
-<h1 id="invite-members">Invite Members to <%= @event.code %>
-  <small>Reply by date: <%= RsvpDeadline.new(@event.start_date).rsvp_by %>
-    <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><i class="fa fa-lg fa-fw fa-question-circle"></i></a></span>
-  </small>
-</h1>
-
 <article>
 <% if @memberships.empty? %>
-  <div class="row">
-      <div class="col-md-12">
-        <h3>No eligible members.</h3>
-        <p>Add some new members to the event by clicking <%= link_to 'Add Members', add_event_memberships_path(@event) %>.</p>
-      </div>
+  <div class="row event-page">
+    <div class="col-md-12">
+      <h3>No eligible members.</h3>
+      <p>Add some new members to the event by clicking <%= link_to 'Add Members', add_event_memberships_path(@event) %>.</p>
     </div>
+  </div>
 <% else %>
+  <div id="reply-by">
+    <strong>Reply by date:</strong> <%= RsvpDeadline.new(@event.start_date).rsvp_by %>
+    <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><i class="fa fa-lg fa-fw fa-question-circle"></i></a></span>
+    <span class="pull-right" id="limits-message"><%= add_limits_message %></span>
+  </div>
+
   <% @memberships.each do |status, members| %>
   <%= form_with model: @invite_members, url: invite_event_memberships_path(@event),
                        class: 'form', role: 'form' do |form| %>
@@ -20,7 +20,7 @@
     <div class="col-lg-12">
       <div class="card card-default">
         <div class="card-title">
-          <%= status %> Members
+          <%= invite_title(status) %>
         </div>
         <!-- /.card-title -->
         <div class="card-body">
@@ -67,9 +67,6 @@
                             class: 'btn btn-primary submit-button pull-right' %>
 
             </div>
-          </div>
-          <div class="row rowlink-skip no-print limits-message">
-          <%= add_limits_message(status) %>
           </div>
         </div>
         <!-- /.card-body -->

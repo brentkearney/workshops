@@ -78,6 +78,12 @@ module MembershipsHelper
     return ' no-print' unless section == 'Confirmed'
   end
 
+  def invite_title(status)
+    title = 'Send '
+    title << (status == 'Not Yet Invited' ? 'Invitations ' : 'Reminders ')
+    title << 'to ' + status + ' Members'
+  end
+
   def format_invited_by(membership)
     invited_by=''
     unless membership.invited_by.blank?
@@ -211,9 +217,9 @@ module MembershipsHelper
     column.html_safe
   end
 
-  def add_limits_message(status)
-    return unless status == 'Not Yet Invited'
-    spots = @event.max_participants - @event.num_invited_participants
+  def add_limits_message
+    invited = @event.num_invited_participants
+    spots = @event.max_participants - invited
     isare = 'are'
     isare = 'is' if spots == 1
     spot_s = 'spots'
@@ -222,8 +228,8 @@ module MembershipsHelper
     if spots == 0
       unless_cancel = 'Unless someone cancels, no more invitations can be sent.'
     end
-    ('<div class="no-print" id="limits-message">There ' + "#{isare} #{spots} #{spot_s} left,
-      out of a maximum of #{@event.max_participants}. #{unless_cancel}</div>").squish.html_safe
+    ('<div class="no-print" id="limits-message">There ' + "#{isare} #{spots} #{spot_s} left:
+      #{invited} confirmed + invited / #{@event.max_participants} max. #{unless_cancel}</div>").squish.html_safe
   end
 
   def display_new_feature_notice?

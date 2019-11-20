@@ -103,7 +103,7 @@ class MembershipsController < ApplicationController
               address.'.squish
           else
             redirect_to event_membership_path(@event, @membership),
-                        notice: 'Membership successfully updated.'
+                        success: 'Membership successfully updated.'
           end
         end
         format.json do

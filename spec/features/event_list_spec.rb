@@ -43,7 +43,7 @@ describe 'Event List', type: :feature do
 
       it 'expands to show event years' do
         visit root_path
-        years = page.all('ul#event-years-list a').map(&:text)
+        years = page.all('ul.treeview-menu a').map(&:text)
 
         expect(years).to include(@past.year)
         expect(years).to include(@current.year)
@@ -60,7 +60,7 @@ describe 'Event List', type: :feature do
       it 'expands to show event locations' do
         visit root_path
         locations =
-          page.all('ul#event-locations-list a').map(&:text)
+          page.all('ul.treeview-menu a').map(&:text)
 
         expect(locations).to include(@past.location)
         expect(locations).to include(@current.location)

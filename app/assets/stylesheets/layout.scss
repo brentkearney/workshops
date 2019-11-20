@@ -55,7 +55,6 @@
 
   .alert {
     @media(min-width: 768px) { margin-left: -$sidebar-width; }
-    //text-indent: $sidebar-width/2;
   }
 
   .alert-notice {
@@ -67,7 +66,7 @@
   }
 }
 
-.alert-alert {
+.alert-alert, .alert-notice {
   @extend .alert-success;
 }
 

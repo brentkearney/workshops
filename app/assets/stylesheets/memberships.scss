@@ -130,22 +130,17 @@ h3#membership, h3#hotel {
   }
 }
 
-#limits-message {
+#reply-by {
+  margin: 1em 0;
+  padding: 0.5em;
   font-size: 1.2em;
-  font-style: bold;
-}
-
-h1#invite-members {
-  margin-bottom: 1em;
-
-  small {
-    font-size: 0.5em;
-    display: block;
-    margin-top: 10px;
-  }
-
+  background-color: white;
+  border: 1px solid $light-border;
   #rsvp-by-icon {
     font-size: 0.8em;
+  }
+  #limits-message {
+    font-size: 1em;
   }
 }
 

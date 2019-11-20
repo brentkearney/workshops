@@ -19,7 +19,7 @@ describe 'Event Edit Page', type: :feature do
   end
 
   def access_denied
-    expect(page.body).to have_css('div.alert.alert-error.flash', text: 'Access denied.')
+    expect(page.body).to have_css('div.alert', text: 'Access denied.')
     expect(page.body).not_to include(@event.description)
   end
 
@@ -34,7 +34,7 @@ describe 'Event Edit Page', type: :feature do
   context 'Not logged-in' do
     it 'denies access' do
       visit edit_event_path(@event)
-      expect(page.body).to have_css('div.alert.alert-alert.flash', text: 'You need to sign in or sign up before continuing.')
+      expect(page.body).to have_css('div.alert', text: 'You need to sign in or sign up before continuing.')
       expect(current_path).to eq(user_session_path)
     end
   end
