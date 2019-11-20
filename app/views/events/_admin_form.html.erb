@@ -1,5 +1,5 @@
 <%= render "shared/errors", object: @event %>
-
+<div class="event-page">
 <%= form_for @event, html: { role: "form", class: "form" } do |f| %>
     <fieldset>
       <div class="row">
@@ -30,7 +30,7 @@
             <div class='input-group date' id='start_date'>
               <input type='text' name="event[start_date]" class="form-control" value="<%= @event.start_date.strftime("%Y-%m-%d") if @event.start_date %>" />
           <span class="input-group-addon">
-            <span class="glyphicon glyphicon-calendar"></span>
+            <i class="fa fa-lg fa-calendar" aria-hidden="true"></i>
           </span>
             </div>
           </div>
@@ -41,7 +41,7 @@
             <div class='input-group date' id='end_date'>
               <input type='text' name="event[end_date]" class="form-control" value="<%= @event.end_date.strftime("%Y-%m-%d") if @event.end_date %>" />
                 <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
+                    <i class="fa fa-lg fa-calendar" aria-hidden="true"></i>
                 </span>
             </div>
 
@@ -76,13 +76,13 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-1 form-group">
+        <div class="col-md-2 form-group">
           <%= f.label :max_participants %>
           <div style="width: 6em;">
             <%= f.number_field :max_participants, class: 'form-control' %>
           </div>
         </div>
-        <div class="col-md-1 form-group">
+        <div class="col-md-2 form-group">
           <%= f.label :max_observers %>
           <div style="width: 6em;">
             <%= f.number_field :max_observers, class: 'form-control' %>
@@ -104,14 +104,15 @@
 
       <div class="row buttons">
         <div class="form-group">
-          <%= f.submit (f.object.new_record? ? 'Add New Event' : 'Update Event'), class: 'btn btn-sm btn-default' %>
+          <%= f.submit (f.object.new_record? ? 'Add New Event' : 'Update Event'), class: 'btn btn-primary' %>
           <% unless f.object.new_record? %>
-              | <%= link_to 'Cancel', event_path(@event), class: 'btn btn-sm btn-default' %>
+              | <%= link_to 'Cancel', event_path(@event), class: 'btn btn-secondary' %>
               <% if policy(@event).delete? %>
-              | <%= link_to 'Delete This Event', event_path(@event, @schedule), method: :delete, class: 'btn btn-sm btn-default', data: { confirm: "Are you sure you want to delete #{@event.code} and all of its associated data?" } %>
+              | <%= link_to 'Delete This Event', event_path(@event, @schedule), method: :delete, class: 'btn btn-danger', data: { confirm: "Are you sure you want to delete #{@event.code} and all of its associated data?" } %>
               <% end %>
           <% end %>
         </div>
       </div>
     </fieldset>
 <% end %>
+</div>

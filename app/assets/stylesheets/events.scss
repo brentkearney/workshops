@@ -1,5 +1,11 @@
 @import "colours";
 
+.event-page {
+  background-color: white;
+  padding: 1em;
+  border: 1px solid $light-border;
+}
+
 td.confirmed {
   text-align: center;
   padding-right: 1.8em;
@@ -14,13 +20,16 @@ h4.event-details {
   margin-top: 25px;
 }
 
-#event-description {
-  margin-top: 1em;
+#event-description-heading {
+  margin: 1em -0.8em 1em -0.8em;
   border-top: 1px solid lightgrey;
+}
+
+#event-description {
   border-bottom: 1px solid lightgrey;
 }
 
-.event-edit-icon {
+.event-edit-button {
   text-align: right;
   font-size: 1.2em;
   padding-top: 1em;
@@ -34,4 +43,12 @@ h4.event-details {
   margin-top: 20px;
   padding-right: 5px;
   vertical-align: bottom;
+}
+
+.input-group-addon {
+  padding: 5px;
+}
+
+label {
+  font-weight: bold;
 }

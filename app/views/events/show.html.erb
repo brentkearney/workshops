@@ -1,8 +1,7 @@
 <article>
- <h4 class="event-details">Event Details</h4>
-
- <div class="table-responsive">
-   <table class="table table-condensed">
+  <div class="event-page">
+   <h4 class="event-details">Event Details</h4>
+   <table class="table table-sm table-responsive">
      <tbody>
      <tr>
        <td align="right">Event Name:</td>
@@ -69,18 +68,19 @@
     <% end %>
      </tbody>
    </table>
- </div>
- <!-- /.table-responsive -->
 
-<div class="row" id="event-description">
+
+<div class="row" id="event-description-heading">
   <div class="col-lg-6">
       <h4 class="event-details">Event Description:</h4>
   </div>
   <% if(policy(@event).edit?) %>
-  <div class="col-lg-6 event-edit-icon">
-    <%= link_to ' Edit', edit_event_path(@event), class: 'fa fa-pencil-square-o' %>
+  <div class="col-lg-6 event-edit-button">
+    <%= link_to 'Edit Event', edit_event_path(@event), class: 'btn btn-primary btn-sm' %>
   </div>
   <% end %>
+</div>
+<div class="row" id="event-description">
   <div class="col-lg-12">
        <%= get_text(@event.description) %>
   </div>
@@ -91,8 +91,8 @@
     <h4 class="event-details">Event Press Release:</h4>
   </div>
   <% if(policy(@event).edit?) %>
-  <div class="col-lg-6 event-edit-icon">
-    <%= link_to ' Edit', edit_event_path(@event), class: 'fa fa-pencil-square-o' %>
+  <div class="col-lg-6 event-edit-button">
+    <%= link_to 'Edit Event', edit_event_path(@event), class: 'btn btn-primary btn-sm' %>
   </div>
   <% end %>
   <div class="col-lg-12">
@@ -103,16 +103,18 @@
   <% if user_signed_in? && policy(@event).edit? %>
   <div class="row buttons">
     <div class="form-group">
-    <%= link_to 'Edit Event Details', edit_event_path(@event), class: 'btn btn-sm btn-default' %>
+    <%= link_to 'Edit Event Details', edit_event_path(@event), class: 'btn btn-primary' %>
     </div>
   </div>
   <% else %>
       <div class="row buttons">
         <div class="form-group">
-          <%= link_to 'Event Members', event_memberships_path(@event), class: 'btn btn-sm btn-default' %>
-          <%= link_to 'Event Schedule', event_schedule_index_path(@event), class: 'btn btn-sm btn-default' %>
+          <%= link_to 'Event Members', event_memberships_path(@event), class: 'btn btn-secondary' %>
+          <%= link_to 'Event Schedule', event_schedule_index_path(@event), class: 'btn btn-secondary' %>
         </div>
       </div>
   <% end %>
 
+</div>
+<!-- /.event-page -->
 </article>

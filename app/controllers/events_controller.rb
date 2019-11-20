@@ -151,7 +151,7 @@ class EventsController < ApplicationController
       if @event.update(update_params)
         notify_staff(event: original_event, params: update_params)
         format.html { redirect_to @event,
-            notice: 'Event was successfully updated.' }
+            success: 'Event was successfully updated.' }
         format.json { render :show, status: :ok, location: @event }
       else
         format.html { render :edit }
@@ -168,7 +168,7 @@ class EventsController < ApplicationController
     @event.destroy
     respond_to do |format|
       format.html { redirect_to events_url,
-        notice: 'Event was successfully destroyed.' }
+        success: 'Event was successfully destroyed.' }
       format.json { head :no_content }
     end
   end

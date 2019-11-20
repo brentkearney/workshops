@@ -61,6 +61,10 @@
   .alert-notice {
     @extend .alert-warning;
   }
+
+  .alert-error {
+    @extend .alert-danger;
+  }
 }
 
 .alert-alert {
@@ -140,6 +144,8 @@ li.nav-second-level {
   width: 106%;
   text-align: center;
   margin: 0;
+  text-indent: $sidebar-width;
+
   padding: 0;
   .card-footer {
     font-size: 0.9em;
