@@ -1,3 +1,3 @@
 <% flash.each do |key, value| %>
-  <%= content_tag(:div, value.html_safe, class: "alert alert-#{key} text-break", role: "alert") %>
+  <%= content_tag(:div, value.html_safe, class: "alert alert-#{key}", role: "alert") %>
 <% end %>

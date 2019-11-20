@@ -5,19 +5,20 @@
     <div class="form-group">
       <%= f.label :email, 'E-MAIL ADDRESS' %>
       <%= f.email_field :email, autofocus: true, autocomplete: "email",
-                      id: 'login-email', class: 'form-control'  %>
+                        placeholder: 'E-mail address', id: 'login-email',
+                        class: 'form-control' %>
     </div>
     <div class="form-group">
-      <%= f.label :password %>
+      <%= f.label :password, 'PASSWORD' %>
       <%= f.password_field :password, autocomplete: "current-password",
-                placeholder: 'Password', class: 'form-control' %>
+                           placeholder: 'Password', class: 'form-control' %>
     </div>
     <div class="form-group">
       <div class="utility">
         <% if devise_mapping.rememberable? %>
         <div class="animated-checkbox">
           <label>
-            <input type="checkbox">
+            <%= f.check_box :remember_me %>
             <span class="label-text" id="stay-signedin">Stay Signed in</span>
           </label>
         </div>
@@ -43,7 +44,8 @@
     <div class="form-group">
       <%= f.label :email, 'E-MAIL ADDRESS' %>
       <%= f.email_field :email, autofocus: true, autocomplete: "email",
-             placeholder: 'Email', id: 'reset-email', class: 'form-control' %>
+                        placeholder: 'E-mail address', id: 'reset-email',
+                        class: 'form-control' %>
     </div>
     <div class="form-group btn-container">
       <%= f.button :submit, class: 'btn btn-primary btn-block', id: "reset-button" do %>

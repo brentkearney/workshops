@@ -51,6 +51,7 @@
   box-shadow: none;
   border: 1px;
   max-width: 99999px;
+  text-align: center;
   width: 100%;
 
   .alert {
@@ -68,6 +69,7 @@
 
 .alert-alert, .alert-notice {
   @extend .alert-success;
+  text-align: center;
 }
 
 // Side Navbar
