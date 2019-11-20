@@ -126,10 +126,10 @@ module MembershipsHelper
   end
 
   def show_reply_by_date(member)
-    return '' if member.invited_on.blank?
     tz = member.event.time_zone
     start_date = member.event.start_date.in_time_zone(tz)
-    invited_on = member.invited_on.in_time_zone(tz)
+    invited_on = member.invited_on.blank? ? DateTime.current.in_time_zone(tz) :
+                  member.invited_on.in_time_zone(tz)
     DateTime.parse(rsvp_by(start_date, invited_on)).strftime("%Y-%m-%d")
   end
 

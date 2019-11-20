@@ -1,11 +1,11 @@
 <div class="login-box" id="ws-login-box">
-  <h3 class="pwchange-head"><i class="fa fa-fw fa-unlock"></i>NEW PASSWORD</h3>
+  <h3 class="pwchange-head"><i class="fa fa-fw fa-unlock"></i>New Password</h3>
   <%= form_for(resource, as: resource_name, url: password_path,
            html: { role: 'form', id: 'reset-form', class: 'newpw-form' }) do |f| %>
     <div class="form-group">
-      <%= f.label :email, 'E-MAIL ADDRESS' %>
+      <%= f.label :email, 'E-mail Address' %>
       <%= f.email_field :email, autofocus: true, autocomplete: "email",
-             placeholder: 'E-mail address', id: 'reset-email', class: 'form-control' %>
+             placeholder: 'email@address.edu', id: 'reset-email', class: 'form-control' %>
     </div>
     <div class="form-group btn-container">
       <%= f.button :submit, class: 'btn btn-primary btn-block', id: "reset-button" do %>

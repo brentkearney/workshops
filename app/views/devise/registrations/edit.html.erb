@@ -1,7 +1,5 @@
-<%= render "devise/shared/error_messages", resource: resource %>
-
 <div class="login-box" id="ws-login-box">
-  <h3 class="pwchange-head">CHANGE <i class="fa fa-fw fa-lock"></i> PASSWORD</h3>
+  <h3 class="pwchange-head"><i class="fa fa-fw fa-lock"></i> Change Password</h3>
 
   <%= form_for(resource, as: resource_name, url: registration_path(resource_name), method: :patch,
             html: { role: 'form', id: 'pwchange-form', class: 'login-form' }) do |f| %>
