@@ -25,6 +25,31 @@
         <i class="fa fa-sign-in fa-lg fa-fw"></i> Request Invitation
       <% end %>
     </div>
+    <div class="form-group mt-3">
+      <p class="semibold-text mb-0" id="back-to-login">
+        <a href="<%= sign_in_url %>"><i class="fa fa-angle-left fa-fw"></i> Sign-in</a>
+      </p>
+    </div>
   <% end %>
+    <div class="align-text-bottom" id="about-invitations">
+      <a href="#" data-toggle="modal" data-target="#about-invitations-modal">
+        About Invitations<i class="fa fa-lg fa-fw fa-question-circle"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+
+<!-- About Invitations Modal -->
+<div class="modal fade" id="about-invitations-modal" tabindex="-1" role="dialog" aria-labelledby="about-invitations" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <%= GetSetting.about_invitations_msg.html_safe %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
   </div>
 </div>

@@ -51,7 +51,9 @@ namespace :ws do
         'email_domain' => 'workshops.example.com',
         'LECTURES_API_KEY' => 'Example-ChangeMe',
         'EVENTS_API_KEY' => 'Example-ChangeMe',
-        'SPARKPOST_AUTH_TOKEN' => 'Example-ChangeMe'
+        'SPARKPOST_AUTH_TOKEN' => 'Example-ChangeMe',
+        'new_registration_msg' => '<h2>About Workshop Participation</h2> <p>To attend an Example Organization workshop, you must be invited by the organizers of the workshop.  If you have been invited, note the e-mail address to which the invitation was sent. This is the e-mail address that identifies you in our database, and must be used to register an account here. Only invited participants may  register.</p> <p>If you have not been invited to a workshop, please see   <a href="#">these guidelines</a>.</p>',
+        'about_invitations_msg' => '<h2>About Workshop Invitations</h2>  <p>This form is for requesting <em>another</em> invitation to a workshop that you have already been invited to, by the workshop organizers. Note the  e-mail address to which the invitation was previously sent. This is the e-mail address that identifies you in our database, and must be used to request another invitation.</p>  <p>If you have not been invited to a workshop already, please see  <a href="#">these guidelines</a>.</p>'
       }
     end
 
