@@ -130,6 +130,19 @@ li.nav-second-level {
   }
 }
 
+// General
+
+.card-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: white;
+  padding: 10px;
+  background-color: $primary-color;
+  h3 {
+    color: white;
+  }
+}
+
 
 // Footer
 .sidebar-mini {

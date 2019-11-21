@@ -10,23 +10,16 @@
   <!-- Membership list, one per type of attendance status -->
   <% @memberships.each do |status, members| %>
     <% if policy(@event).view_attendance_status?(status) %>
-      <div class="container-fluid members-list <%= print_section?(status) %> <%= status.parameterize %>-members">
-        <div class="card">
-          <div class="card-title">
-            <%= status %> Members
-          </div>
-          <div class="card-body members-list">
-            <div class="list-group" id="<%= status %>-list" role="tablist">
-              <%= render partial: 'member_list_items', locals: {status: status, members: members } %>
-            </div>
-            <!-- ./list-group -->
-          </div>
-          <!-- /.card-body -->
+    <div class="card members-list <%= print_section?(status) %> <%= status.parameterize %>-members">
+      <h4 class="card-title">
+        <%= status_with_icon(status) %> Members (<%= members.size %>)
+      </h4>
+      <div class="card-body">
+        <div class="card-text">
+          <%= render partial: 'member_list_items', locals: {status: status, members: members } %>
         </div>
-        <!-- /.card -->
       </div>
-      <!-- /.container-fluid -->
-
+    </div>
     <% end %>
   <% end %>
 <% end %>

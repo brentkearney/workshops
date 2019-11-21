@@ -236,4 +236,25 @@ module MembershipsHelper
     @unread_notice && @current_user.sign_in_count > 1 &&
       Date.current < Date.parse('2019-11-30') && policy(@event).send_invitations?
   end
+
+  def get_status_heading(status)
+    case status
+    when "Confirmed"
+      '<i class="fa fa-check-circle-o" aria-hidden="true"></i> Confirmed'
+    when "Invited"
+      '<i class="fa fa-envelope-o" aria-hidden="true"></i> Invited'
+    when "Undecided"
+      '<i class="fa fa-envelope-open-o" aria-hidden="true"></i> Undecided'
+    when "Not Yet Invited"
+      '<i class="fa fa-clock-o" aria-hidden="true"></i> Not Yet Invited'
+    when "Declined"
+      '<i class="fa fa-thumbs-down" aria-hidden="true"></i> Declined'
+    else
+      status
+    end
+  end
+
+  def status_with_icon(status)
+    get_status_heading(status).html_safe
+  end
 end

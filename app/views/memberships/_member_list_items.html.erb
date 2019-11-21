@@ -1,44 +1,13 @@
-<% i=1 %>
+<ol class="ordered-member-list">
 <% members.each do |member| %>
-  <a class="list-group-item list-group-item-action" data-toggle="list" href="#member-<%= member.id %>" role="tab" aria-controls="member-info-<%= member.id %>">
-  <span class="row-counter">#<%= i %></span>
-  <%= member.person.lname %>
-  <% unless member.person.affiliation.blank? %>
-    (<%= member.person.affiliation %>)
-  <% end %>
-  <% if member.role =~ /Organizer|Observer/ %>
-    <p class="mb-1 member-role"><%= member.role %></p>
-  <% end %>
-  </a>
-  <% i += 1 %>
-
-
-
-<div class="tab-content">
-  <div class="tab-pane fade" id="member-<%= member.id %>" role="tabpanel">
-    <div class="row">
-      <div class="col">
-        <h3><%= member.person.lname %> Details</h3>
-        <%= member.role %>
-        <%= member.person.affiliation %><br>
-        <%= member.person.country %><br>
-      </div><!-- ./col -->
-
-      <div class="col col-lg-2">
-      <% if policy(member).edit_membership? %>
-      <%= link_to "Edit Membership", edit_event_membership_path(@event, member),
-            class: 'btn btn-primary' %> &nbsp; &nbsp;
-      <% end %>
-
-      <% if policy(member).delete_membership? %>
-      <%= link_to 'Delete Membership', event_membership_path(@event, member),
-            method: :delete, class: 'btn btn-danger',
-            data: { confirm: "Are you sure you want to remove #{member.person.name} from #{@event.code}?" } %>
-      <% end %>
-      </div><!-- ./col -->
-    </div><!-- ./row -->
-  </div>
-</div>
-<!-- /.tab-content -->
-
+  <li id="member-<%= member.id %>">
+    <%= link_to "#{member.person.lname}", event_membership_path(@event, member) %>
+    <% unless member.person.affiliation.blank? %>
+      (<%= member.person.affiliation %>)
+    <% end %>
+    <% if member.role =~ /Organizer|Observer/ %>
+      <p class="mb-1 member-role"><%= member.role %></p>
+    <% end %>
+  </li>
 <% end %>
+</ol>
