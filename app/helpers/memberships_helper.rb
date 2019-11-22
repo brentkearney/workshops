@@ -257,4 +257,8 @@ module MembershipsHelper
   def status_with_icon(status)
     get_status_heading(status).html_safe
   end
+
+  def member_link(member)
+    link_to "#{member.person.lname}", event_membership_path(@event, member)
+  end
 end

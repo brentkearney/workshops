@@ -5,6 +5,7 @@
   height: 50px;
   padding: 0;
   margin: 0;
+  overflow: hidden;
 
   #mobile-nav {
     color: white;
@@ -13,18 +14,35 @@
   }
 
   a.app-header__logo {
-    @extend .d-none, .d-md-block;
-    max-width: 60px;
+    border: 1px dotted $primary-color;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0;
+    max-width: 50px;
     background-color: $primary-color;
+    display: block;
+    height: 100%;
+    vertical-align: middle;
+
     img {
-      height: 40px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      vertical-align: middle;
+
+      max-height: 40px;
+      max-width: 40px;
+      margin: 5px;
       background-color: white;
-      margin: 5px 10px 5px -10px;
       padding: 0;
     }
   }
 
   #application-title {
+    position: absolute;
+    top: 0;
+    left: 50px;
     line-height: 50px;
     text-align: center;
     vertical-align: middle;

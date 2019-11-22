@@ -7,8 +7,8 @@
       </div>
     </div>
 <% else %>
-  <!-- Membership list, one per type of attendance status -->
-  <div class="d-flex flex-wrap align-content-stretch">
+  <!-- Membership list, one per type of attendance status  -->
+  <div class="d-flex flex-wrap align-content-stretch align-self-start">
   <% @memberships.each do |status, members| %>
     <% if policy(@event).view_attendance_status?(status) %>
     <div class="card p-2 members-list <%= print_section?(status) %> <%= status.parameterize %>-members">
@@ -17,7 +17,7 @@
       </h4>
       <div class="card-body">
         <div class="card-text">
-          <%= render partial: 'member_list_items', locals: {status: status, members: members } %>
+          <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
   <a class="app-sidebar__toggle" id="mobile-nav" href="#" data-toggle="sidebar" aria-label="Hide Sidebar"></a>
 
   <a class="app-header__logo" href="<%= root_path -%>">
-    <%= image_tag(GetSetting.site_setting('logo'), class: 'pull-left') %>
+    <%= image_tag(GetSetting.site_setting('logo')) %>
   </a>
   <div id="application-title"><%= Setting.Site['title'] %></div>
 
