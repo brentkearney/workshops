@@ -1,25 +1,23 @@
 <% if policy(@membership).edit_person? %>
-<div class="form-group">
-  <div class="col-sm-9 lead">
+  <div class="card-title">
     <% if @membership.person_id.blank? %>
       <h3>New Member</h3>
     <% else %>
       <h3 id="personal"><%= @membership.person.name %>'s Personal Details</h3>
     <% end %>
   </div>
-</div>
 
-<%= f.fields_for :person do |person| %>
-<div class="form-group">
-  <div class="col-sm-3 control-label">
-    <%= person.label :salutation, "Salutation: " %>
+  <%= f.fields_for :person do |person| %>
+  <div class="form-group">
+    <div class="col-sm-3 control-label">
+      <%= person.label :salutation, "Salutation: " %>
+    </div>
+    <div class="col-sm-2">
+      <%= person.select :salutation, Setting.Site['salutations'],
+        { include_blank: true }, { class: 'form-control' } %>
+    </div>
+    <div class="col-sm-7"></div>
   </div>
-  <div class="col-sm-2">
-    <%= person.select :salutation, Setting.Site['salutations'],
-      { include_blank: true }, { class: 'form-control' } %>
-  </div>
-  <div class="col-sm-7"></div>
-</div>
 
   <div class="form-group">
     <div class="col-sm-3 control-label">

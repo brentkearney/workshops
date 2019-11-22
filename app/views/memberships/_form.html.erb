@@ -6,18 +6,21 @@
 <%= f.hidden_field :updated_by, value: @current_user.person.name %>
 
 <!-- person details -->
+<div class="card edit-person">
 <%= render partial: 'person_details_form', locals: { membership: @membership, f: f } %>
+</div>
 
 <!-- membership details -->
+<div class="card edit-person">
 <%= render partial: 'membership_details_form', locals: { membership: @membership, f: f } %>
-
+</div>
 
 <div class="form-group">
 	<div class="col-sm-3"></div>
 	<div class="col-sm-9" id="member-buttons">
-	<%= f.submit 'Update Member', class: 'btn btn-sm btn-default' %> |
+	<%= f.submit 'Update Member', class: 'btn btn-primary' %> |
 	<%= link_to "Back to Profile", event_membership_path(@event, @membership),
-							class: 'btn btn-sm btn-default' %>
+							class: 'btn btn-secondary' %>
 	</div>
 </div>
 </fieldset>

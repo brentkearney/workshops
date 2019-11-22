@@ -1,13 +1,17 @@
 <ol class="ordered-member-list">
 <% members.each do |member| %>
   <li id="member-<%= member.id %>">
+    <% if member.role =~ /Organizer/ %>
+      <strong><%= member.role %>:</strong>
+    <% end %>
+    <% if member.role == 'Observer' %>
+      Observer:
+    <% end %>
     <%= link_to "#{member.person.lname}", event_membership_path(@event, member) %>
     <% unless member.person.affiliation.blank? %>
       (<%= member.person.affiliation %>)
     <% end %>
-    <% if member.role =~ /Organizer|Observer/ %>
-      <p class="mb-1 member-role"><%= member.role %></p>
-    <% end %>
+
   </li>
 <% end %>
 </ol>
