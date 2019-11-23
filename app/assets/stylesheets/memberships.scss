@@ -1,8 +1,6 @@
 .members-list {
   margin-bottom: 25px;
   margin-right: 10px;
-  //display: inline-block;
-  //vertical-align: top;
   border: 1px solid $light-border;
 
   h4.card-title {
@@ -16,118 +14,49 @@
   }
 }
 
-.edit-person {
-  @extend .members-list;
+.member-show {
+  .card {
+    border: 1px solid $light-border;
+    max-width: 550px;
+    margin: 0px 10px 10px 0;
+  }
 
   .card-title {
-    padding: 0.5em 0 1em 0.5em;
-  }
-  padding-bottom: 1.2em;
-}
+    margin: -8px;
 
-ul.ordered-member-list, li {
-
-}
-
-.member-role {
-  text-weight: bold;
-}
-
-#profile-pic {
-  margin: 8px 0;
-}
-
-.page-header-subtitle h4 {
-    font-size: 1em;
-}
-
-.personal-details-and-other-memberships {
-  padding-right: 45px;
-}
-
-.profile {
-  margin-top: 20px;
-  font-size: 1.2em;
-
-  .row {
-    margin: 10px 0;
-  }
-
-  #other-memberships {
-    p {
-      font-size: 0.9em;
+    h2#profile-name {
       margin-bottom: 0;
-    }
-    li {
-      font-size: 1.2em;
+
+      small {
+        font-size: 0.8rem;
+      }
     }
   }
 
-  #profile-name {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 0.3em;
-    small {
-      font-size: 0.5em;
-      margin-left: 15px;
-    }
+  #profile-email-url {
+    margin-bottom: 1.5rem;
   }
-  #profile-phone {
-    margin-top: 1.5em;
-  }
+
   #profile-address {
-    margin-top: 1.5em;
-  }
-  #profile-bio, #profile-special-info p {
-    font-size: 0.9em;
-    margin-left: 1em;
-    margin-bottom: 1em;
+    text-align: left;
+    margin-bottom: 1.5rem;
   }
 
-  .membership-details {
-    margin-top: 1.5em;
+  #profile-bio {
+    font-size: 0.8rem;
   }
 
-  #profile-rsvp-invited {
-    font-style: italics;
-    font-size: 0.8em;
-    padding: 0 0.8em;
+  .card-footer {
+    margin: -8px;
+    font-size: 0.7rem;
+    text-align: left;
   }
-}
 
-.updated-by {
-  font-size: 0.8em;
-  padding-top: 15px;
-  text-align: left;
-}
-#member-updated-by {
-  padding-left: 15px;
-  margin-bottom: -30px;
+
 }
 
 #member-buttons {
-  padding: 15px;
-}
-
-#gender-select {
-  width: 50px;
-}
-
-h3#personal {
-  margin-bottom: -15px;
-}
-h3#membership, h3#hotel {
-  margin-top: 60px;
-  margin-bottom: 30px;
-}
-
-.member_notes {
-  font-size: 0.8em;
-  margin-left: 1em;
-  p {
-    padding: 0;
-    margin: 0.5em;
-  }
+  margin-left: 0px;
 }
 
 #reply-by {
@@ -153,6 +82,7 @@ h3#membership, h3#hotel {
     font-size: 1em;
   }
 }
+
 
 a.invitation-dates {
   text-decoration: underline;
@@ -308,3 +238,4 @@ table#new-people {
       content: none !important;
     }
 }
+

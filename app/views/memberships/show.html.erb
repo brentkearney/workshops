@@ -1,226 +1,196 @@
 <article>
-<div class="container-fluid">
-  <div class="row"> <!-- master row -->
-
-    <div class="col-md-6 personal-details-and-other-memberships">
-      <div class="row profile">
-        <div class="card card-default">
-          <div class="card-title">
-            <h2 id="profile-name"><%= @person.name %>
-            <% if @current_user && @current_user.is_admin? %>
-            <br><small>person id: <%= @person.id %>, legacy id: <%= @person.legacy_id %>, membership id: <%= @membership.id %></small>
-            <% end %>
-            </h2>
-          </div><!-- /card-title -->
-          <div class="card-body">
-            <div class="row" id="profile-affil"><%= @person.affil_with_title %></div>
-            <% if policy(@membership).use_email_addresses? || policy(@membership).show_email_address? %>
-            <div class="row" id="profile-email"><%= mail_to @person.email %></div>
-            <% end %>
-
-            <% unless @person.url.blank? %>
-            <div class="row" id="profile-url"><%= link_to @person.uri, @person.uri %></div>
-            <% end %>
-
-            <% if policy(@membership).show_details? && !@person.phone.blank? %>
-            <div class="row" id="profile-phone"><strong>Phone:</strong> <%= @person.phone %></div>
-            <% end %>
-
-            <% if policy(@membership).show_personal_info? %>
-              <% unless @person.emergency_contact.blank? %>
-              <div class="row" id="profile-emergency_contact">
-                <strong>Emergency Contact:</strong> <%= @person.emergency_contact +
-                  '  (' + @person.emergency_phone + ')' %>
-              </div>
-              <% end %>
-
-              <div class="row" id="profile-address">
-                <%= print_address(@person) %>
-              </div>
-
-              <% unless @person.academic_status.blank? %>
-              <div class="row" id="profile-academic-status">
-                <strong>Academic Status:</strong> <%= @person.academic_status %>
-              </div>
-              <% end %>
-
-              <% unless @person.phd_year.blank? %>
-              <div class="row" id="profile-phd_year">
-                <strong>Year of Ph.D.:</strong> <%= @person.phd_year %>
-              </div>
-              <% end %>
-            <% end %>
-
-            <% unless @person.research_areas.blank? %>
-            <div class="row" id="profile-research">
-              <strong>Research:</strong> <%= @person.research_areas %>
-            </div>
-            <% end %>
-
-            <% unless @person.biography.blank? %>
-            <div class="row" id="profile-bio">
-              <strong>Bio:</strong> <%= simple_format(@person.biography) %>
-            </div>
-            <% end %>
-          </div><!-- /card-body -->
-          <% if policy(@membership).show_details? %>
-            <div class="card-footer updated-by">
-              Last updated by: <%= @person.updated_by %> on <%= @person.updated_at.in_time_zone(@membership.event.time_zone) %>
-            </div>
+  <div class="member-show d-flex flex-wrap align-content-stretch align-self-start">
+    <div class="card p-2 member-show profile">
+      <div class="card-title">
+        <h2 id="profile-name"><%= @person.name %>
+        <% if @current_user && @current_user.is_admin? %>
+        <br><small>person id: <%= @person.id %>, legacy id: <%= @person.legacy_id %>, membership id: <%= @membership.id %></small>
+        <% end %>
+        </h2>
+      </div><!-- /card-title -->
+      <div class="card-body">
+        <div class="row" id="profile-affil"><%= @person.affil_with_title %></div>
+        <% if policy(@membership).use_email_addresses? || policy(@membership).show_email_address? %>
+        <div class="row" id="profile-email-url">
+          <%= mail_to @person.email %>
+          <% unless @person.url.blank? %>
+            &nbsp; | &nbsp; <%= link_to @person.uri.truncate(48), @person.uri %>
           <% end %>
-        </div><!-- card -->
-      </div>
+        </div>
+        <% end %>
 
-      <!-- Other Memberships -->
-      <% unless @memberships.empty? %>
-      <div class="row profile">
-        <div class="card card-default" id="other-memberships">
-          <div class="card-title">
-            <h3><%= @person.dear_name %>'s Other Events</h3>
-          </div><!-- /card-title -->
+        <% if policy(@membership).show_details? && !@person.phone.blank? %>
+        <div class="row" id="profile-phone"><strong>Phone:</strong> &nbsp; <%= @person.phone %></div>
+        <% end %>
 
-          <ul class="list-group">
-          <% @memberships.each do |m| %>
-            <li class="list-group-item">
-              <%= link_to event_membership_name(m), event_membership_path(m.event, m) %>
-            </li>
+        <% if policy(@membership).show_personal_info? %>
+          <% unless @person.emergency_contact.blank? %>
+          <div class="row" id="profile-emergency_contact">
+            <strong>Emergency Contact:</strong>  &nbsp; <%= @person.emergency_contact +
+              '  (' + @person.emergency_phone + ')' %>
+          </div>
           <% end %>
-          </ul>
-        </div><!-- /card -->
+
+          <div class="row" id="profile-address">
+            <%= print_address(@person) %>
+          </div>
+
+          <% unless @person.academic_status.blank? %>
+          <div class="row" id="profile-academic-status">
+            <strong>Academic Status:</strong>  &nbsp; <%= @person.academic_status %>
+          </div>
+          <% end %>
+
+          <% unless @person.phd_year.blank? %>
+          <div class="row" id="profile-phd_year">
+            <strong>Year of Ph.D.:</strong>  &nbsp; <%= @person.phd_year %>
+          </div>
+          <% end %>
+        <% end %>
+
+        <% unless @person.research_areas.blank? %>
+        <div class="row" id="profile-research">
+          <strong>Research:</strong>  &nbsp; <%= @person.research_areas %>
+        </div>
+        <% end %>
+
+        <% unless @person.biography.blank? %>
+        <div class="row">
+          <strong>Bio:</strong>
+          <span id="profile-bio">
+            <%= simple_format(@person.biography) %>
+          </span>
+        </div>
+        <% end %>
+      </div><!-- /card-body -->
+      <% if policy(@membership).show_details? %>
+      <div class="card-footer updated-by">
+        Last updated by: <%= @person.updated_by %> on <%= @person.updated_at.in_time_zone(@membership.event.time_zone) %>
       </div>
       <% end %>
-    </div><!-- /col-md-6 personal-details-and-other-memberships -->
-
+    </div><!-- ./card -->
 
     <!-- Event Membership Details -->
     <% if policy(@membership).show_details? %>
-    <div class="col-md-6 membership-and-hotel-details">
-
+    <div class="card p-2 member-show membership-details">
       <% if pending_invitation? %>
-      <div class="row profile membership-details">
-        <div class="card card-info">
-          <div class="card-title">
-            <h3>Pending Invitation</h3>
-          </div>
-          <div class="card-body">
-            <p>You were sent an e-mail inviting you to attend this workshop.</p>
-            <p>Please respond to the invitation to let us know whether or not
-                you will attend, and to update your information.</p>
-            <p>You can respond by following the link sent in the e-mail, or by
-                <%= link_to 'clicking here', @membership.invitation.rsvp_url %>.
-            </p>
-          </div>
-        </div>
+      <div class="card-title">
+        <h3>Pending Invitation</h3>
+      </div>
+      <div class="card-body">
+        <p>You were sent an e-mail inviting you to attend this workshop.</p>
+        <p>Please respond to the invitation to let us know whether or not
+            you will attend, and to update your information.</p>
+        <p>You can respond by following the link sent in the e-mail, or by
+            <%= link_to 'clicking here', @membership.invitation.rsvp_url %>.
+        </p>
       </div>
 
       <% else %>
-      <div class="row profile membership-details">
-        <div class="card card-default">
-          <div class="card-title">
-            <h3><%= @membership.event.code %> Membership Details</h3>
-          </div><!-- /card-title -->
-          <div class="card-body">
-            <div class="row" id="profile-role">
-              <strong>Role:</strong>
-              <%= @membership.role %>
-            </div>
+      <div class="card-title">
+        <h3><%= @membership.event.code %> Membership Details</h3>
+      </div><!-- /card-title -->
+      <div class="card-body">
+        <div class="row" id="profile-role">
+          <strong>Role:</strong>
+          <%= @membership.role %>
+        </div>
 
-            <div class="row" id="profile-attendance">
-              <strong>Attendance:</strong>
-              <%= @membership.attendance %>
-            </div>
+        <div class="row" id="profile-attendance">
+          <strong>Attendance:</strong>
+          <%= @membership.attendance %>
+        </div>
 
-            <%= show_invited_by? %>
+        <%= show_invited_by? %>
 
-            <div class="row" id="profile-arrival">
-             <strong>Arriving on:</strong>
-             <%= @membership.arrives %>
-            </div>
+        <div class="row" id="profile-arrival">
+         <strong>Arriving on:</strong>
+         <%= @membership.arrives %>
+        </div>
 
-            <div class="row" id="profile-departure">
-             <strong>Departing on:</strong>
-             <%= @membership.departs %>
-            </div>
+        <div class="row" id="profile-departure">
+         <strong>Departing on:</strong>
+         <%= @membership.departs %>
+        </div>
 
-            <div class="row" id="profile-rsvp-date">
-             <strong>RSVP date:</strong>
-             <%= @membership.rsvp_date %>
-            </div>
+        <div class="row" id="profile-rsvp-date">
+         <strong>RSVP date:</strong>
+         <%= @membership.rsvp_date %>
+        </div>
 
-            <% if policy(@membership).organizer_notes? %>
-            <div class="row" id="profile-org-notes">
-              <strong>Organizer Notes:</strong>
-              <div class="member_notes">
-                <%= simple_format(@membership.org_notes) %>
-              </div>
-            </div>
-            <% end %>
-          </div><!-- /card-body -->
-          <div class="card-footer updated-by">
-            Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at.in_time_zone(@membership.event.time_zone) %>
+        <% if policy(@membership).organizer_notes? %>
+        <div class="row" id="profile-org-notes">
+          <strong>Organizer Notes:</strong>
+          <div class="member_notes">
+            <%= simple_format(@membership.org_notes) %>
           </div>
-        </div><!-- /card -->
-      </div><!-- /row -->
+        </div>
+        <% end %>
+      </div><!-- ./card-body -->
+      <div class="card-footer updated-by">
+        Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at.in_time_zone(@membership.event.time_zone) %>
+      </div>
+    </div><!-- ./card -->
+    <% end %>
 
-      <!-- Event Hotel & Billing Details -->
-      <% if policy(@membership).hotel_and_billing? %>
-      <div class="row profile hotel-billing">
-        <div class="card card-default">
-          <div class="card-title">
-            <h3><%= @membership.event.code %> Hotel & Billing Details</h3>
-          </div><!-- /card-title -->
-          <div class="card-body">
-            <div class="row" id="profile-reviewed">
-             <strong>Reviewed:</strong> <%= @membership.reviewed ? 'Yes' : 'No' %>
-            </div>
-            <div class="row" id="profile-billing">
-              <strong>Billing:</strong>
-              <%= @membership.billing %>
-            </div>
-            <div class="row" id="profile-gender">
-              <strong>Gender:</strong> <%= @person.gender %>
-            </div>
-            <% if @membership.own_accommodation %>
-              <div class="row" id="profile-ownaccommodation">
-                <strong>Own Accommodation:</strong> Yes
-              </div>
-            <% else %>
-              <div class="row" id="profile-room">
-                <strong>Hotel Room:</strong>
-                <%= @membership.room %>
-              </div>
-              <div class="row" id="profile-room_notes">
-                <strong>Room notes:</strong>
-                <%= @membership.room_notes %>
-              </div>
-            <% end %>
-            <div class="row" id="profile-has-guest">
-              <strong>Has Guest:</strong> <%= @membership.has_guest ? 'Yes' : 'No' %>
-            </div>
-            <div class="row" id="profile-special-info">
-              <strong>Special Info:</strong> <%= simple_format(@membership.special_info) %>
-            </div>
-            <div class="row" id="profile-staff-notes">
-              <strong>Staff Notes:</strong>
-              <div class="member_notes">
-                <%= simple_format(@membership.staff_notes) %>
-              </div>
-            </div>
-          </div><!-- /card-body -->
-          <% if policy(@membership).show_details? %>
-          <div class="card-footer updated-by">
-            Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at.in_time_zone(@membership.event.time_zone) %>
+
+    <!-- Event Hotel & Billing Details -->
+    <% if policy(@membership).hotel_and_billing? %>
+    <div class="card p-2 member-show hotel-billing">
+      <div class="card-title">
+        <h3><%= @membership.event.code %> Hotel & Billing Details</h3>
+      </div><!-- /card-title -->
+      <div class="card-body">
+        <div class="row" id="profile-reviewed">
+         <strong>Reviewed:</strong> <%= @membership.reviewed ? 'Yes' : 'No' %>
+        </div>
+        <div class="row" id="profile-billing">
+          <strong>Billing:</strong>
+          <%= @membership.billing %>
+        </div>
+        <div class="row" id="profile-gender">
+          <strong>Gender:</strong> <%= @person.gender %>
+        </div>
+        <% if @membership.own_accommodation %>
+          <div class="row" id="profile-ownaccommodation">
+            <strong>Own Accommodation:</strong> Yes
           </div>
-          <% end %>
-        </div><!-- /card -->
-      </div><!-- /row -->
-      <% end # if policy(@membership).hotel_and_billing? %>
-      <% end # if pending_invitation? / else %>
+        <% else %>
+          <div class="row" id="profile-room">
+            <strong>Hotel Room:</strong>
+            <%= @membership.room %>
+          </div>
+          <div class="row" id="profile-room_notes">
+            <strong>Room notes:</strong>
+            <%= @membership.room_notes %>
+          </div>
+        <% end %>
+        <div class="row" id="profile-has-guest">
+          <strong>Has Guest:</strong> <%= @membership.has_guest ? 'Yes' : 'No' %>
+        </div>
+        <div class="row" id="profile-special-info">
+          <strong>Special Info:</strong> <%= simple_format(@membership.special_info) %>
+        </div>
+        <div class="row" id="profile-staff-notes">
+          <strong>Staff Notes:</strong>
+          <div class="member_notes">
+            <%= simple_format(@membership.staff_notes) %>
+          </div>
+        </div>
+      </div><!-- ./card-body -->
+      <% if policy(@membership).show_details? %>
+      <div class="card-footer updated-by">
+        Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at.in_time_zone(@membership.event.time_zone) %>
+      </div>
+      <% end %>
+    </div><!-- ./card -->
+    <% end %>
 
-    </div><!-- /membership-and-hotel-details -->
-    <% end # policy(@membership).show_details? %>
+  <% end %>
+  </div><!-- ./member-show -->
 
-  </div><!-- master row -->
+
+
   <div class="row" id="member-buttons">
     <%= link_to "Back to #{@event.code}", event_memberships_path(@event),
           class: 'btn btn-secondary' %> &nbsp; &nbsp;
@@ -236,6 +206,5 @@
             method: :delete, class: 'btn btn-danger',
             data: { confirm: "Are you sure you want to remove #{@person.name} from #{@event.code}?" } %>
     <% end %>
-  </div><!-- /row buttons -->
-</div><!-- /container-fluid -->
+  </div><!-- ./row member-buttons -->
 </article>
