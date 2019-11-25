@@ -6,12 +6,11 @@
 <%= f.hidden_field :updated_by, value: @current_user.person.name %>
 
 <!-- person details -->
-<div class="card edit-person">
+<div class="card p-2 edit-person">
 <%= render partial: 'person_details_form', locals: { membership: @membership, f: f } %>
 </div>
 
 <!-- membership details -->
-<div class="card edit-person">
 <%= render partial: 'membership_details_form', locals: { membership: @membership, f: f } %>
 </div>
 
