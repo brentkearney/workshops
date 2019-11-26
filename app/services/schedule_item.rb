@@ -80,8 +80,11 @@ class ScheduleItem
 
     unless lecture_id.nil?
       lecture = Lecture.find(lecture_id)
-      lecture.start_time = new_schedule.start_time
-      lecture.end_time = new_schedule.end_time
+      # don't update the time if a recording has already been made
+      unless lecture.filename.blank?
+        lecture.start_time = new_schedule.start_time
+        lecture.end_time = new_schedule.end_time
+      end
       lecture.title = new_schedule.name
       lecture.person = Person.find(person_id) unless person_id.nil?
       lecture.do_not_publish = do_not_publish
