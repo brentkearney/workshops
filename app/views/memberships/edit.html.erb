@@ -1,9 +1,15 @@
-<article>
-<% content_for :title do %>
-	<h3><%= link_to @event.name, @event %><h3>
-	<h4><%= @event.dates %></h4>
-<% end %>
-<div class="d-flex flex-wrap align-content-stretch align-self-start">
-<%= render 'form'%>
+<%= form_with model: [@event, @membership], class: "horizontal-form" do |f| %>
+<div class="member-edit container">
+  <div class="row">
+  <%= render "shared/errors", object: @membership %>
+  </div>
+  <div class="row" id="form-page">
+    <div class="col-lg-6" id="person-form">
+      <%= render partial: 'person_details_form', locals: { membership: @membership, f: f } %>
+    </div>
+    <div class="col-lg-6" id="membership-deets-form">
+      <%= render partial: 'membership_details_form', locals: { membership: @membership, f: f } %>
+    </div>
+  </div><!-- ./#form-page -->
 </div>
-</article>
+<% end %>
