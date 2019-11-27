@@ -12,6 +12,10 @@
       color: $secondary-text-color;
     }
   }
+
+  ol.ordered-member-list {
+    li:nth-child(odd) { background: lighten( $light-border, 10% ); }
+  }
 }
 
 .member-show {
@@ -272,9 +276,26 @@ table#new-people {
 }
 
 @media print {
-    .no-print { display:none }
-    a[href]:after {
-      content: none !important;
+  .no-print { display:none }
+  a[href]:after {
+    content: none !important;
+  }
+  a:link {
+    text-decoration: none;
+    color: #000;
+  }
+  a:visited {
+    text-decoration: none;
+    color: #000;
+  }
+  ol.ordered-member-list {
+    li {
+      font-size: 1.2em;
     }
+  }
+  .footer {
+    display: none;
+    visibility: hidden;
+  }
 }
 
