@@ -1,6 +1,6 @@
 <% i=1 %>
 <% members.each do |member| %>
-  <tr class="<%= member.role.delete(' ').downcase %>-row">
+  <tr class="<%= member.role.delete(' ').downcase %>-row <%= reply_due?(member) %>">
     <% if defined?(f) %>
     <td class="select form-group"><%= f.check_box member.id, class: "form-control-lg #{member.attendance.parameterize.downcase}" %></td>
     <% end %>

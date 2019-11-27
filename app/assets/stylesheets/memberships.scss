@@ -13,8 +13,43 @@
     }
   }
 
+  .colheading-right {
+    display: block;
+    width: 100%;
+    text-align: right;
+    font-weight: bold;
+  }
+
+  .reply-by-date {
+    float: right;
+    text-align: right;
+    font-size: 0.9em;
+    margin-left: 1.5em;
+  }
+
+  .reply-due {
+    background-color: lighten( $flash-message-color, 30% );
+    border-bottom: 1px solid $flash-message-color;
+  }
+
+  table.table-striped tr.reply-due td {
+      background-color: lighten( $flash-message-color, 30% );
+  }
+
+  .tooltip-inner {
+    background-color: $secondary-background-color;
+    color: white;
+  }
+
   ol.ordered-member-list {
-    li:nth-child(odd) { background: lighten( $light-border, 10% ); }
+    padding-left: 1em;
+    li {
+      clear: both;
+      padding: 5px;
+    }
+    li:nth-child(odd):not(.reply-due) {
+      background: lighten( $light-border, 10% );
+    }
   }
 }
 
@@ -291,6 +326,15 @@ table#new-people {
   ol.ordered-member-list {
     li {
       font-size: 1.2em;
+      padding: 1px;
+    }
+  }
+  .observer {
+    a:link {
+      color: #000;
+    }
+    a:visited {
+      color: #000;
     }
   }
   .footer {

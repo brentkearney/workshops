@@ -16,9 +16,10 @@
         <%= status_with_icon(status) %> Members (<%= members.size %>)
       </h4>
       <div class="card-body">
-        <div class="card-text">
-          <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
-        </div>
+        <% if %w(Invited Undecided).include?(status) && policy(@event).send_invitations? %>
+        <div class="colheading-right">Invited On</div>
+        <% end %>
+      <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
       </div>
     </div>
     <% end %>

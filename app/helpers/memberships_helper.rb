@@ -125,16 +125,23 @@ module MembershipsHelper
     text << '</ul>'
   end
 
+  def last_invited(member, tz)
+    unless member.invite_reminders.blank?
+      return member.invite_reminders.keys.last.in_time_zone(tz)
+    end
+    member.invited_on.blank? ? DateTime.current.in_time_zone(tz) :
+                               member.invited_on.in_time_zone(tz)
+  end
+
   def show_reply_by_date(member)
     tz = member.event.time_zone
     start_date = member.event.start_date.in_time_zone(tz)
-    invited_on = member.invited_on.blank? ? DateTime.current.in_time_zone(tz) :
-                  member.invited_on.in_time_zone(tz)
+    invited_on = last_invited(member, tz)
     DateTime.parse(rsvp_by(start_date, invited_on)).strftime("%Y-%m-%d")
   end
 
-  def show_invited_on_date(member)
-    column = '<td class="rowlink-skip no-print">'
+  def show_invited_on_date(member, no_td = false)
+    column = no_td ? '' : '<td class="rowlink-skip no-print">'
     if show_invited_on?(member)
       if member.invited_on.blank?
         column << '(not set)'
@@ -154,13 +161,21 @@ module MembershipsHelper
         column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"> &nbsp; <i class="fa fa-md fa-repeat"></i></a></span>'.html_safe
       end
     end
-    column << '</td>'
+    column << "#{no_td ? '' : '</td>'}"
     column.html_safe
   end
 
   def show_invited_on?(member)
     policy(@event).send_invitations? &&
       %w(Invited Undecided).include?(member.attendance)
+  end
+
+  def reply_due?(member)
+    return '' if member.invited_on.blank?
+    return '' unless %w(Invited Undecided).include?(member.attendance)
+    event_start = member.event.start_date
+    rsvp_by = RsvpDeadline.new(event_start, member.invited_on).rsvp_by
+    return 'reply-due' if DateTime.current > DateTime.parse(rsvp_by)
   end
 
   def add_email_buttons(status)
