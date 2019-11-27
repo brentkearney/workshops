@@ -27,7 +27,18 @@ class HomeController < ApplicationController
     end
   end
 
+  def toggle_sidebar
+    cookies[:sidebar_toggle] = { value: toggle_param, expires: 1.day.from_now }
+    render json: {sidebar_toggle: toggle_param}
+  end
+
+  private
+
   def staff_at_location?
     current_user && current_user.staff? && !current_user.location.blank?
+  end
+
+  def toggle_param
+    params.require(:toggle)
   end
 end

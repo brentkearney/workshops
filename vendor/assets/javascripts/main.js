@@ -3,11 +3,12 @@ document.addEventListener("turbolinks:load", function() {
 
   var treeviewMenu = $('.app-menu');
 
-  // Toggle Sidebar
+  /* Toggle Sidebar
   $('[data-toggle="sidebar"]').click(function(event) {
     event.preventDefault();
     $('.app').toggleClass('sidenav-toggled');
   });
+  */
 
   // Activate sidebar treeview toggle
   $("[data-toggle='treeview']").click(function(event) {

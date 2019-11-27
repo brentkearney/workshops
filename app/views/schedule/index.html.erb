@@ -49,7 +49,7 @@
 
   <% if policy(Schedule.new(event: @event)).publish_schedule? %>
   <div id="event-code"><%= @event.code %></div>
-  <div class="row bottom-buttons">
+  <div class="row schedule-buttons no-print">
     <div class="col-md-6">
       <div class="card card-body bg-light publish_schedule_controls">
         <label class="switch">
@@ -58,7 +58,7 @@
         </label>
         <div id="publish_schedule_text">Publish Schedule (OFF/ON)</div>
       </div>
-      <!-- /.well -->
+      <!-- /.publish_schedule_controls -->
     </div>
     <!-- /.col-md-6 -->
     <div class="col-md-6">
@@ -68,7 +68,7 @@
         </span>
         <div id="spacer"></div>
       </div>
-      <!-- /.well -->
+      <!-- /.publish_schedule_controls -->
     </div>
     <!-- /.col-md-6 -->
   </div>

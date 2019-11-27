@@ -31,6 +31,7 @@ Rails.application.routes.draw do
 
   # Post-login home page
   get 'home' => 'home#index'
+  post 'home/toggle_sidebar' => 'home#toggle_sidebar'
 
   # Events, schedules, memberships
   get 'events/my_events' => 'events#my_events', as: :my_events

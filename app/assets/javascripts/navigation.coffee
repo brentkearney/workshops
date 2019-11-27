@@ -2,6 +2,23 @@ $(document).on 'turbolinks:load', ->
   $('#sidebar-toggle').click (e) ->
     $('.toggle-arrows').toggleClass('fa-rotate-180')
 
+  toggle_sidebar_cookie =(state) ->
+    $.ajax
+      url: '/home/toggle_sidebar'
+      type: 'POST'
+      dataType: 'html'
+      data: { toggle: state }
+      success: (data, status, response) ->
+        #alert 'Toggle successful! received: ' + data + ' resp:' + response
+      error: ->
+        #alert 'Failed to change toggle status! :('
+
+  $('[data-toggle="sidebar"]').click (e) ->
+    e.preventDefault();
+    $('.app').toggleClass('sidenav-toggled');
+    state = $('.app').hasClass('sidenav-toggled')
+    toggle_sidebar_cookie(state)
+
   remove_active =->
     $('ul.app-menu').find('a').each (index, element) ->
       if element.id

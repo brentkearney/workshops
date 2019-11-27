@@ -37,6 +37,9 @@ module ApplicationHelper
     end
   end
 
+  def sidebar_toggle
+    cookies[:sidebar_toggle] == 'true' ? 'sidenav-toggled' : ''
+  end
 
   def profile_pic(person)
     image_tag "profile.png", alt: "#{person.name}", id: "profile-pic-#{person.id}", class: "img-responsive img-rounded"
