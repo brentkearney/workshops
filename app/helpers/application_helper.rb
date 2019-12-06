@@ -6,8 +6,8 @@
 
 module ApplicationHelper
   def devise_error_messages
-    return '' unless defined?(resource) && resource.errors.present?
-
+    return '' if !defined?(resource) || resource.nil?
+    return '' unless resource.errors.present?
     messages = resource.errors.full_messages.join('，')
     sentence = I18n.t('errors.messages.not_saved',
                       count: resource.errors.count,

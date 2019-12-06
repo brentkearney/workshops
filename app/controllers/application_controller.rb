@@ -29,9 +29,10 @@ class ApplicationController < ActionController::Base
   def set_event
     event_id = validate_event_id
     if event_id.nil?
-      redirect_to events_path, error: 'Invalid event id.'
+      redirect_to events_future_path, error: 'Invalid event id.'
     else
       @event = Event.find(event_id)
+      redirect_to events_future_path, error: 'Invalid event id.' if @event.nil?
     end
   end
 

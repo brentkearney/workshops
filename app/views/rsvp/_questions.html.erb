@@ -7,24 +7,22 @@
   <div class="row">
     <div class='col-md-12'>
         <p class='lead text-center'>You have been invited to the
-        <%= @inv_event.event_type %>, <%= @inv_event.code %>:
+        <%= @inv_event.event_type %>, <%= @inv_event.code %>:<br>
         "<%= link_to @inv_event.name, event_path(@inv_event), target: '_new' %>", on
         <%= @inv_event.dates(:long) %>.<br>
         </p>
         <h3 id="attend">Will you attend?</h3>
     </div>
   </div>
-  <div class="jumbotron">
-    <div class="row">
-      <div class='col-md-4'>
+  <div class="jumbotron answers">
+    <div class="d-flex justify-content-center flex-column flex-md-row">
+      <div class="p-2 flex-fill">
         <a href="<%= rsvp_email_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-success">Yes</a>
       </div>
-      <div class="hidden-lg hidden-md">&nbsp;</div>
-      <div class='col-md-4'>
+      <div class="p-2 flex-fill">
         <a href="<%= rsvp_maybe_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-warning">Maybe</a>
       </div>
-      <div class="hidden-lg hidden-md">&nbsp;</div>
-      <div class='col-md-4'>
+      <div class="p-2 flex-fill">
         <a href="<%= rsvp_no_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-danger">No</a>
       </div>
     </div>

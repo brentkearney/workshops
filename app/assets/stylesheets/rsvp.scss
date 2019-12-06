@@ -1,174 +1,255 @@
 @import "colours";
 
-h1 {
-  color: $grey-heading;
-  font-weight: bold;
-}
-
-h3 {
-  color: $grey-heading;
-  font-weight: bold;
-}
-
-h3#attend {
-  text-align: center;
-  margin: 20px;
-}
-
-h2.rsvp-section {
-  margin: 1em 0;
-  font-size: 1.8em;
-  color: $grey-heading;
-  padding-bottom: 5px;
-  border-bottom: 1px solid lightgrey;
-}
-
-h2.midpage {
-  margin-top: 3em;
-}
-
-label {
-  margin-top: 5px;
-}
-
-#unique-notice {
-  font-size: 0.9em;
-}
-
-#invitation-error {
-  h3 {
-    margin-top: 0;
-    margin-bottom: 1.5em;
-    padding: 0 1em;
-  }
-  ul li {
-    font-size: 1.5em;
-    line-spacing: 1.3em;
-    margin: 0 1em;
-  }
-  h4 {
-    margin-top: 2em;
-    padding: 0 1.5em;
-    a {
-      text-decoration: underline;
-    }
-  }
-}
-
-#maybe-form {
-  p {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    text-align: left;
-  }
-  #message {
-    margin-top: 0;
-  }
-}
-
-#yes-form {
-  label {
-    font-size: 1.2em;
-    display: inline;
-    color: $secondary-text-color;
-    max-width: 80%;
-  }
-  .mandatory:after {
-    content:"*";color:red;
+.rsvp {
+  .invitation-box {
+    box-shadow: 0px 29px 147.5px 102.5px rgba(0, 0, 0, 0.05), 0px 29px 95px;
+    padding: 0;
+    margin: 0;
   }
 
-  .date-titles {
-    text-align: right;
-    color: $secondary-text-color;
+  .rsvp-content {
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
   }
 
-  .date-picker {
-    overflow: hidden;
-    margin-left: 30px;
-    label {
-      font-size: 1.2em;
-      text-decoration: underline;
-    }
-  }
-  p {
-    color: $secondary-text-color;
-  }
-  .checkbox {
-    margin: 10px;
-  }
-  #accommodation_buttons {
+  .rsvp-card-title {
+    @extend .card-title;
     text-align: center;
-    margin-top: 20px;
+    border: 2px solid white;
   }
-  .inline-checkbox {
-    margin-left: 10px;
+
+  h1 {
+    color: $grey-heading;
+    font-weight: bold;
+    small {
+      font-size: 0.7em;
+    }
+  }
+
+  h2 {
+    small {
+      font-size: 0.6em;
+    }
+  }
+
+  h3 {
+    color: $grey-heading;
+    font-weight: bold;
+  }
+
+  h3#attend {
+    text-align: center;
+    margin: 60px auto 30px auto;
+  }
+
+  h2.rsvp-section {
+    margin: 1em 0;
+    font-size: 1.8em;
+    color: $grey-heading;
+    padding-bottom: 5px;
+    border-bottom: 1px solid lightgrey;
+  }
+
+  h2.midpage {
+    margin-top: 3em;
+  }
+
+  label {
+    margin-top: 5px;
+  }
+
+  .answers {
+    .btn {
+      border: 1px solid lightgrey;
+    }
+  }
+
+  #unique-notice {
+    font-size: 0.9em;
+  }
+
+  #invitation-error {
+    h3 {
+      margin-top: 0;
+      margin-bottom: 1.5em;
+      padding: 0 1em;
+    }
+    ul li {
+      font-size: 1.5em;
+      line-spacing: 1.3em;
+      margin: 0 1em;
+    }
+    h4 {
+      margin-top: 2em;
+      padding: 0 1.5em;
+      a {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  #email-form {
+    text-align: center;
     p {
+      margin-top: 1.5em;
+    }
+    #new_email_form {
+      margin-top: -2em;
+    }
+    .verification-msg {
+      @extend .text-right;
+      padding: 0.4em;
+    }
+    .email-code {
+      padding: 0.4em;
+      input {
+        width: 8rem;
+      }
+    }
+  }
+
+  #maybe-form {
+    p {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    #message {
+      margin-top: 0;
+    }
+  }
+
+  #yes-form {
+    label {
       font-size: 1.2em;
       display: inline;
       color: $secondary-text-color;
-      margin-top: 10px;
+      max-width: 80%;
     }
-    br {
-      line-height: 5px;
+    .mandatory:after {
+      content:"*";color:red;
+    }
+    #may-return {
+      @extend .text-center;
+      margin-top: 1em;
+      margin-bottom: 0;
+    }
+
+    .date-titles {
+      text-align: right;
+      color: $secondary-text-color;
+      h4 {
+        font-size: 1.5em;
+      }
+    }
+
+    .date-selectors {
+      overflow: none;
+      label {
+        font-size: 1.2em;
+        text-decoration: underline;
+      }
+    }
+    p {
+      color: $secondary-text-color;
     }
     .checkbox {
-      margin-bottom: 12px;
-      display: inline;
+      margin: 10px;
     }
-  }
-  .guest-options {
-    .field_with_errors {
-      background-color: #e9d5d5;
+    #accommodation_buttons {
+      width: 100%;
+      text-align: left;
+      line-height: 1.5em;
+      margin: -1em 0 0 1em;
+      @media (min-width: 415px) {
+        margin-left: 20%;
+      }
     }
-    display: inline;
-    td {
-      padding-left: 8px;
-    }
-  }
-}
 
-#canadian-grants {
-  h4 {
+    #guest-options {
+      margin-left: 1.5em;
+
+      label {
+        margin-left: 0.5em;
+      }
+
+      .form-check-input {
+        margin-top: 8px;
+      }
+
+      .mandatory:before {
+        content:"*";color:red;
+        margin-right: 0.5em;
+        font-size: 1.8em;
+      }
+
+      .field_with_errors {
+        background-color: #e9d5d5;
+      }
+    }
+
+    #email-options {
+      margin-left: 1.5em;
+      margin-bottom: 2em;
+      line-height: 2em;
+    }
+
+    #canadian-grants {
+      h4 {
+        color: $grey-heading;
+      }
+      p {
+        font-size: 1.2em;
+        line-height: 1.5em;
+        margin-left: 15px;
+      }
+    }
+
+    #privacy-notice {
+      border: 1px solid lightgrey;
+      p {
+        padding: 1em;
+      }
+    }
+
+    .field_with_errors {
+      label {
+        color: $errors-text-color;
+      }
+      input,select {
+        background-color: #e9d5d5;
+      }
+    }
+  }
+
+
+  #feedback-form {
+    h1 {
+      margin-bottom: 20px;
+    }
+  }
+
+  .well {
+    margin: 70px 20px 20px 20px;
+  }
+
+  #click-submit {
+    font-size: 1.3em;
+    color: $errors-text-color;
+    text-align: right;
+  }
+
+  #revisit-note {
+    padding: 1em;
+    margin-top: 10px;
+    color: $grey-heading;
+    a:link {
+      text-decoration: underline;
+    }
+  }
+
+  #errors h4 {
     color: $grey-heading;
   }
-  p {
-    font-size: 1.2em;
-    line-height: 1.5em;
-    margin-left: 15px;
-  }
-}
-
-#feedback-form {
-  h1 {
-    margin-bottom: 20px;
-  }
-}
-
-.btn {
-  margin-top: 10px;
-}
-
-.well {
-  margin: 70px 20px 20px 20px;
-}
-
-#click-submit {
-  padding: 1em;
-  margin-top: 5px;
-  text-align: right;
-  font-size: 1.3em;
-  color: $errors-text-color;
-}
-
-#revisit-note {
-  padding: 2em;
-  margin-top: 10px;
-  color: $grey-heading;
-  a:link {
-    text-decoration: underline;
-  }
-}
-
-#errors h4 {
-  color: $grey-heading;
 }

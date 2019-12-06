@@ -1,4 +1,4 @@
-<% if defined?(resource) && resource.errors.any? %>
+<% if defined?(resource) && !resource.nil? && resource.errors.any? %>
 <div class="devise-errors" role="alert">
   <div id="error_explanation">
     <h2>

@@ -1,7 +1,7 @@
 .devise-flash {
+  text-align: center;
   .alert-alert, .alert-error {
     @extend .alert-danger;
-    text-align: center;
   }
   margin-bottom: 0;
   padding-bottom: 0;
@@ -19,7 +19,6 @@
     }
   }
 }
-
 
 .login-title {
   img {

@@ -33,7 +33,7 @@ class Membership < ApplicationRecord
   validate :check_max_participants
   validate :check_max_observers
   validate :arrival_and_departure_dates
-  validate :guest_disclamer_acknowledgement
+  validate :guest_disclaimer_acknowledgement
 
   ROLES = ['Contact Organizer', 'Organizer', 'Participant', 'Observer',
            'Backup Participant'].freeze
@@ -138,11 +138,10 @@ class Membership < ApplicationRecord
     end
   end
 
-  def guest_disclamer_acknowledgement
-    guest_disclaimer = true if has_guest && update_by_staff
-
+  def guest_disclaimer_acknowledgement
+    return if update_by_staff == true
     if has_guest && guest_disclaimer == false
-      errors.add(:guest_disclaimer, 'must be acknowledged if bringing a guest.')
+      errors.add(:guest_disclaimer, "must be acknowledged if bringing a guest.")
     end
   end
 
