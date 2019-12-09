@@ -1,345 +1,354 @@
-.members-list {
-  margin-bottom: 25px;
-  margin-right: 10px;
-  border: 1px solid $light-border;
-
-  h4.card-title {
-    margin: -8px;
-  }
-
-  .observer {
-    a {
-      color: $secondary-text-color;
-    }
-  }
-
-  .colheading-right {
-    display: block;
-    width: 100%;
-    text-align: right;
-    font-weight: bold;
-  }
-
-  .reply-by-date {
-    float: right;
-    text-align: right;
-    font-size: 0.9em;
-    margin-left: 1.5em;
-  }
-
-  .reply-due {
-    background-color: lighten( $flash-message-color, 30% );
-    border-bottom: 1px solid $flash-message-color;
-  }
-
-  table.table-striped tr.reply-due td {
-      background-color: lighten( $flash-message-color, 30% );
-  }
-
-  .tooltip-inner {
-    background-color: $secondary-background-color;
-    color: white;
-  }
-
-  ol.ordered-member-list {
-    padding-left: 1em;
-    li {
-      clear: both;
-      padding: 5px;
-    }
-    li:nth-child(odd):not(.reply-due) {
-      background: lighten( $light-border, 10% );
-    }
-  }
-}
-
-.member-show {
-  .card {
+.memberships {
+  .members-list {
+    margin-bottom: 25px;
+    margin-right: 10px;
     border: 1px solid $light-border;
-    max-width: 550px;
-    margin: 0px 10px 10px 0;
-  }
 
-  .card-title {
-    margin: -8px;
+    h4.card-title, .card-footer {
+      margin: -8px;
+    }
 
-    h2#profile-name {
-      margin-bottom: 0;
+    .observer {
+      a {
+        color: $secondary-text-color;
+      }
+    }
 
-      small {
-        font-size: 0.8rem;
+    .colheading-right {
+      display: block;
+      width: 100%;
+      text-align: right;
+      font-weight: bold;
+    }
+
+    .reply-by-date {
+      float: right;
+      text-align: right;
+      font-size: 0.9em;
+      margin-left: 1.5em;
+    }
+
+    .reply-due {
+      background-color: lighten( $flash-message-color, 30% );
+      border-bottom: 1px solid $flash-message-color;
+    }
+
+    .email-links {
+      font-size: 0.8em;
+
+      .separator {
+        margin: 0 1em;
+      }
+    }
+
+    table.table-striped tr.reply-due td {
+        background-color: lighten( $flash-message-color, 30% );
+    }
+
+    .tooltip-inner {
+      background-color: $secondary-background-color;
+      color: white;
+    }
+
+    ol.ordered-member-list {
+      padding-left: 1em;
+      li {
+        clear: both;
+        padding: 5px;
+      }
+      li:nth-child(odd):not(.reply-due) {
+        background: lighten( $light-border, 10% );
       }
     }
   }
 
-  #profile-url {
-    margin-bottom: 1.5rem;
-  }
-
-  #profile-address {
-    text-align: left;
-    margin-bottom: 1.5rem;
-  }
-
-  #profile-bio {
-    font-size: 0.8rem;
-  }
-
-  .card-footer {
-    margin: -8px;
-    font-size: 0.7rem;
-    text-align: left;
-  }
-}
-
-.member-edit {
-  .card {
-    border: 1px solid $light-border;
-    //padding: 8px;
-    margin: 0px 10px 10px 0;
-  }
-  .card-title {
-    //margin: -8px;
-  }
-
-  #form-page {
-  }
-
-  #person-form {
-  }
-
-  #membership-details {
-  }
-
-  #hotel-details {
-  }
-
-  .checkbox-field {
-    label {
-      margin-left: 5px;
-      margin-bottom: 4px;
-      font-weight: normal;
-      font-size: 0.9em;
+  .member-show {
+    .card {
+      border: 1px solid $light-border;
+      max-width: 550px;
+      margin: 0px 10px 10px 0;
     }
-    margin-bottom: 1em;
+
+    .card-title {
+      margin: -8px;
+
+      h2#profile-name {
+        margin-bottom: 0;
+
+        small {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    #profile-url {
+      margin-bottom: 1.5rem;
+    }
+
+    #profile-address {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    #profile-bio {
+      font-size: 0.8rem;
+    }
+
+    .card-footer {
+      margin: -8px;
+      font-size: 0.7rem;
+      text-align: left;
+    }
   }
 
-  #member-email {
-    margin-bottom: -0.5em;
+  .member-edit {
+    .card {
+      border: 1px solid $light-border;
+      //padding: 8px;
+      margin: 0px 10px 10px 0;
+    }
+    .card-title {
+      //margin: -8px;
+    }
+
+    #form-page {
+    }
+
+    #person-form {
+    }
+
+    #membership-details {
+    }
+
+    #hotel-details {
+    }
+
+    .checkbox-field {
+      label {
+        margin-left: 5px;
+        margin-bottom: 4px;
+        font-weight: normal;
+        font-size: 0.9em;
+      }
+      margin-bottom: 1em;
+    }
+
+    #member-email {
+      margin-bottom: -0.5em;
+    }
+
+    #has-guest {
+      margin-left: 1.5em;
+    }
   }
 
-  #has-guest {
-    margin-left: 1.5em;
+  #member-buttons {
+    margin-left: 0px;
   }
-}
 
-#member-buttons {
-  margin-left: 0px;
-}
+  #reply-by {
+    margin: 0 10px 20px 0;
 
-#reply-by {
-  margin: 0 10px 20px 0;
+    padding: 0.5em;
+    font-size: 1.2em;
+    background-color: white;
+    border: 1px solid $light-border;
+    display: flex;
+    justify-content: space-between;
 
-  padding: 0.5em;
-  font-size: 1.2em;
-  background-color: white;
-  border: 1px solid $light-border;
-  display: flex;
-  justify-content: space-between;
+    #reply-by-date {
+      float: left;
 
-  #reply-by-date {
-    float: left;
+      #rsvp-by-icon {
+        font-size: 0.8em;
+      }
+    }
 
-    #rsvp-by-icon {
+    #limits-message {
+      float: right;
+      font-size: 1em;
+    }
+  }
+
+
+  a.invitation-dates {
+    text-decoration: underline;
+  }
+
+  .invite-buttons {
+    vertical-align:middle;
+    margin-bottom: 0;
+    margin-top: -15px;
+  }
+
+  .checkboxes {
+    @extend .animated-checkbox;
+    display: inline;
+    visibility: visible;
+    margin-left: 30px;
+  }
+
+  .popover {
+      width: 250px;
+      ul {
+        margin-left: 10px;
+        padding-left: 10px;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+  }
+
+  .limits-message {
+    text-align: center;
+    margin-top: 15px;
+  }
+
+  #add-members {
+    p {
+      margin: 0.8em 0;
+    }
+
+    .inline-checkbox {
+      margin-top: 10px;
+      margin-left: 5px;
+      p {
+        font-size: 1.2em;
+        display: inline;
+        margin-left: 5px;
+      }
+      .checkbox {
+        margin-bottom: 12px;
+        display: inline;
+      }
+    }
+
+    #add-members-submit {
+      margin-top: 10px;
+    }
+
+    .member-roles {
+      margin-top: 10px;
+      font-size: 1.2em;
+      font-weight: normal;
+    }
+
+    #roles-icon {
+      padding-top: 15px;
+      font-size: 1.8em;
+    }
+
+    ul#about-roles-list {
+      font-size: 1.2em;
+      font-weight: normal;
+      li {
+        margin-bottom: 1.2em;
+        line-height: 1.5em;
+      }
+    }
+  }
+
+  #add-members-success {
+    margin: 5px 10px 50px 10px;
+    background: #d7f7d8;
+  }
+
+  ol#add-members-errors {
+    li {
+      font-size: 12pt;
+    }
+  }
+
+  ol#added-members {
+    margin: 1em;
+    font-size: 1.2em;
+    li {
+      margin-bottom: 1em;
+    }
+  }
+
+  #add-members-button-row {
+    padding-bottom: 20px;
+  }
+
+  #new-people-header {
+    h2 {
+      font-size: 1.2em;
+    }
+    small {
+      margin-left: 0.9em;
+      font-size: 0.8em;
+    }
+    p {
       font-size: 0.8em;
     }
   }
 
-  #limits-message {
-    float: right;
-    font-size: 1em;
-  }
-}
-
-
-a.invitation-dates {
-  text-decoration: underline;
-}
-
-.invite-buttons {
-  vertical-align:middle;
-  margin-bottom: 0;
-  margin-top: -15px;
-}
-
-.checkboxes {
-  @extend .animated-checkbox;
-  display: inline;
-  visibility: visible;
-  margin-left: 30px;
-}
-
-.popover {
-    width: 250px;
-    ul {
-      margin-left: 10px;
-      padding-left: 10px;
-    }
-    li {
-      margin-bottom: 10px;
-    }
-}
-
-.limits-message {
-  text-align: center;
-  margin-top: 15px;
-}
-
-#add-members {
-  p {
-    margin: 0.8em 0;
+  td.select, th.select {
+    text-align: center;
   }
 
-  .inline-checkbox {
-    margin-top: 10px;
-    margin-left: 5px;
-    p {
+  table#new-people {
+    td, th {
       font-size: 1.2em;
-      display: inline;
-      margin-left: 5px;
     }
-    .checkbox {
-      margin-bottom: 12px;
-      display: inline;
+    th.counter {
+      width: 40px;
+      padding-left: 20px;
     }
-  }
-
-  #add-members-submit {
-    margin-top: 10px;
-  }
-
-  .member-roles {
-    margin-top: 10px;
-    font-size: 1.2em;
-    font-weight: normal;
-  }
-
-  #roles-icon {
-    padding-top: 15px;
-    font-size: 1.8em;
-  }
-
-  ul#about-roles-list {
-    font-size: 1.2em;
-    font-weight: normal;
-    li {
-      margin-bottom: 1.2em;
-      line-height: 1.5em;
+    td.counter {
+      width: 40px;
+      align: center;
+      valign: middle;
+      vertical-align: center;
+      font-size: 12pt;
+      padding-top: 20px;
+      padding-left: 20px;
+    }
+    td {
+      input[type="text"].has-error {
+        background-color: #ffb3b3;
+      }
+    }
+    td input {
+      margin: 5px;
+      padding: 5px;
+    }
+    td.last-column {
+      padding-right: 20px;
     }
   }
-}
 
-#add-members-success {
-  margin: 5px 10px 50px 10px;
-  background: #d7f7d8;
-}
-
-ol#add-members-errors {
-  li {
-    font-size: 12pt;
-  }
-}
-
-ol#added-members {
-  margin: 1em;
-  font-size: 1.2em;
-  li {
-    margin-bottom: 1em;
-  }
-}
-
-#add-members-button-row {
-  padding-bottom: 20px;
-}
-
-#new-people-header {
-  h2 {
-    font-size: 1.2em;
-  }
-  small {
-    margin-left: 0.9em;
-    font-size: 0.8em;
-  }
-  p {
-    font-size: 0.8em;
-  }
-}
-
-td.select, th.select {
-  text-align: center;
-}
-
-table#new-people {
-  td, th {
-    font-size: 1.2em;
-  }
-  th.counter {
-    width: 40px;
-    padding-left: 20px;
-  }
-  td.counter {
-    width: 40px;
-    align: center;
-    valign: middle;
-    vertical-align: center;
-    font-size: 12pt;
-    padding-top: 20px;
-    padding-left: 20px;
-  }
-  td {
-    input[type="text"].has-error {
-      background-color: #ffb3b3;
+  @media print {
+    .no-print { display:none }
+    a[href]:after {
+      content: none !important;
     }
-  }
-  td input {
-    margin: 5px;
-    padding: 5px;
-  }
-  td.last-column {
-    padding-right: 20px;
-  }
-}
-
-@media print {
-  .no-print { display:none }
-  a[href]:after {
-    content: none !important;
-  }
-  a:link {
-    text-decoration: none;
-    color: #000;
-  }
-  a:visited {
-    text-decoration: none;
-    color: #000;
-  }
-  ol.ordered-member-list {
-    li {
-      font-size: 1.2em;
-      padding: 1px;
-    }
-  }
-  .observer {
     a:link {
+      text-decoration: none;
       color: #000;
     }
     a:visited {
+      text-decoration: none;
       color: #000;
     }
-  }
-  .footer {
-    display: none;
-    visibility: hidden;
+    ol.ordered-member-list {
+      li {
+        font-size: 1.2em;
+        padding: 1px;
+      }
+    }
+    .observer {
+      a:link {
+        color: #000;
+      }
+      a:visited {
+        color: #000;
+      }
+    }
+    .footer {
+      display: none;
+      visibility: hidden;
+    }
   }
 }
-

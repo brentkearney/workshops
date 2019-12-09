@@ -178,7 +178,7 @@ module MembershipsHelper
     return 'reply-due' if DateTime.current > DateTime.parse(rsvp_by)
   end
 
-  def add_email_buttons(status)
+  def old_add_email_buttons(status)
     return unless policy(@event).show_email_buttons?(status)
     content = '<div class="no-print" id="email-members">'
     content << add_email_button(status)
@@ -196,17 +196,19 @@ module MembershipsHelper
     @event.max_participants - @event.num_invited_participants > 0
   end
 
-  def add_email_button(status)
+  def add_email_buttons(status)
     return '' unless policy(@event).show_email_buttons?(status)
-    to_email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
-    to_email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
-    content = mail_to(to_email, "<i class=\"fa fa-envelope fa-fw\"></i> Email #{status} Members".html_safe, subject: "[#{@event.code}] ", title: "Email #{to_email}", class: "btn btn-primary email-members")
+    domain = GetSetting.email(@event.location, 'email_domain')
+    to_email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{domain}"
+    to_email = "#{@event.code}@#{domain}" if status == 'Confirmed'
 
-    if status == 'Confirmed' && !@organizer_emails.blank?
-      content << ' | '
-      content << mail_to(@organizer_emails.join(','), "<i class=\"fa fa-envelope fa-fw\"></i> Email Organizers".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-primary email-members')
+    content = mail_to(to_email, to_email, subject: "[#{@event.code}] ", title: "Email #{status} members at #{to_email}")
+
+    if status == 'Confirmed'
+      content << ' <span class="separator">|</span> '.html_safe
+      content << mail_to("organizers@#{domain}", "organizers@#{domain}", title: "Email event organizers", subject: "[#{@event.code}] ").html_safe
     end
-    content
+    content.html_safe
   end
 
   def show_email(member)

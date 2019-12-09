@@ -18,8 +18,6 @@ class MembershipsController < ApplicationController
     SyncMembers.new(@event) if policy(@event).sync?
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
-    @domain = GetSetting.email(@event.location, 'email_domain')
-    assign_buttons if policy(@event).show_email_buttons?('Confirmed')
     @unread_notice = check_read_notice_cookie
   end
 
@@ -188,11 +186,6 @@ class MembershipsController < ApplicationController
     return false unless policy(@event).send_invitations?
     return false if cookies[:read_notice]
     cookies[:read_notice] = { value: true, expires: 6.months.from_now }
-  end
-
-  def assign_buttons
-    organizers = @memberships.values[0].nil? ? '' : select_organizers
-    @organizer_emails = map_emails(organizers)
   end
 
   def map_emails(members)

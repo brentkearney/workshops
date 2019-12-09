@@ -21,6 +21,7 @@
         <% end %>
       <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
       </div>
+      <div class="card-footer email-links no-print"><%= add_email_buttons(status) %></div>
     </div>
     <% end %>
   <% end %>
