@@ -1,41 +1,36 @@
-<div class="row invitation-box container">
-  <div class="col-md-8 col-md-offset-1">
-    <%= render 'validation_errors' %>
-    <div class="card card-primary" id="maybe-form">
-      <div class="card-title">
-        <span class="card-title"><h4>Invitation RSVP</h4></span>
+<div class="invitation-box container d-flex" id="maybe-form">
+  <div class="card">
+    <div class="rsvp-card-title card-header">
+      <h2>Invitation RSVP for: <%= @invitation.membership.event.code %></h2>
+    </div>
+    <div class="card-body d-flex flex-column justify-content-center">
+      <h1>Thanks! One more step:<br>
+        <small>Please let us know if you can make it, as soon as possible.
+        A spot is being held for you, which prevents others from being invited.
+        </small>
+      </h1>
+
+      <p>The Contact Organizer for the event, <%= @organizer %>, will
+      be notified that you <strong>might</strong> be attending, when you
+      click the button, below. Would you like to add a note
+      to the message?</p>
+
+      <%= form_tag({controller: 'rsvp', action: 'maybe', method: 'post'},
+                   { class: 'form', role: 'form'}) do %>
+
+      <div class="p-2">
+        <div class="form-group">
+          <%= text_area_tag('rsvp[organizer_message]', "", size: "100x4",
+              class: 'form-control',
+              placeholder:
+                    "Optional: enter a message for the organizer here.") %>
+        </div>
       </div>
-      <div class="card-body">
-        <%= form_tag({controller: 'rsvp', action: 'maybe', method: 'post'},
-                     { class: 'form', role: 'form'}) do %>
-        <div class="row">
-          <div class="col-md-12">
-              <p class="lead text-center">Thanks! Please let us know by
-              <%= @invitation.expire_date %>.</p>
-              <h1>One more step:</h1>
-              <p>The Contact Organizer for the event, <%= @organizer %>, will
-              be notified that you <strong>might</strong> be attending, as soon
-              as you click the "Send Reply" button. Would you like to add
-              something to the message?</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class='col-md-12 text-center'>
-            <%= text_area_tag('rsvp[organizer_message]', "", size: "100x4",
-                class: 'form-control',
-                placeholder:
-                      "Optional: enter a message for the organizer here.") %>
-          </div>
-        </div>
-        <div class="row">
-           <div class='col-md-12'>
-            <%= submit_tag('Send Reply', class: 'btn btn-warning pull-right') %>
-            <span id="click-submit" class="pull-right">Click the button
-            to complete your RSVP ➜</span>
-          </div>
-        </div>
-        <% end %>
-      </div><!-- card-body -->
-    </div><!-- card maybe-form -->
-  </div><!-- col-md-8 -->
+      <div class="d-flex flex-row-reverse p-2">
+        <%= submit_tag('Send "Maybe" Reply', class: "btn bt-lg btn-warning") %>
+        <span id="click-submit" class="p-2">Click the button to complete your RSVP ➜</span>
+      </div>
+      <% end %>
+    </div><!-- ./card-body -->
+  </div><!-- ./card -->
 </div><!-- container -->

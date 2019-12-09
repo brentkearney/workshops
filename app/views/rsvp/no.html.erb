@@ -1,41 +1,32 @@
-<div class="row invitation-box container">
-  <div class="col-md-8 col-md-offset-1">
-    <%= render 'validation_errors' %>
-    <div class="card card-primary" id="no-form">
-      <div class="card-title">
-        <span class="card-title"><h4>Invitation RSVP</h4></span>
-      </div>
-      <div class="card-body">
-        <%= form_tag({controller: 'rsvp', action: 'no', method: 'post'},
-                     { class: 'form', role: 'form'}) do %>
-        <div class="row">
-          <div class="col-md-12">
-              <h1>One more step:</h1>
-              <p class="lead">The Contact Organizer for the event,
-              <%= @organizer %>, will notified that you will
-              <strong>not</strong> be attending, as soon as you click the
-              "Decline Attendance" button below. Would you like to add
-              anything to the message?</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class='col-md-12 text-center'>
-              <%= text_area_tag('rsvp[organizer_message]', "", size: "100x4",
-                  class: 'form-control',
-                  placeholder:
-                        "Optional: enter a message for the organizer here.") %>
-           </div>
-         </div>
-        <div class="row">
-           <div class='col-md-12'>
-
-            <%= submit_tag('Decline Attendance', class: 'btn btn-danger pull-right') %>
-            <span id="click-submit" class="pull-right">Click the button
-            to complete your RSVP ➜</span>
-          </div>
-        </div>
-        <% end %>
-      </div>
+<div class="invitation-box container d-flex" id="maybe-form">
+  <div class="card">
+    <div class="rsvp-card-title card-header">
+      <h2>Invitation RSVP for: <%= @invitation.membership.event.code %></h2>
     </div>
-  </div>
-</div>
+    <div class="card-body d-flex flex-column justify-content-center">
+      <h1>Thanks! One more step:</h1>
+
+      <p class="lead">The Contact Organizer for the event,
+      <%= @organizer %>, will notified that you will
+      <strong>not</strong> be attending, when you click the
+      "Decline Attendance" button below. Would you like to add
+      anything to the message?</p>
+
+      <%= form_tag({controller: 'rsvp', action: 'no', method: 'post'},
+                       { class: 'form', role: 'form'}) do %>
+      <div class="p-2">
+        <div class="form-group">
+        <%= text_area_tag('rsvp[organizer_message]', "", size: "100x4",
+            class: 'form-control',
+            placeholder:
+                  "Optional: enter a message for the organizer here.") %>
+        </div>
+      </div>
+      <div class="d-flex flex-row-reverse p-2">
+        <%= submit_tag('Decline Attendance', class: "btn bt-lg btn-danger pull-right") %>
+        <span id="click-submit" class="p-2">Click the button to complete your RSVP ➜</span>
+      </div>
+      <% end %>
+    </div><!-- ./card-body -->
+  </div><!-- ./card -->
+</div><!-- container -->

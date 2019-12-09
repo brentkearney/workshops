@@ -48,9 +48,7 @@ class RsvpController < ApplicationController
   def cancel
     person = @invitation.membership.person
     ConfirmEmailChange.where(replace_person_id: person.id,
-                             replace_email: person.email).each do |change|
-      change.destroy
-    end
+                             replace_email: person.email).destroy_all
     if ConfirmEmailChange.where(replace_person_id: person.id,
                              replace_email: person.email).empty?
       redirect_to rsvp_email_path(otp: otp_params),
@@ -64,7 +62,6 @@ class RsvpController < ApplicationController
   # GET /rsvp/yes/:otp
   # POST /rsvp/yes/:otp
   def yes
-    @rsvp = RsvpForm.new(@invitation.reload)
     @years = (1930..Date.current.year).to_a.reverse
     set_default_dates
 
@@ -81,6 +78,7 @@ class RsvpController < ApplicationController
   # GET /rsvp/maybe/:otp
   # POST /rsvp/maybe/:otp
   def maybe
+    @rsvp = RsvpForm.new(@invitation.reload)
     update_and_redirect(rsvp: :maybe) if request.post?
   end
 
@@ -100,7 +98,7 @@ class RsvpController < ApplicationController
   private
 
   def post_feedback_url(membership)
-    return membership.event.url if Rails.env.production?
+    return membership.event.url #if Rails.env.production?
     event_memberships_path(membership.event_id)
   end
 
