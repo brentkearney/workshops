@@ -62,6 +62,7 @@ class RsvpController < ApplicationController
   # GET /rsvp/yes/:otp
   # POST /rsvp/yes/:otp
   def yes
+    @rsvp = RsvpForm.new(@invitation.reload)
     @years = (1930..Date.current.year).to_a.reverse
     set_default_dates
 
@@ -78,7 +79,6 @@ class RsvpController < ApplicationController
   # GET /rsvp/maybe/:otp
   # POST /rsvp/maybe/:otp
   def maybe
-    @rsvp = RsvpForm.new(@invitation.reload)
     update_and_redirect(rsvp: :maybe) if request.post?
   end
 
