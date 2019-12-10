@@ -31,13 +31,13 @@
                 </table>
               </div>
               <!-- /.table-responsive -->
-              <% if policy(@schedule_policy).create? %>
-                  <div class="add-item-buttons">
-                  <%= link_to "Add an item on " + day.strftime("%A"), event_schedule_day_path(@event, day.strftime("%Y-%m-%d")), class: 'btn btn-sm btn-default add-item' %>
-                  </div>
-              <% end %>
             </div>
             <!-- /.card-body -->
+            <% if true # policy(@schedule_policy).create? %>
+            <div class="card-footer add-item-buttons">
+              <%= link_to "Add an item on " + day.strftime("%A"), event_schedule_day_path(@event, day.strftime("%Y-%m-%d")), class: 'btn btn-sm btn-primary' %>
+            </div>
+            <% end %>
           </div>
           <!-- /.card -->
         </div>

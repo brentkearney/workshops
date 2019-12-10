@@ -1,183 +1,209 @@
-.day-table {
-  margin-bottom: 1.5em;
-}
+.schedule {
+  h2 {
+    margin: -0.5em 0 1em -0.5em;
+  }
 
-.event-not-found {
-  margin: auto;
-  padding: 20px;
-}
+  .day-table {
+    margin-bottom: 1.5em;
+  }
 
-.schedule-times {
-  font-size: 1.1em;
-  background-color: #DADADA;
-  padding: 5px;
-  display: block;
-}
+  .event-not-found {
+    margin: auto;
+    padding: 20px;
+  }
 
-.schedule-times {
-  display: block;
-}
-
-.glyphicon-remove {
-  color: #999999;
-}
-
-.add-item {
-  margin-bottom: 10px;
-}
-
-.card-schedule {
-  padding-bottom: 0;
-}
-
-.not-striped {
-  background-color: #FFFFFF;
-}
-.location {
-  color: #999999;
-}
-
-#send_video_button {
-  padding: 0 35px 25px 0;
-}
-
-#schedule-sidebar {
-  margin-top: -50px;
-}
-
-table#select-times {
-  border: 0;
-  margin-bottom: 1.5em;
-  td {
-    text-align: right;
-    vertical-align: middle;
+  .schedule-times {
+    font-size: 1.1em;
+    background-color: #DADADA;
     padding: 5px;
-  }
-  select {
-    display: inline;
-    width: 55px;
-  }
-  select.days {
-    width: 205px;
-  }
-  .select-times {
-    text-align: left;
-  }
-  .staff-option {
-    padding-left: 65px;
-  }
-}
-
-.update-all {
-  margin-bottom: 1.5em;
-}
-
-.buttons {
-  padding: 15px 0 70px 15px;
-}
-
-.publish_schedule_controls {
-  text-align: center;
-  display: block;
-
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-  }
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  input:checked + .slider {
-    background-color: #2196F3;
-  }
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-  }
-  .slider.round {
-    border-radius: 34px;
-  }
-  .slider.round:before {
-    border-radius: 50%;
+    display: block;
   }
 
-  #publish_schedule_text {
-    font-size: 1.4em;
+  .schedule-times {
+    display: block;
   }
 
-  #spacer {
-    height: 20px;
+  .glyphicon-remove {
+    color: #999999;
   }
 
-  #print-button {
-    font-size: 1.3em;
+  .add-item-buttons {
+    display: block;
+    visibility: visible;
   }
-}
 
-#event-code {
-  display: none;
-}
+  .card-schedule {
+    padding-bottom: 0;
+  }
 
-.print_schedule {
-  padding-bottom: 200px;
-}
+  .not-striped {
+    background-color: #FFFFFF;
+  }
+  .location {
+    color: #999999;
+  }
 
-.item-description {
-  display: none;
-  padding: 1em;
-}
+  #schedule-form-page {
+    border: 1px solid $light-border;
+  }
 
-td a:hover {
-  background-color: transparent;
-  text-decoration: none;
-  color: inherit;
-}
+  #schedule-edit-form {
+    padding: 2em;
+  }
 
-.lecture-item {
-  font-weight: bold;
-}
+  #schedule-sidebar {
+    @media (max-width: 801px) {
+      margin-top: 25px;
+    }
+  }
 
-p#updated_by {
-  text-align: right;
-  font-size: 0.9em;
-  color: #999999;
-}
+  #other-days {
+    margin-top: 25px;
+  }
 
-p#mathjax {
-	font-size: 1em;
-	margin-top: 0.8em;
-}
+  #do-not-publish {
+    font-weight: normal;
+    margin-left: 0.5em;
+  }
 
-p#staff_item_locked {
-  margin-top: 1em;
+  table#select-times {
+    border: 0;
+    margin-bottom: 1.5em;
+    td {
+      text-align: right;
+      vertical-align: middle;
+      padding: 5px;
+    }
+    select {
+      display: inline;
+      width: 55px;
+    }
+    select.days {
+      width: 205px;
+    }
+    .select-times {
+      text-align: left;
+    }
+    .staff-option {
+      padding-left: 65px;
+    }
+  }
+
+  .update-all {
+    margin-bottom: 1.5em;
+  }
+
+  .buttons {
+    @media (max-width: 580px) {
+      .btn {
+        margin-top: 10px;
+      }
+    }
+  }
+
+  .publish_schedule_controls {
+    text-align: center;
+    display: block;
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+    .slider.round {
+      border-radius: 34px;
+    }
+    .slider.round:before {
+      border-radius: 50%;
+    }
+
+    #publish_schedule_text {
+      font-size: 1.4em;
+    }
+
+    #spacer {
+      height: 20px;
+    }
+
+    #print-button {
+      font-size: 1.3em;
+    }
+  }
+
+  #event-code {
+    display: none;
+  }
+
+  .print_schedule {
+    padding-bottom: 200px;
+  }
+
+  .item-description {
+    display: none;
+    padding: 1em;
+  }
+
+  td a:hover {
+    background-color: transparent;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .lecture-item {
+    font-weight: bold;
+  }
+
+  p#updated_by {
+    text-align: right;
+    font-size: 0.9em;
+    color: #999999;
+  }
+
+  p#mathjax {
+  	font-size: 1em;
+  	margin-top: 0.8em;
+  }
+
+  p#staff_item_locked {
+    margin-top: 1em;
+  }
 }
