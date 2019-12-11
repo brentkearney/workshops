@@ -94,56 +94,6 @@
     }
   }
 
-  #email-form {
-    text-align: center;
-    overflow: auto;
-
-    p { margin-top: 1.5em; }
-
-    #new_email_form {
-      margin-top: -2em;
-    }
-
-    .verification-msg {
-      @media (min-width: 768px) {
-        text-align: right;
-      }
-      padding: 0.4em;
-    }
-
-    .email-code {
-      padding: 0.4em;
-
-      width: 100vw;
-      position: relative;
-
-      display: flex;
-      flex-flow: column wrap;
-      align-items: center;
-
-      input {
-        @media (max-width: 768px) {
-          width: 50%;
-        }
-      }
-    }
-
-    #second-row {
-      margin-top: 1.5em;
-    }
-
-    #button-row {
-      margin-top: 1.5em;
-
-      @media (max-width: 413px) {
-        .btn {
-          float: none;
-          margin-bottom: 1em;
-          }
-      }
-    }
-  }
-
   #maybe-form {
     p {
       margin-top: 20px;
@@ -286,5 +236,56 @@
 
   #errors h4 {
     color: $grey-heading;
+  }
+}
+
+/* also used by memberships#email_change */
+#email-form {
+  text-align: center;
+  overflow: auto;
+
+  p { margin-top: 1.5em; }
+
+  #new_email_form {
+    margin-top: -2em;
+  }
+
+  .verification-msg {
+    @media (min-width: 768px) {
+      text-align: right;
+    }
+    padding: 0.4em;
+  }
+
+  .email-code {
+    padding: 0.4em;
+
+    width: 100vw;
+    position: relative;
+
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+
+    input {
+      @media (max-width: 768px) {
+        width: 50%;
+      }
+    }
+  }
+
+  #second-row {
+    margin-top: 1.5em;
+  }
+
+  #button-row {
+    margin-top: 1.5em;
+
+    @media (max-width: 413px) {
+      .btn {
+        float: none;
+        margin-bottom: 1em;
+        }
+    }
   }
 }

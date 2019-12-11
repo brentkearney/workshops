@@ -284,6 +284,8 @@
     }
   }
 
+
+
   td.select, th.select {
     text-align: center;
   }
@@ -352,3 +354,10 @@
     }
   }
 }
+
+#button-row {
+  @media (min-width: 415px) {
+    margin-left: -50px;
+  }
+}
+

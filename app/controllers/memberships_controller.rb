@@ -136,7 +136,7 @@ class MembershipsController < ApplicationController
 
   def cancel_email_change
     ConfirmEmailChange.where(replace_with_id: @membership.person_id)
-                      .first.delete
+                      .destroy_all
     redirect_to event_membership_path(@membership.event, @membership),
         success: 'Email change cancelled.'
   end

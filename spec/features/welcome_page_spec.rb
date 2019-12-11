@@ -6,7 +6,7 @@
 
 require 'rails_helper'
 
-describe 'Post-login Welcome Page', type: :feature do
+describe 'Post-login Home Page', type: :feature do
 
   before do
     @user = create(:user, password: 'secret123456',

@@ -21,7 +21,9 @@
         <% end %>
       <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
       </div>
+      <% if policy(@event).show_email_buttons?(status) %>
       <div class="card-footer email-links no-print"><%= add_email_buttons(status) %></div>
+      <% end %>
     </div>
     <% end %>
   <% end %>

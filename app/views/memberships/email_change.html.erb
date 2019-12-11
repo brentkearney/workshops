@@ -1,50 +1,53 @@
-<div class="row invitation-box container">
-  <div class="col-md-8 col-md-offset-1">
-    <%= render 'validation_errors' %>
-    <div class="card card-primary" id="email-form">
-      <div class="card-title">
-        <span class="card-title"><h4>Confirm Your E-mail Address</h4></span>
+<div class="invitation-box container d-flex" id="email-form">
+  <%= render 'validation_errors' %>
+  <div class="card" id="email-form">
+    <div class="card-title card-header">
+      <h2>Confirm Your E-mail Address</h2>
+    </div>
+    <div class="card-body d-flex flex-column justify-content-center">
+      <div class="p-2">
+        <h2>Oops! We have an e-mail conflict.</h2>
       </div>
-      <div class="card-body">
-      <h2>Oops! We have an e-mail conflict.</h2>
+      <div class="p-2">
+        <p>There is another record in our database using <em><%= @confirmation.replace_with_email %></em>.
+          But that's OK! We will consolidate the data into a single record. First we must verify that
+          you control both accounts.</p>
+        <p><strong>Please check both of your email accounts, and enter the codes we sent:</strong></p>
+      </div>
       <%= form_for @email_form, as: :email_form,
-         url: event_membership_email_change_path(@membership.event, @membership), method: :post,
-        html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |email_form| %>
+       url: event_membership_email_change_path(@membership.event, @membership), method: :post,
+      html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |email_form| %>
       <fieldset>
-      <div class="row">
-        <div class='col-md-12'>
-          <p>There is another record in our database using <em><%= @confirmation.replace_with_email %></em>.
-            But that's OK! We will consolidate the data into a single record. First we must verify that
-            you control both accounts.</p>
-          <p><strong>Please check both of your email accounts, and enter the codes we sent:</strong></p>
+      <div class="container p-2 justify-content-center" id="verification-codes">
+        <div class="row align-items-center">
+          <div class='col-md verification-msg'>
+            Verification code for <strong><%= @confirmation.replace_email %></strong>:
+          </div>
+          <div class='col-md email-code'>
+            <%= email_form.text_field :replace_email_code, class: "form-control" %>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class='col-md-6 text-right'>
-          <p>Verification code for <strong><%= @confirmation.replace_email %></strong>:</p>
+        <div class="row align-items-center" id="second-row">
+          <div class='col-md verification-msg'>
+            Verification code for <strong><%= @confirmation.replace_with_email %></strong>:
+          </div>
+          <div class='col-md email-code'>
+            <%= email_form.text_field :replace_with_email_code, class: "form-control" %>
+          </div>
         </div>
-        <div class='col-md-6'>
-          <%= email_form.text_field :replace_email_code, class: "form-control" %>
+        </fieldset>
+
+        <div class="row justify-content-center" id="button-row">
+          <div class="col-sm-6">
+            <a href="<%= event_membership_email_cancel_path(@membership.event, @membership, @email_form.confirmation) %>" role="button" class="btn btn-lg btn-danger pull-right">Cancel Email Change</a>
+          </div>
+          <div class="col-sm-6" id="submit-btn">
+            <%= email_form.submit 'Submit Verification Codes', class: 'btn btn-lg btn-success' %>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class='col-md-6 text-right'>
-          <p>Verification code for <strong><%= @confirmation.replace_with_email %></strong>:</p>
-        </div>
-        <div class='col-md-6'>
-          <%= email_form.text_field :replace_with_email_code, class: "form-control" %>
-        </div>
-      </div>
-      <div class="row">
-        <div class='col-md-6'>
-          <a href="<%= event_membership_email_cancel_path(@membership.event, @membership, @email_form.confirmation) %>" role="button" class="btn btn-lg btn-block btn-danger">Cancel Email Change</a>
-        </div>
-        <div class='col-md-6'>
-          <%= email_form.submit 'Submit Verification Codes', class: 'btn btn-lg btn-success text-center pull-right' %>
-        </div>
-      </div>
-      <% end %>
-      </div><!-- card-body -->
-    </div><!-- card email-form -->
-  </div><!-- col-md-8 -->
+      </div><!-- ./container -->
+    <% end %>
+    <div class="row"><br></div>
+    </div><!-- card-body -->
+  </div><!-- card email-form -->
 </div><!-- container -->
