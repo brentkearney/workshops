@@ -21,42 +21,42 @@ describe 'SignIn', type: :feature do
   end
 
   def fill_in_form
-    fill_in 'user_email', with: @user.email
-    fill_in 'user_password', with: @password
-    click_button 'Sign in'
+    fill_in 'login-email', with: @user.email
+    fill_in 'login-password', with: @password
+    click_button 'Sign-in'
   end
 
   it 'Allows a user to login with email and password' do
     fill_in_form
-    # puts page.body
+
     expect(page.body).to have_text('Signed in successfully')
   end
 
   it 'The character case of the email does not matter' do
-    fill_in 'Email', with: @user.email.upcase
-    fill_in 'Password', with: @password
+    fill_in 'login-email', with: @user.email.upcase
+    fill_in 'login-password', with: @password
 
-    click_button 'Sign in'
+    click_button 'Sign-in'
 
     expect(page.body).to have_text('Signed in successfully')
   end
 
   it 'Denies a user with incorrect credentials' do
-    fill_in 'Email', with: 'nonsense@foo.bar'
-    fill_in 'Password', with: @password
-    click_button 'Sign in'
+    fill_in 'login-email', with: 'nonsense@foo.bar'
+    fill_in 'login-password', with: @password
+    click_button 'Sign-in'
     expect(page.body).not_to have_text('Signed in successfully')
     expect(page.body).to have_text('Invalid Email or password')
 
-    fill_in 'Email', with: @user.email
-    fill_in 'Password', with: 'Rubbish'
-    click_button 'Sign in'
+    fill_in 'login-email', with: @user.email
+    fill_in 'login-password', with: 'Rubbish'
+    click_button 'Sign-in'
     expect(page.body).not_to have_text('Signed in successfully')
     expect(page.body).to have_text('Invalid Email or password')
 
-    fill_in 'Email', with: 'nonsense@foo.bar'
-    fill_in 'Password', with: 'Rubbish'
-    click_button 'Sign in'
+    fill_in 'login-email', with: 'nonsense@foo.bar'
+    fill_in 'login-password', with: 'Rubbish'
+    click_button 'Sign-in'
     expect(page.body).not_to have_text('Signed in successfully')
     expect(page.body).to have_text('Invalid Email or password')
   end
@@ -93,17 +93,17 @@ describe 'SignIn', type: :feature do
     fill_in_form
 
     expect(page.body).to have_text(membership.event.name)
-    expect(current_path).to eq(welcome_path)
+    expect(current_path).to eq(home_path)
   end
 
 
-  it 'Forwards users with current events to welcome#index page signin' do
+  it 'Forwards users with current events to home#index page signin' do
     future_event = create(:event, current: true)
     create(:membership, event: future_event, person: @person)
     fill_in_form
 
     expect(page.body).to have_text('Signed in successfully')
-    expect(current_path).to eq(welcome_path)
+    expect(current_path).to eq(home_path)
   end
 
   it 'Forwards users with no current events to Future Events' do

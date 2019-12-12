@@ -20,20 +20,20 @@ describe 'Visitor Signup', type: :feature do
     fill_in 'user_email', with: @person.email
     fill_in 'user_password', with: @password
     fill_in 'user_password_confirmation', with: @password
-    click_button 'Sign up'
+    click_button 'Sign-up'
   end
 
   it 'Is denied if visitor email is not associated with a Person record' do
     fill_in 'user_email', with: 'incorrect@email.com'
     fill_in 'user_password', with: @password
     fill_in 'user_password_confirmation', with: @password
-    click_button 'Sign up'
+    click_button 'Sign-up'
     expect(page).to have_text('We have no record of that email address.')
   end
 
   it 'Is denied if visitor enters invalid email address' do
     fill_in 'user_email', with: 'foo'
-    click_button 'Sign up'
+    click_button 'Sign-up'
     expect(page).to have_text('You must enter a valid e-mail address.')
   end
 
@@ -49,7 +49,7 @@ describe 'Visitor Signup', type: :feature do
         fill_in 'user_password', with: @password
         fill_in 'user_password_confirmation', with: @password
 
-        click_button 'Sign up'
+        click_button 'Sign-up'
 
         expect(page).to have_text('Account successfully created')
       end

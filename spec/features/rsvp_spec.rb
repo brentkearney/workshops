@@ -225,7 +225,7 @@ describe 'RSVP', type: :feature do
         visit rsvp_no_path(@invitation.code)
         click_button 'Decline Attendance'
         expect(current_path).to eq(rsvp_feedback_path(@membership.id))
-        expect(page.body).to have_css('div.alert.alert-success.flash', text:
+        expect(page.body).to have_css('div.alert', text:
           'Your attendance status was successfully updated. Thanks for your
           reply!'.squish)
       end
@@ -255,10 +255,6 @@ describe 'RSVP', type: :feature do
       expect(page).to have_text('Thanks')
     end
 
-    it 'displays invitation expiry date' do
-      expect(page).to have_text(@invitation.expire_date)
-    end
-
     it 'presents a "message to the organizer" form' do
       organizer_name = @event.organizer.name
       expect(page).to have_text(organizer_name)
@@ -277,7 +273,7 @@ describe 'RSVP', type: :feature do
         allow(EmailOrganizerNoticeJob).to receive(:perform_later).once
         visit rsvp_maybe_path(@invitation.code)
         fill_in "rsvp_organizer_message", with: 'I might be there'
-        click_button "Send Reply"
+        click_button "commit"
 
         @args['organizer_message'] = 'I might be there'
         expect(EmailOrganizerNoticeJob).to have_received(:perform_later).once
@@ -286,29 +282,29 @@ describe 'RSVP', type: :feature do
 
       it 'changes membership attendance to Undecided' do
         visit rsvp_maybe_path(@invitation.code)
-        click_button "Send Reply"
+        click_button "commit"
         expect(Membership.find(@membership.id).attendance).to eq('Undecided')
       end
 
       it 'forwards to feedback form, with flash message' do
         visit rsvp_maybe_path(@invitation.code)
-        click_button "Send Reply"
+        click_button "commit"
 
         expect(current_path).to eq(rsvp_feedback_path(@membership.id))
-        expect(page.body).to have_css('div.alert.alert-success.flash', text:
+        expect(page.body).to have_css('div.alert', text:
           'Your attendance status was successfully updated. Thanks for your
           reply!'.squish)
       end
 
       it 'updates legacy database' do
         visit rsvp_maybe_path(@invitation.code)
-        click_button "Send Reply"
+        click_button "commit"
 
         allow(SyncMembershipJob).to receive(:perform_later)
         reset_database
 
         visit rsvp_maybe_path(@invitation.code)
-        click_button 'Send Reply'
+        click_button 'commit'
 
         expect(SyncMembershipJob).to have_received(:perform_later)
           .with(@membership.id)
@@ -440,10 +436,10 @@ describe 'RSVP', type: :feature do
       end
 
       it 'arrival & departure default to event start & end' do
-        expect(page).to have_select('rsvp_membership_arrival_date',
-          selected: @event.start_date.strftime("%Y-%m-%d"))
-        expect(page).to have_select('rsvp_membership_departure_date',
-          selected: @event.end_date.strftime("%Y-%m-%d"))
+        expect(page).to have_select('rsvp[membership][arrival_date]',
+          selected: @event.start_date.strftime("%A, %b %-d, %Y"))
+        expect(page).to have_select('rsvp[membership][departure_date]',
+          selected: @event.end_date.strftime("%A, %b %-d, %Y"))
       end
 
       it 'has guests form' do
@@ -667,7 +663,7 @@ describe 'RSVP', type: :feature do
 
           it 'forwards to feedback form, with flash message' do
             expect(current_path).to eq(rsvp_feedback_path(@membership.id))
-            expect(page.body).to have_css('div.alert.alert-success.flash', text:
+            expect(page.body).to have_css('div.alert', text:
               'Your attendance status was successfully updated. Thanks for your
               reply!'.squish)
           end

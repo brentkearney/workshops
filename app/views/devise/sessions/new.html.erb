@@ -11,7 +11,8 @@
     <div class="form-group">
       <%= f.label :password, 'Password' %>
       <%= f.password_field :password, autocomplete: "current-password",
-                           placeholder: 'Password', class: 'form-control' %>
+                           placeholder: 'Password', id: 'login-password',
+                           class: 'form-control' %>
     </div>
     <div class="form-group">
       <div class="utility">
@@ -31,9 +32,9 @@
       </div>
     </div>
     <div class="form-group btn-container">
-      <%= f.button :submit, class: 'btn btn-primary btn-block',
+      <%= f.button :submit, name: 'Sign-in', class: 'btn btn-primary btn-block',
                                id: "signin-button" do %>
-        <i class="fa fa-sign-in fa-lg fa-fw"></i> SIGN IN
+        <i class="fa fa-sign-in fa-lg fa-fw"></i> Sign-in
       <% end %>
     </div>
   <% end %>

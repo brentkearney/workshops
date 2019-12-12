@@ -19,7 +19,7 @@ describe 'Post-login Home Page', type: :feature do
 
   def sign_in_as(user)
     login_as user, scope: :user
-    visit welcome_path
+    visit home_path
   end
 
   def expect_current_and_upcoming
@@ -30,7 +30,7 @@ describe 'Post-login Home Page', type: :feature do
   end
 
   it 'Disallows access to non-logged in users' do
-    visit welcome_path
+    visit home_path
 
     expect(current_path).to eq(new_user_session_path)
   end
@@ -51,7 +51,7 @@ describe 'Post-login Home Page', type: :feature do
     it "shows the user's current and upcoming workshops" do
       sign_in_as @user
 
-      expect(current_path).to eq(welcome_path)
+      expect(current_path).to eq(home_path)
       expect_current_and_upcoming
     end
 
@@ -63,7 +63,7 @@ describe 'Post-login Home Page', type: :feature do
 
       sign_in_as @user
 
-      expect(current_path).to eq(welcome_path)
+      expect(current_path).to eq(home_path)
       expect(page.body).not_to include("#{event.name}")
 
       event.destroy!
@@ -76,7 +76,7 @@ describe 'Post-login Home Page', type: :feature do
 
       sign_in_as @user
 
-      expect(current_path).to eq(welcome_path)
+      expect(current_path).to eq(home_path)
       expect(page.body).not_to include("#{membership.event.name}")
 
       membership.destroy!
@@ -89,7 +89,7 @@ describe 'Post-login Home Page', type: :feature do
 
       sign_in_as @user
 
-      expect(current_path).to eq(welcome_path)
+      expect(current_path).to eq(home_path)
       expect(page.body).not_to include("#{membership.event.name}")
 
       membership.destroy!
@@ -102,7 +102,7 @@ describe 'Post-login Home Page', type: :feature do
 
       sign_in_as @user
 
-      expect(current_path).to eq(welcome_path)
+      expect(current_path).to eq(home_path)
       expect(page.body).not_to include("#{membership.event.name}")
 
       membership.destroy!
@@ -138,7 +138,7 @@ describe 'Post-login Home Page', type: :feature do
       sign_in_as @user
 
       expect_current_and_upcoming
-      expect(current_path).to eq(welcome_path)
+      expect(current_path).to eq(home_path)
     end
 
     it 'shows the workshops for which the user is Not Yet Invited' do
@@ -148,7 +148,7 @@ describe 'Post-login Home Page', type: :feature do
 
       sign_in_as @user
 
-      expect(current_path).to eq(welcome_path)
+      expect(current_path).to eq(home_path)
       expect(page.body).to have_text("#{membership.event.name}")
 
       membership.destroy!
@@ -161,7 +161,7 @@ describe 'Post-login Home Page', type: :feature do
 
       sign_in_as @user
 
-      expect(current_path).to eq(welcome_path)
+      expect(current_path).to eq(home_path)
       expect(page.body).to include("#{membership.event.name}")
 
       membership.destroy!
