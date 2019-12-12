@@ -62,9 +62,9 @@
           <% unless @person.biography.blank? %>
           <div class="row">
             <strong>Bio:</strong>
-            <span id="profile-bio">
+            <div id="profile-bio">
               <%= simple_format(@person.biography) %>
-            </span>
+            </div>
           </div>
           <% end %>
         </div><!-- /card-body -->

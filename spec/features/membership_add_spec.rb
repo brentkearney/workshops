@@ -125,7 +125,7 @@ describe 'Membership#add', type: :feature do
     end
 
     it 'has a title, a text area, a role select, and a submit button' do
-      expect(page).to have_css('h1', text: "Add Members to #{@event.code}")
+      expect(page).to have_css('div.card-title', text: "Add Members to #{@event.code}")
       expect(page).to have_field('add_members_form[add_members]')
       expect(page).to have_field('add_members_form[role]')
       expect(page).to have_button('Add These Members')

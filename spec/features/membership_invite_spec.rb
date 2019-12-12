@@ -127,11 +127,11 @@ describe 'Invite Members', type: :feature do
 
     it 'groups members according to non-confirmed/declined attendance' do
       ['Not Yet Invited', 'Undecided', 'Invited'].each do |status|
-        expect(page).to have_css(".panel-heading, .table-heading",
+        expect(page).to have_css(".card-title, .table-heading",
                                   text: "#{status} Members")
       end
       ['Confirmed', 'Declined'].each do |status|
-        expect(page).not_to have_css(".panel-heading, .table-heading",
+        expect(page).not_to have_css(".card-title, .table-heading",
                                   text: "#{status} Members")
       end
     end
@@ -177,7 +177,7 @@ describe 'Invite Members', type: :feature do
     end
 
     it 'warns if no members selected' do
-      click_button('Invite Selected Members')
+      click_button("not-yet-invited-submit")
       expect(current_path).to eq(invite_event_memberships_path(@event))
       expect(page).to have_text("No members selected to invite")
     end
@@ -195,7 +195,7 @@ describe 'Invite Members', type: :feature do
         i+=1
       end
 
-      click_button('Invite Selected Members')
+      click_button('not-yet-invited-submit')
 
       selected.each do |id|
         expect(Membership.find(id).attendance).to eq('Invited')
@@ -239,7 +239,7 @@ describe 'Invite Members', type: :feature do
       html_id = 'invite_members_form_' + participant.id.to_s
       find(:css, "input##{html_id}").set(true)
 
-      click_button('Invite Selected Members')
+      click_button('not-yet-invited-submit')
 
       expect(current_path).to eq(invite_event_memberships_path(@event))
       updated_member = Membership.find(participant.id)
@@ -259,7 +259,7 @@ describe 'Invite Members', type: :feature do
       html_id = 'invite_members_form_' + observer.id.to_s
       find(:css, "input##{html_id}").set(true)
 
-      click_button('Invite Selected Members')
+      click_button('not-yet-invited-submit')
 
       expect(current_path).to eq(invite_event_memberships_path(@event))
       expect(Membership.find(observer.id).attendance).to eq('Not Yet Invited')
@@ -279,7 +279,7 @@ describe 'Invite Members', type: :feature do
       visit invite_event_memberships_path(@event)
       html_id = 'invite_members_form_' + observer.id.to_s
       find(:css, "input##{html_id}").set(true)
-      click_button('Invite Selected Members')
+      click_button('not-yet-invited-submit')
 
       expect(current_path).to eq(event_memberships_path(@event))
       expect(Membership.find(observer.id).attendance).to eq('Invited')

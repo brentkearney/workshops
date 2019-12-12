@@ -39,10 +39,10 @@ describe 'Membership#show', type: :feature do
     expect(page.body).to have_css('div#profile-affil',
                                   text: member.person.affil_with_title)
     expect(page.body).to have_css('div#profile-url', text: member.person.uri)
-    expect(page.body).to have_css('div#profile-bio',
-                                  text: member.person.biography)
     expect(page.body).to have_css('div#profile-research',
                                   text: member.person.research_areas)
+    expect(page.body).to have_css('div#profile-bio',
+                                  text: member.person.biography)
   end
 
   def hides_email(member)
@@ -174,9 +174,17 @@ describe 'Membership#show', type: :feature do
     visit event_membership_path(@event, member)
     expect(page.body).not_to have_css('div#profile-name',
                                       text: member.person.name)
-    expect(page.body).to have_css('div.alert.flash')
+    expect(page.body).to have_css('div.alert', text:
+      'You need to sign in or sign up before continuing.')
   end
 
+  def access_denied(member)
+    visit event_membership_path(@event, member)
+    expect(page.body).not_to have_css('div#profile-name',
+                                      text: member.person.name)
+    expect(page.body).to have_css('div.alert', text:
+      'Access denied.')
+  end
 
   context 'As a not-logged in user' do
     before do
@@ -281,11 +289,11 @@ describe 'Membership#show', type: :feature do
 
       nonconfirmed.attendance = 'Declined'
       nonconfirmed.save
-      denies_access(nonconfirmed)
+      access_denied(nonconfirmed)
 
       nonconfirmed.attendance = 'Not Yet Invited'
       nonconfirmed.save
-      denies_access(nonconfirmed)
+      access_denied(nonconfirmed)
     end
 
     it 'shows other memberships' do
@@ -602,11 +610,11 @@ describe 'Membership#show', type: :feature do
 
       nonconfirmed.attendance = 'Declined'
       nonconfirmed.save
-      denies_access(nonconfirmed)
+      access_denied(nonconfirmed)
 
       nonconfirmed.attendance = 'Not Yet Invited'
       nonconfirmed.save
-      denies_access(nonconfirmed)
+      access_denied(nonconfirmed)
     end
 
     it 'shows other memberships' do
