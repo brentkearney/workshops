@@ -71,7 +71,7 @@ describe 'Event List', type: :feature do
     it 'Event list navigation disappears when an event is opened' do
       visit root_path
       click_link 'All Events'
-      click_link @current.name
+      first("\##{@current.code}").click
 
       expect(page.body).not_to have_link 'All Events'
       expect(page.body).not_to have_link 'My Events'

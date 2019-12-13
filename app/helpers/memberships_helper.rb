@@ -206,7 +206,7 @@ module MembershipsHelper
 
     if status == 'Confirmed'
       content << ' <span class="separator">|</span> '.html_safe
-      content << mail_to("organizers@#{domain}", "organizers@#{domain}", title: "Email event organizers", subject: "[#{@event.code}] ").html_safe
+      content << mail_to("#{@event.code}-organizers@#{domain}", "#{@event.code}-organizers@#{domain}", title: "Email event organizers", subject: "[#{@event.code}] ").html_safe
     end
     content.html_safe
   end

@@ -98,7 +98,7 @@ class RsvpController < ApplicationController
   private
 
   def post_feedback_url(membership)
-    return membership.event.url #if Rails.env.production?
+    return membership.event.url if Rails.env.production?
     event_memberships_path(membership.event_id)
   end
 

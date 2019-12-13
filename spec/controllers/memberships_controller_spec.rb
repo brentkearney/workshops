@@ -102,7 +102,7 @@ RSpec.describe MembershipsController, type: :controller do
       def redirects_with_error
         get :index, params: { event_id: 'foo' }
 
-        expect(response).to redirect_to(events_path)
+        expect(response).to redirect_to(events_future_path)
         expect(flash[:error]).to be_present
       end
 
@@ -136,7 +136,7 @@ RSpec.describe MembershipsController, type: :controller do
 
           post :create, params: { event_id: 'foo', membership: membership.attributes }
 
-          expect(response).to redirect_to(events_path)
+          expect(response).to redirect_to(events_future_path)
           expect(flash[:error]).to be_present
         end
       end
@@ -145,7 +145,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'responds with redirect and error message' do
           patch :update, params: { event_id: 'foo', id: 1 }
 
-          expect(response).to redirect_to(events_path)
+          expect(response).to redirect_to(events_future_path)
           expect(flash[:error]).to be_present
         end
       end
@@ -154,7 +154,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'responds with redirect and error message' do
           delete :destroy, params: { event_id: 'foo', id: 1 }
 
-          expect(response).to redirect_to(events_path)
+          expect(response).to redirect_to(events_future_path)
           expect(flash[:error]).to be_present
         end
       end
@@ -162,7 +162,7 @@ RSpec.describe MembershipsController, type: :controller do
       describe '#invite' do
         it 'GET responds with redirect and error message' do
           get :invite, params: { event_id: 'foo' }
-          expect(response).to redirect_to(events_path)
+          expect(response).to redirect_to(events_future_path)
           expect(flash[:error]).to be_present
         end
 
@@ -192,14 +192,6 @@ RSpec.describe MembershipsController, type: :controller do
           get :index, params: { event_id: @event.id }
 
           expect(assigns(:memberships)).to eq('Confirmed' => [@membership])
-        end
-
-        it 'assigns email @domain' do
-          domain = GetSetting.email(@event.location, 'email_domain')
-
-          get :index, params: { event_id: @event.id }
-
-          expect(assigns(:domain)).to eq(domain)
         end
 
         context 'as role: member' do
@@ -442,7 +434,8 @@ RSpec.describe MembershipsController, type: :controller do
 
             expect(response).to redirect_to(event_membership_path(@event,
                                                                   @membership))
-            expect(flash[:notice]).to eq('Membership successfully updated.')
+
+            expect(flash[:success]).to eq('Membership successfully updated.')
           end
 
           it 'updates User email, signs out with flash message' do
@@ -526,7 +519,7 @@ RSpec.describe MembershipsController, type: :controller do
 
             expect(response).to redirect_to(event_membership_path(@event,
                                                                   @membership))
-            expect(flash[:notice]).to eq('Membership successfully updated.')
+            expect(flash[:success]).to eq('Membership successfully updated.')
           end
 
           it 'allows updating some person fields' do
@@ -700,7 +693,7 @@ RSpec.describe MembershipsController, type: :controller do
 
             expect(response).to redirect_to(event_membership_path(@event,
                                                                   @membership))
-            expect(flash[:notice]).to eq('Membership successfully updated.')
+            expect(flash[:success]).to eq('Membership successfully updated.')
           end
 
           it 'allows updating personal info' do
@@ -741,7 +734,7 @@ RSpec.describe MembershipsController, type: :controller do
 
             expect(response).to redirect_to(event_membership_path(@event,
                                                                   @membership))
-            expect(flash[:notice]).to eq('Membership successfully updated.')
+            expect(flash[:success]).to eq('Membership successfully updated.')
           end
 
           it 'allows updating personal info' do
@@ -836,7 +829,7 @@ RSpec.describe MembershipsController, type: :controller do
             @user.save
           end
 
-          it 'deletes membership, redirects with notice' do
+          it 'deletes membership, redirects with success' do
             deletes_membership
           end
         end
@@ -846,7 +839,7 @@ RSpec.describe MembershipsController, type: :controller do
             @user.admin!
           end
 
-          it 'deletes membership, redirects with notice' do
+          it 'deletes membership, redirects with success' do
             deletes_membership
           end
         end

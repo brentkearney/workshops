@@ -49,8 +49,9 @@ describe 'Event Membership Page', type: :feature do
   end
 
   def shows_confirmed_email_buttons
-    expect(page.body).to have_css('a', text: 'Email Organizers')
-    expect(page.body).to have_css('a', text: 'Email Confirmed Members')
+    domain = GetSetting.email(@event.location, 'email_domain')
+    expect(page.body).to have_css('a', text: "#{@event.code}@#{domain}")
+    expect(page.body).to have_css('a', text: "#{@event.code}-organizers@#{domain}")
   end
 
   def shows_all_email_buttons

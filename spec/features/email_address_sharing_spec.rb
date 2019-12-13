@@ -20,6 +20,7 @@ describe 'Email address sharing', type: :feature do
 
   def shows_member_emails
     @event.memberships.where(attendance: 'Confirmed').each do |membership|
+      visit event_membership_path(@event, membership)
       expect(page.body).to include(membership.person.email)
     end
   end
@@ -28,6 +29,8 @@ describe 'Email address sharing', type: :feature do
     @event.memberships.where(attendance: 'Invited')
           .or(@event.memberships.where(attendance: 'Undecided'))
           .each do |membership|
+
+      visit event_membership_path(@event, membership)
       expect(page.body).to include(membership.person.email)
     end
   end

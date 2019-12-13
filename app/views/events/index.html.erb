@@ -13,11 +13,11 @@
     	<tr>
           <td><%= image_tag("flags/#{event.country}.png", height: 18) %></td>
     	    <td><%= link_to event.code, event_path(event), { title: event.name } %></td>
-    	    <td class="d-none d-sm-table-cell"><%= link_to event.name, event_path(event) %></td>
+    	    <td class="d-none d-sm-table-cell"><%= link_to event.name, event_path(event), id: event.code %></td>
     	    <td width="125" class="d-none d-lg-table-cell"><%= link_to '<i class="fa fa-calendar fa-fw"></i> Schedule'.html_safe, event_schedule_index_path(event) %></td>
     	    <td width="125" class="d-none d-lg-table-cell"><%= link_to '<i class="fa fa-users fa-fw"></i> Members'.html_safe, event_memberships_path(event) %></td>
     	    <td width="125"><%= event.dates %></td>
-    	    <td class="d-none d-sm-table-cell"><%= event.confirmed_count %></td>
+    	    <td class="d-none d-sm-table-cell confirmed"><%= event.confirmed_count %></td>
     	</tr>
       <% end %>
       <tr>
