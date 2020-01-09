@@ -38,7 +38,7 @@ module PersonHelper
       address = city_and_region(person, street_address(person))
       address += "<br />\n" + person.country unless person.country.blank?
     elsif person.country && policy(@membership).show_address?
-      address = "<strong>Country:</strong> #{person.country}<br />\n"
+      address = "<strong>Country:</strong>&nbsp; #{person.country}<br />\n"
     end
 
     address.html_safe
