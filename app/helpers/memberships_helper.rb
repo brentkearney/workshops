@@ -51,7 +51,7 @@ module MembershipsHelper
   def add_member_errors(add_members)
     return '' if add_members.errors.empty?
     errors = add_members.errors
-    msg = "<p><strong>‼️These problems were detected:</strong>\n"
+    msg = "<h3>‼️Problems were detected on these lines, below:</h3>\n"
     msg << "<ol id=\"add-members-errors\">\n"
     errors.messages.each do |line|
       msg << "<li value=\"#{line[0]}\">"
@@ -61,8 +61,12 @@ module MembershipsHelper
       msg.chomp!(', ') << ".</li>\n"
     end
     msg << "</ol>\n"
+  end
 
-    msg << '</p>'
+  def invalid_email?(add_members, line)
+    if add_members.errors.messages[:"#{line}"].first.include?("E-mail")
+      return 'has-error'
+    end
   end
 
   def show_attendances(f)

@@ -253,9 +253,13 @@
     background: #d7f7d8;
   }
 
+  #add-member-errors-container {
+    margin: 0 10px 10px 10px;
+  }
+
   ol#add-members-errors {
     li {
-      font-size: 12pt;
+      font-size: 14pt;
     }
   }
 
