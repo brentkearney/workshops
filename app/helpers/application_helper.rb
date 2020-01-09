@@ -31,6 +31,8 @@ module ApplicationHelper
       %Q(#{@event.code} Schedule)
     when /events\/(\w+)\/memberships/
       %Q(#{@event.code} Members)
+    when /invitations/
+      "Workshop Invitations"
     else
       return %Q(#{@event.code}: #{@event.name}) unless @event.nil?
       Setting.Site[:title]
