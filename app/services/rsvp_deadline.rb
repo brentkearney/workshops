@@ -28,14 +28,16 @@ class RsvpDeadline
   end
 
   def rsvp_by
-    rsvp_deadline = (@sent_on + 4.weeks).strftime('%B %-d, %Y')
+    rsvp_deadline = (@sent_on + 4.weeks)
+    today = DateTime.current
     if (@start_date - @sent_on).to_i < 10.days.to_i
-      rsvp_deadline = @start_date.prev_week(:tuesday).strftime('%B %-d, %Y')
+      rsvp_deadline = @start_date.prev_week(:tuesday)
+      rsvp_deadline = today + 1.day if rsvp_deadline < today
     elsif (@start_date - @sent_on).to_i < 2.month.to_i
-      rsvp_deadline = (@sent_on + 10.days).strftime('%B %-d, %Y')
+      rsvp_deadline = (@sent_on + 10.days)
     elsif (@start_date - @sent_on).to_i < (3.months + 5.days).to_i
-      rsvp_deadline = (@sent_on + 21.days).strftime('%B %-d, %Y')
+      rsvp_deadline = (@sent_on + 21.days)
     end
-    rsvp_deadline
+    rsvp_deadline.strftime('%B %-d, %Y')
   end
 end

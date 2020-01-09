@@ -106,6 +106,12 @@
   }
 
   #yes-form {
+    .rsvp-card-title {
+      h1 {
+        color: white;
+      }
+    }
+
     label {
       font-size: 1.2em;
       display: inline;
@@ -119,6 +125,22 @@
       @extend .text-center;
       margin-top: 1em;
       margin-bottom: 0;
+    }
+
+    /* Larger text for form inputs & placeholders */
+    input, select {
+      font-size: 16px;
+    }
+
+    ::-webkit-input-placeholder {
+       font-size: 16px!important;
+    }
+
+    :-moz-placeholder { /* Firefox 18- */
+          font-size: 16px!important;
+    }
+    ::-moz-placeholder {  /* Firefox 19+ */
+          font-size: 16px!important;
     }
 
     .date-titles {

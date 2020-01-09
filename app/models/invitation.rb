@@ -29,6 +29,11 @@ class Invitation < ApplicationRecord
   def send_reminder
     template = membership.attendance
     update_reminder
+    if expires < DateTime.current
+      start_date = self.membership.event.start_date
+      rsvp_by = DateTime.parse(RsvpDeadline.new(start_date).rsvp_by)
+      self.update_columns(expires: rsvp_by.at_end_of_day)
+    end
     EmailInvitationJob.perform_later(id, template)
   end
 
