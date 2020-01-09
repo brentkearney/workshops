@@ -108,8 +108,12 @@ describe 'Event Membership Page', type: :feature do
       end
     end
 
-    it 'hides email & invite buttons' do
+    it 'hides email links' do
       hides_all_email_buttons
+    end
+
+    it 'hides Add & Invite Member links' do
+      expect(page.body).not_to have_link('Add Members')
       expect(page.body).not_to have_link('Invite Members')
     end
   end
@@ -125,8 +129,12 @@ describe 'Event Membership Page', type: :feature do
       shows_confirmed_members
     end
 
-    it 'hides email & invite buttons' do
+    it 'hides email links' do
       hides_all_email_buttons
+    end
+
+    it 'hides Add & Invite Member links' do
+      expect(page.body).not_to have_link('Add Members')
       expect(page.body).not_to have_link('Invite Members')
     end
 
@@ -150,7 +158,7 @@ describe 'Event Membership Page', type: :feature do
       shows_confirmed_members
     end
 
-    it 'shows email buttons for confirmed members' do
+    it 'shows email links for confirmed members' do
       shows_confirmed_email_buttons
     end
 
@@ -158,7 +166,8 @@ describe 'Event Membership Page', type: :feature do
       hides_nonconfirmed_email_buttons
     end
 
-    it 'hides invite buttons' do
+    it 'hides Add & Invite Member links' do
+      expect(page.body).not_to have_link('Add Members')
       expect(page.body).not_to have_link('Invite Members')
     end
 
@@ -183,13 +192,20 @@ describe 'Event Membership Page', type: :feature do
       shows_all_members
     end
 
-    it 'shows email & invite buttons' do
+    it 'shows mail list links' do
       shows_all_email_buttons
       expect(page.body).to have_link('Invite Members',
         href: invite_event_memberships_path(@event))
     end
 
-    it 'hides invite buttons if workshop has already started' do
+    it 'shows Add & Invite Member links' do
+      expect(page.body).to have_link('Add Members',
+        href: add_event_memberships_path(@event))
+      expect(page.body).to have_link('Invite Members',
+        href: invite_event_memberships_path(@event))
+    end
+
+    it 'hides Add & Invite Member links if workshop has already started' do
       original_start = @event.start_date.dup
       original_end = @event.end_date.dup
       @event.start_date = Date.current
@@ -198,6 +214,7 @@ describe 'Event Membership Page', type: :feature do
 
       visit event_memberships_path(@event)
 
+      expect(page.body).not_to have_link('Add Members')
       expect(page.body).not_to have_link('Invite Members')
 
       @event.start_date = original_start
@@ -233,8 +250,13 @@ describe 'Event Membership Page', type: :feature do
         shows_all_members
       end
 
-      it 'shows email & invite buttons' do
+      it 'shows email links' do
         shows_all_email_buttons
+      end
+
+      it 'shows Add & Invite Member links' do
+        expect(page.body).to have_link('Add Members',
+          href: add_event_memberships_path(@event))
         expect(page.body).to have_link('Invite Members',
           href: invite_event_memberships_path(@event))
       end
@@ -255,8 +277,13 @@ describe 'Event Membership Page', type: :feature do
         hides_nonconfirmed_members
       end
 
-      it 'hides email buttons' do
+      it 'hides email links' do
         hides_all_email_buttons
+        expect(page.body).not_to have_link('Invite Members')
+      end
+
+      it 'hides Add & Invite Member links' do
+        expect(page.body).not_to have_link('Add Members')
         expect(page.body).not_to have_link('Invite Members')
       end
 
@@ -277,8 +304,13 @@ describe 'Event Membership Page', type: :feature do
       shows_all_members
     end
 
-    it 'shows email & invite buttons' do
+    it 'shows email links' do
       shows_all_email_buttons
+    end
+
+    it 'shows Add & Invite Member links' do
+      expect(page.body).to have_link('Add Members',
+        href: add_event_memberships_path(@event))
       expect(page.body).to have_link('Invite Members',
         href: invite_event_memberships_path(@event))
     end
