@@ -20,6 +20,11 @@
         <div class="colheading-right">Invited On</div>
         <% end %>
       <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
+        <% if %w(Invited Undecided).include?(status) %>
+        <div class="reply-by-legend" id="<%= status %>-legend">
+          <p class="card-text"><span class="highlighted">Highlighting</span> indicates that a member is overdue to reply to an invitation. Hold pointer over the <strong>Invited On</strong> date for details.</p>
+        </div>
+        <% end %>
       </div>
       <% if policy(@event).show_email_buttons?(status) %>
       <div class="card-footer email-links no-print"><%= add_email_buttons(status) %></div>

@@ -49,6 +49,13 @@ $(document).on 'turbolinks:load', ->
   $('[data-toggle="popover"]').popover()
   $('[data-toggle="tooltip"]').tooltip()
 
+  # Show legend for invited & undecided overdue replies
+  if $('.invited-members').find('.reply-due').length > 0
+    $('#Invited-legend').show()
+  if $('.undecided-members').find('.reply-due').length > 0
+    $('#Undecided-legend').show()
+
+
   # Memberships invite page buttons
   # Check All
   checkall = (status) ->

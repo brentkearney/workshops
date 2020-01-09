@@ -33,6 +33,19 @@
       border-bottom: 1px solid $flash-message-color;
     }
 
+    .reply-by-legend {
+      display: none;
+      padding: 10px;
+      margin: 15px 5px 5px 5px;
+      min-width: 100%;
+      width: 0;
+
+      .highlighted {
+        padding: 5px;
+        background-color: lighten( $flash-message-color, 30% );
+      }
+    }
+
     .email-links {
       font-size: 0.8em;
 
