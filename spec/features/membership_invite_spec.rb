@@ -64,7 +64,7 @@ describe 'Invite Members', type: :feature do
       visit event_memberships_path(@event)
       expect(page).to have_link("Invite Members")
 
-      click_link("Invite Members")
+      first(:link, "Invite Members").click
       expect(current_path).to eq(invite_event_memberships_path(@event))
       logout(@org_user)
     end
@@ -76,7 +76,7 @@ describe 'Invite Members', type: :feature do
       expect(page.body).to have_link('Invite Members',
           href: invite_event_memberships_path(@event))
 
-      click_link("Invite Members")
+      first(:link, "Invite Members").click
 
       expect(current_path).to eq(invite_event_memberships_path(@event))
       logout(@user)
@@ -92,7 +92,7 @@ describe 'Invite Members', type: :feature do
       visit event_memberships_path(@event)
       expect(page.body).to have_link('Invite Members',
           href: invite_event_memberships_path(@event))
-      click_link("Invite Members")
+      first(:link, "Invite Members").click
 
       expect(current_path).to eq(invite_event_memberships_path(@event))
       logout(@user)

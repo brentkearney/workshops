@@ -64,6 +64,7 @@ module ApplicationHelper
   end
 
   def display_new_feature_notice?
+    return if current_user.nil?
     @unread_notice && current_user.sign_in_count > 1 &&
      Date.current < Date.parse('2020-06-30')
   end

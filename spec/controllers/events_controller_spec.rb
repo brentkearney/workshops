@@ -8,9 +8,6 @@
 
   RSpec.describe EventsController, type: :controller do
     before do
-      Schedule.delete_all
-      Membership.delete_all
-      Event.delete_all
       @past_event = create(:event, past: true)
       @event = create(:event, current: true)
       @future_event = create(:event, future: true)

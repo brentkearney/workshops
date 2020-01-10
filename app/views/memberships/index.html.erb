@@ -20,7 +20,7 @@
         <div class="colheading-right">Invited On</div>
         <% end %>
       <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
-        <% if %w(Invited Undecided).include?(status) %>
+        <% if %w(Invited Undecided).include?(status) && policy(@event).send_invitations? %>
         <div class="reply-by-legend" id="<%= status %>-legend">
           <p class="card-text"><span class="highlighted">Highlighting</span> indicates that the person is overdue to reply to an invitation. Hold pointer over the <strong>Invited On</strong> date for details. Send reminders in the <%= link_to 'Invite Members', invite_event_memberships_path(@event) %> section.</p>
         </div>

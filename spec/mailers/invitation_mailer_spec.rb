@@ -92,9 +92,15 @@ RSpec.describe InvitationMailer, type: :mailer do
       InvitationMailer.invite(@invitation, @template).deliver_now
       delivery = ActionMailer::Base.deliveries.first
       body = delivery.body.empty? ? delivery.text_part : delivery.body
+      rsvp_date = @event.start_date.prev_week(:tuesday)
 
-      rsvp_date = @event.start_date.prev_week(:tuesday).strftime('%B %-d, %Y')
-      expect(body).to have_text("before #{rsvp_date}")
+      # unless Tuesday is in the past. In which case, set reply-by to tomorrow
+      if rsvp_date < @today
+        tomorrow = (@today + 1.day).strftime('%B %-d, %Y')
+        expect(body).to have_text("before #{tomorrow}")
+      else
+        expect(body).to have_text("before #{rsvp_date}")
+      end
     end
 
     it 'sets date to 10 days in advance if event is < 2 months away' do

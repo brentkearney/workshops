@@ -103,7 +103,7 @@
       </div>
 
       <div class="row buttons">
-        <div class="form-group">
+        <div class="form-group col-md-12">
           <%= f.submit (f.object.new_record? ? 'Add New Event' : 'Update Event'), class: 'btn btn-primary' %>
           <% unless f.object.new_record? %>
               | <%= link_to 'Cancel', event_path(@event), class: 'btn btn-secondary' %>
