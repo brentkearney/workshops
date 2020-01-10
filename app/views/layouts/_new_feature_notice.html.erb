@@ -1,0 +1,21 @@
+<!-- Notice of new feature modal -->
+<div class="modal fade in" id="new-feature-notice" tabindex="-1" role="dialog" aria-labelledby="new-feature-notice" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="new-feature-title">New Design!</h3>
+      </div>
+      <div class="modal-body">
+        <p>"Workshops" has been overhauled with a new look & feel.
+        It has the same features as before, with new features on the way.</p>
+        <p>I hope you enjoy the new design, and welcome any feedback.</p>
+        <p><%= GetSetting.site_setting('webmaster_name') %><br/>
+          <a href="mailto:<%= GetSetting.site_setting('webmaster_email') %>">
+            <%= GetSetting.site_setting('webmaster_email') %></a></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
