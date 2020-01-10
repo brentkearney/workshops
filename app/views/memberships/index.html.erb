@@ -22,7 +22,7 @@
       <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
         <% if %w(Invited Undecided).include?(status) %>
         <div class="reply-by-legend" id="<%= status %>-legend">
-          <p class="card-text"><span class="highlighted">Highlighting</span> indicates that a member is overdue to reply to an invitation. Hold pointer over the <strong>Invited On</strong> date for details.</p>
+          <p class="card-text"><span class="highlighted">Highlighting</span> indicates that the person is overdue to reply to an invitation. Hold pointer over the <strong>Invited On</strong> date for details. Send reminders in the <%= link_to 'Invite Members', invite_event_memberships_path(@event) %> section.</p>
         </div>
         <% end %>
       </div>
@@ -35,7 +35,3 @@
 <% end %>
 </div>
 </article>
-
-<% if display_new_feature_notice? %>
-  <%= render partial: 'new_feature_notice' %>
-<% end %>

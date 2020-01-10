@@ -27,10 +27,12 @@
     </section>
     <section class="login-content d-flex flex-column">
       <div class="login-title p-2">
-        <a href="<%= Setting.app_url %>">
-        <%= image_tag(GetSetting.site_setting('logo'), class: 'img-thumbnail mx-auto d-block p-2') %>
-        </a>
-        <h1 class="p-2"><%= page_title %></h1>
+        <div class="d-flex flex-row align-items-center">
+          <%= image_tag(GetSetting.site_setting('logo'), class: 'img-thumbnail p-2') %>
+        </div>
+        <div id="app-title" class="d-flex flex-row justify-content-center">
+          <h1><%= GetSetting.site_setting('title') %></h1>
+        </div>
       </div>
       <%= yield %>
     </section>

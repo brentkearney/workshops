@@ -21,7 +21,7 @@
 }
 
 .login-content {
-  min-height: 85vh;
+  min-height: 80vh;
 }
 
 .login-title {
@@ -31,9 +31,12 @@
     margin-bottom: 1em;
     max-width: 150px;
   }
-  h1 {
-    color: white;
-    font-family: sans-serif;
+
+  #app-title {
+    h1 {
+      color: white;
+      font-family: sans-serif;
+    }
   }
 }
 

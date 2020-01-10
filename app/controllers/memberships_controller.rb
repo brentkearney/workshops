@@ -14,11 +14,9 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
   def index
-    # cookies.delete(:read_notice)
     SyncMembers.new(@event) if policy(@event).sync?
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
-    @unread_notice = check_read_notice_cookie
   end
 
   # GET /events/:event_id/memberships/1
@@ -181,12 +179,6 @@ class MembershipsController < ApplicationController
   end
 
   private
-
-  def check_read_notice_cookie
-    return false unless policy(@event).send_invitations?
-    return false if cookies[:read_notice]
-    cookies[:read_notice] = { value: true, expires: 6.months.from_now }
-  end
 
   def map_emails(members)
     return [] if members.blank?

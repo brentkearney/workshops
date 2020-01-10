@@ -10,6 +10,7 @@ class SessionsController < Devise::SessionsController
 
   # POST /sign_in
   def create
+    # cookies.delete(:read_notice2)
     self.resource = warden.authenticate!(auth_options)
     resource.validate
 

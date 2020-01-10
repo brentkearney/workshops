@@ -31,6 +31,10 @@ module ApplicationHelper
       %Q(#{@event.code} Schedule)
     when /events\/(\w+)\/memberships/
       %Q(#{@event.code} Members)
+    when /sign_in/
+      "Workshops Sign-in"
+    when /register/
+      "Workshops Registration"
     when /invitations/
       "Workshop Invitations"
     else
@@ -57,5 +61,10 @@ module ApplicationHelper
 
   def user_is_member?
     current_user && current_user.is_member?(@event)
+  end
+
+  def display_new_feature_notice?
+    @unread_notice && current_user.sign_in_count > 1 &&
+     Date.current < Date.parse('2020-06-30')
   end
 end

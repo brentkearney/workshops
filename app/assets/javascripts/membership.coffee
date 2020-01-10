@@ -94,5 +94,3 @@ $(document).on 'turbolinks:load', ->
 
     return confirm(msg)
 
-  # Display new feature modal
-  $('#new-feature-notice').modal('show');

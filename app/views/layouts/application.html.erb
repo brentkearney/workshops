@@ -63,7 +63,13 @@
           <% end %>
       <% end %>
     <%= yield %>
+
+    <% if display_new_feature_notice? %>
+      <%= render partial: 'layouts/new_feature_notice' %>
+    <% end %>
+
     </main>
     <%= render 'layouts/footer' %>
   </body>
 </html>
+
