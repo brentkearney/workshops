@@ -176,7 +176,8 @@ module MembershipsHelper
 
   def reply_due?(member)
     return '' if member.invited_on.blank?
-    return '' unless %w(Invited Undecided).include?(member.attendance)
+    return '' unless %w(Invited Undecided).include?(member.attendance) &&
+      policy(@event).send_invitations?
     event_start = member.event.start_date
     rsvp_by = RsvpDeadline.new(event_start, member.invited_on).rsvp_by
     return 'reply-due' if DateTime.current > DateTime.parse(rsvp_by)

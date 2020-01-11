@@ -27,13 +27,14 @@ class Api::SessionsController < Devise::SessionsController
   end
 
   # DELETE /api/logout
-  def destroy
-    super and return if params['Authorization'].blank?
-    user = ApiUser.find_by_jti(decode_token)
-    super and return if user.blank?
-    revoke_token(user)
-    super
-  end
+  # def destroy
+  #   Rails.logger.debug "\n\n*** params: #{request.env['HTTP_AUTHORIZATION']}\n\n"
+  #   super and return if params['Authorization'].blank?
+  #   user = ApiUser.find_by_jti(decode_token)
+  #   super and return if user.blank?
+  #   revoke_token(user)
+  #   super
+  # end
 
   private
 
@@ -51,22 +52,22 @@ class Api::SessionsController < Devise::SessionsController
   end
 
 
-  def decode_token
-    token = params['Authorization'].split('Bearer ').last
-    secret = ENV['DEVISE_JWT_SECRET_KEY']
-    JWT.decode(token, secret, true, algorithm: 'HS256',
-      verify_jti: true)[0]['jti']
-  end
+  # def decode_token
+  #   token = params['Authorization'].split('Bearer ').last
+  #   secret = ENV['DEVISE_JWT_SECRET_KEY']
+  #   JWT.decode(token, secret, true, algorithm: 'HS256',
+  #     verify_jti: true)[0]['jti']
+  # end
 
-  def revoke_token(user)
-    user.update_column(:jti, generate_jti)
-  end
+  # def revoke_token(user)
+  #   user.update_column(:jti, generate_jti)
+  # end
 
   def current_token
     request.env['warden-jwt_auth.token']
   end
 
-  def generate_jti
-    SecureRandom.uuid
-  end
+  # def generate_jti
+  #   SecureRandom.uuid
+  # end
 end

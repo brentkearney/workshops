@@ -34,7 +34,7 @@
             </div>
             <!-- /.card-body -->
             <% if policy(@schedule_policy).create? %>
-            <div class="card-footer add-item-buttons">
+            <div class="card-footer add-item-buttons no-print">
               <%= link_to "Add an item on " + day.strftime("%A"), event_schedule_day_path(@event, day.strftime("%Y-%m-%d")), class: 'btn btn-sm btn-primary' %>
             </div>
             <% end %>

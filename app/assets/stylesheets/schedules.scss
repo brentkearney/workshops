@@ -206,4 +206,15 @@
   p#staff_item_locked {
     margin-top: 1em;
   }
+
+  /* Remove printing of URLs */
+  @media print {
+    a[href]:after {
+      content: none !important;
+    }
+    .no-print { display:none }
+  }
 }
+
+@import 'print';
+

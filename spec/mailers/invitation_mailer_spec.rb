@@ -99,7 +99,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         tomorrow = (@today + 1.day).strftime('%B %-d, %Y')
         expect(body).to have_text("before #{tomorrow}")
       else
-        expect(body).to have_text("before #{rsvp_date}")
+        expect(body).to have_text("before #{rsvp_date.strftime('%B %-d, %Y')}")
       end
     end
 
