@@ -48,19 +48,16 @@
         </table>
       </div>
       <!-- /.table-responsive -->
-      <div class="row rowlink-skip no-print invite-buttons">
-        <div class="col-lg-6 pull-left">
-          <%= button_tag 'Select All', type: 'button', id: "#{status.parameterize.downcase}-all", class: "btn btn-secondary all-button" %>
+      <div class="d-flex flex-column flex-md-row rowlink-skip no-print invite-buttons">
+        <%= button_tag 'Select All', type: 'button', id: "#{status.parameterize.downcase}-all", class: "btn btn-secondary all-button p-2" %>
 
-          <%= button_tag 'Select None', type: 'button', id: "#{status.parameterize.downcase}-none", class: 'btn btn-secondary none-button' %>
+        <%= button_tag 'Select None', type: 'button', id: "#{status.parameterize.downcase}-none", class: 'btn btn-secondary none-button p-2' %>
 
-          <%= button_tag 'Invert Selection', type: 'button', id: "#{status.parameterize.downcase}-invert", class: 'btn btn-secondary invert-button d-none d-md-block' %>
-        </div>
-        <div class="col-lg-6 pull-right">
-          <%= form.submit invite_button(status), id: "#{status.parameterize.downcase}-submit",
-                        class: 'btn btn-primary submit-button pull-right' %>
+        <%= button_tag 'Invert Selection', type: 'button', id: "#{status.parameterize.downcase}-invert", class: 'btn btn-secondary invert-button p-2' %>
 
-        </div>
+        <%= form.submit invite_button(status), id: "#{status.parameterize.downcase}-submit",
+                      class: 'btn btn-primary submit-button ml-auto p-2' %>
+
       </div>
       <!-- /.row invite-buttons -->
     </div>

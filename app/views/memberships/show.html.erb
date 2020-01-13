@@ -217,19 +217,19 @@
   </div><!-- ./member-show -->
 
 
-  <div class="row" id="member-buttons">
+  <div class="d-flex flex-column flex-md-row rowlink-skip no-print" id="member-buttons">
     <%= link_to "Back to #{@event.code}", event_memberships_path(@event),
-          class: 'btn btn-secondary' %> &nbsp; &nbsp;
+          class: 'btn btn-secondary p-2' %> &nbsp; &nbsp;
     <% if pending_invitation? %>
       <%= link_to "Respond to Invitation", @membership.invitation.rsvp_url,
-            class: 'btn btn-secondary' %> &nbsp; &nbsp;
+            class: 'btn btn-secondary p-2' %> &nbsp; &nbsp;
     <% elsif policy(@membership).edit_membership? %>
       <%= link_to "Edit Membership", edit_event_membership_path(@event, @membership),
-            class: 'btn btn-primary' %> &nbsp; &nbsp;
+            class: 'btn btn-primary p-2' %> &nbsp; &nbsp;
     <% end %>
     <% if policy(@membership).delete_membership? %>
       <%= link_to 'Delete Membership', event_membership_path(@event, @membership),
-            method: :delete, class: 'btn btn-danger',
+            method: :delete, class: 'btn btn-danger p-2',
             data: { confirm: "Are you sure you want to remove #{@person.name} from #{@event.code}?" } %>
     <% end %>
   </div><!-- ./row member-buttons -->
