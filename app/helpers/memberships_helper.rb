@@ -146,7 +146,7 @@ module MembershipsHelper
 
   def show_invited_on_date(member, no_td = false)
     column = no_td ? '' : '<td class="rowlink-skip no-print">'
-    if show_invited_on?(member)
+    if show_invited_on?(member.attendance)
       if member.invited_on.blank?
         column << '(not set)'
       else
@@ -169,17 +169,27 @@ module MembershipsHelper
     column.html_safe
   end
 
-  def show_invited_on?(member)
-    policy(@event).send_invitations? &&
-      %w(Invited Undecided).include?(member.attendance)
+  def show_invited_on?(status)
+    %w(Invited Undecided).include?(status) && policy(@event).send_invitations?
+  end
+
+  def latest_request_date(member)
+    tz = member.event.time_zone
+
+    if member.invite_reminders.blank?
+      rsvp_by_date = member.invited_on.in_time_zone(tz)
+    else
+      rsvp_by_date = member.invite_reminders.keys.last.in_time_zone(tz)
+    end
+
+    RsvpDeadline.new(member.event.start_date, rsvp_by_date).rsvp_by
   end
 
   def reply_due?(member)
+    return '' unless show_invited_on?(member.attendance)
     return '' if member.invited_on.blank?
-    return '' unless %w(Invited Undecided).include?(member.attendance) &&
-      policy(@event).send_invitations?
-    event_start = member.event.start_date
-    rsvp_by = RsvpDeadline.new(event_start, member.invited_on).rsvp_by
+
+    rsvp_by = latest_request_date(member)
     return 'reply-due' if DateTime.current > DateTime.parse(rsvp_by)
   end
 
@@ -200,6 +210,8 @@ module MembershipsHelper
   def spots_left
     @event.max_participants - @event.num_invited_participants > 0
   end
+
+
 
   def add_email_buttons(status)
     return '' unless policy(@event).show_email_buttons?(status)

@@ -36,7 +36,6 @@ class Api::SessionsController < Devise::SessionsController
   end
 
   def sign_out_and_respond(resource)
-    revoke_token(resource)
     sign_out(resource)
     render status: 401, json: { message: "Staff access only." }
   end

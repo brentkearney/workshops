@@ -11,7 +11,7 @@
     <% unless member.person.affiliation.blank? %>
       (<%= member.person.affiliation %>)
     <% end %>
-    <% if %w(Invited Undecided).include?(status) && policy(@event).send_invitations? %>
+    <% if show_invited_on?(member.attendance) %>
       <span class="reply-by-date"><%= show_invited_on_date(member, true) %></span>
     <% end %>
   </li>
