@@ -1,5 +1,5 @@
 <%= render "shared/errors", object: @event %>
-
+<div class="event-page">
 <%= form_for @event, html: { role: 'form', class: 'form' } do |f| %>
 <fieldset>
   <% @editable_fields.each do |field| %>
@@ -7,10 +7,11 @@
   <% end %>
 
   <div class="row buttons">
-    <div class="form-group">
-      <%= f.submit 'Update Event', class: 'btn btn-sm btn-default' %>
-      | <%= link_to 'Cancel', event_path(@event), class: 'btn btn-sm btn-default' %>
+    <div class="col-md-12 form-group">
+      <%= f.submit 'Update Event', class: 'btn btn-primary' %>
+      | <%= link_to 'Cancel', event_path(@event), class: 'btn btn-secondary' %>
     </div>
   </div>
 </fieldset>
 <% end %>
+</div>

@@ -55,14 +55,21 @@ class InviteMembersForm < ComplexForms
   def add_success_message
     @success_msg = ''
     @success_msg << "Invitations " and fill_msg(@invited) unless @invited.empty?
+    @success_msg << "<br>\n" unless @success_msg.empty?
     @success_msg << " Reminders " and fill_msg(@reminded) unless @reminded.empty?
   end
 
   def fill_msg(names)
-    @success_msg << "were sent to #{names.size} participants: "
-    last_person = names.pop
-    names.each {|p| @success_msg << "#{p}, " }
-    @success_msg << "#{last_person}."
+    @success_msg << "were sent to #{names.size} participants"
+    if names.size > 3
+      @success_msg << "."
+    else
+      @success_msg << ": "
+      last_person = names.pop
+      names.each {|p| @success_msg << "#{p}, " }
+      @success_msg << "#{last_person}."
+    end
+    @success_msg
   end
 
   def check_for_errors

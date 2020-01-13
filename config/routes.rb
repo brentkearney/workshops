@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  root 'welcome#index'
+  root 'home#index'
 
   # Devise (login/logout)
   devise_for :users, defaults: { format: :html },
@@ -29,8 +29,9 @@ Rails.application.routes.draw do
   patch 'users/confirmation', to: 'confirmations#create'
   patch 'confirmation.user', to: 'confirmations#create'
 
-  # Post-login welcome page
-  get 'welcome' => 'welcome#index'
+  # Post-login home page
+  get 'home' => 'home#index'
+  post 'home/toggle_sidebar' => 'home#toggle_sidebar'
 
   # Events, schedules, memberships
   get 'events/my_events' => 'events#my_events', as: :my_events

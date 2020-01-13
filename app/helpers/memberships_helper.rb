@@ -51,7 +51,7 @@ module MembershipsHelper
   def add_member_errors(add_members)
     return '' if add_members.errors.empty?
     errors = add_members.errors
-    msg = "<p><strong>‼️These problems were detected:</strong>\n"
+    msg = "<h3>‼️Problems were detected on these lines, below:</h3>\n"
     msg << "<ol id=\"add-members-errors\">\n"
     errors.messages.each do |line|
       msg << "<li value=\"#{line[0]}\">"
@@ -61,8 +61,12 @@ module MembershipsHelper
       msg.chomp!(', ') << ".</li>\n"
     end
     msg << "</ol>\n"
+  end
 
-    msg << '</p>'
+  def invalid_email?(add_members, line)
+    if add_members.errors.messages[:"#{line}"].first.include?("E-mail")
+      return 'has-error'
+    end
   end
 
   def show_attendances(f)
@@ -76,6 +80,12 @@ module MembershipsHelper
 
   def print_section?(section)
     return ' no-print' unless section == 'Confirmed'
+  end
+
+  def invite_title(status)
+    title = 'Send '
+    title << (status == 'Not Yet Invited' ? 'Invitations ' : 'Reminders ')
+    title << 'to ' + status + ' Members'
   end
 
   def format_invited_by(membership)
@@ -119,9 +129,24 @@ module MembershipsHelper
     text << '</ul>'
   end
 
-  def show_invited_on_date(member)
-    column = '<td class="rowlink-skip no-print">'
-    if show_invited_on?(member)
+  def last_invited(member, tz)
+    unless member.invite_reminders.blank?
+      return member.invite_reminders.keys.last.in_time_zone(tz)
+    end
+    member.invited_on.blank? ? DateTime.current.in_time_zone(tz) :
+                               member.invited_on.in_time_zone(tz)
+  end
+
+  def show_reply_by_date(member)
+    tz = member.event.time_zone
+    start_date = member.event.start_date.in_time_zone(tz)
+    invited_on = last_invited(member, tz)
+    DateTime.parse(rsvp_by(start_date, invited_on)).strftime("%Y-%m-%d")
+  end
+
+  def show_invited_on_date(member, no_td = false)
+    column = no_td ? '' : '<td class="rowlink-skip no-print">'
+    if show_invited_on?(member.attendance)
       if member.invited_on.blank?
         column << '(not set)'
       else
@@ -137,19 +162,38 @@ module MembershipsHelper
           '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
       end
       unless member.invite_reminders.blank?
-        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"><span class="glyphicon glyphicon-repeat"></span></a></span>'.html_safe
+        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"> &nbsp; <i class="fa fa-md fa-repeat"></i></a></span>'.html_safe
       end
     end
-    column << '</td>'
+    column << "#{no_td ? '' : '</td>'}"
     column.html_safe
   end
 
-  def show_invited_on?(member)
-    policy(@event).send_invitations? &&
-      %w(Invited Undecided).include?(member.attendance)
+  def show_invited_on?(status)
+    %w(Invited Undecided).include?(status) && policy(@event).send_invitations?
   end
 
-  def add_email_buttons(status)
+  def latest_request_date(member)
+    tz = member.event.time_zone
+
+    if member.invite_reminders.blank?
+      rsvp_by_date = member.invited_on.in_time_zone(tz)
+    else
+      rsvp_by_date = member.invite_reminders.keys.last.in_time_zone(tz)
+    end
+
+    RsvpDeadline.new(member.event.start_date, rsvp_by_date).rsvp_by
+  end
+
+  def reply_due?(member)
+    return '' unless show_invited_on?(member.attendance)
+    return '' if member.invited_on.blank?
+
+    rsvp_by = latest_request_date(member)
+    return 'reply-due' if DateTime.current > DateTime.parse(rsvp_by)
+  end
+
+  def old_add_email_buttons(status)
     return unless policy(@event).show_email_buttons?(status)
     content = '<div class="no-print" id="email-members">'
     content << add_email_button(status)
@@ -157,8 +201,9 @@ module MembershipsHelper
     content.html_safe
   end
 
-  def invite_button(status)
+  def invite_button(status, smallscreen = false)
     return 'Invite Selected Members' if status == 'Not Yet Invited'
+    return 'Send Reminders to Selected' if smallscreen
     "Send Reminder to Selected #{status.titleize} Members"
   end
 
@@ -166,17 +211,21 @@ module MembershipsHelper
     @event.max_participants - @event.num_invited_participants > 0
   end
 
-  def add_email_button(status)
-    return '' unless policy(@event).show_email_buttons?(status)
-    to_email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
-    to_email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
-    content = mail_to(to_email, "<i class=\"fa fa-envelope fa-fw\"></i> Email #{status} Members".html_safe, subject: "[#{@event.code}] ", title: "Email #{to_email}", class: 'btn btn-sm btn-default email-members')
 
-    if status == 'Confirmed' && !@organizer_emails.blank?
-      content << ' | '
-      content << mail_to(@organizer_emails.join(','), "<i class=\"fa fa-envelope fa-fw\"></i> Email Organizers".html_safe, subject: "[#{@event.code}] ", class: 'btn btn-sm btn-default email-members')
+
+  def add_email_buttons(status)
+    return '' unless policy(@event).show_email_buttons?(status)
+    domain = GetSetting.email(@event.location, 'email_domain')
+    to_email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{domain}"
+    to_email = "#{@event.code}@#{domain}" if status == 'Confirmed'
+
+    content = mail_to(to_email, to_email, subject: "[#{@event.code}] ", title: "Email #{status} members at #{to_email}")
+
+    if status == 'Confirmed'
+      content << ' <span class="separator">|</span> '.html_safe
+      content << mail_to("#{@event.code}-organizers@#{domain}", "#{@event.code}-organizers@#{domain}", title: "Email event organizers", subject: "[#{@event.code}] ").html_safe
     end
-    content
+    content.html_safe
   end
 
   def show_email(member)
@@ -202,23 +251,43 @@ module MembershipsHelper
     column.html_safe
   end
 
-  def add_limits_message(status)
-    return unless status == 'Not Yet Invited'
-    spots = @event.max_participants - @event.num_invited_participants
+  def add_limits_message
+    invited = @event.num_invited_participants
+    spots = @event.max_participants - invited
     isare = 'are'
     isare = 'is' if spots == 1
     spot_s = 'spots'
     spot_s = 'spot' if spots == 1
     unless_cancel = ''
     if spots == 0
-      unless_cancel = 'Unless someone cancels, no more invitations can be sent.'
+      unless_cancel = "<br>\nUnless someone cancels, no more invitations can be sent."
     end
-    ('<div class="no-print" id="limits-message">There ' + "#{isare} #{spots} #{spot_s} left,
-      out of a maximum of #{@event.max_participants}. #{unless_cancel}</div>").squish.html_safe
+    ('<div class="no-print" id="limits-message">There ' + "#{isare} #{spots} #{spot_s} left:
+      #{invited} confirmed & invited / #{@event.max_participants} maximum. #{unless_cancel}</div>").squish.html_safe
   end
 
-  def display_new_feature_notice?
-    @unread_notice && @current_user.sign_in_count > 1 &&
-      Date.current < Date.parse('2019-11-30') && policy(@event).send_invitations?
+  def get_status_heading(status)
+    case status
+    when "Confirmed"
+      '<i class="fa fa-check-circle-o" aria-hidden="true"></i> Confirmed'
+    when "Invited"
+      '<i class="fa fa-envelope-o" aria-hidden="true"></i> Invited'
+    when "Undecided"
+      '<i class="fa fa-envelope-open-o" aria-hidden="true"></i> Undecided'
+    when "Not Yet Invited"
+      '<i class="fa fa-clock-o" aria-hidden="true"></i> Not Yet Invited'
+    when "Declined"
+      '<i class="fa fa-thumbs-down" aria-hidden="true"></i> Declined'
+    else
+      status
+    end
+  end
+
+  def status_with_icon(status)
+    get_status_heading(status).html_safe
+  end
+
+  def member_link(member)
+    link_to "#{member.person.lname}", event_membership_path(@event, member)
   end
 end

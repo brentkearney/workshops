@@ -1,11 +1,11 @@
 <% if policy(@schedule).update? %>
-  <%= form.submit 'Update Schedule', class: 'btn btn-sm btn-default' %>
+  <%= form.submit 'Update Schedule', class: 'btn btn-primary' %>
   <% else %>
     <% if @schedule.staff_item %>
       <%= mail_to Setting.Emails[@schedule.event.location]['station_manager'],
           "<i class=\"fa fa-envelope fa-fw\"></i> Request Change".html_safe,
           subject: "[#{@schedule.event.code}] Schedule Change Request",
-          class: 'btn btn-sm btn-default' %>
+          class: 'btn btn-primary' %>
 
         <p id="staff_item_locked">Given proximity to the start of the event,
         we may already have made staffing arrangements to provide for this

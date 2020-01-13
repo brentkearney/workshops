@@ -1,0 +1,16 @@
+<% i=1 %>
+<% members.each do |member| %>
+  <tr class="<%= member.role.delete(' ').downcase %>-row <%= reply_due?(member) %>">
+    <% if defined?(f) %>
+    <td class="select form-group"><%= f.check_box member.id, class: "form-control-lg #{member.attendance.parameterize.downcase}" %></td>
+    <% end %>
+    <td><%= link_to i, event_membership_path(@event, member) %></td>
+    <td class="rowlink-skip"><%= link_to "#{member.person.lname}", event_membership_path(@event, member) %></td>
+    <%= show_invited_on_date(member) %>
+    <td class="d-none d-lg-table-cell rowlink-skip no-print"><%= show_reply_by_date(member) %></td>
+    <td class="d-none d-xl-table-cell rowlink-skip no-print" align="left">
+      <%= mail_to(member.person.email, member.person.email, subject: "[#{@event.code}] ") %></td>
+    <td class="d-none d-lg-table-cell rowlink-skip no-print"><%= member.role %></td>
+  </tr>
+  <% i += 1 %>
+<% end %>

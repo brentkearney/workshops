@@ -4,11 +4,11 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-class WelcomeController < ApplicationController
+class HomeController < ApplicationController
   before_action :set_attendance
   before_action :authenticate_user!
 
-  # GET / or /welcome
+  # GET / or /home
   def index
     if staff_at_location?
       redirect_to events_future_path(current_user.location) and return
@@ -27,7 +27,18 @@ class WelcomeController < ApplicationController
     end
   end
 
+  def toggle_sidebar
+    cookies[:sidebar_toggle] = { value: toggle_param, expires: 1.day.from_now }
+    render json: {sidebar_toggle: toggle_param}
+  end
+
+  private
+
   def staff_at_location?
     current_user && current_user.staff? && !current_user.location.blank?
+  end
+
+  def toggle_param
+    params.require(:toggle)
   end
 end

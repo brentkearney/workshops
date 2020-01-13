@@ -51,7 +51,8 @@ describe "GetLectures" do
   context '.current' do
     before do
       @room = 'Empty'
-      @event = create(:event, current: true)
+      @event = create(:event, start_date: Date.today,
+                                end_date: Date.today + 5.days)
     end
 
     it 'returns the lecture closest to the current time' do
@@ -83,7 +84,8 @@ describe "GetLectures" do
     it 'returns the next lecture today' do
       start_time = DateTime.current + 2.hours
       end_time = start_time + 30.minutes
-      event = create(:event, current: true)
+      event = create(:event, start_date: Date.today,
+                               end_date: Date.today + 5.days)
       lecture = create(:lecture, start_time: start_time, event: event,
                        end_time: end_time, room: @room)
 

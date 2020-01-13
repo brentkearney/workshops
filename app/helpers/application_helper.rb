@@ -5,6 +5,15 @@
 # See the COPYRIGHT file for details and exceptions.
 
 module ApplicationHelper
+  def devise_error_messages
+    return '' if !defined?(resource) || resource.nil?
+    return '' unless resource.errors.present?
+    messages = resource.errors.full_messages.join('，')
+    sentence = I18n.t('errors.messages.not_saved',
+                      count: resource.errors.count,
+                      resource: resource.class.model_name.human.downcase)
+    "#{sentence}#{messages}"
+  end
 
   def page_title
     case request.path
@@ -22,12 +31,21 @@ module ApplicationHelper
       %Q(#{@event.code} Schedule)
     when /events\/(\w+)\/memberships/
       %Q(#{@event.code} Members)
+    when /sign_in/
+      "Workshops Sign-in"
+    when /register/
+      "Workshops Registration"
+    when /invitations/
+      "Workshop Invitations"
     else
       return %Q(#{@event.code}: #{@event.name}) unless @event.nil?
       Setting.Site[:title]
     end
   end
 
+  def sidebar_toggle
+    cookies[:sidebar_toggle] == 'true' ? 'sidenav-toggled' : ''
+  end
 
   def profile_pic(person)
     image_tag "profile.png", alt: "#{person.name}", id: "profile-pic-#{person.id}", class: "img-responsive img-rounded"
@@ -43,5 +61,11 @@ module ApplicationHelper
 
   def user_is_member?
     current_user && current_user.is_member?(@event)
+  end
+
+  def display_new_feature_notice?
+    return if current_user.nil?
+    @unread_notice && current_user.sign_in_count > 1 &&
+     Date.current < Date.parse('2020-06-30')
   end
 end

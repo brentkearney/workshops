@@ -8,9 +8,10 @@ require 'rails_helper'
 
 describe 'Invitation#new', type: :feature do
   before do
-    create(:event, past: true)
+    @past_event = create(:event, past: true)
     @current_event = create(:event, current: true)
-    3.times { create(:event, future: true) }
+    @future_event = create(:event, future: true)
+    @future_event2 = create(:event, future: true)
   end
 
   before :each do
@@ -70,7 +71,7 @@ describe 'Invitation#new', type: :feature do
       event = Event.last
       member = create(:membership, event: event, attendance: 'Invited')
 
-      select "#{event.name}", from: 'invitation_event'
+      select "#{event.code}", from: 'invitation_event'
       page.fill_in 'invitation[email]', with: member.person.email
       click_button 'Request Invitation'
 
@@ -90,12 +91,11 @@ describe 'Invitation#new', type: :feature do
 
   context 'validates membership' do
     before do
-      @event = Event.last
-      @member = create(:membership, event: @event)
+      @member = create(:membership, event: @future_event)
     end
 
     def submit_member_request(member)
-      select "#{@event.name}", from: 'invitation_event'
+      select "#{@future_event.code}", from: 'invitation_event'
       page.fill_in 'invitation[email]', with: member.person.email
       click_button 'Request Invitation'
     end

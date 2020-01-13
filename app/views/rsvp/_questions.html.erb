@@ -1,4 +1,4 @@
-<div class="panel-body">
+<div class="card-body">
   <div class="row">
     <div class='col-md-12 text-center'>
         <h1>Dear <%= @invitation.membership.person.dear_name %>:</h1>
@@ -7,31 +7,29 @@
   <div class="row">
     <div class='col-md-12'>
         <p class='lead text-center'>You have been invited to the
-        <%= @inv_event.event_type %>, <%= @inv_event.code %>:
+        <%= @inv_event.event_type %>, <%= @inv_event.code %>:<br>
         "<%= link_to @inv_event.name, event_path(@inv_event), target: '_new' %>", on
         <%= @inv_event.dates(:long) %>.<br>
         </p>
         <h3 id="attend">Will you attend?</h3>
     </div>
   </div>
-  <div class="jumbotron">
-    <div class="row">
-      <div class='col-md-4'>
+  <div class="jumbotron answers">
+    <div class="d-flex justify-content-center flex-column flex-md-row">
+      <div class="p-2 flex-fill">
         <a href="<%= rsvp_email_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-success">Yes</a>
       </div>
-      <div class="hidden-lg hidden-md">&nbsp;</div>
-      <div class='col-md-4'>
+      <div class="p-2 flex-fill">
         <a href="<%= rsvp_maybe_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-warning">Maybe</a>
       </div>
-      <div class="hidden-lg hidden-md">&nbsp;</div>
-      <div class='col-md-4'>
+      <div class="p-2 flex-fill">
         <a href="<%= rsvp_no_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-danger">No</a>
       </div>
     </div>
   </div>
   <div class="row">
     <div class='col-md-12'>
-      <p id="unique-notice">Note: if you are <strong>not</strong> <%= @invitation.membership.person.name %>, then please do not proceed. Invitation links are specific to each individual. To request your own invitation link, <%= link_to('go here', invitations_new_path) %>, or contact the Program Coordinator at <a href="mailto:<%= @pc_email %>?subject=[<%= @inv_event.code %>] invitation request"><%= @pc_email %></a>.</p>
+      <p id="unique-notice">Note: if you are <strong>not</strong> <%= @invitation.membership.person.name %>, then please do not proceed. Invitation links are specific to each individual. To request your own invitation link, <%= link_to('go here', invitations_new_path(@inv_event.code)) %>, or contact the Program Coordinator at <a href="mailto:<%= @pc_email %>?subject=[<%= @inv_event.code %>] invitation request"><%= @pc_email %></a>.</p>
     </div>
   </div>
 </div>

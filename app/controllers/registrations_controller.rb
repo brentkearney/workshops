@@ -6,6 +6,7 @@
 
 class RegistrationsController < Devise::RegistrationsController
   include ActiveSupport::Rescuable
+  layout "devise"
 
   def create
     invalid_email_redirect and return unless valid_email?

@@ -1,116 +1,111 @@
-<div class="navbar-default sidebar" id="sidebar" role="navigation">
-  <div class="sidebar-nav navbar-collapse">
-    <ul class="nav" id="side-menu">
-      <li id="home">
-        <a href="/"><i class="fa fa-dashboard fa-fw"></i> Home</a>
-        <div class="bottom-border"></div>
-      </li>
-
-      <% unless @event && @event.id %>
-      <li id="all-events">
-        <%= link_to '<i class="fa fa-university fa-fw"></i> All Events'.html_safe, events_path %>
-        <div class="bottom-border"></div>
-      </li>
-      <li id="my-events">
-        <%= link_to '<i class="fa fa-suitcase fa-fw"></i> My Events'.html_safe, my_events_path %>
-        <div class="bottom-border"></div>
-      </li>
-
-      <!-- /.locations -->
-      <li id="future-events">
-        <%= link_to '<i class="fa fa-forward fa-fw"></i> Future Events'.html_safe, events_future_path %>
-        <div class="bottom-border"></div>
-      </li>
-
-      <li id="past-events">
-        <%= link_to '<i class="fa fa-backward fa-fw"></i> Past Events'.html_safe, events_past_path %>
-        <div class="bottom-border"></div>
-      </li>
-
-      <% unless Setting.Locations.keys.blank? %>
-      <li id="event-locations">
-        <a href="#" id="event-locations-link"><i class="fa fa-globe fa-fw"></i> Event Locations <span id="locations-arrow" class="fa arrow"></span></a>
-        <ul class="nav nav-second-level" id="event-locations-list">
-          <% Setting.Locations.keys.each do |location| %>
-          <li id="<%= location %>">
-            <div class="top-border"></div>
-            <%= link_to %Q(<i class="fa fa-location-arrow fa-fw"></i> #{location}).html_safe, location_url(location) %>
-            <div class="bottom-border"></div>
-          </li>
-          <% end %>
-        </ul>
-        <!-- /.nav-second-level -->
-      </li>
-      <% end %>
-      <!-- /.locations -->
-
-      <li id="event-years">
-        <a href="#" id="event-years-link"><i class="fa fa-calendar fa-fw"></i> Event Years <span id="years-arrow" class="fa arrow"></span></a>
-        <ul class="nav nav-second-level" id="event-years-list">
-          <% Event.years.each do |year| %>
-          <li id="year-<%= year %>">
-            <div class="top-border"></div>
-            <%= link_to %Q(<i class="fa fa-calendar-check-o fa-fw"></i> #{year}).html_safe, year_url(year) %>
-            <div class="bottom-border"></div>
-          </li>
-          <% end %>
-        </ul>
-        <!-- /.nav-second-level -->
-      </li>
-
-      <% end %>
-
-
-      <% if @event && @event.id %>
-      <li id="event-links">
-        <a href="#"><i class="fa fa-gears fa-fw"></i> <%= @event.code %> <span class="fa arrow"></span></a>
-        <ul class="nav nav-second-level">
-
-          <li id="event-details">
-            <div class="top-border"></div>
-            <%= link_to '<i class="fa fa-book fa-fw"></i> Details'.html_safe, event_path(@event) %>
-            <div class="bottom-border"></div>
-          </li>
-
-          <li id="event-schedule">
-            <div class="top-border"></div>
-            <%= link_to '<i class="fa fa-calendar fa-fw"></i> Schedule'.html_safe, event_schedule_index_path(@event) %>
-            <div class="bottom-border"></div>
-          </li>
-
-          <li id="event-memberships">
-            <a href="#" id="event-members-link"><i class="fa fa-users fa-fw"></i> Members<span id="locations-arrow" class="fa arrow"></span></a>
-
-            <ul class="nav nav-second-level memberships">
-              <li id="event-members-list">
-                <div class="top-border"></div>
-                <%= link_to '<i class="fa fa-list fa-fw"></i> List Members'.html_safe, event_memberships_path(@event) %>
-                <div class="bottom-border"></div>
-              </li>
-              <% if policy(@event).allow_add_members? %>
-              <li id="event-members-add">
-                <div class="top-border"></div>
-                <%= link_to '<i class="fa fa-user-plus fa-fw"></i> Add Members'.html_safe, add_event_memberships_path(@event) %>
-                <div class="bottom-border"></div>
-              </li>
-              <% end %>
-              <% if policy(@event).send_invitations? %>
-              <li id="event-members-invite">
-                <div class="top-border"></div>
-                <%= link_to '<i class="fa fa-envelope fa-fw"></i> Invite Members'.html_safe, invite_event_memberships_path(@event) %>
-                <div class="bottom-border"></div>
-              </li>
-              <% end %>
-            </ul>
-          </li>
-          <!-- /#event-memberships -->
-        </ul>
-        <!-- /.nav-second-level -->
-      </li>
-      <% end %>
-      <!-- /.if @event -->
-    </ul>
+<span id="current-page" class="<%= action_name %>-<%= controller_name %>"></span>
+<div class="app-sidebar__overlay" data-toggle="sidebar"></div>
+<aside class="app-sidebar">
+  <%# Sidebar toggle button %>
+  <div id="hide-sidebar">
+    <a href="#" id="sidebar-toggle" data-toggle="sidebar" aria-label="Hide Sidebar" title="Hide Sidebar">
+      <i class="toggle-arrows fa fa-angle-double-left"></i>
+      <i class="toggle-arrows fa fa-angle-double-left"></i>
+    </a>
   </div>
-  <!-- /.sidebar-nav -->
-</div>
-<!-- /.navbar-default sidebar -->
+  <ul class="app-menu">
+    <li>
+      <%= link_to root_path, id: 'index-home', class: 'app-menu__item active' do %>
+        <i class="app-menu__icon fa fa-home"></i><span class="app-menu__label">Home</span>
+      <% end %>
+    </li>
+    <% if @event && @event.id %>
+    <li>
+      <%= link_to event_path(@event), id: 'event', class: 'app-menu__item active' do %>
+        <i class="app-menu__icon fa fa-briefcase"></i>
+        <span class="app-menu__label"><%= @event.code %></span>
+      <% end %>
+    </li>
+    <li class="nav-second-level">
+      <%= link_to '<i class="fa fa-book fa-fw"></i>
+          <span class="app-menu__label"> Details</span>'.html_safe,
+          event_path(@event), id: 'show-events',
+          class: 'app-menu__item' %>
+    </li>
+    <li class="nav-second-level">
+      <%= link_to '<i class="fa fa-calendar fa-fw"></i>
+          <span class="app-menu__label"> Schedule</span>'.html_safe,
+          event_schedule_index_path(@event), id: 'index-schedule',
+          class: 'app-menu__item' %>
+    </li>
+    <li class="nav-second-level">
+      <%= link_to '<i class="fa fa-users fa-fw"></i>
+          <span class="app-menu__label"> List Members</span>'.html_safe,
+          event_memberships_path(@event), id: 'index-memberships',
+          class: 'app-menu__item' %>
+    </li>
+    <% if policy(@event).allow_add_members? %>
+    <li class="nav-second-level">
+      <%= link_to '<i class="fa fa-user-plus fa-fw"></i>
+          <span class="app-menu__label"> Add Members</span>'.html_safe,
+          add_event_memberships_path(@event), id: 'add-memberships',
+          class: 'app-menu__item' %>
+    </li>
+    <% end %>
+    <% if policy(@event).send_invitations? %>
+    <li class="nav-second-level">
+      <%= link_to '<i class="fa fa-envelope fa-fw"></i>
+          <span class="app-menu__label"> Invite Members</span>'.html_safe,
+          invite_event_memberships_path(@event), id: 'invite-memberships',
+          class: 'app-menu__item' %>
+    </li>
+    <% end %>
+    <% else # no @event %>
+    <li class="nav-item">
+      <%= link_to '<i class="fa fa-suitcase fa-fw"></i>
+          <span class="app-menu__label"> My Events</span>'.html_safe,
+          my_events_path, id: 'my_events-events', class: 'app-menu__item' %>
+    </li>
+    <li class="nav-item">
+      <%= link_to '<i class="fa fa-university fa-fw"></i>
+          <span class="app-menu__label"> All Events</span>'.html_safe,
+          events_path, id: 'index-events', class: 'app-menu__item' %>
+    </li>
+    <li class="nav-item">
+      <%= link_to '<i class="fa fa-forward fa-fw"></i>
+          <span class="app-menu__label">Future Events</span>'.html_safe,
+          events_future_path, id: 'future-events', class: 'app-menu__item' %>
+    </li>
+    <li class="nav-item">
+      <%= link_to '<i class="fa fa-backward fa-fw"></i>
+          <span class="app-menu__label">Past Events</span>'.html_safe,
+          events_past_path, id: 'past-events', class: 'app-menu__item' %>
+    </li>
+    <% unless Setting.Locations.keys.blank? %>
+    <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview" id="location-events">
+      <i class="app-menu__icon fa fa-globe"></i><span class="app-menu__label">Event Locations</span>
+      <i class="treeview-indicator fa fa-angle-right"></i></a>
+      <ul class="treeview-menu">
+        <% Setting.Locations.keys.each do |location| %>
+        <li id="<%= location %>">
+          <%= link_to %Q(<i class="fa fa-location-arrow fa-fw"></i>
+              <span class="app-menu__label">#{location}</span>).html_safe,
+              location_url(location), id: "#{location}-events",
+              class: 'treeview-item' %>
+        </li>
+        <% end %>
+      </ul>
+    </li>
+    <% end %>
+    <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview" id="year-events">
+      <i class="app-menu__icon fa fa-calendar"></i><span class="app-menu__label">Event Years</span>
+      <i class="treeview-indicator fa fa-angle-right"></i></a>
+      <ul class="treeview-menu">
+        <% Event.years.each do |year| %>
+        <li id="year-<%= year %>">
+          <%= link_to %Q(<i class="fa fa-calendar-check-o fa-fw"></i>
+          <span class="app-menu__label">#{year}</span>).html_safe,
+          year_url(year), id: "#{year}-events", class: 'treeview-item year-link' %>
+        </li>
+        <% end %>
+      </ul>
+    </li>
+    <% end # end if @event else... %>
+  </ul>
+</aside>
+

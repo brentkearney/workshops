@@ -4,7 +4,7 @@
 
 <div class="tab tab-content">
 <% @setting.value.each do |key, values| %>
-  <div role="tabpanel" class="tab-pane<%= ' active' if key == @setting.value.keys.first %>" id="<%= key %>">
+  <div role="tabcard" class="tab-pane<%= ' active' if key == @setting.value.keys.first %>" id="<%= key %>">
     <h3><%= @setting.name(key) %></h3>
     <%= setting_form.fields_for @setting.var do |var_form| %>
       <%= var_form.fields_for key do |var_field| %>
@@ -41,7 +41,7 @@
 
       <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>
     <% end %><!-- setting_form -->
-  </div><!-- tabpanel -->
+  </div><!-- tabcard -->
 
 
 <% end %><!-- @setting -->

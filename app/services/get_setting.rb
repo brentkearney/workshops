@@ -138,7 +138,12 @@ class GetSetting
 
   def self.new_registration_msg
     setting = Setting.Site['new_registration_msg']
-    setting.blank? ? '' : setting
+    setting.blank? ? 'Site Setting "new_registration_msg" is missing.' : setting
+  end
+
+  def self.about_invitations_msg
+    setting = Setting.Site['about_invitations_msg']
+    setting.blank? ? 'Site Setting "about_invitations_msg" is missing.' : setting
   end
 
   def self.default_timezone

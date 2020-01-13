@@ -1,34 +1,66 @@
-<div class="authform">
-  <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { role: 'form' }) do |f| %>
-    <h3>Sign in</h3>
-    <%= render "devise/shared/error_messages" %>
+<div class="login-box" id="ws-login-box">
+  <%= form_for(resource, as: resource_name, url: session_path(resource_name),
+        html: { role: 'form', id: 'login-form', class: 'login-form' }) do |f| %>
+    <h3 class="login-head"><i class="fa fa-lg fa-fw fa-user"></i>Sign In</h3>
     <div class="form-group">
-      <%= f.label :email %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'form-control' %>
+      <%= f.label :email, 'E-mail Address' %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                        placeholder: 'email@address.edu', id: 'login-email',
+                        class: 'form-control' %>
     </div>
     <div class="form-group">
-      <%= f.label :password %>
-      <%= f.password_field :password, autocomplete: "current-password", class: 'form-control' %>
+      <%= f.label :password, 'Password' %>
+      <%= f.password_field :password, autocomplete: "current-password",
+                           placeholder: 'Password', id: 'login-password',
+                           class: 'form-control' %>
     </div>
-    <%= f.submit 'Sign in', class: 'button' %>
-    <% if devise_mapping.rememberable? %>
-        <div class="checkbox" style="width:150px">
+    <div class="form-group">
+      <div class="utility">
+        <% if devise_mapping.rememberable? %>
+        <div class="animated-checkbox">
           <label>
-            <%= f.check_box :remember_me %> Remember me
+            <%= f.check_box :remember_me %>
+            <span class="label-text" id="stay-signedin">Stay Signed in</span>
           </label>
         </div>
-    <% end -%>
-  <% end %>
-</div>
-<div class="row">
-  <div class="col-lg-4">
-    <p class="sign-in-links">Have you registered an account here already?<br>If not, <%= link_to 'Sign-up here', new_registration_path(resource_name), class: 'right' %>.</p>
-  </div>
-</div>
-<%- if devise_mapping.recoverable? %>
-  <div class="row">
-    <div class="col-lg-4">
-      <p class="sign-in-links">Did you forget your password?<br><%= link_to "Reset password", new_password_path(resource_name) %>.</p>
+        <% end %>
+        <%- if devise_mapping.recoverable? %>
+        <p class="semibold-text mb-2" id="forgot-password">
+          <a href="#" data-toggle="flip">Forgot Password ?</a>
+        </p>
+        <% end %>
+      </div>
     </div>
-  </div>
-<% end -%>
+    <div class="form-group btn-container">
+      <%= f.button :submit, name: 'Sign-in', class: 'btn btn-primary btn-block',
+                               id: "signin-button" do %>
+        <i class="fa fa-sign-in fa-lg fa-fw"></i> Sign-in
+      <% end %>
+    </div>
+  <% end %>
+  <%- if devise_mapping.recoverable? %>
+  <%= form_for(resource, as: resource_name, url: password_path,
+         html: { role: 'form', id: 'reset-form', class: 'forget-form' }) do |f| %>
+    <h3 class="login-head"><i class="fa fa-lg fa-fw fa-lock"></i> Reset Password</h3>
+    <div class="form-group">
+      <%= f.label :email, 'E-mail Address' %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                        placeholder: 'email@address.edu', id: 'reset-email',
+                        class: 'form-control' %>
+    </div>
+    <div class="form-group btn-container">
+      <%= f.button :submit, class: 'btn btn-primary btn-block', id: "reset-button" do %>
+        <i class="fa fa-unlock fa-lg fa-fw"></i> RESET
+      <% end %>
+    </div>
+    <div class="form-group mt-3">
+      <p class="semibold-text mb-0" id="back-to-login">
+        <a href="#" data-toggle="flip"><i class="fa fa-angle-left fa-fw"></i> Back to Login</a>
+      </p>
+    </div>
+  <% end %>
+  <% end %>
+
+  <div class="forget-form align-text-bottom" id="registration-link">Have you registered an account?<br>If not, <%= link_to 'Sign-up here', new_registration_path(resource_name) %>.</div>
+
+</div>

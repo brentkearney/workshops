@@ -20,7 +20,6 @@ describe 'Event Show Page', type: :feature do
 
   def shows_partial_details
     body = page.body.squish
-    expect(body).to have_css('h4.event-details', text: "Event Details")
     expect(body).to have_text(@event.code)
     expect(body).to have_text(@event.name)
     expect(body).to have_text(@event.location)

@@ -4,25 +4,31 @@ $(document).on 'turbolinks:load', ->
   $(".spinner").hide()
   $('#add-members').show()
 
+  # Memberships list
+  # hide shown tab-pane if member name is re-clicked
+  $('a[data-toggle="list"]').click (e) ->
+    $(e.target.hash).toggle()
+    # e.target.classList.remove('active')
+
   arrival_date = $('#arrival_date').val()
   arrival_date or= $('#min_date').val()
 
-  $('#arrival').datetimepicker({
-    format: 'YYYY-MM-DD',
-    minDate: $('#min_date').val(),
-    maxDate: $('#max_date').val(),
-    defaultDate: arrival_date
-  })
+  #$('#arrival').datetimepicker({
+  #  format: 'YYYY-MM-DD',
+  #  minDate: $('#min_date').val(),
+  #  maxDate: $('#max_date').val(),
+  #  defaultDate: arrival_date
+  #})
 
   departure_date = $('#departure_date').val()
   departure_date or= $('#max_date').val()
 
-  $('#departure').datetimepicker({
-    format: 'YYYY-MM-DD',
-    minDate: $('#min_date').val(),
-    maxDate: $('#max_date').val(),
-    defaultDate: departure_date
-  })
+  #$('#departure').datetimepicker({
+  #  format: 'YYYY-MM-DD',
+  #  minDate: $('#min_date').val(),
+  #  maxDate: $('#max_date').val(),
+  #  defaultDate: departure_date
+  #})
 
   $('#new-people tr').find('.person-data').each (i, field) ->
     if field.value.length == 0
@@ -42,6 +48,13 @@ $(document).on 'turbolinks:load', ->
   # Enable tooltips & popovers
   $('[data-toggle="popover"]').popover()
   $('[data-toggle="tooltip"]').tooltip()
+
+  # Show legend for invited & undecided overdue replies
+  if $('.invited-members').find('.reply-due').length > 0
+    $('#Invited-legend').show()
+  if $('.undecided-members').find('.reply-due').length > 0
+    $('#Undecided-legend').show()
+
 
   # Memberships invite page buttons
   # Check All
@@ -81,5 +94,3 @@ $(document).on 'turbolinks:load', ->
 
     return confirm(msg)
 
-  # Display new feature modal
-  $('#new-feature-notice').modal('show');

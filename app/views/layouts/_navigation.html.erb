@@ -1,0 +1,58 @@
+<header class="app-header">
+  <a class="app-sidebar__toggle" id="mobile-nav" href="#" data-toggle="sidebar" aria-label="Hide Sidebar"></a>
+
+  <a class="app-header__logo" href="<%= root_path -%>">
+    <%= image_tag(GetSetting.site_setting('logo')) %>
+  </a>
+  <div id="application-title"><%= Setting.Site['title'] %></div>
+
+  <%# Navbar Right Menu %>
+  <ul class="app-nav">
+    <% if current_user.present? %>
+      <% if false %>
+      <li class="app-search">
+        <input class="app-search__input" type="search" placeholder="Search">
+        <button class="app-search__button"><i class="fa fa-search"></i></button>
+      </li>
+      <% end %>
+
+      <%# User Menu %>
+      <li class="dropdown rightmost">
+        <a class="app-nav__item" href="#" data-toggle="dropdown" aria-label="Open Profile Menu">
+          <i class="fa fa-user fa-lg"></i>
+        </a>
+        <ul class="dropdown-menu settings-menu dropdown-menu-right">
+          <% if current_user.is_admin? %>
+          <li>
+            <%= link_to settings_path, class: 'dropdown-item' do -%>
+              <i class="fa fa-cog fa-lg"></i> Settings
+            <% end %>
+          </li>
+          <% end %>
+          <% if current_user.is_staff? %>
+          <li>
+            <%= link_to admin_root_path, class: 'dropdown-item' do -%>
+              <i class="fa fa-database fa-lg"></i> Database Admin
+            <% end %>
+          </li>
+          <% end %>
+          <li>
+            <%= link_to edit_user_registration_path, class: 'dropdown-item' do -%>
+              <i class="fa fa-user fa-lg"></i> Change Password
+            <% end %>
+          </li>
+          <li>
+            <%= link_to sign_out_path, method: :delete, class: 'dropdown-item' do %>
+              <i class="fa fa-sign-out fa-lg"></i> Logout
+            <% end %>
+          </li>
+        </ul>
+      </li>
+    <% else %>
+      <li class="app-login-box">
+        <a class="btn btn-dark" href="<%= new_user_session_path -%>"><%= t('user.sign_in') -%></a>
+        <a class="btn btn-light" href="<%= new_user_registration_path -%>"><%= t('user.sign_up') -%></a>
+      </li>
+    <% end %>
+  </ul>
+</header>

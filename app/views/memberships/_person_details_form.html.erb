@@ -1,156 +1,117 @@
 <% if policy(@membership).edit_person? %>
-<div class="form-group">
-  <div class="col-sm-9 lead">
+<div class="card" id="person-form">
+  <div class="card-title">
     <% if @membership.person_id.blank? %>
       <h3>New Member</h3>
     <% else %>
       <h3 id="personal"><%= @membership.person.name %>'s Personal Details</h3>
     <% end %>
   </div>
-</div>
-
-<%= f.fields_for :person do |person| %>
-<div class="form-group">
-  <div class="col-sm-3 control-label">
-    <%= person.label :salutation, "Salutation: " %>
-  </div>
-  <div class="col-sm-2">
-    <%= person.select :salutation, Setting.Site['salutations'],
-      { include_blank: true }, { class: 'form-control' } %>
-  </div>
-  <div class="col-sm-7"></div>
-</div>
-
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :firstname, "Firstname: " %>
+  <div class="card-body">
+    <%= f.fields_for :person do |person| %>
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :salutation, "Salutation: " %>
+      </div>
+      <%= person.select :salutation, Setting.Site['salutations'],
+        { include_blank: true }, { class: 'form-control' } %>
     </div>
-    <div class="col-sm-9">
+
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :firstname, "Firstname: " %>
+      </div>
       <%= person.text_field :firstname, class: 'form-control' %>
     </div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :lastname, "Lastname: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :lastname, "Lastname: " %>
+      </div>
       <%= person.text_field :lastname, class: 'form-control' %>
     </div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :email, "E-mail: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :email, "E-mail: " %>
+      </div>
       <%= person.text_field :email, class: 'form-control' %>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="form-inline" id="member-email">
-      <div class="col-sm-3">
-        &nbsp;
-      </div>
-      <div class="col-sm-9 share_email">
-        <%= f.check_box 'share_email', class: "form-control" %>
-        <%= f.label(:share_email, "Allow confirmed members of #{@event.code} to see this e-mail address") %>
-      </div>
-      <div class="col-sm-3">
-        &nbsp;
-      </div>
-      <div class="col-sm-9 share_email">
-        <%= f.check_box 'share_email_hotel', class: "form-control" %>
-        <%= f.label(:share_email_hotel, "Share e-mail with hotel") %>
-      </div>
+    <div class="form-inline checkbox-field" id="member-email">
+      <%= f.check_box 'share_email', class: "form-control" %>
+      <%= f.label(:share_email, "Allow confirmed members of #{@event.code} to see this e-mail address") %>
     </div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :url, "Website: " %>
+    <div class="form-inline checkbox-field" id="share-email">
+      <%= f.check_box 'share_email_hotel', class: "form-control" %>
+      <%= f.label(:share_email_hotel, "Share e-mail with hotel") %>
     </div>
-    <div class="col-sm-9">
+
+    <div class="form-group" id="website">
+      <div class="control-label">
+        <%= person.label :url, "Website: " %>
+      </div>
       <%= person.text_field :url, class: 'form-control' %>
     </div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :affiliation, "Affiliation: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :affiliation, "Affiliation: " %>
+      </div>
       <%= person.text_field :affiliation, class: 'form-control' %>
     </div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :department, "Department: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :department, "Department: " %>
+      </div>
       <%= person.text_field :department, class: 'form-control' %>
     </div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :title, "Title: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :title, "Title: " %>
+      </div>
       <%= person.text_field :title, class: 'form-control' %>
     </div>
-  </div>
 
-  <% if policy(@membership).edit_personal_info? %>
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :academic_status, "Academic Status: " %>
-    </div>
-    <div class="col-sm-3">
+    <% if policy(@membership).edit_personal_info? %>
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :academic_status, "Academic Status: " %>
+      </div>
       <%= person.select :academic_status, Setting.Site['academic_status'],
           { include_blank: true }, { class: 'form-control' } %>
     </div>
-    <div class="col-sm-6"></div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :phd_year, "Year of Ph.D.: " %>
-    </div>
-    <div class="col-sm-3">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :phd_year, "Year of Ph.D.: " %>
+      </div>
       <%= person.text_field :phd_year, class: 'form-control' %>
     </div>
-    <div class="col-sm-6"></div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :gender, "Gender: " %>
-    </div>
-    <div class="col-sm-3">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :gender, "Gender: " %>
+      </div>
       <%= person.select :gender,
         { "Male" => "M", "Female" => "F", "Other" => "O" },
         { include_blank: false }, { class: 'form-control' } %>
     </div>
-    <div class="col-sm-6"></div>
-  </div>
 
-  <% if policy(@membership).show_address? %>
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :phone, "Phone: " %>
-    </div>
-    <div class="col-sm-9">
+    <% if policy(@membership).show_address? %>
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :phone, "Phone: " %>
+      </div>
       <%= person.text_field :phone, class: 'form-control' %>
     </div>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :address, "Address: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :address, "Address: " %>
+      </div>
       <%= person.text_field :address1, class: 'form-control', placeholder: 'Address line 1' %>
       <%= person.text_field :address2, class: 'form-control', placeholder: 'Address line 2' %>
       <%= person.text_field :address3, class: 'form-control', placeholder: 'Address line 3' %>
@@ -159,53 +120,45 @@
       <%= person.text_field :postal_code, class: 'form-control', placeholder: 'Postal Code' %>
       <%= person.text_field :country, class: 'form-control', placeholder: 'Country' %>
     </div>
-  </div>
-  <% else %>
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :country, "Country: " %>
-    </div>
-    <div class="col-sm-9">
+    <% else %>
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :country, "Country: " %>
+      </div>
       <%= person.text_field :country, class: 'form-control', placeholder: 'Country' %>
     </div>
-  </div>
-  <% end %>
+    <% end %>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :emergency_contact, "Emergency Contact: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :emergency_contact, "Emergency Contact: " %>
+      </div>
       <%= person.text_field :emergency_contact, class: 'form-control' %>
     </div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :emergency_phone, "Emergency Phone: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :emergency_phone, "Emergency Phone: " %>
+      </div>
       <%= person.text_field :emergency_phone, class: 'form-control' %>
     </div>
-  </div>
-  <% end %>
+    <% end %>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :research_areas, "Research Areas: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :research_areas, "Research Areas: " %>
+      </div>
       <%= person.text_field :research_areas, class: 'form-control' %>
     </div>
-  </div>
 
-  <div class="form-group">
-    <div class="col-sm-3 control-label">
-      <%= person.label :biograhy, "Biography: " %>
-    </div>
-    <div class="col-sm-9">
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :biograhy, "Biography: " %>
+      </div>
       <%= person.text_area :biography, class: 'form-control' %>
     </div>
-  </div>
-<% end # fields_for person %>
+    <% end # fields_for person %>
+  </div><!-- ./card-body -->
+</div> <!-- ./card person-form -->
 <% end # edit_person policy %>
+

@@ -1,0 +1,14 @@
+{
+  "name": "harman_vendor",
+  "private": true,
+  "license": "SEE LICENSE IN GNU-AGPL-3.0",
+  "dependencies": {
+    "@rails/webpacker": "^4.0.7",
+    "stimulus": "^1.0.1",
+    "vali-admin": "^2.4.1"
+  },
+  "devDependencies": {
+    "webpack": "^4.28.4",
+    "webpack-dev-server": "^3.2.1"
+  }
+}

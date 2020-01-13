@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= page_title %></title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+  <body class="app devise <%= controller_name %> <%= action_name %>" data-notice="<%= j notice -%>" data-alert="<%= j alert || devise_error_messages -%>">
+
+    <%# Flash messages %>
+
+    <div class="devise-flash">
+      <%= render 'layouts/flashes' %>
+      <%= render 'devise/shared/error_messages' %>
+    </div>
+
+
+    <section class="material-half-bg">
+      <div class="cover"></div>
+    </section>
+    <section class="login-content d-flex flex-column">
+      <div class="login-title p-2">
+        <div class="d-flex flex-row align-items-center">
+          <%= image_tag(GetSetting.site_setting('logo'), class: 'img-thumbnail p-2') %>
+        </div>
+        <div id="app-title" class="d-flex flex-row justify-content-center">
+          <h1><%= GetSetting.site_setting('title') %></h1>
+        </div>
+      </div>
+      <%= yield %>
+    </section>
+  </body>
+</html>

@@ -1,5 +1,18 @@
-@import "bootstrap-sprockets";
-@import "bootstrap";
-@import 'bootstrap-datetimepicker';
-@import "font-awesome";
-@import "sb-admin-2";
+// Val-admin-theme
+@import 'val-admin';
+
+// Workshops
+@import 'font-awesome';
+@import 'administrate';
+@import 'devise';
+@import 'errors';
+@import 'events';
+@import 'invitations';
+@import 'line-spinner';
+@import 'memberships';
+@import 'print';
+@import 'rsvp';
+@import 'schedules';
+@import 'settings';
+@import 'home';
+@import 'layout';

@@ -1,48 +1,54 @@
-<div class="row invitation-box">
-  <div class="col-md-8 col-md-offset-2">
-    <%= render 'validation_errors' %>
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <span class="panel-title"><h2>Request New Event Invitation</h2></span>
+<div class="invitation-content">
+  <%= render 'validation_errors' %>
+  <div class="invitation-box">
+  <%= form_for @invitation, as: :invitation, url: invitations_create_path,
+                        method: 'post',
+                          html: { class: 'form', role: 'form' } do |f| %>
+    <h3 class="login-head">
+      <i class="fa fa-lg fa-fw fa-envelope"></i>Request New Event Invitation
+    </h3>
+    <div class="form-group">
+      <%= f.label :event, 'Select the event you were invited to:' %><br />
+      <%= f.collection_select(:event, @events, :code, :options_list,
+                              { include_blank: true, selected: @code },
+                              { class: 'form-control' }) %>
+    </div>
+    <div class="form-group">
+      <%= f.label :email, 'E-mail Address' %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                        placeholder: 'email@address.edu', id: 'login-email',
+                        class: 'form-control' %>
+    </div>
+    <div class="form-group btn-container">
+      <%= f.button :submit, class: 'btn btn-primary btn-block',
+                               id: "request-button" do %>
+        <i class="fa fa-sign-in fa-lg fa-fw"></i> Request Invitation
+      <% end %>
+    </div>
+    <div class="form-group mt-3">
+      <p class="semibold-text mb-0" id="back-to-login">
+        <a href="<%= sign_in_url %>"><i class="fa fa-angle-left fa-fw"></i> Sign-in</a>
+      </p>
+    </div>
+  <% end %>
+    <div class="align-text-bottom" id="about-invitations">
+      <a href="#" data-toggle="modal" data-target="#about-invitations-modal">
+        About Invitations<i class="fa fa-lg fa-fw fa-question-circle"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+
+<!-- About Invitations Modal -->
+<div class="modal fade" id="about-invitations-modal" tabindex="-1" role="dialog" aria-labelledby="about-invitations" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <%= GetSetting.about_invitations_msg.html_safe %>
       </div>
-      <div class="panel-body">
-
-        <%= form_for @invitation, as: :invitation, url: invitations_create_path,
-                              method: 'post',
-                                html: { class: 'form', role: 'form' } do |f| %>
-        <fieldset>
-        <div class="row">
-          <div class='col-md-12'>
-            <div class="form-group">
-              <p>
-              <%= f.label :event, 'Select the event you were invited to:' %><br />
-              <%= f.collection_select(:event, @events, :code, :options_list,
-                                { include_blank: true, selected: @code }, { class: 'form-control' }) %>
-             </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class='col-md-12'>
-            <div class="form-group">
-              <p>
-              <%= f.label :email, 'Enter your email address:' %><br />
-              <%= f.email_field :email, class: 'form-control' %>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class='col-md-4'>
-            <div class="form-group">
-              <%= f.submit 'Request Invitation', class: 'btn btn-default' %>
-            </div>
-          </div>
-        </div>
-        </fieldset>
-        <% end %>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

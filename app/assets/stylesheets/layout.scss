@@ -1,205 +1,186 @@
-/* Import Twitter Bootstrap */
-@import "bootstrap-sprockets";
-@import "bootstrap";
-@import "bootstrap/theme";
-@import "colours";
+// Top Navbar
 
-body {
-  background-color: #fff;
-  color: #333;
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 18px;
-}
+.app-header {
+  @extend .navbar;
+  height: 50px;
+  padding: 0;
+  margin: 0;
 
-p, ol, ul, td {
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 18px;
-}
-
-a {
-  color: #000;
-  &:visited {
-    color: #666;
+  #mobile-nav {
+    color: white;
+    max-width: 50px;
   }
-  &:hover {
-    color: #fff;
-    background-color: #000;
-  }
-}
 
+  a.app-header__logo {
+    border: 1px dotted $primary-color;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0;
+    max-width: 50px;
+    background-color: $primary-color;
+    display: block;
+    height: 100%;
+    vertical-align: middle;
+    @extend .d-none, .d-md-block;
 
-/* Header area */
-.navbar-top-links a {
-  color: inherit;
-}
-.page-header a {
-  color: inherit;
-}
-
-#application-heading {
-  margin-top: 5px;
-  height: 45px;
-  /* border: 1px solid red; */
-  text-align: bottom;
-  #logo-heading {
-    padding: 5px;
     img {
-      max-height: 45px;
-      vertical-align:middle;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      vertical-align: middle;
+
+      max-height: 40px;
+      max-width: 40px;
+      margin: 5px;
+      background-color: white;
+      padding: 0;
     }
   }
+
   #application-title {
-    font-size: 1.5em;
-    padding-bottom: 10px;
+    position: absolute;
+    top: 0;
+    left: 50px;
+    line-height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    font-family: sans-serif;
+    font-size: 1.2em;
+    color: white;
+  }
+
+  // User menu
+  ul.app-nav {
   }
 }
 
-.page-header-subtitle {
-  margin-top: -0.5em;
-  margin-bottom: 1em;
-  img { display: inline; }
-  h4 { display: inline; }
-}
-
-/* Flash notices */
+// Alerts
 .flash-messages {
-  margin-top: 51px;
-}
-.flash-messages .alert ul {
-  text-align: left;
-  margin-top: 1em;
-  margin-left: 25%;
-  margin-right: 2em;
-}
-
-.flash-messages .warning-header {
-  font-size: 1em;
-  font-weight: bold;
-}
-
-.flash-messages p {
-  font-size: 1em;
-  margin-top: 1.5em;
-}
-
-.flash {
-  @extend .alert;
+  position: relative;
+  top: 50px;
   text-align: center;
-  vertical-align: middle;
-}
-.notice {
-  @extend .alert-success;
-}
-.warning {
-  @extend .alert-warning;
-}
-.alert-alert {
-  @extend .alert-warning;
-}
-.alert-error {
-  @extend .alert-danger;
-}
-.alert-notice {
-  @extend .alert-success;
-  margin: 0;
+  padding: 0;
+  @media(min-width: 768px) { margin-left: $sidebar-width; }
 }
 
-/* Tables on Events, Membership, Schedule pages */
-.table-heading {
-  font-size: 1.1em;
-  font-style: bold;
-  font-weight: bold;
-}
+.notify-alert {
+  box-shadow: none;
+  border: 1px;
+  max-width: 99999px;
+  text-align: center;
+  width: 100%;
 
-form .field_with_errors {
-	width: 100%;
-	background-color: #fff;
-}
-form .field_with_errors input {
-	background-color: #edd4d5;
-	/* margin-top: -20px; */
-}
-form .field_with_errors select {
-	background-color: #edd4d5;
-}
-form .small-field {
-	width: 100px;
-}
-.member-email {
-	padding-bottom: 25px;
-}
+  .alert {
+    @media(min-width: 768px) { margin-left: -$sidebar-width; }
+  }
 
-li.spacer {
-  background-color: #FFFFFF;
-  height: 4em;
-}
-.page-title {
-	padding-bottom: 1em;
-}
-.page-title h1 {
-	margin: 0;
-	padding: 0.5em 0;
-}
+  .alert-notice {
+    @extend .alert-warning;
+  }
 
-li.rightside {
-	float: right;
-	text-align: right;
-}
-
-.nav-second-level .memberships {
-  li a {
-    margin-left: 13px;
+  .alert-error {
+    @extend .alert-danger;
   }
 }
 
-/* centered columns styles */
-.row-centered {
+.alert-alert, .alert-notice {
+  @extend .alert-success;
   text-align: center;
 }
-.col-centered {
-  display: inline-block;
-  float: none;
+
+// Side Navbar
+.app-sidebar__overlay {
+  @media(max-width: 767px) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 9;
+  }
+}
+
+.app-sidebar {
+  #hide-sidebar {
+    margin-top: -15px;
+    margin-bottom: 50px;
+    text-align: right;
+    width: 100%;
+
+    a {
+      font-size: 1.2em;
+      color: white;
+      margin-right: 8px;
+      text-decoration: none;
+
+      i.hidden {
+        visibility: none;
+      }
+    }
+  }
+  ul.app-menu {
+    margin-top: -50px;
+  }
+}
+
+li.nav-second-level {
+  margin-left: 5%;
+}
+
+// Events pages
+.page-header-subtitle {
+  margin-bottom: 15px;
+
+  img {
+    margin-right: 5px;
+    vertical-align: -25%;
+  }
+  h4 {
+    display: inline-block;
+    .small-bullet {
+      font-size: 1.3em;
+    }
+  }
+}
+
+// General
+
+.card-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: white;
+  padding: 10px;
+  background-color: $primary-color;
+  h3 {
+    color: white;
+  }
+}
+
+
+// Footer
+.sidebar-mini {
+  margin: 0;
+  padding: 0;
+}
+
+.footer {
+  display: block;
+  float: top;
+  position: absolute;
+  left: -3%;
+  width: 106%;
   text-align: center;
-  /* inline-block space fix */
-  margin-right: -4px;
-}
+  margin: 0;
+  @media(min-width: 768px) { text-indent: $sidebar-width; }
 
-footer#page-footer {
-  color: $blue-border;
-  background: $background;
-  padding: 5px;
-  margin: 2em 1em;
-  border: 1px solid $grey-border;
-  border-top: 5px solid darken($background, 25%);
-
-}
-
-.panel-footer {
-  text-align: center;
-  vertical-align: middle;
-}
-/* "blank" row class in striped table */
-.table-striped > tbody > tr.blank > td {
-	background-color: white;
-}
-
-.footer .powered-by {
-  text-align: right;
-  font-size: 0.8em;
-  font-color: $subdued-color;
-  padding-right: 10px;
-  padding-bottom: 8px;
-  margin-top: -10px;
-}
-
-a:hover {
-  background-color: transparent;
-  text-decoration: none;
-  color: inherit;
-}
-
-a.btn-primary a:visited {
-  color: #fff;
+  padding: 0;
+  .card-footer {
+    font-size: 0.9em;
+  }
+  .powered-by {
+    @extend .pull-right;
+    margin-right: 2%;
+    font-size: 0.8em;
+  }
 }

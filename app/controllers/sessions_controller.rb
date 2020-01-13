@@ -6,10 +6,13 @@
 
 class SessionsController < Devise::SessionsController
   respond_to :html
+  layout "devise"
 
   # POST /sign_in
   def create
+    cookies.delete(:read_notice2)
     self.resource = warden.authenticate!(auth_options)
+    resource.validate
 
     if self.resource.person_id.nil?
       StaffMailer.notify_sysadmin(nil, { error: 'User has no associated person record', user: resource.inspect })
@@ -19,7 +22,7 @@ class SessionsController < Devise::SessionsController
       self.destroy
       set_flash_message(:error, :has_no_memberships)
     else
-      set_flash_message!(:notice, :signed_in)
+      set_flash_message!(:success, :signed_in)
       sign_in(resource_name, resource)
       yield resource if block_given?
       respond_with resource, location: after_sign_in_path_for(resource)

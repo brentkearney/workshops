@@ -12,6 +12,7 @@ class RsvpController < ApplicationController
   def index
     unless @invitation.event.nil?
       @inv_event = @invitation.event
+      @location = GetSetting.org_name(@inv_event.location)
       @pc_email = GetSetting.email(@inv_event.location, 'program_coordinator')
     end
   end
@@ -47,9 +48,15 @@ class RsvpController < ApplicationController
   def cancel
     person = @invitation.membership.person
     ConfirmEmailChange.where(replace_person_id: person.id,
-                             replace_email: person.email).first.delete
-    redirect_to rsvp_email_path(otp: otp_params),
-        success: 'E-mail change cancelled.'
+                             replace_email: person.email).destroy_all
+    if ConfirmEmailChange.where(replace_person_id: person.id,
+                             replace_email: person.email).empty?
+      redirect_to rsvp_email_path(otp: otp_params),
+                              success: 'E-mail change cancelled.'
+    else
+      redirect_to rsvp_email_path(otp: otp_params),
+                              error: 'Unable to cancel e-mail change :(.'
+    end
   end
 
   # GET /rsvp/yes/:otp

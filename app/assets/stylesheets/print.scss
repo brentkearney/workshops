@@ -46,4 +46,5 @@ nav, .footer, .add-item-buttons, .delete-item-buttons,
   a[href]:after {
     content: none !important;
   }
+  .no-print { display:none }
 }

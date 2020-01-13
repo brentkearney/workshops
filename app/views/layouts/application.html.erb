@@ -1,85 +1,75 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= page_title %></title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
 
-  <title><%= page_title %></title>
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
 
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= stylesheet_link_tag    'application', media: 'screen, projection', 'data-turbolinks-track' => true %>
-  <%= stylesheet_link_tag    'print', media: 'print', 'data-turbolinks-track' => true %>
-	<%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-	<%= csrf_meta_tags %>
+    <!-- MathJax to display math -->
+    <script type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [['$','$'], ['\\(','\\)']],
+              processEscapes: true
+          },
+          TeX: {
+              extensions: ["autobold.js", "AMSmath.js", "AMSsymbols.js"],
+              equationNumbers: { autoNumber: "AMS" }
+          }
+      });
+    </script>
+  </head>
+  <body class="app sidebar-mini <%= controller_name %> <%= action_name %> <%= sidebar_toggle %>" data-notice="<%= j notice -%>"
+    data-alert="<%= j alert || devise_error_messages -%>">
 
-  <%= render 'layouts/favicon' %>
+    <%# Navbar %>
+    <%= render 'layouts/navigation' %>
 
-	<%= yield :head %>
+    <%# Sidebar menu %>
+    <% if user_signed_in? %>
+    <%= render 'layouts/sidebar' %>
+    <% end %>
 
-	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-	<!--[if lt IE 9]>
-	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-	<![endif]-->
-
-  <!-- MathJax to display math -->
-  <script type="text/javascript"
-    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-  </script>
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [['$','$'], ['\\(','\\)']],
-            processEscapes: true
-        },
-        TeX: {
-            extensions: ["autobold.js", "AMSmath.js", "AMSsymbols.js"],
-            equationNumbers: { autoNumber: "AMS" }
-        }
-    });
-  </script>
-</head>
-
-<body class="<%= controller_name %> <%= action_name %>">
-<div id="wrapper" class="fluid-container">
-
-  <%= render 'layouts/navigation' %>
-
-  <div id="page-wrapper">
-    <div class="row">
-      <div class="col-lg-12">
-        <% if @event && !@event.name.nil? %>
-            <header>
-              <h3 class="page-header"><%= link_to @event.name, @event %></h3>
-              <div class="page-header-subtitle">
-                <%= image_tag("flags/#{@event.country}.png", height: 22) %>
-                <h4><%= @event.dates(:long) %></h4>
-              </div>
-            </header>
-        <% else %>
-            <% if user_signed_in? %>
-            <h1 class="page-header"><%= event_list_title %></h1>
-            <% end %>
-        <% end %>
-      </div>
-      <!-- /.col-lg-12 -->
+    <%# Flash messages %>
+    <% unless flash.blank? %>
+    <div class="flash-messages notify-alert">
+      <%= render 'layouts/flashes' %>
     </div>
-    <!-- /.row -->
-    <div class="row">
-      <!-- xs <= 768px, sm >= 768px, md >= 992px, lg >= 1200px -->
-      <div class="col-lg-12">
-        <%= yield %>
-      </div>
-    </div>
-    <!-- /.row -->
+    <% end %>
 
-  </div>
-  <!-- /#page-wrapper -->
+    <%# Main body content %>
+    <main class="app-content">
+      <% if @event && !@event.name.nil? %>
+          <header>
+            <h3 class="page-header"><%= link_to @event.name, @event %></h3>
+            <div class="page-header-subtitle">
+              <%= image_tag("flags/#{@event.country}.png", height: 22) %>
+              <h4><%= @event.code %> <span class="small-bullet">&middot;</span> <%= @event.dates(:long) %></h4>
+            </div>
+          </header>
+      <% else %>
+          <% if user_signed_in? %>
+          <h1 class="page-header"><%= event_list_title %></h1>
+          <% end %>
+      <% end %>
+    <%= yield %>
 
-  <%= render 'layouts/footer' %>
-</div>
-<!-- /#wrapper -->
+    <% if display_new_feature_notice? %>
+      <%= render partial: 'layouts/new_feature_notice' %>
+    <% end %>
 
-</body>
+    </main>
+    <%= render 'layouts/footer' %>
+  </body>
 </html>
+

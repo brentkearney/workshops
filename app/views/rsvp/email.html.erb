@@ -1,35 +1,30 @@
-<div class="row invitation-box container">
-  <div class="col-md-8 col-md-offset-1">
+<div class="row invitation-box container" id="email-form">
+  <div class="card">
+    <div class="rsvp-card-title card-header">
+      <h2>Confirm Your E-mail Address</h2>
+    </div>
     <%= render 'validation_errors' %>
-    <div class="panel panel-primary" id="email-form">
-      <div class="panel-heading">
-        <span class="panel-title"><h4>Confirm Your E-mail Address</h4></span>
+    <div class="card-body d-flex flex-column justify-content-center">
+      <div class="p-2 flex-grow-1">
+        <h1>We're glad you can attend! 🎉</h1>
       </div>
-      <div class="panel-body">
-      <h1>We're glad you can attend! 🎉<br />
-      <small>Is this your preferred email address? If not, please change it.</small></h1>
+      <div class="p-2">
+        <p>Is this your preferred email address? If not, please change it.</p>
+      </div>
       <%= form_for @email_form, as: :email_form,
          url: rsvp_email_path(@invitation.code), method: :post,
         html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |email_form| %>
         <fieldset>
         <%= email_form.fields_for :person, @email_form.person do |p| %>
-        <div class="row">
-          <div class='col-md-3'></div>
-          <div class='col-md-6 text-center'>
-            <%= p.email_field :email, class: "form-control", autocomplete: "email" %>
+          <div class='p-2'>
+            <%= p.email_field :email, class: "form-control text-center", autocomplete: "email" %>
           </div>
-          <div class='col-md-3'></div>
-        </div>
-        <div class="row">
-          <div class='col-md-3'></div>
-          <div class='col-md-6 text-center'>
-            <%= submit_tag('Continue', class: 'btn btn-lg btn-success text-center pull-right') %>
-          </div>
-          <div class='col-md-3'></div>
-        </div>
         <% end %><!-- end fields_for -->
+        <div class="p-2">
+          <%= submit_tag('Continue to Next Step', class: 'btn btn-lg btn-primary pull-right') %>
+        </div>
+        </fieldset>
       <% end %><!-- end form -->
-      </div><!-- panel-body -->
-    </div><!-- panel email-form -->
-  </div><!-- col-md-8 -->
+    </div><!-- card-body -->
+  </div>
 </div><!-- container -->

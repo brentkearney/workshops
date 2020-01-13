@@ -1,24 +1,33 @@
 <article>
-<table class="table table-striped table-hover" id="events-list">
-	<tbody>
-	<tr>
-		<th><%= image_tag('globe.png', alt: 'Location') %></th></th><th>Code</th><th>Workshop Name</th><th colspan="2"><th>Dates</th><th>Participants</th>
-	</tr>
-	<% @events.each do |event| %>
-	<tr>
-      <td><%= image_tag("flags/#{event.country}.png", height: 18) %></td>
-	    <td><%= link_to event.code, event_path(event) %></td>
-	    <td><%= link_to event.name, event_path(event) %></td>
-	    <td width="125"><%= link_to '<i class="fa fa-calendar fa-fw"></i> Schedule'.html_safe, event_schedule_index_path(event) %></td>
-	    <td width="125"><%= link_to '<i class="fa fa-users fa-fw"></i> Members'.html_safe, event_memberships_path(event) %></td>
-	    <td width="125"><%= event.dates %></td>
-	    <td class="confirmed"><%= event.confirmed_count %></td>
-	</tr>
-  <% end %>
-  <tr>
-  	<td colspan="3" align="left"><%= year_link(@events.last, :previous) %></td>
-  	<td colspan="4" align="right"><%= year_link(@events.last, :next) %></td>
-  </tr>
-	</tbody>
-</table>
+  <div class="event-page">
+    <table class="table table-striped table-hover" id="events-list">
+    	<thead>
+    	 <tr>
+    		<th><%= image_tag('globe.png', alt: 'Location') %></th><th>Code</th><th class="d-none d-sm-table-cell">Workshop Name</th>
+        <th colspan="2" class="d-none d-lg-table-cell"></th><th>Dates</th>
+        <th class="d-none d-sm-table-cell"><a title="Confirmed Participants">#</a></th>
+    	 </tr>
+      </thead>
+      <tbody>
+    	<% @events.each do |event| %>
+    	<tr>
+          <td><%= image_tag("flags/#{event.country}.png", height: 18) %></td>
+    	    <td><%= link_to event.code, event_path(event), { title: event.name } %></td>
+    	    <td class="d-none d-sm-table-cell"><%= link_to event.name, event_path(event), id: event.code %></td>
+    	    <td width="125" class="d-none d-lg-table-cell"><%= link_to '<i class="fa fa-calendar fa-fw"></i> Schedule'.html_safe, event_schedule_index_path(event) %></td>
+    	    <td width="125" class="d-none d-lg-table-cell"><%= link_to '<i class="fa fa-users fa-fw"></i> Members'.html_safe, event_memberships_path(event) %></td>
+    	    <td width="125"><%= event.dates %></td>
+    	    <td class="d-none d-sm-table-cell confirmed"><%= event.confirmed_count %></td>
+    	</tr>
+      <% end %>
+      <tr>
+        <td align="left" colspan="2"><%= year_link(@events.last, :previous) %></td>
+        <td class="d-none d-sm-table-cell"></td>
+        <td class="d-none d-lg-table-cell"></td>
+        <td class="d-none d-lg-table-cell"></td>
+        <td align="right" colspan="2"><%= year_link(@events.last, :next) %></td>
+      </tr>
+    	</tbody>
+    </table>
+  </div>
 </article>

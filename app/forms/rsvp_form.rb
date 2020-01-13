@@ -38,7 +38,7 @@ class RsvpForm < ComplexForms
   def date_list
     dates = [@event.start_date]
     dates << dates.last + 1.day while dates.last != @event.end_date
-    dates
+    dates.collect {|d| [d.strftime("%A, %b %-d, %Y"), d] }
   end
 
   def arrival_departure_intro

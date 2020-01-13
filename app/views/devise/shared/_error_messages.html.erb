@@ -1,10 +1,11 @@
-<% if resource.errors.any? %>
+<% if defined?(resource) && !resource.nil? && resource.errors.any? %>
+<div class="devise-errors" role="alert">
   <div id="error_explanation">
     <h2>
-      <%= I18n.t("errors.messages.not_saved",
-                 count: resource.errors.count,
-                 resource: resource.class.model_name.human.downcase)
-       %>
+          <%= I18n.t("errors.messages.not_saved",
+                     count: resource.errors.count,
+                     resource: resource.class.model_name.human.downcase)
+           %>
     </h2>
     <ul>
       <% resource.errors.full_messages.each do |message| %>

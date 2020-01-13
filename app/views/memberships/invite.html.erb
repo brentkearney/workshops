@@ -1,84 +1,75 @@
-<h1 id="invite-members">Invite Members to <%= @event.code %>
-  <small>Reply by date: <%= RsvpDeadline.new(@event.start_date).rsvp_by %>
-    <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><span class="glyphicon glyphicon-question-sign"></span></a></span>
-  </small>
-</h1>
-
 <article>
 <% if @memberships.empty? %>
-  <div class="row">
-      <div class="col-md-12">
-        <h3>No eligible members.</h3>
-        <p>Add some new members to the event by clicking <%= link_to 'Add Members', add_event_memberships_path(@event) %>.</p>
-      </div>
+  <div class="row event-page">
+    <div class="col-md-12">
+      <h3>No eligible members.</h3>
+      <p>Add some new members to the event by clicking <%= link_to 'Add Members', add_event_memberships_path(@event) %>.</p>
     </div>
+  </div>
 <% else %>
+  <div id="reply-by">
+    <span id="reply-by-date">
+      <strong>Reply by date:</strong> <%= RsvpDeadline.new(@event.start_date).rsvp_by %>
+      <span id="rsvp-by-icon"><a href="#" data-toggle="modal" data-target="#about-reply-by"><i class="fa fa-lg fa-fw fa-question-circle"></i></a></span>
+    </span>
+    <span class="pull-right" id="limits-message"><%= add_limits_message %></span>
+  </div>
+
   <% @memberships.each do |status, members| %>
   <%= form_with model: @invite_members, url: invite_event_memberships_path(@event),
                        class: 'form', role: 'form' do |form| %>
-  <div class="row<%= print_section?(status) %> <%= status.parameterize %>-members">
-    <div class="col-lg-12">
-      <div class="panel panel-default">
-        <div class="panel-heading table-heading">
-          <%= status %> Members
-        </div>
-        <!-- /.panel-heading -->
-        <div class="panel-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-hover members-list container-fluid">
-              <thead>
-              <tr class="no-print">
-                <th class="select">Select</th>
-                <th>#</th>
-                <th>Name</th>
-                <% if show_invited_on?(members.first) %>
-                  <th>Invited On</th>
-                <% else %>
-                  <th></th>
-                <% end %>
-                <th class="hidden-xs hidden-sm hidden-md">Affiliation</th>
-                <% if policy(@event).show_email_buttons?(status) %>
-                    <th class="hidden-md hidden-lg" align="middle">Email</th>
-                    <th class="hidden-xs hidden-sm">E-mail</th>
-                <% end %>
-                <th class="hidden-xs">Role</th>
-              </tr>
-              </thead>
-              <tbody>
-              <%= render partial: 'member_index_items', locals: {status: status, members: members, f: form } %>
-              </tbody>
-            </table>
-          </div>
-          <!-- /.table-responsive -->
-          <div class="row rowlink-skip no-print invite-buttons">
-            <div class="col-lg-6 pull-left">
-              <%= button_tag 'Select All', type: 'button', id: "#{status.parameterize.downcase}-all", class: "btn btn-sm btn-default all-button" %>
-
-              <%= button_tag 'Select None', type: 'button', id: "#{status.parameterize.downcase}-none", class: 'btn btn-sm btn-default none-button' %>
-
-              <%= button_tag 'Invert Selection', type: 'button', id: "#{status.parameterize.downcase}-invert", class: 'btn btn-sm btn-default invert-button' %>
-            </div>
-            <div class="col-lg-6 pull-right">
-              <%= form.submit invite_button(status), id: "#{status.parameterize.downcase}-submit",
-                            class: 'btn btn-sm btn-default submit-button pull-right' %>
-
-            </div>
-          </div>
-          <div class="row rowlink-skip no-print limits-message">
-          <%= add_limits_message(status) %>
-          </div>
-        </div>
-        <!-- /.panel-body -->
-      </div>
-      <!-- /.panel -->
+  <div class="card members-list <%= print_section?(status) %> <%= status.parameterize %>-members">
+    <div class="card-title">
+      <%= invite_title(status) %>
     </div>
-    <!-- /.col-lg-12 -->
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover members-list container-fluid">
+          <thead>
+          <tr class="no-print">
+            <th class="select">Select</th>
+            <th>#</th>
+            <th>Name</th>
+            <% if show_invited_on?(members.first) %>
+              <th>Invited On</th>
+            <% else %>
+              <th></th>
+            <% end %>
+            <th class="d-none d-lg-table-cell rowlink-skip no-print">Reply-by</th>
+            <% if policy(@event).show_email_buttons?(status) %>
+                <th class="d-none d-xl-table-cell rowlink-skip no-print">E-mail</th>
+            <% end %>
+            <th class="d-none d-lg-table-cell rowlink-skip no-print">Role</th>
+          </tr>
+          </thead>
+          <tbody>
+          <%= render partial: 'member_invite_items', locals: {status: status, members: members, f: form } %>
+          </tbody>
+        </table>
+      </div>
+      <!-- /.table-responsive -->
+      <div class="d-flex flex-column flex-md-row rowlink-skip no-print invite-buttons">
+        <%= button_tag 'Select All', type: 'button', id: "#{status.parameterize.downcase}-all", class: "btn btn-secondary all-button p-2" %>
+
+        <%= button_tag 'Select None', type: 'button', id: "#{status.parameterize.downcase}-none", class: 'btn btn-secondary none-button p-2' %>
+
+        <%= button_tag 'Invert Selection', type: 'button', id: "#{status.parameterize.downcase}-invert", class: 'btn btn-secondary invert-button p-2' %>
+
+        <%= form.submit invite_button(status), id: "#{status.parameterize.downcase}-submit",
+                      class: 'btn btn-primary submit-button ml-auto p-2' %>
+
+      </div>
+      <!-- /.row invite-buttons -->
+    </div>
+    </div>
+    <!-- /.card-body -->
   </div>
-  <!-- /.row -->
+  <!-- /.card -->
   <% end %>
   <% end %>
 <% end %>
 </article>
+
 
 <!-- ? Reply-by Date Modal -->
 <div class="modal fade" id="about-reply-by" tabindex="-1" role="dialog" aria-labelledby="about-reply-by" aria-hidden="true">
@@ -94,6 +85,7 @@
           <li>If the event is <strong>less</strong> than 3 months, 5 days from now, the deadline is 21 days from now.</li>
           <li>If the event is less than 2 months from now, the deadline is 10 days from now.</li>
           <li>If the event is less than 10 days from now, the deadline is the Tuesday before the event.</li>
+          <li>If the Tuesday before the event is in the past, the deadline is tomorrow.</li>
         </ul>
         <p>If you wish to communicate a different date or any other information to the participants, you should e-mail them directly.</p>
       </div>

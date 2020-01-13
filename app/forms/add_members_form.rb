@@ -39,6 +39,7 @@ class AddMembersForm < ComplexForms
         @added << person if add_new_member(person, @role)
       end
     end
+    Rails.logger.debug "\n\n * Errors object: \n#{errors.inspect}\n\n"
   end
 
   def organize_params(params)
@@ -74,7 +75,13 @@ class AddMembersForm < ComplexForms
     if EmailValidator.valid?(email)
       find_person(data) || add_new_person(data, i)
     else
-      errors.add(i.to_s, "E-mail is invalid")
+      invalid_msg = "E-mail is invalid"
+      if errors[i.to_s].empty?
+        errors.add(i.to_s, invalid_msg)
+      else
+        error = errors.delete(i.to_s).unshift(invalid_msg).join(', ')
+        errors.add(i.to_s, error)
+      end
       return
     end
   end

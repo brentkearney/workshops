@@ -79,7 +79,8 @@ class EventPolicy
   end
 
   def allow_add_members?
-    return false if @event.past?
+    return false if current_user.nil?
+    return false if Date.current + 2.days > event.start_date
     organizers_and_staff
   end
 
@@ -99,8 +100,7 @@ class EventPolicy
   def send_invitations?
     return false if current_user.nil?
     return false if Date.current + 2.days > event.start_date
-    return true if staff_and_admins
-    current_user.is_organizer?(event)
+    organizers_and_staff
   end
 
   def sync?

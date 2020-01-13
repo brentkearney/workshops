@@ -14,13 +14,9 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships
   # GET /events/:event_id/memberships.json
   def index
-    # cookies.delete(:read_notice)
     SyncMembers.new(@event) if policy(@event).sync?
     @memberships = SortedMembers.new(@event).memberships
     authorize(Membership.new)
-    @domain = GetSetting.email(@event.location, 'email_domain')
-    assign_buttons if policy(@event).show_email_buttons?('Confirmed')
-    @unread_notice = check_read_notice_cookie
   end
 
   # GET /events/:event_id/memberships/1
@@ -103,7 +99,7 @@ class MembershipsController < ApplicationController
               address.'.squish
           else
             redirect_to event_membership_path(@event, @membership),
-                        notice: 'Membership successfully updated.'
+                        success: 'Membership successfully updated.'
           end
         end
         format.json do
@@ -138,7 +134,7 @@ class MembershipsController < ApplicationController
 
   def cancel_email_change
     ConfirmEmailChange.where(replace_with_id: @membership.person_id)
-                      .first.delete
+                      .destroy_all
     redirect_to event_membership_path(@membership.event, @membership),
         success: 'Email change cancelled.'
   end
@@ -148,12 +144,13 @@ class MembershipsController < ApplicationController
   def destroy
     authorize @membership
     @membership.updated_by = @current_user.name
+    name = @membership.person.name
     @membership.destroy
 
     respond_to do |format|
       format.html do
         redirect_to event_memberships_path(@event),
-                    notice: 'Membership was successfully removed.'
+                    success: "#{name} was successfully removed."
       end
       format.json { head :no_content }
     end
@@ -182,17 +179,6 @@ class MembershipsController < ApplicationController
   end
 
   private
-
-  def check_read_notice_cookie
-    return false unless policy(@event).send_invitations?
-    return false if cookies[:read_notice]
-    cookies[:read_notice] = { value: true, expires: 6.months.from_now }
-  end
-
-  def assign_buttons
-    organizers = @memberships.values[0].nil? ? '' : select_organizers
-    @organizer_emails = map_emails(organizers)
-  end
 
   def map_emails(members)
     return [] if members.blank?

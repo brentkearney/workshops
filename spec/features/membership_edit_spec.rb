@@ -31,10 +31,21 @@ describe 'Membership#edit', type: :feature do
     @participant_user.save
   end
 
+
   def denies_user_access(member)
     visit edit_event_membership_path(@event, member)
 
-    expect(page.body).to have_css('div.alert.flash')
+    expect(page.body).to have_css('div.alert', text:
+      'You need to sign in or sign up before continuing.')
+    expect(current_path).to eq(my_events_path)
+  end
+
+  def access_denied(member)
+    visit edit_event_membership_path(@event, member)
+    expect(page.body).not_to have_css('div#profile-name',
+                                      text: member.person.name)
+    expect(page.body).to have_css('div.alert', text:
+      'Access denied.')
     expect(current_path).to eq(my_events_path)
   end
 
@@ -120,8 +131,8 @@ describe 'Membership#edit', type: :feature do
     uncheck 'membership_own_accommodation'
     fill_in 'membership_room', with: 'AB 123'
     fill_in 'membership_room_notes', with: 'Night-owl'
-    expect(page).to have_field('membership_has_guest', checked: false)
-    check 'membership_has_guest'
+    expect(page).to have_field('membership[has_guest]', checked: false)
+    check 'membership[has_guest]'
     fill_in 'membership_special_info', with: 'Very.'
     fill_in 'membership_staff_notes', with: 'Beware.'
     select 'Other', from: 'membership_person_attributes_gender'
@@ -208,7 +219,8 @@ describe 'Membership#edit', type: :feature do
     it 'denies access' do
       visit edit_event_membership_path(@event, @participant)
 
-      expect(page.body).to have_css('div.alert.flash')
+      expect(page.body).to have_css('div.alert', text:
+            'You need to sign in or sign up before continuing.')
       expect(current_path).to eq(new_user_session_path)
     end
   end
@@ -216,14 +228,14 @@ describe 'Membership#edit', type: :feature do
   context 'As a logged-in user who is not a member of the event' do
     it 'denies access' do
       login_as @non_member_user, scope: :user
-      denies_user_access(@participant)
+      access_denied(@participant)
     end
   end
 
   context "As a member of the event editing someone else's record" do
     it 'denies access' do
       login_as @participant_user, scope: :user
-      denies_user_access(@organizer)
+      access_denied(@organizer)
     end
   end
 
@@ -450,7 +462,7 @@ describe 'Membership#edit', type: :feature do
       end
 
       it 'denies access' do
-        denies_user_access(@participant)
+        access_denied(@participant)
       end
     end
   end
@@ -635,7 +647,7 @@ describe 'Membership#edit', type: :feature do
       login_as @non_member_user, scope: :user
       visit edit_event_membership_path(@event, @participant)
 
-      denies_user_access(@participant)
+      access_denied(@participant)
     end
   end
 
