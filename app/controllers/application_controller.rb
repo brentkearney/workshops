@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
 
   include ApplicationHelper
 
-  before_action :set_paper_trail_whodunnit, :set_unread_notice
+  before_action :set_paper_trail_whodunnit
   before_action :set_current_user, if: :json_request?
   before_action :configure_permitted_parameters, if: :devise_controller?
 
@@ -107,14 +107,5 @@ class ApplicationController < ActionController::Base
   def configure_permitted_parameters
     update_attrs = [:password, :password_confirmation, :current_password]
     devise_parameter_sanitizer.permit :account_update, keys: update_attrs
-  end
-
-  def check_read_notice_cookie
-    return false if @current_user.nil? || cookies[:read_notice2]
-    cookies[:read_notice2] = { value: true, expires: 1.month.from_now }
-  end
-
-  def set_unread_notice
-    @unread_notice = check_read_notice_cookie
   end
 end

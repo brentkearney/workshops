@@ -65,7 +65,11 @@ module ApplicationHelper
 
   def display_new_feature_notice?
     return if current_user.nil?
-    @unread_notice && current_user.sign_in_count > 1 &&
-     Date.current < Date.parse('2020-06-30')
+    return if cookies[:read_notice2]
+    current_user.sign_in_count > 1 && Date.current < Date.parse('2020-06-30')
+  end
+
+  def set_read_notice
+    cookies[:read_notice2] = { value: true, expires: 1.month.from_now }
   end
 end
