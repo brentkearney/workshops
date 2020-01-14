@@ -14,7 +14,7 @@ class RegistrationsController < Devise::RegistrationsController
     no_person_redirect and return if person.blank?
 
     membership = person.memberships.where("(role LIKE '%Org%') OR
-          (attendance != 'Not Yet Invited' AND attendance != 'Declined')").first
+          attendance != 'Not Yet Invited'").first
     not_invited_redirect and return if membership.blank?
 
     params[:user][:person_id] = person.id

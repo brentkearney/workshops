@@ -25,7 +25,7 @@
             <td><%= @event.location %></td>
 
             <td align="right">Time Zone:</td>
-            <td><%= @event.time_zone %></td>
+            <td><%= ActiveSupport::TimeZone[@event.time_zone].to_s %></td>
          </tr>
          <tr>
            <td align="right">Start Date:</td>

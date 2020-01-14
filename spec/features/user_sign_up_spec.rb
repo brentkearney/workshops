@@ -71,13 +71,13 @@ describe 'Visitor Signup', type: :feature do
     end
 
     context 'Person record is not an active member of the Event' do
-      it 'denies "Declined" participants to signup' do
+      it 'allows "Declined" participants to signup' do
         @membership.attendance = 'Declined'
         @membership.save!
 
         login_with_credentials
 
-        expect(page).to have_text('We have no records of pending event invitations')
+        expect(page).to have_text('Account successfully created')
       end
 
       it 'denies "Not Yet Invited" participants to signup' do

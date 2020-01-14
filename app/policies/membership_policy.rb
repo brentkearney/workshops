@@ -39,7 +39,7 @@ class MembershipPolicy
       all_fields
     when 'staff'
       staff_at_location ? all_fields - [:org_notes, :address1, :address2,
-        :address3, :city, :region, :postal_code] : []
+        :address3, :city, :region, :postal_code, :phone] : []
     when 'member'
       return organizer_fields if organizer?
       return [] unless member_self?

@@ -116,8 +116,7 @@ describe Api::V1::EventsController do
     end
 
     it 'queues an ActiveJob job to sync events in the background' do
-    expect { post "/api/v1/events/sync.json", params: @payload.to_json }
-      .to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(1)
+      expect { post "/api/v1/events/sync.json", params: @payload.to_json }.to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(1)
     end
 
     it 'sends given event_id to SyncEventMembersJob' do
