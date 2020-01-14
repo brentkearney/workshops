@@ -38,7 +38,7 @@ class Api::V1::EventsController < Api::V1::BaseController
     SyncEventMembersJob.perform_later(event.id)
 
     respond_to do |format|
-      format.json { head :success }
+      format.json { head :no_content }
     end
   end
 
