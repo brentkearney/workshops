@@ -6,13 +6,12 @@
 
 require 'rails_helper'
 
-describe 'Editing a Lecture Item', :type => :feature do
+describe 'Editing a Lecture Item', type: :feature do
   before do
     authenticate_user
     @event = create(:event_with_schedule)
     @event.schedules.each do |s|
-      person = create(:person)
-      create(:membership, event: @event, person: person)
+      person = create(:membership, event: @event).person
       lecture = create(:lecture, event: @event, person: person, start_time: s.start_time, end_time: s.end_time)
       s.lecture = lecture
       s.save
@@ -28,7 +27,7 @@ describe 'Editing a Lecture Item', :type => :feature do
 
   it 'updates the day of the item to the selected day' do
     new_day = @item.start_time.to_date + 1.day
-    page.select new_day.strftime("%A"), :from => 'schedule_day'
+    page.select new_day.strftime("%A"), from: 'schedule_day'
     click_button 'Update Schedule'
     expect(Lecture.find(@lecture.id).start_time.to_date).to eq(new_day)
   end

@@ -81,7 +81,7 @@ class ScheduleItem
     unless lecture_id.nil?
       lecture = Lecture.find(lecture_id)
       # don't update the time if a recording has already been made
-      unless lecture.filename.blank?
+      if lecture.filename.blank?
         lecture.start_time = new_schedule.start_time
         lecture.end_time = new_schedule.end_time
       end
