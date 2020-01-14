@@ -109,12 +109,12 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit :account_update, keys: update_attrs
   end
 
-  def set_unread_notice
-    @unread_notice = check_read_notice_cookie
+  def check_read_notice_cookie
+    return false if @current_user.nil? || cookies[:read_notice2]
+    cookies[:read_notice2] = { value: true, expires: 1.month.from_now }
   end
 
-  def check_read_notice_cookie
-    return false if cookies[:read_notice2]
-    cookies[:read_notice2] = { value: true, expires: 1.month.from_now }
+  def set_unread_notice
+    @unread_notice = check_read_notice_cookie
   end
 end
