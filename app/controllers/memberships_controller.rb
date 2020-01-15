@@ -145,6 +145,7 @@ class MembershipsController < ApplicationController
     authorize @membership
     @membership.updated_by = @current_user.name
     name = @membership.person.name
+    Invitation.where(membership: @membership).destroy_all
     @membership.destroy
 
     respond_to do |format|
