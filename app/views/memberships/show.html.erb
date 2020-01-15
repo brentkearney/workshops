@@ -29,28 +29,28 @@
           <% end %>
 
           <% if policy(@membership).show_personal_info? %>
-          <% unless @person.emergency_contact.blank? %>
-          <div class="row" id="profile-emergency_contact">
-            <strong>Emergency Contact:</strong>  &nbsp; <%= @person.emergency_contact +
-              '  (' + @person.emergency_phone + ')' %>
-          </div>
-          <% end %>
+            <% unless @person.emergency_contact.blank? %>
+            <div class="row" id="profile-emergency_contact">
+              <strong>Emergency Contact:</strong>  &nbsp; <%= @person.emergency_contact +
+                '  (' + @person.emergency_phone + ')' %>
+            </div>
+            <% end %>
 
-          <div class="row" id="profile-address">
-            <%= print_address(@person) %>
-          </div>
+            <div class="row" id="profile-address">
+              <%= print_address(@person) %>
+            </div>
 
-          <% unless @person.academic_status.blank? %>
-          <div class="row" id="profile-academic-status">
-            <strong>Academic Status:</strong>  &nbsp; <%= @person.academic_status %>
-          </div>
-          <% end %>
+            <% unless @person.academic_status.blank? %>
+            <div class="row" id="profile-academic-status">
+              <strong>Academic Status:</strong>  &nbsp; <%= @person.academic_status %>
+            </div>
+            <% end %>
 
-          <% unless @person.phd_year.blank? %>
-          <div class="row" id="profile-phd_year">
-            <strong>Year of Ph.D.:</strong>  &nbsp; <%= @person.phd_year %>
-          </div>
-          <% end %>
+            <% unless @person.phd_year.blank? %>
+            <div class="row" id="profile-phd_year">
+              <strong>Year of Ph.D.:</strong>  &nbsp; <%= @person.phd_year %>
+            </div>
+            <% end %>
           <% end %>
 
           <% unless @person.research_areas.blank? %>

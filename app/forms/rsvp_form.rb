@@ -76,6 +76,11 @@ class RsvpForm < ComplexForms
     (GetSetting.rsvp_personal_info_intro(@event.location) || default).html_safe
   end
 
+  def biography_intro
+    default = "An optional biographical summary for other participants to see."
+    (GetSetting.rsvp_biography_intro(@event.location) || default).html_safe
+  end
+
   def privacy_notice
     default = "Privacy Notice: We promise not to share your information with anyone."
     (GetSetting.rsvp_privacy_notice(@event.location) || default).html_safe

@@ -162,7 +162,7 @@
           <%= p.url_field :url, class: "form-control", autocomplete: "url" %>
         </div>
         <div class="form-group">
-          <%= p.label :phone, class: "mandatory" %>
+          <%= p.label :phone %>
           <%= p.telephone_field :phone, class: "form-control", autocomplete: "tel" %>
         </div>
         <div class="form-group" id="address-fields">
@@ -190,9 +190,14 @@
           <%= p.label :emergency_phone, 'Emergency Contact Phone' %>
           <%= p.text_field :emergency_phone, class: "form-control" %>
         </div>
+
+        <div class="p-2">
+          <h2 class="rsvp-section midpage">Optional Biographical Summary</h2>
+          <p><%= @rsvp.biography_intro %></p>
+        </div>
         <div class="form-group">
           <%= p.label :biography %>
-          <%= p.text_area :biography, size: "100x4", class: "form-control", placeholder: 'An optional, brief biographical summary for other workshop participants to see.' %>
+          <%= p.text_area :biography, size: "100x4", class: "form-control", placeholder: 'An optional, brief biographical summary for other participants to see.' %>
         </div>
         <div class="form-group">
           <%= p.label :research_areas %>

@@ -39,7 +39,7 @@ class Person < ApplicationRecord
             }, if: :is_organizer_rsvp
   validates :region, presence: { message: '← region field cannot be blank'
             }, if: :region_required?
-  validates :phone, :academic_status, presence: true, if: :is_rsvp
+  validates :academic_status, presence: true, if: :is_rsvp
 
 
   # app/models/concerns/person_decorators.rb

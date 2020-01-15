@@ -89,6 +89,11 @@ class GetSetting
     Setting.RSVP[location]['personal_info_intro']
   end
 
+  def self.rsvp_biography_intro(location)
+    return false if no_setting("RSVP['#{location}']['biography_intro']")
+    Setting.RSVP[location]['biography_intro']
+  end
+
   def self.rsvp_privacy_notice(location)
     return false if no_setting("RSVP['#{location}']['privacy_notice']")
     Setting.RSVP[location]['privacy_notice']

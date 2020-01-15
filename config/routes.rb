@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   get '/password', to: redirect('/edit')
   patch 'users/confirmation', to: 'confirmations#create'
   patch 'confirmation.user', to: 'confirmations#create'
+  get '/welcome', to: redirect('/home')
 
   # Post-login home page
   get 'home' => 'home#index'
