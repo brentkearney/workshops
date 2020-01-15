@@ -146,16 +146,16 @@
 
     <div class="form-group">
       <div class="control-label">
-        <%= person.label :research_areas, "Research Areas: " %>
-      </div>
-      <%= person.text_field :research_areas, class: 'form-control' %>
-    </div>
-
-    <div class="form-group">
-      <div class="control-label">
-        <%= person.label :biograhy, "Biography: " %>
+        <%= person.label :biography, "Biographical Summary: " %>
+        <p class="description"><%= GetSetting.rsvp_biography_intro(@event.location) %></p>
       </div>
       <%= person.text_area :biography, class: 'form-control' %>
+    </div>
+    <div class="form-group">
+      <div class="control-label">
+        <%= person.label :research_areas, "Research Areas: " %>
+      </div>
+      <%= person.text_field :research_areas, class: 'form-control', placeholder: 'An optional comma-separated list of your areas of research (tags)' %>
     </div>
     <% end # fields_for person %>
   </div><!-- ./card-body -->

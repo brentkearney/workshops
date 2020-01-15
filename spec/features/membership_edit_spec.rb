@@ -78,7 +78,6 @@ describe 'Membership#edit', type: :feature do
            from: 'membership_person_attributes_academic_status'
     select 'Other', from: 'membership_person_attributes_gender'
     fill_in 'membership_person_attributes_phone', with: '123-456-7890'
-    fill_in 'membership_person_attributes_country', with: 'USA'
     fill_in 'membership_person_attributes_country', with: 'Zimbabwe'
     fill_in 'membership_person_attributes_emergency_contact', with: 'Mom'
     fill_in 'membership_person_attributes_emergency_phone', with: '1234'

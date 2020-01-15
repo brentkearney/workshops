@@ -48,22 +48,22 @@ describe 'Event Membership Page', type: :feature do
     end
   end
 
-  def shows_confirmed_email_buttons
+  def shows_confirmed_maillist_links
     domain = GetSetting.email(@event.location, 'email_domain')
     expect(page.body).to have_css('a', text: "#{@event.code}@#{domain}")
     expect(page.body).to have_css('a', text: "#{@event.code}-organizers@#{domain}")
   end
 
-  def shows_all_email_buttons
+  def shows_maillist_links
     @event.memberships.select(:attendance).each do |member|
       status = member.attendance
       email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
       email = "#{@event.code}@#{@domain}" if status == 'Confirmed'
-      expect(page.body).to include(email)
+      expect(page.body).to have_css('a', text: email)
     end
   end
 
-  def hides_nonconfirmed_email_buttons
+  def hides_nonconfirmed_maillist_links
     @event.memberships.select(:attendance).each do |member|
       status = member.attendance
       email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
@@ -72,7 +72,7 @@ describe 'Event Membership Page', type: :feature do
     end
   end
 
-  def hides_all_email_buttons
+  def hides_all_maillist_links
     @event.memberships.select(:attendance).each do |member|
       status = member.attendance
       email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{@domain}"
@@ -109,7 +109,7 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'hides email links' do
-      hides_all_email_buttons
+      hides_all_maillist_links
     end
 
     it 'hides Add & Invite Member links' do
@@ -130,7 +130,7 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'hides email links' do
-      hides_all_email_buttons
+      hides_all_maillist_links
     end
 
     it 'hides Add & Invite Member links' do
@@ -158,12 +158,12 @@ describe 'Event Membership Page', type: :feature do
       shows_confirmed_members
     end
 
-    it 'shows email links for confirmed members' do
-      shows_confirmed_email_buttons
+    it 'shows maillist links for confirmed members' do
+      shows_confirmed_maillist_links
     end
 
-    it 'hides email buttons for non-confirmed members' do
-      hides_nonconfirmed_email_buttons
+    it 'hides maillist links for non-confirmed members' do
+      hides_nonconfirmed_maillist_links
     end
 
     it 'hides Add & Invite Member links' do
@@ -177,6 +177,26 @@ describe 'Event Membership Page', type: :feature do
 
     it "has links to Confirmed participants' profiles" do
       links_to_confirmed_member_profiles
+    end
+
+    context 'As an invited but declined member of the event' do
+      before do
+        @member.attendance = 'Declined'
+        @member.save
+        visit event_memberships_path(@event)
+      end
+
+      it 'shows confirmed members' do
+        shows_confirmed_members
+      end
+
+      it 'hides email links' do
+        hides_all_maillist_links
+      end
+
+      it "has links to Confirmed participants' profiles" do
+        links_to_confirmed_member_profiles
+      end
     end
   end
 
@@ -193,7 +213,7 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'shows mail list links' do
-      shows_all_email_buttons
+      shows_maillist_links
       expect(page.body).to have_link('Invite Members',
         href: invite_event_memberships_path(@event))
     end
@@ -251,7 +271,7 @@ describe 'Event Membership Page', type: :feature do
       end
 
       it 'shows email links' do
-        shows_all_email_buttons
+        shows_maillist_links
       end
 
       it 'shows Add & Invite Member links' do
@@ -278,7 +298,7 @@ describe 'Event Membership Page', type: :feature do
       end
 
       it 'hides email links' do
-        hides_all_email_buttons
+        hides_all_maillist_links
         expect(page.body).not_to have_link('Invite Members')
       end
 
@@ -305,7 +325,7 @@ describe 'Event Membership Page', type: :feature do
     end
 
     it 'shows email links' do
-      shows_all_email_buttons
+      shows_maillist_links
     end
 
     it 'shows Add & Invite Member links' do
