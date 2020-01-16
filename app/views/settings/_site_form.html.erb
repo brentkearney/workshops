@@ -13,5 +13,9 @@
     <%= render partial: 'new_field', locals:
       { setting_form: setting_form, fields_for: @setting.var } %>
   <% end %>
-  <%= setting_form.submit 'Update Settings', class: 'btn btn-default' %>
+  <div class="row submit-button">
+    <div class="col">
+      <%= setting_form.submit 'Update Settings', class: 'btn btn-primary' %>
+    </div>
+  </div>
 <% end %>

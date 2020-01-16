@@ -1,6 +1,10 @@
 .settings {
   @import "colours";
-  @import "memberships.scss";
+
+
+  #settings-tab, .new-setting {
+    background-color: white;
+  }
 
   .profile {
     margin-bottom: 1em;
@@ -41,11 +45,16 @@
   }
 
   .new-setting {
-    padding-top: 3em;
+    h3 {
+      padding: 10px 0 0 10px;
+    }
   }
 
-  .card-title {
-    padding: 0;
-    margin-bottom: 1em;
+  .delete-setting {
+    margin-top: 15px;
+  }
+
+  .submit-button {
+    margin-top: 1em;
   }
 }

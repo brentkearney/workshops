@@ -22,7 +22,11 @@
 
         <% end %>
       <% end %><!-- var_form -->
-      <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>
+      <div class="row submit-button">
+        <div class="col">
+          <%= var_form.submit "Update #{key} Settings", class: 'btn btn-primary' %>
+        </div>
+      </div>
     <% end %><!-- setting_form -->
   </div><!-- tabcard -->
 <% end %><!-- @setting -->

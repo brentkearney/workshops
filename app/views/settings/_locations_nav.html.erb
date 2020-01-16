@@ -1,15 +1,15 @@
 <ul class="nav nav-tabs" role="tablist">
     <% tabs.each do |tab| %>
-      <li role="presentation" id="<%= tab %>" class="location-tab<%= ' active' if tab == tabs.first %>">
+      <li role="presentation" id="<%= tab %>" class="nav-item location-tab">
         <%= link_to tab, edit_setting_path('Locations', tab),
-              class: "location-link", id: tab,
+              class: "nav-link location-link #{'active' if tab == tabs.first}", id: tab,
                role: "tab", data: { toggle: 'tab', target: "##{tab}" } %>
       </li>
     <% end %>
     <% if policy(Setting).new? && @setting.var == 'Locations' %>
-    <li role="presentation" id="NEW" class="location-tab">
+    <li role="presentation" id="NEW" class="nav-item location-tab">
       <%= link_to '+/- Location', edit_setting_path('Locations', 'NEW'),
-            class: "location-link", id: 'NEW',
+            class: "nav-link location-link", id: 'NEW',
              role: "tab", data: { toggle: 'tab', target: "#NEW" } %>
     </li>
     <% end %>

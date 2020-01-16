@@ -1,13 +1,15 @@
-<h1 class="app-settings">Application Settings</h1>
-
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs settings">
     <% @tabs.each do |tab| %>
-      <li id="<%= tab %>" class="<%= 'active' if tab == params[:id] %>">
+      <li id="<%= tab %>" class="nav-item">
         <%= link_to tab.titleize, edit_setting_path(tab),
-          data: { toggle: 'tooltip' } %>
+                    class: "nav-link #{'active' if tab == params[:id]}",
+                     data: { toggle: 'tooltip' } %>
       </li>
     <% end %>
-    <li id="new" class="<%= 'active' if action_name == 'new' %>">
-      <%= link_to '+/- Setting', new_setting_path if policy(Setting).new? %>
+    <li id="new" class="nav-item">
+      <% if policy(Setting).new? %>
+        <%= link_to '+/- Setting', new_setting_path,
+                      class: "nav-link #{'active' if action_name == 'new'}" %>
+      <% end %>
     </li>
 </ul>

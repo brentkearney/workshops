@@ -9,10 +9,10 @@
     <%= setting_form.fields_for @setting.var do |var_form| %>
       <%= var_form.fields_for key do |var_field| %>
         <div class="row">
-          <div class="col-xs-2">
-              <label>Location code:</label>
+          <div class="col-md-1">
+              <label>Location:</label><br>
             </div>
-          <div class="col-xs-2">
+          <div class="col-md-2">
           <p><%= var_field.text_field 'new_key', size: 5, value: key,
                   class: 'form-control input-sm' %></p>
           </div>
@@ -38,8 +38,11 @@
 
         <% end %>
       <% end %><!-- var_form -->
-
-      <%= var_form.submit "Update #{key} Settings", class: 'btn btn-default' %>
+      <div class="row submit-button">
+        <div class="col">
+          <%= var_form.submit "Update #{key} Settings", class: 'btn btn-primary' %>
+        </div>
+      </div>
     <% end %><!-- setting_form -->
   </div><!-- tabcard -->
 

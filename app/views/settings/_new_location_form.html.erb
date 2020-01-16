@@ -10,7 +10,11 @@
                               class: 'form-control input-xs' %>
         <span class="help-block">Use a short abbreviation, like "BIRS".</span>
       </div>
-    <%= nl_form.submit "Create New Location", class: 'btn btn-default' %>
+      <div class="row submit-button">
+        <div class="col">
+        <%= nl_form.submit "Create New Location", class: 'btn btn-primary' %>
+        </div>
+    </div>
     <% end %>
     </div>
   </div>
@@ -28,7 +32,11 @@
 
         <span class="help-block">Warning: there is no confirmation step!</span>
       </div>
-      <%= dl_form.submit "Delete Location", class: 'btn btn-default' %>
+      <div class="row submit-button">
+        <div class="col">
+          <%= dl_form.submit "Delete Location", class: 'btn btn-danger' %>
+        </div>
+      </div>
     <% end %>
     </div>
   </div>

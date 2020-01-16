@@ -25,6 +25,8 @@ module EventsHelper
     title = ''
     return title if controller_name == 'registrations'
     case request.path
+    when /settings/
+      return 'Application Settings'
     when '/events'
       title = 'All'
     when /events\/my_events/
