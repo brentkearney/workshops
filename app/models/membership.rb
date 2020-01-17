@@ -69,7 +69,7 @@ class Membership < ApplicationRecord
   private
 
   def set_billing
-    return unless billing.blank?
+    return unless billing.blank? && !self.person.country.blank?
     self.billing = is_usa?(self.person.country) ? 'USBIRS' : 'BIRS'
   end
 

@@ -125,7 +125,8 @@ module Syncable
 
     booleans = boolean_fields(local)
     remote.each_pair do |k, v|
-      next if k == 'legacy_id' || k == 'email'
+      next if k == 'legacy_id' || k == 'email' || k == 'biography' ||
+        k == 'research_areas'
       v = prepare_value(k, v)
       v = bool_value(v) if booleans.include?(k)
 
