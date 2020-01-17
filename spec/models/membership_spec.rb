@@ -145,16 +145,36 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(new_observer2).not_to be_valid
   end
 
-  it 'sets a role automatically, if absent' do
+  it 'sets a role, if absent' do
     @membership.role = nil
     @membership.save
     expect(@membership.role).not_to be_nil
   end
 
-  it 'sets an attendance automatically, if absent' do
+  it 'sets an attendance, if absent' do
     @membership.attendance = nil
     @membership.save
     expect(@membership.attendance).not_to be_nil
+  end
+
+  it 'sets billing, if absent' do
+    @membership.billing = nil
+    @membership.save
+    expect(@membership.billing).not_to be_nil
+  end
+
+  it 'sets num_guests if empty but has_guest selected' do
+    @membership.has_guest = true
+    @membership.num_guests = 0
+    @membership.save
+    expect(@membership.num_guests).to eq(1)
+  end
+
+  it 'sets has_guests if false but num_guests > 0' do
+    @membership.has_guest = false
+    @membership.num_guests = 2
+    @membership.save
+    expect(@membership.has_guest).to eq(true)
   end
 
   it "increases associated event's confirmed_cache when Confirmed member is

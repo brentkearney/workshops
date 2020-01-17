@@ -16,6 +16,8 @@ describe 'Membership#show', type: :feature do
     @participant.person.phd_year = '1992'
     @participant.person.emergency_contact = 'Mom'
     @participant.person.emergency_phone = '1234'
+    @participant.has_guest = true
+    @participant.num_guests = 2
     @participant.save
     @other_membership = create(:membership, person: @participant.person)
     @unconfirmed_membership = create(:membership, attendance: 'Not Yet Invited',
@@ -143,7 +145,10 @@ describe 'Membership#show', type: :feature do
                                   text: member.person.gender)
     expect(page.body).to have_css('div#profile-room',
                                   text: member.room)
-    expect(page.body).to have_css('div#profile-has-guest')
+    if member.has_guest
+      expect(page.body).to have_css('div#profile-has-guest')
+      expect(page.body).to have_css('span#num-guests', text: member.num_guests)
+    end
     expect(page.body).to have_css('div#profile-special-info',
                                   text: member.special_info)
     expect(page.body).to have_css('div#profile-staff-notes',
@@ -164,6 +169,7 @@ describe 'Membership#show', type: :feature do
                                       text: member.stay_id)
     expect(page.body).not_to have_css('div#profile-has-guest',
                                       text: member.has_guest)
+    expect(page.body).not_to have_css('span#num-guests')
     expect(page.body).not_to have_css('div#profile-special-info',
                                       text: member.special_info)
     expect(page.body).not_to have_css('div#profile-staff-notes',
@@ -188,31 +194,31 @@ describe 'Membership#show', type: :feature do
 
   context 'As a not-logged in user' do
     before do
-      visit event_membership_path(@event, @organizer)
+      visit event_membership_path(@event, @participant)
     end
 
     it 'denies access' do
-      denies_access(@organizer)
+      denies_access(@participant)
     end
 
     it 'excludes email' do
-      hides_email(@organizer)
+      hides_email(@participant)
     end
 
     it 'excludes personal info' do
-      hides_personal_info(@organizer)
+      hides_personal_info(@participant)
     end
 
     it 'excludes personal address' do
-      hides_personal_address(@organizer)
+      hides_personal_address(@participant)
     end
 
     it 'excludes details' do
-      does_not_show_details(@organizer)
+      does_not_show_details(@participant)
     end
 
     it 'excludes hotel & billing' do
-      does_not_show_hotel_billing(@organizer)
+      does_not_show_hotel_billing(@participant)
     end
 
     it 'excludes edit and delete buttons' do
@@ -252,31 +258,31 @@ describe 'Membership#show', type: :feature do
   context 'As a logged-in user who is not a member of the event' do
     before do
       login_as @non_member_user, scope: :user
-      visit event_membership_path(@event, @organizer)
+      visit event_membership_path(@event, @participant)
     end
 
     it 'shows basic personal info' do
-      shows_basic_info(@organizer)
+      shows_basic_info(@participant)
     end
 
     it 'excludes email' do
-      hides_email(@organizer)
+      hides_email(@participant)
     end
 
     it 'excludes personal info' do
-      hides_personal_info(@organizer)
+      hides_personal_info(@participant)
     end
 
     it 'excludes personal address' do
-      hides_personal_address(@organizer)
+      hides_personal_address(@participant)
     end
 
     it 'excludes details' do
-      does_not_show_details(@organizer)
+      does_not_show_details(@participant)
     end
 
     it 'excludes hotel & billing' do
-      does_not_show_hotel_billing(@organizer)
+      does_not_show_hotel_billing(@participant)
     end
 
     it 'excludes edit and delete buttons' do
@@ -401,7 +407,7 @@ describe 'Membership#show', type: :feature do
     end
 
     it 'excludes hotel & billing' do
-      does_not_show_hotel_billing(@organizer)
+      does_not_show_hotel_billing(@participant)
     end
 
     it 'includes edit button' do

@@ -15,6 +15,7 @@ class Membership < ApplicationRecord
   has_one :invitation, dependent: :delete
   serialize :invite_reminders, Hash
 
+  before_save :set_billing, :set_guests
   after_save :update_counter_cache
   after_update :notify_staff
   after_commit :sync_with_legacy
@@ -40,6 +41,8 @@ class Membership < ApplicationRecord
   ATTENDANCE = ['Confirmed', 'Invited', 'Undecided', 'Not Yet Invited',
                 'Declined'].freeze
 
+  include SharedDecorators
+
   def shares_email?
     self.share_email
   end
@@ -64,6 +67,16 @@ class Membership < ApplicationRecord
   end
 
   private
+
+  def set_billing
+    return unless billing.blank?
+    self.billing = is_usa?(self.person.country) ? 'USBIRS' : 'BIRS'
+  end
+
+  def set_guests
+    self.num_guests = 1 if has_guest && num_guests == 0
+    self.has_guest = true if num_guests > 0
+  end
 
   def set_role
     unless ROLES.include?(role)

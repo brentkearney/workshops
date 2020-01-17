@@ -144,7 +144,7 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).to have_css('div#profile-gender', text: 'O')
     expect(page.body).to have_css('div#profile-room', text: 'AB 123')
     expect(page.body).to have_css('div#profile-room_notes', text: 'Night-owl')
-    expect(page.body).to have_css('div#profile-has-guest', text: 'Yes')
+    expect(page.body).to have_css('div#profile-has-guest', text: 1)
     expect(page.body).to have_css('div#profile-special-info', text: 'Very.')
     expect(page.body).to have_css('div#profile-staff-notes', text: 'Beware.')
   end

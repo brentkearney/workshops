@@ -69,7 +69,7 @@ class MembershipPolicy
      :arrival_date, :departure_date, :reviewed, :billing, :room, :room_notes,
      :special_info, :staff_notes, :org_notes, :own_accommodation, :has_guest,
      :guest_disclaimer, :share_email, :share_email_hotel, :updated_by,
-     :updated_at, :invited_on, :invited_by, :replied_at,
+     :updated_at, :invited_on, :invited_by, :replied_at, :num_guests,
      person_attributes: [:salutation, :firstname, :lastname, :email, :phone,
                          :gender, :affiliation, :department, :title, :url,
                          :academic_status, :research_areas, :biography, :id,

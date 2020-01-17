@@ -290,4 +290,9 @@ module MembershipsHelper
   def member_link(member)
     link_to "#{member.person.lname}", event_membership_path(@event, member)
   end
+
+  def show_guests(member)
+    return 'No' unless member.has_guest
+    member.num_guests
+  end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_30_213104) do
+ActiveRecord::Schema.define(version: 2020_01_17_012842) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -128,6 +128,7 @@ ActiveRecord::Schema.define(version: 2019_10_30_213104) do
     t.boolean "share_email_hotel"
     t.string "room_notes"
     t.string "invite_reminders"
+    t.integer "num_guests", default: 0, null: false
     t.index ["event_id"], name: "index_memberships_on_event_id"
     t.index ["person_id"], name: "index_memberships_on_person_id"
   end

@@ -191,7 +191,7 @@
           </div>
         <% end %>
         <div class="row" id="profile-has-guest">
-          <strong>Has Guest:</strong> &nbsp;  <%= @membership.has_guest ? 'Yes' : 'No' %>
+          <strong>Has Guests:</strong> <span id="num-guests"><%= show_guests(@membership) %></span>
         </div>
         <div class="row" id="profile-special-info">
           <strong>Special Info:</strong> &nbsp;  <%= simple_format(@membership.special_info) %>

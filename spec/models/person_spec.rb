@@ -54,6 +54,21 @@ RSpec.describe 'Model validations: Person', type: :model do
     expect(p.valid?).to be_truthy
   end
 
+  it 'sets country to "USA" if country is analogous' do
+    p = build(:person, country: 'United States')
+    p.save
+    p = Person.find(p.id)
+    expect(p.country).to eq('USA')
+
+    p.country = 'U.S.A.'
+    p.save
+    expect(Person.find(p.id).country).to eq('USA')
+
+    p.country = 'U.S.'
+    p.save
+    expect(Person.find(p.id).country).to eq('USA')
+  end
+
   it 'does not require a gender if importing memberships' do
     p = build(:person, gender: '', member_import: true)
     expect(p.valid?).to be_truthy

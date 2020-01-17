@@ -20,7 +20,7 @@ class Person < ApplicationRecord
   belongs_to :replace_with, class_name: "ConfirmEmailChange", optional: true
 
   before_validation :downcase_email
-  before_save :clean_data
+  before_save :clean_data, :set_usa
 
   validates :email, presence: true,
                     case_sensitive: false,
@@ -44,13 +44,12 @@ class Person < ApplicationRecord
 
   # app/models/concerns/person_decorators.rb
   include PersonDecorators
+  include SharedDecorators
 
   def region_required?
     country ||= self.country
     return false if country.blank? || member_import
-    c = country.downcase
-    c == 'canada' || c == 'usa' || c == 'u.s.a.' || c == 'us' ||
-      c =~ /united states/
+    country.downcase == 'canada' || is_usa?(country)
   end
 
   def pending_replacement?
@@ -62,6 +61,10 @@ class Person < ApplicationRecord
 
   def clean_data
     attributes.each_value {|v| v.strip! if v.respond_to? :strip! }
+  end
+
+  def set_usa
+    self.country = 'USA' if is_usa?(country)
   end
 
   def downcase_email

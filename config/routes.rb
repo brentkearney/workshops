@@ -29,6 +29,8 @@ Rails.application.routes.draw do
   patch 'users/confirmation', to: 'confirmations#create'
   patch 'confirmation.user', to: 'confirmations#create'
   get '/welcome', to: redirect('/home')
+  get '/apple-touch-icon-precomposed.png', to: redirect('/icons/apple-touch-icon-precomposed.png')
+  get '/apple-touch-icon.png', to: redirect('/icons/apple-touch-icon.png')
 
   # Post-login home page
   get 'home' => 'home#index'

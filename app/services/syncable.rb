@@ -141,6 +141,7 @@ module Syncable
       next if k == 'invited_on'
       local.send("#{k}=", v) if local.has_attribute?(k)
     end
+
     local
   end
 

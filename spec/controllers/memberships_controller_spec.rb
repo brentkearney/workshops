@@ -304,7 +304,7 @@ RSpec.describe MembershipsController, type: :controller do
             { arrival_date: @membership.event.start_date,
               departure_date: @membership.event.end_date,
               own_accommodation: false, has_guest: true, guest_disclaimer: true,
-              special_info: '', share_email: true,
+              special_info: '', share_email: true, num_guests: 2,
               'person_attributes' =>
               { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
                 gender: 'M', affiliation: 'Foo', department: '', title: '',
