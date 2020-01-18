@@ -21,13 +21,6 @@
       font-weight: bold;
     }
 
-    .reply-by-date {
-      float: right;
-      text-align: right;
-      font-size: 0.9em;
-      margin-left: 1.5em;
-    }
-
     .reply-due {
       background-color: lighten( $flash-message-color, 30% );
       border-bottom: 1px solid $flash-message-color;
@@ -36,9 +29,8 @@
     .reply-by-legend {
       display: none;
       padding: 10px;
-      margin: 15px 5px 5px 5px;
-      min-width: 100%;
-      width: 0;
+      margin: 10px 5px 5px 5px;
+      max-width: 550px;
 
       .highlighted {
         padding: 5px;
@@ -68,9 +60,28 @@
       li {
         clear: both;
         padding: 5px;
+        width: 100%;
+        max-width: 560px;
       }
       li:nth-child(odd):not(.reply-due) {
         background: lighten( $light-border, 10% );
+      }
+      .member-list-item {
+        float: left;
+
+        .member-name {
+          max-width: 450px;
+          white-space: normal;
+          word-wrap: normal;
+          float: left;
+        }
+
+        .reply-by-date {
+          float: right;
+          text-align: right;
+          font-size: 0.9em;
+          margin-left: 1.5em;
+        }
       }
     }
   }

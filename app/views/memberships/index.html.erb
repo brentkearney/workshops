@@ -19,12 +19,15 @@
         <% if show_invited_on?(status) %>
         <div class="colheading-right">Invited On</div>
         <% end %>
-      <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
-        <% if show_invited_on?(status) %>
-        <div class="reply-by-legend" id="<%= status %>-legend">
-          <p class="card-text"><span class="highlighted">Highlighting</span> indicates that the person is overdue to reply to an invitation. Hold pointer over the <strong>Invited On</strong> date for details. Send reminders in the <%= link_to 'Invite Members', invite_event_memberships_path(@event) %> section.</p>
+        <div class="d-flex flex-column">
+          <%= render partial: 'member_index_items', locals: {status: status, members: members } %>
+
+          <% if show_invited_on?(status) %>
+          <div class="reply-by-legend p-2" id="<%= status %>-legend">
+            <p class="card-text"><span class="highlighted">Highlighting</span> indicates that the person is overdue to reply to an invitation. Hold pointer over the <strong>Invited On</strong> date for details. Send reminders in the <%= link_to 'Invite Members', invite_event_memberships_path(@event) %> section.</p>
+          </div>
+          <% end %>
         </div>
-        <% end %>
       </div>
       <% if policy(@event).show_email_buttons?(status) %>
       <div class="card-footer email-links no-print"><%= add_email_buttons(status) %></div>

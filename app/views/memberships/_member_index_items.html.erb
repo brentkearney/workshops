@@ -1,6 +1,7 @@
-<ol class="ordered-member-list">
+<ol class="ordered-member-list p-2">
 <% members.each do |member| %>
-  <li id="member-<%= member.id %>" class="<%= reply_due?(member) %>">
+  <li id="member-<%= member.id %>" class="member-list-item <%= reply_due?(member) %>">
+    <span class="member-name">
     <% if member.role =~ /Organizer/ %>
       <strong><%= member_link(member) %></strong>
     <% elsif member.role == 'Observer' %>
@@ -11,6 +12,7 @@
     <% unless member.person.affiliation.blank? %>
       (<%= member.person.affiliation %>)
     <% end %>
+    </span>
     <% if show_invited_on?(member.attendance) %>
       <span class="reply-by-date"><%= show_invited_on_date(member, true) %></span>
     <% end %>
