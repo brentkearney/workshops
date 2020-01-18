@@ -19,6 +19,7 @@
       width: 100%;
       text-align: right;
       font-weight: bold;
+      margin-left: -15px;
     }
 
     .reply-due {
@@ -30,7 +31,7 @@
       display: none;
       padding: 10px;
       margin: 10px 5px 5px 5px;
-      max-width: 550px;
+      max-width: 450px;
 
       .highlighted {
         padding: 5px;
