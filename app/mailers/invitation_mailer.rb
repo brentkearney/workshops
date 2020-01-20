@@ -41,7 +41,6 @@ class InvitationMailer < ApplicationMailer
     from_email = GetSetting.rsvp_email(@event.location)
 
     location = @event.location
-    location = 'IAS-Hangzhou' if location == 'IAS-H'
     subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
 
     bcc_email = GetSetting.rsvp_email(@event.location)

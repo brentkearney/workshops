@@ -23,12 +23,14 @@ class ParticipantMailer < ApplicationMailer
     @person = membership.person
     @event = membership.event
     @organization = GetSetting.org_name(@event.location)
+    template = @event.event_type
 
     # PDF attachment in lib/assets/rsvp/[location]
     pdf_path = Rails.root.join('lib', 'assets', 'rsvp', "#{@event.location}")
     file_attachment = "#{pdf_path}/#{@event.event_type}.pdf"
     if membership.role == 'Observer'
       file_attachment = "#{pdf_path}/#{@event.location}-Observer.pdf"
+      template << "-Observer"
     end
     if File.exist?("#{file_attachment}") # spaces in file name
       attachments["#{@event.location}-arrival-info.pdf"] = {
@@ -46,7 +48,7 @@ class ParticipantMailer < ApplicationMailer
 
     template_path = Rails.root.join('app', 'views', 'participant_mailer',
                       'rsvp', "#{@event.location}")
-    mail_template = "#{template_path}/#{@event.event_type}.text.erb"
+    mail_template = "#{template_path}/#{template}.text.erb"
 
     if File.exist?(mail_template)
       mail(to: to_email,
