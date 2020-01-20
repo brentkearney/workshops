@@ -80,6 +80,7 @@ class EventPolicy
 
   def allow_add_members?
     return false if current_user.nil?
+    return true if staff_and_admins
     return false if Date.current + 2.days > event.start_date
     organizers_and_staff
   end
