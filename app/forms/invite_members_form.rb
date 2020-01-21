@@ -23,7 +23,7 @@ class InviteMembersForm < ComplexForms
   def process(membership_ids)
     membership_ids.each do |id|
       membership = Membership.find(id.to_i)
-      @memberships << membership
+      @memberships << membership unless membership.attendance == 'Confirmed'
     end
     check_for_errors
   end

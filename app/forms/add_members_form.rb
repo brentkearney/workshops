@@ -39,7 +39,6 @@ class AddMembersForm < ComplexForms
         @added << person if add_new_member(person, @role)
       end
     end
-    Rails.logger.debug "\n\n * Errors object: \n#{errors.inspect}\n\n"
   end
 
   def organize_params(params)
