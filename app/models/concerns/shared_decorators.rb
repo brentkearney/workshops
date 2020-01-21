@@ -10,6 +10,6 @@ module SharedDecorators
   def is_usa?(country)
     return if country.blank?
     c = country.downcase
-    c == 'usa' || c == 'us' || !!(c =~ /u.s./) || !!(c =~ /united states/)
+    c == 'usa' || c == 'us' || !!(c =~ /u\.s\./) || !!(c =~ /united states/)
   end
 end
