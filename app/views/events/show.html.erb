@@ -1,74 +1,86 @@
 <article>
-  <div class="card card-default">
+  <div class="card card-default event-details">
     <div class="card-title"><%= @event.code %>: <%= @event.name %></div>
-    <div class="card-body">
-      <table class="table table-sm table-responsive">
-         <tbody>
-         <tr>
-           <td align="right">Event Name:</td>
-           <td colspan="3"><%= @event.name %></td>
-         </tr>
-         <% unless @event.short_name.blank? %>
-             <tr>
-               <td align="right">Short Name:</td>
-               <td colspan="3"><%= @event.short_name %></td>
-             </tr>
+    <div class="card-body event-details">
+      <h2>Event Details:</h2>
+       <table class="table table-sm" border="0">
+          <tbody>
+          <tr>
+            <td class="label">Event Code:</td>
+            <td><%= @event.code %></td>
+            <% if policy(@event).event_staff? %>
+            <td class="label">Booking Code:</td>
+            <td><%= @event.booking_code %></td>
+            <% else %>
+            <td></td><td></td>
+            <% end %>
+          </tr>
+          <tr>
+            <td class="label">Event Name:</td>
+            <td colspan="3"><%= @event.name %></td>
+          </tr>
+          <% unless @event.short_name.blank? %>
+              <tr>
+                <td class="label">Short Name:</td>
+                <td colspan="3"><%= @event.short_name %></td>
+              </tr>
+          <% end %>
+          <tr>
+            <td class="label">Event Type:</td>
+            <td colspan="3"><%= @event.event_type %></td>
+          </tr>
+          <tr>
+            <td class="label">Subject Areas:</td>
+            <td colspan="3"><%= @event.subjects %></td>
+          </tr>
+          <tr>
+            <td class="label">Event Location:</td>
+            <td colspan="3">
+              <%= GetSetting.org_name(@event.location) %>
+              (<%= @event.location %>),
+              <%= GetSetting.location_country(@event.location) %>
+            </td>
+          </tr>
+          <tr>
+            <td class="label">Event Timezone:</td>
+            <td colspan="3"><%= ActiveSupport::TimeZone[@event.time_zone].to_s %></td>
+          </tr>
+          <tr>
+            <td class="label">Start Date:</td>
+            <td><%= @event.arrival_date %></td>
+
+            <td class="label">End Date:</td>
+            <td><%= @event.departure_date %></td>
+          </tr>
+
+        <% if policy(@event).view_details? %>
+          <tr>
+            <td class="label">Maximum participants:</td>
+            <td><%= @event.max_participants %></td>
+            <td class="label">Maximum observers:</td>
+            <td><%= @event.max_observers %></td>
+          </tr>
          <% end %>
          <tr>
-           <td align="right" width="140">Event Code:</td>
-           <td><%= @event.code %></td>
-
-           <td align="right">Event type:</td>
-           <td><%= @event.event_type %></td>
-         <tr>
-            <td align="right">Location:</td>
-            <td><%= @event.location %></td>
-
-            <td align="right">Time Zone:</td>
-            <td><%= ActiveSupport::TimeZone[@event.time_zone].to_s %></td>
-         </tr>
-         <tr>
-           <td align="right">Start Date:</td>
-           <td><%= @event.arrival_date %></td>
-
-           <td align="right">End Date:</td>
-           <td><%= @event.departure_date %></td>
+           <td class="label">Event Webpage:</td>
+           <td colspan="3"><%= link_to @event.url, @event.url %></td>
          </tr>
 
-       <% if policy(@event).view_details? %>
+         <% if policy(@event).view_details? %>
          <tr>
-           <td align="right">Door Access Code:</td>
-           <td><%= @event.door_code unless @event.door_code.blank? %></td>
-
-           <td align="right">Booking Code:</td>
-           <td><%= @event.booking_code if policy(@event).event_staff? %></td>
+          <td class="label">Door  Code:</td>
+          <td><%= @event.door_code unless @event.door_code.blank? %></td>
+          <td class="label">Last updated:</td>
+          <td>
+            <%= @event.updated_at.strftime('%Y-%m-%d @ %H:%M %Z') %>
+            <% unless @event.updated_by.blank? %>
+              by <%= @event.updated_by %>
+            <% end %>
+          </td>
          </tr>
-         <tr>
-           <td align="right">Max participants:</td>
-           <td><%= @event.max_participants %></td>
-           <td align="right">Max observers:</td>
-           <td><%= @event.max_observers %></td>
-         </tr>
-        <% end %>
-        <tr>
-          <td align="right">Event Webpage:</td>
-          <td align="left"><%= link_to @event.url, @event.url %></td>
-          <td align="right">Subject Areas:</td>
-          <td align="left"><%= @event.subjects %></td>
-        </tr>
-        <% if policy(@event).view_details? %>
-        <tr>
-         <td align="right">Last updated:</td>
-         <td colspan="3">
-           <% unless @event.updated_by.blank? %>
-             by <%= @event.updated_by %> on
-           <% end %>
-           <%= @event.updated_at.strftime('%Y-%m-%d @ %H:%M %Z') %>
-         </td>
-        </tr>
-        <% end %>
-       </tbody>
-     </table>
+         <% end %>
+        </tbody>
+      </table>
 
      <% if(policy(@event).edit?) %>
      <div class="event-edit-button">
@@ -76,19 +88,23 @@
      </div>
      <% end %>
 
-    </div><!--/card-body -->
+    </div><!--/.card-body -->
 
     <div class="card-body">
       <div class="row" id="event-description">
         <div class="col">
-        <h2>Event Description:</h2>
+        <h2>Event Description:<br>
+          <small>appears only here, for participants to see</small>
+        </h2>
          <%= get_text(@event.description) %>
 
-        <h2>Event Press Release:</h2>
+        <h2>Event Press Release:<br>
+          <small>appears on the public webpage</small>
+        </h2>
         <%= get_text(@event.press_release) %>
         </div>
       </div>
-    </div><!--/card-body -->
+    </div><!--/.card-body -->
 
     <% if user_signed_in? && policy(@event).edit? %>
     <div class="card-body buttons">

@@ -1,36 +1,56 @@
 @import "colours";
 
-.event-page {
-   background-color: white;
-   padding: 1em;
-   border: 1px solid $light-border;
- }
+.event-details {
+  .event-page {
+     background-color: white;
+     padding: 1em;
+     border: 1px solid $light-border;
+   }
 
-td.confirmed {
-  text-align: center;
-  padding-right: 1.8em;
-}
+  td.confirmed {
+    text-align: center;
+    padding-right: 1.8em;
+  }
 
-.table tbody tr.heading > th {
-  background-color: $subdued-color !important;
-  font-size: 1.3em;
-}
+  .table tbody tr.heading > th {
+    background-color: $subdued-color !important;
+    font-size: 1.3em;
+  }
 
-.event-edit-button {
-  text-align: right;
-  font-size: 1.2em;
-}
+  td.label {
+    font-weight: bold;
+    text-align: right;
+    max-width: 200px;
+  }
 
-.schedule-button {
-  margin-top: 20px;
-  padding-right: 5px;
-  vertical-align: bottom;
-}
+  @media only screen and (max-width: 767px) {
+    .table>tbody>tr>td {
+      display: block;
+      min-width: 100%!important;
+    }
+    td.label {
+      text-align: left;
+    }
+  }
 
-.input-group-addon {
-  padding: 5px;
-}
+  .event-edit-button {
+    text-align: right;
+    font-size: 1.2em;
+  }
 
-label {
-  font-weight: bold;
+  .schedule-button {
+    margin-top: 20px;
+    padding-right: 5px;
+    vertical-align: bottom;
+  }
+
+  .input-group-addon {
+    padding: 5px;
+  }
+
+  h2 small {
+    font-style: italic;
+    color: lighten($grey-heading, 20%);
+  }
+
 }
