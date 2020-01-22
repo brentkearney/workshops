@@ -35,6 +35,10 @@ class RsvpForm < ComplexForms
     @membership.save! if @membership.valid?
   end
 
+  def has_no_account?
+    User.find_by_email(@person.email).nil?
+  end
+
   def date_list
     dates = [@event.start_date]
     dates << dates.last + 1.day while dates.last != @event.end_date

@@ -1,0 +1,95 @@
+  <% if policy(membership).edit_membership? %>
+  <div class="card" id="membership-details">
+    <div class="card-title">
+      <h3 id="membership">
+        <%= @event.code %> Participation Details
+      </h3>
+    </div>
+    <div class="card-body">
+
+      <%= f.hidden_field :min_date, id: 'min_date', value: @event.start_date %>
+      <%= f.hidden_field :max_date, id: 'max_date', value: @event.end_date %>
+      <div class="p-2">
+        <h2 class="rsvp-section">Arrival & Departure Dates<br>
+          <small>Event dates: <%= @event.dates(:long) %></small></h2>
+          <p class="rsvp-instructions">
+            <%= rsvp_setting('rsvp_dates_intro', @event.location) %>
+          </p>
+      </div>
+      <div class="row justify-content-center align-items-center">
+        <div class="col-md">
+          <div class="p-2 date-titles text-left">
+            <h4>Arrival Date:</h4>
+            <%= f.select :arrival_date, date_list, { selected: selected_date('arrival') }, class: "form-control" %>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="p-2 date-titles text-left">
+            <h4>Departure Date:</h4>
+            <%= f.select :departure_date, date_list, { selected: selected_date }, class: "form-control" %>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-2">
+        <h2 class="rsvp-section midpage">Accommodation</h2>
+        <p class="rsvp-instructions">
+          <%= rsvp_setting('rsvp_accommodation_intro', @event.location) %>
+        </p>
+      </div>
+      <div class="form-group" id="accommodation_buttons">
+        <div class="row">
+          <label class="radio-inline">
+            <%= f.radio_button :own_accommodation, 'false', checked: 'checked' %>
+            Book a free room for me.
+          </label>
+        </div>
+        <div class="row">
+          <label class="radio-inline">
+            <%= f.radio_button :own_accommodation, 'true' %>
+            I will arrange and pay for my own accommodation.
+          </label>
+        </div>
+      </div>
+
+      <div class="p-2">
+        <h2 class="rsvp-section midpage">Guests</h2>
+        <p class="rsvp-instructions">
+          <%= rsvp_setting('rsvp_guests_intro', @event.location) %>
+        </p>
+      </div>
+      <div class="form-inline checkbox-field">
+        <%= f.check_box :has_guest, class: "form-control", id: "has-guest" %>
+        <div class="control-label">
+          <%= f.label :has_guest, "I am bringing a guest" %>
+        </div>
+      </div>
+      <div class="form-inline checkbox-field">
+        <%= f.check_box :guest_disclaimer, class: "form-control", id: "has-guest" %>
+        <div class="control-label">
+          <%= f.label :guest_disclaimer, "I acknowledge that my guest's meals are not included" %>
+        </div>
+      </div>
+      <div class="form-group" id="number-of-guests">
+        <strong>Number of Guests:</strong> <%= f.text_field :num_guests, class: 'form-control' %>
+      </div>
+
+      <div class="p-2">
+        <h2 class="rsvp-section midpage">Special Considerations</h2>
+        <p class="rsvp-instructions">
+          <%= GetSetting.rsvp_special_intro(@event.location).html_safe %>
+        </p>
+      </div>
+      <div class="p-2 form-group">
+        <%= f.text_area :special_info, size: "100x4", class: "form-control", placeholder: 'Notes to staff' %>
+      </div>
+
+    </div><!-- ./card-body -->
+  </div><!-- ./card -->
+  <% end # policy edit membership %>
+
+  <div class="form-group" id="member-buttons">
+  <%= f.submit 'Update Membership', class: 'btn btn-primary' %> |
+  <%= link_to "Back to Profile", event_membership_path(@event, @membership),
+              class: 'btn btn-secondary' %>
+  </div>

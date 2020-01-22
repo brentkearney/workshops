@@ -8,7 +8,11 @@
       <%= render partial: 'person_details_form', locals: { membership: @membership, f: f } %>
     </div>
     <div class="col-lg-6" id="membership-deets-form">
-      <%= render partial: 'membership_details_form', locals: { membership: @membership, f: f } %>
+      <% if policy(@membership).self_edit? %>
+        <%= render partial: 'membership_rsvp_form', locals: { membership: @membership, f: f } %>
+      <% else %>
+        <%= render partial: 'membership_details_form', locals: { membership: @membership, f: f } %>
+      <% end %>
     </div>
   </div><!-- ./#form-page -->
 </div>

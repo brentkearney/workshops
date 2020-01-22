@@ -372,13 +372,12 @@ RSpec.describe MembershipsController, type: :controller do
           expect(membership.own_accommodation).to eq(!own_accommodation)
         end
 
-        def disallows_hotel_updates
+        def disallows_room_and_billing_updates
           @params['membership']['room'] = 'Forest'
+          @params['membership']['room_notes'] = 'Nice room.'
           @params['membership']['billing'] = '$$$'
-          @params['membership']['special_info'] = 'special'
-          own_accommodation = @membership.own_accommodation
-          @params['membership']['own_accommodation'] = !own_accommodation
-          @params['membership']['has_guest'] = !@membership.has_guest
+          @params['membership']['reviewed'] = true
+
 
           patch :update, params: @params
 
@@ -386,9 +385,26 @@ RSpec.describe MembershipsController, type: :controller do
           expect(membership.room).not_to eq('Forest')
           expect(membership.billing).to eq(@membership.billing)
           expect(membership.billing).not_to eq('$$$')
-          expect(membership.has_guest).to eq(@membership.has_guest)
-          expect(membership.special_info).to eq(@membership.special_info)
-          expect(membership.special_info).not_to eq('special')
+        end
+
+        def allows_rsvp_updates
+          @membership.has_guest = false
+          @membership.num_guests = 0
+          @membership.save
+
+          special_info = Faker::Lorem.paragraph
+          @params['membership']['special_info'] = special_info
+          own_accommodation = !@membership.own_accommodation
+          @params['membership']['own_accommodation'] = own_accommodation
+          @params['membership']['has_guest'] = true
+          @params['membership']['num_guests'] = 2
+
+          patch :update, params: @params
+
+          membership = Membership.find(@membership.id)
+          expect(membership.has_guest).to be_truthy
+          expect(membership.num_guests).to eq(2)
+          expect(membership.special_info).to eq(special_info)
           expect(membership.own_accommodation).to eq(own_accommodation)
         end
 
@@ -495,8 +511,12 @@ RSpec.describe MembershipsController, type: :controller do
             expect(membership.org_notes).not_to eq('Bar')
           end
 
-          it 'disallows updating hotel & billing details' do
-            disallows_hotel_updates
+          it 'allows updating RSVP info' do
+            allows_rsvp_updates
+          end
+
+          it 'disallows updating room & billing details' do
+            disallows_room_and_billing_updates
           end
         end
 
@@ -650,7 +670,7 @@ RSpec.describe MembershipsController, type: :controller do
           end
 
           it 'disallows updating hotel and billing details' do
-            disallows_hotel_updates
+            disallows_room_and_billing_updates
           end
         end
 

@@ -1,4 +1,4 @@
-<article>
+`<article>
   <div class="member-show d-flex flex-wrap align-content-stretch align-self-start">
     <div class="d-flex flex-column">
       <div class="card p-2 member-show profile">
@@ -98,7 +98,7 @@
     <% if policy(@membership).show_details? %>
     <div class="d-flex flex-column">
       <div class="card p-2 member-show membership-details">
-        <% if pending_invitation? %>
+      <% if pending_invitation? %>
         <div class="card-title">
           <h3>Pending Invitation</h3>
         </div>
@@ -110,11 +110,9 @@
               <%= link_to 'clicking here', @membership.invitation.rsvp_url %>.
           </p>
         </div>
-      </div>
-
       <% else %>
       <div class="card-title">
-        <h3>Membership Details</h3>
+        <h3><%= @event.code %> Membership Details</h3>
       </div><!-- /card-title -->
       <div class="card-body">
         <div class="row" id="profile-role">
@@ -160,48 +158,57 @@
     <% end %>
 
     <!-- Event Hotel & Billing Details -->
-    <% if policy(@membership).hotel_and_billing? %>
+    <% if !pending_invitation? && policy(@membership).show_personal_info? %>
     <div class="card p-2 member-show hotel-billing">
       <div class="card-title">
-        <h3>Hotel & Billing Details</h3>
+        <h3>Accommodation Details</h3>
       </div><!-- /card-title -->
       <div class="card-body">
-        <div class="row" id="profile-reviewed">
-         <strong>Reviewed:</strong>  &nbsp; <%= @membership.reviewed ? 'Yes' : 'No' %>
-        </div>
-        <div class="row" id="profile-billing">
-          <strong>Billing:</strong> &nbsp;
-          <%= @membership.billing %>
-        </div>
-        <div class="row" id="profile-gender">
-          <strong>Gender:</strong> &nbsp;  <%= @person.gender %>
-        </div>
         <% if @membership.own_accommodation %>
-          <div class="row" id="profile-ownaccommodation">
-            <strong>Own Accommodation:</strong> &nbsp;  Yes
+          <div class="row">
+            <p id="off-site">Member has indicated they will book their own accommodation.</p>
           </div>
         <% else %>
-          <div class="row" id="profile-room">
-            <strong>Hotel Room:</strong> &nbsp;
-            <%= @membership.room %>
+          <div class="row" id="profile-own_accommodation">
+            <strong>Accommodation:</strong> &nbsp;  Onsite
           </div>
-          <div class="row" id="profile-room_notes">
-            <strong>Room notes:</strong> &nbsp;
-            <%= @membership.room_notes %>
+          <div class="row" id="profile-gender">
+            <strong>Gender:</strong> &nbsp;  <%= @person.gender %>
           </div>
-        <% end %>
-        <div class="row" id="profile-has-guest">
-          <strong>Has Guests:</strong> <span id="num-guests"><%= show_guests(@membership) %></span>
-        </div>
+          <div class="row" id="profile-has-guest">
+            <strong>Has Guests:</strong> <span id="num-guests"><%= show_guests(@membership) %></span>
+          </div>
+        <% end # own_accommodation %>
         <div class="row" id="profile-special-info">
-          <strong>Special Info:</strong> &nbsp;  <%= simple_format(@membership.special_info) %>
+          <strong>Special Info:</strong>
+          <p><%= simple_format(@membership.special_info) %></p>
         </div>
-        <div class="row" id="profile-staff-notes">
-          <strong>Staff Notes:</strong> &nbsp;
-          <div class="member_notes">
-            <%= simple_format(@membership.staff_notes) %>
+        <% if policy(@membership).hotel_and_billing? %>
+          <div class="row" id="profile-reviewed">
+           <strong>Reviewed:</strong>  &nbsp; <%= @membership.reviewed ? 'Yes' : 'No' %>
           </div>
-        </div>
+          <div class="row" id="profile-billing">
+            <strong>Billing:</strong> &nbsp;
+            <%= @membership.billing %>
+          </div>
+          <% unless @membership.own_accommodation %>
+            <div class="row" id="profile-room">
+              <strong>Hotel Room:</strong> &nbsp;
+              <%= @membership.room %>
+            </div>
+            <div class="row" id="profile-room_notes">
+              <strong>Room notes:</strong> &nbsp;
+              <%= @membership.room_notes %>
+            </div>
+          <% end # own_accommodation %>
+          <div class="row" id="profile-staff-notes">
+            <strong>Staff Notes:</strong> &nbsp;
+            <div class="member_notes">
+              <%= simple_format(@membership.staff_notes) %>
+            </div>
+          </div>
+        <% end # hotel_and_billing %>
+
       </div><!-- ./card-body -->
       <% if policy(@membership).show_details? %>
       <div class="card-footer updated-by">

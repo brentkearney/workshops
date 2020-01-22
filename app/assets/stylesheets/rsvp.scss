@@ -187,8 +187,13 @@
 
       .mandatory:before {
         content:"*";color:red;
-        margin-right: 0.5em;
         font-size: 1.8em;
+        float: right;
+        margin-top: -10px;
+        margin-right: -15px;
+      }
+      .mandatory:after {
+        content:"";
       }
 
       .field_with_errors {

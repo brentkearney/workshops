@@ -42,20 +42,18 @@ class MembershipPolicy
         :address3, :city, :region, :postal_code, :phone] : []
     when 'member'
       return organizer_fields if organizer?
-      return [] unless member_self?
+      return [] unless self_edit?
       all_fields - [:id, :event_id, :person_id, :role, :room, :room_notes,
-                    :attendance, :reviewed, :billing, :special_info,
-                    :staff_notes, :org_notes, :own_accommodation, :has_guest,
-                    :guest_disclaimer]
+                    :attendance, :reviewed, :billing, :staff_notes, :org_notes]
     else
       []
     end
   end
 
   def organizer_fields
-    if member_self?
+    if self_edit?
       all_fields - [:id, :event_id, :person_id, :room, :reviewed, :billing,
-        :staff_notes, :has_guest, :guest_disclaimer]
+        :staff_notes]
     else
       [:id, :event_id, :person_id, :share_email, :role, :attendance, :org_notes,
       person_attributes: [:id, :salutation, :firstname, :lastname, :email, :url,
@@ -211,6 +209,11 @@ class MembershipPolicy
     staff_and_admins
   end
 
+  def self_edit?
+    return false if @current_user.nil?
+    @membership.person == @current_user.person
+  end
+
   private
 
   def confirmed_member
@@ -223,12 +226,7 @@ class MembershipPolicy
   end
 
   def self_organizer_staff
-    organizer_and_staff || member_self?
-  end
-
-  def member_self?
-    return false if @current_user.nil?
-    @membership.person == @current_user.person
+    organizer_and_staff || self_edit?
   end
 
   def organizer_and_staff

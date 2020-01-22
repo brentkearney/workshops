@@ -3,7 +3,7 @@
     <div class="rsvp-card-title card-header">
       <h1>
         You will be joining us at:<br />
-        <small><%= @rsvp.event.code %>: <%= @rsvp.event.name %>,
+        <small><%= @rsvp.event.name %> (<%= @rsvp.event.code %>),
           <%= @rsvp.event.dates(:long) %></small>
       </h1>
     </div>
@@ -78,7 +78,9 @@
         <div class="row">
           <div class="form-check">
             <%= m.check_box :guest_disclaimer, { class: "form-check-input" }, true %>
-            <%= m.label :guest_disclaimer, @rsvp.guest_disclaimer, class: "form-check-label" %>
+            <%= m.label :guest_disclaimer, @rsvp.guest_disclaimer,
+                                           class: "form-check-label",
+                                              id: "guest-disclaimer-label" %>
           </div>
         </div>
       </div>
@@ -268,8 +270,19 @@
     <% end %>
 
     <div class="p-2">
-      <span id="revisit-note" class="pull-right">You may revisit this page any time
-        by <%= link_to 'generating a new invitation link', invitations_new_path(@rsvp.event.code) %>.</span>
+      <span id="revisit-note" class="pull-right">
+        You can update this information any time by
+        <% if @rsvp.has_no_account? %>
+          <%= link_to 'registering an account', new_user_registration_path,
+                      target: "_blank" %> and
+        <% end %>
+        accessing your <%= link_to 'membership profile',
+                    event_membership_path(@rsvp.event, @rsvp.membership),
+                    target: "_blank" %>.
+        Or you can revisit this page any time by
+        <%= link_to 'generating a new invitation link',
+                    invitations_new_path(@rsvp.event.code), target: "_blank" %>.
+      </span>
     </div>
 
     <div class="p-2">

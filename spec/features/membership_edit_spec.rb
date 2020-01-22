@@ -95,18 +95,14 @@ describe 'Membership#edit', type: :feature do
   end
 
   def allows_personal_address_editing(member)
-    fill_in 'membership_person_attributes_address1', with: '1 Infinity Loop'
-    fill_in 'membership_person_attributes_city', with: 'Cupertino'
-    fill_in 'membership_person_attributes_region', with: 'CA'
-    fill_in 'membership_person_attributes_postal_code', with: '95014'
+    fill_in 'membership_person_attributes_country', with: 'Canada'
+    fill_in 'membership_person_attributes_region', with: 'BC'
 
     click_button 'Update Member'
 
     person = Person.find(member.person_id)
-    expect(person.address1).to eq('1 Infinity Loop')
-    expect(person.city).to eq('Cupertino')
-    expect(person.region).to eq('CA')
-    expect(person.postal_code).to eq('95014')
+    expect(person.country).to eq('Canada')
+    expect(person.region).to eq('BC')
   end
 
   def allows_membership_info_editing(member)
@@ -149,6 +145,27 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).to have_css('div#profile-staff-notes', text: 'Beware.')
   end
 
+  def allows_rsvp_info_editing(member)
+    member.own_accommodation = true
+    member.special_info = 'Vegetarian'
+    member.has_guest = false
+    member.num_guests = 0
+    member.save!
+
+    visit edit_event_membership_path(@event, member)
+    choose 'membership_own_accommodation_false'
+    fill_in 'membership_special_info', with: 'Carnivore'
+    check 'membership[has_guest]'
+    fill_in 'membership_num_guests', with: '2'
+    click_button 'Update Member'
+
+    updated = Membership.find(member.id)
+    expect(updated.own_accommodation).to be_falsey
+    expect(updated.special_info).to eq('Carnivore')
+    expect(updated.has_guest).to be_truthy
+    expect(updated.num_guests).to eq(2)
+  end
+
   def allows_arrival_departure_editing(member)
     arrives = (@event.start_date + 1.day).strftime('%Y-%m-%d')
     select "#{arrives}", from: 'membership_arrival_date'
@@ -189,19 +206,14 @@ describe 'Membership#edit', type: :feature do
   end
 
   def disallows_personal_address_editing
-    expect(page.body).not_to have_field 'membership_person_attributes_address1'
-    expect(page.body).not_to have_field 'membership_person_attributes_address2'
-    expect(page.body).not_to have_field 'membership_person_attributes_address3'
-    expect(page.body).not_to have_field 'membership_person_attributes_city'
-    expect(page.body).not_to have_field 'membership_person_attributes_postal_code'
+    expect(page.body).not_to have_field 'membership_person_attributes_country'
+    expect(page.body).not_to have_field 'membership_person_attributes_region'
   end
 
   def disallows_hotel_fields
     expect(page.body).not_to have_field 'membership_reviewed'
     expect(page.body).not_to have_field 'membership_billing'
     expect(page.body).not_to have_field 'membership_room'
-    expect(page.body).not_to have_field 'membership_has_guest'
-    expect(page.body).not_to have_field 'membership_special_info'
     expect(page.body).not_to have_field 'membership_staff_notes'
   end
 
@@ -261,9 +273,12 @@ describe 'Membership#edit', type: :feature do
       allows_personal_address_editing(@participant)
     end
 
+    it 'allows editing of rsvp fields' do
+      allows_rsvp_info_editing(@participant)
+    end
+
     it 'changing email signs out user and sends confirmation email' do
       assign_participant_email_to_user
-      old_email = @participant.person.email
       new_email = 'new@email.com'
 
       visit edit_event_membership_path(@event, @participant)
@@ -284,7 +299,6 @@ describe 'Membership#edit', type: :feature do
                             firstname: @participant.person.firstname,
                              lastname: @participant.person.lastname,
                     emergency_contact: 'Me')
-      old_email = @participant.person.email
       new_email = other_person.email
 
       visit edit_event_membership_path(@event, @participant)

@@ -486,6 +486,7 @@ describe 'RSVP', type: :feature do
           expect(page).to have_field('rsvp_person_city')
           expect(page).to have_field('rsvp_person_region')
           expect(page).to have_field('rsvp_person_country')
+          expect(page).to have_field('rsvp_person_postal_code')
         end
       end
 
@@ -495,6 +496,7 @@ describe 'RSVP', type: :feature do
           expect(page).not_to have_field('rsvp_person_address2')
           expect(page).not_to have_field('rsvp_person_address3')
           expect(page).not_to have_field('rsvp_person_city')
+          expect(page).not_to have_field('rsvp_person_postal_code')
         end
 
         it 'has region and country fields' do
@@ -513,8 +515,28 @@ describe 'RSVP', type: :feature do
         expect(page).to have_field("rsvp_organizer_message")
       end
 
-      it 'has link to new invitations form for this event' do
-        expect(page).to have_link(nil, href: invitations_new_path(@event.code))
+      it 'has instructions for editing information' do
+        expect(page).to have_css('span#revisit-note',
+                  text: 'You can update this information')
+        expect(page).to have_link(href: invitations_new_path(@event.code))
+        expect(page).to have_link('membership profile', href: event_membership_path(@event, @membership))
+      end
+
+      it 'if participant has no account, links to register new account' do
+        expect(User.find_by_email(@membership.person.email)).to be_nil
+        expect(page).to have_link('registering an account',
+                                   href: new_user_registration_path)
+      end
+
+      it 'if participant already has an account, does not link to register' do
+        person = @membership.person
+        user = create(:user, person: person, email: person.email)
+        expect(User.find_by_email(person.email)).not_to be_nil
+
+        visit rsvp_yes_path(@invitation.code)
+
+        expect(page).not_to have_link('registering an account',
+                                       href: new_user_registration_path)
       end
 
       it 'persists the organizer message through form validation' do

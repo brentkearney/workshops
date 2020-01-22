@@ -46,21 +46,17 @@
             <td colspan="3"><%= ActiveSupport::TimeZone[@event.time_zone].to_s %></td>
           </tr>
           <tr>
-            <td class="label">Start Date:</td>
-            <td><%= @event.arrival_date %></td>
-
-            <td class="label">End Date:</td>
-            <td><%= @event.departure_date %></td>
+            <td class="label">Event Dates:</td>
+            <td colspan="3"><%= @event.dates(:long) %></td>
           </tr>
-
-        <% if policy(@event).view_details? %>
+          <% if policy(@event).view_details? %>
           <tr>
             <td class="label">Maximum participants:</td>
             <td><%= @event.max_participants %></td>
             <td class="label">Maximum observers:</td>
             <td><%= @event.max_observers %></td>
           </tr>
-         <% end %>
+          <% end %>
          <tr>
            <td class="label">Event Webpage:</td>
            <td colspan="3"><%= link_to @event.url, @event.url %></td>
@@ -84,7 +80,7 @@
 
      <% if(policy(@event).edit?) %>
      <div class="event-edit-button">
-       <%= link_to 'Edit Event', edit_event_path(@event), class: 'btn btn-primary btn-sm' %>
+       <%= link_to 'Edit Event', edit_event_path(@event), class: 'btn btn-primary' %>
      </div>
      <% end %>
 
@@ -93,20 +89,26 @@
     <div class="card-body">
       <div class="row" id="event-description">
         <div class="col">
-        <h2>Event Description:<br>
-          <small>appears only here, for participants to see</small>
+        <% if user_signed_in? %>
+        <h2>Event Description:
+          <% if policy(@event).edit? %>
+          <br><small>appears only here, for participants to see</small>
+          <% end %>
         </h2>
          <%= get_text(@event.description) %>
+        <% end %>
 
-        <h2>Event Press Release:<br>
-          <small>appears on the public webpage</small>
+        <h2>Event Press Release:
+          <% if policy(@event).edit? %>
+          <br><small>appears on the public webpage</small>
+          <% end %>
         </h2>
         <%= get_text(@event.press_release) %>
         </div>
       </div>
     </div><!--/.card-body -->
 
-    <% if user_signed_in? && policy(@event).edit? %>
+    <% if policy(@event).edit? %>
     <div class="card-body buttons">
       <div class="form-group">
       <%= link_to 'Edit Event Details', edit_event_path(@event), class: 'btn btn-primary' %>

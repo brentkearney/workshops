@@ -156,25 +156,39 @@ describe 'Membership#show', type: :feature do
   end
 
   def does_not_show_hotel_billing(member)
-    expect(page.body).not_to have_css('div.hotel-billing')
     expect(page.body).not_to have_css('div#profile-reviewed',
                                       text: member.reviewed)
     expect(page.body).not_to have_css('div#profile-billing',
                                       text: member.billing)
-    expect(page.body).not_to have_css('div#profile-gender',
-                                          text: member.person.gender)
+
     expect(page.body).not_to have_css('div#profile-room',
                                       text: member.room)
     expect(page.body).not_to have_css('div#profile-stay-id',
                                       text: member.stay_id)
-    expect(page.body).not_to have_css('div#profile-has-guest',
-                                      text: member.has_guest)
-    expect(page.body).not_to have_css('span#num-guests')
-    expect(page.body).not_to have_css('div#profile-special-info',
-                                      text: member.special_info)
     expect(page.body).not_to have_css('div#profile-staff-notes',
                                       text: member.staff_notes)
   end
+
+  def shows_rsvp_info(member)
+    expect(page.body).to have_css('div#profile-gender',
+                                          text: member.person.gender)
+    expect(page.body).to have_css('div#profile-has-guest',
+                                      text: 'Has Guests:')
+    expect(page.body).to have_css('span#num-guests')
+    expect(page.body).to have_css('div#profile-special-info',
+                                      text: member.special_info)
+  end
+
+  def does_not_show_rsvp_info(member)
+    expect(page.body).not_to have_css('div#profile-gender',
+                                          text: member.person.gender)
+    expect(page.body).not_to have_css('div#profile-has-guest',
+                                      text: 'Has Guests:')
+    expect(page.body).not_to have_css('span#num-guests')
+    expect(page.body).not_to have_css('div#profile-special-info',
+                                      text: member.special_info)
+  end
+
 
   def denies_access(member)
     visit event_membership_path(@event, member)
@@ -219,6 +233,10 @@ describe 'Membership#show', type: :feature do
 
     it 'excludes hotel & billing' do
       does_not_show_hotel_billing(@participant)
+    end
+
+    it 'excludes RSVP info' do
+      does_not_show_rsvp_info(@participant)
     end
 
     it 'excludes edit and delete buttons' do
@@ -283,6 +301,10 @@ describe 'Membership#show', type: :feature do
 
     it 'excludes hotel & billing' do
       does_not_show_hotel_billing(@participant)
+    end
+
+    it 'excludes RSVP info' do
+      does_not_show_rsvp_info(@participant)
     end
 
     it 'excludes edit and delete buttons' do
@@ -355,6 +377,10 @@ describe 'Membership#show', type: :feature do
       does_not_show_hotel_billing(@organizer)
     end
 
+    it 'excludes RSVP info' do
+      does_not_show_rsvp_info(@participant)
+    end
+
     it 'excludes edit and delete buttons' do
       expect(page).not_to have_link 'Edit Membership'
       expect(page).not_to have_link 'Delete Membership'
@@ -410,6 +436,10 @@ describe 'Membership#show', type: :feature do
       does_not_show_hotel_billing(@participant)
     end
 
+    it 'shows RSVP info' do
+      shows_rsvp_info(@participant)
+    end
+
     it 'includes edit button' do
       expect(page).to have_link 'Edit Membership'
     end
@@ -460,6 +490,10 @@ describe 'Membership#show', type: :feature do
         does_not_show_hotel_billing(@participant)
       end
 
+      it 'does not show RSVP info' do
+        does_not_show_rsvp_info(@participant)
+      end
+
       it 'shows Pending Invitation panel & link to RSVP page' do
         expect(page.body).to have_text("Pending Invitation")
         expect(page.body).to have_link('clicking here',
@@ -508,6 +542,10 @@ describe 'Membership#show', type: :feature do
 
     it 'excludes hotel & billing' do
       does_not_show_hotel_billing(@participant)
+    end
+
+    it 'excludes RSVP info' do
+      does_not_show_rsvp_info(@participant)
     end
 
     it 'includes edit button' do
@@ -606,6 +644,10 @@ describe 'Membership#show', type: :feature do
       does_not_show_hotel_billing(@participant)
     end
 
+    it 'excludes RSVP info' do
+      does_not_show_rsvp_info(@participant)
+    end
+
     it 'excludes edit and delete buttons' do
       expect(page).not_to have_link 'Edit Membership'
       expect(page).not_to have_link 'Delete Membership'
@@ -676,6 +718,10 @@ describe 'Membership#show', type: :feature do
       shows_hotel_billing(@participant)
     end
 
+    it 'shows RSVP info' do
+      shows_rsvp_info(@participant)
+    end
+
     it 'hides room and shows own accommodation if true' do
       @participant.own_accommodation = true
       @participant.save
@@ -684,8 +730,9 @@ describe 'Membership#show', type: :feature do
 
       expect(page.body).not_to have_css('div#profile-room',
                                         text: @participant.room)
-      expect(page.body).to have_css('div#profile-ownaccommodation',
-                                    text: 'Own Accommodation')
+      expect(page.body).to have_css('p#off-site',
+                                    text: 'Member has indicated they will book
+                                            their own accommodation.'.squish)
 
       @participant.own_accommodation = false
       @participant.save
@@ -748,6 +795,10 @@ describe 'Membership#show', type: :feature do
       shows_hotel_billing(@participant)
     end
 
+    it 'shows RSVP info' do
+      shows_rsvp_info(@participant)
+    end
+
     it 'hides room and shows own accommodation if true' do
       @participant.own_accommodation = true
       @participant.save
@@ -756,8 +807,9 @@ describe 'Membership#show', type: :feature do
 
       expect(page.body).not_to have_css('div#profile-room',
                                         text: @participant.room)
-      expect(page.body).to have_css('div#profile-ownaccommodation',
-                                    text: 'Own Accommodation')
+      expect(page.body).to have_css('p#off-site',
+                                    text: 'Member has indicated they will book
+                                            their own accommodation.'.squish)
 
       @participant.own_accommodation = false
       @participant.save

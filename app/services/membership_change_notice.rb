@@ -24,7 +24,7 @@ class MembershipChangeNotice
 
   # if these fields change, notify staff
   NOTIFY_FIELDS = %w(attendance arrival_date departure_date special_info
-                     has_guest own_accommodation)
+                     has_guest num_guests own_accommodation)
 
   private
 
