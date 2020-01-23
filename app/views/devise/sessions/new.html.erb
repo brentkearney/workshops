@@ -26,7 +26,7 @@
         <% end %>
         <%- if devise_mapping.recoverable? %>
         <p class="semibold-text mb-2" id="forgot-password">
-          <a href="#" data-toggle="flip">Forgot Password ?</a>
+          <a href="#" data-toggle="flip">Lost Password /<br>Sign-up</a>
         </p>
         <% end %>
       </div>
@@ -38,27 +38,28 @@
       <% end %>
     </div>
   <% end %>
+
   <%- if devise_mapping.recoverable? %>
-  <%= form_for(resource, as: resource_name, url: password_path,
-         html: { role: 'form', id: 'reset-form', class: 'forget-form' }) do |f| %>
-    <h3 class="login-head"><i class="fa fa-lg fa-fw fa-lock"></i> Reset Password</h3>
-    <div class="form-group">
-      <%= f.label :email, 'E-mail Address' %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email",
-                        placeholder: 'email@address.edu', id: 'reset-email',
-                        class: 'form-control' %>
-    </div>
-    <div class="form-group btn-container">
-      <%= f.button :submit, class: 'btn btn-primary btn-block', id: "reset-button" do %>
-        <i class="fa fa-unlock fa-lg fa-fw"></i> RESET
-      <% end %>
-    </div>
-    <div class="form-group mt-3">
-      <p class="semibold-text mb-0" id="back-to-login">
-        <a href="#" data-toggle="flip"><i class="fa fa-angle-left fa-fw"></i> Back to Login</a>
-      </p>
-    </div>
-  <% end %>
+    <%= form_for(resource, as: resource_name, url: password_path,
+           html: { role: 'form', id: 'reset-form', class: 'forget-form' }) do |f| %>
+      <h3 class="login-head"><i class="fa fa-lg fa-fw fa-lock"></i> Reset Password</h3>
+      <div class="form-group">
+        <%= f.label :email, 'E-mail Address' %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                          placeholder: 'email@address.edu', id: 'reset-email',
+                          class: 'form-control' %>
+      </div>
+      <div class="form-group btn-container">
+        <%= f.button :submit, class: 'btn btn-primary btn-block', id: "reset-button" do %>
+          <i class="fa fa-unlock fa-lg fa-fw"></i> RESET
+        <% end %>
+      </div>
+      <div class="form-group mt-3">
+        <p class="semibold-text mb-0" id="back-to-login">
+          <a href="#" data-toggle="flip"><i class="fa fa-angle-left fa-fw"></i> Back to Login</a>
+        </p>
+      </div>
+    <% end %>
   <% end %>
 
   <div class="forget-form align-text-bottom" id="registration-link">Have you registered an account?<br>If not, <%= link_to 'Sign-up here', new_registration_path(resource_name) %>.</div>
