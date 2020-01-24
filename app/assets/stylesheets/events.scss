@@ -51,9 +51,20 @@
     padding: 5px;
   }
 
+  ul,ol {
+    margin: 1em;
+  }
+
+  li {
+    font-size: 1.2em;
+  }
+
   h2 small {
     font-style: italic;
     color: lighten($grey-heading, 20%);
   }
 
+  h2#press-release {
+    margin-top: 1.7em;
+  }
 }

@@ -148,19 +148,29 @@ RSpec.describe 'Model validations: Membership', type: :model do
   it 'sets a role, if absent' do
     @membership.role = nil
     @membership.save
-    expect(@membership.role).not_to be_nil
+    expect(@membership.role).to eq('Participant')
   end
 
   it 'sets an attendance, if absent' do
     @membership.attendance = nil
     @membership.save
-    expect(@membership.attendance).not_to be_nil
+    expect(@membership.attendance).to eq('Not Yet Invited')
   end
 
-  it 'sets billing, if absent' do
+  it "sets billing to US billing code, if member's country is USA" do
     @membership.billing = nil
+    @membership.person.country = 'United States'
     @membership.save
-    expect(@membership.billing).not_to be_nil
+
+    expect(@membership.billing).to eq('EO2')
+  end
+
+  it "sets billing to default billing code, if member's country is not USA" do
+    @membership.billing = nil
+    @membership.person.country = 'France'
+    @membership.save
+
+    expect(@membership.billing).to eq('EO1')
   end
 
   it 'sets num_guests if empty but has_guest selected' do

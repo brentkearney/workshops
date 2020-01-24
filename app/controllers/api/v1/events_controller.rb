@@ -12,18 +12,27 @@ class Api::V1::EventsController < Api::V1::BaseController
   # POST /api/v1/events/1.json
   def create
     go_away && return unless valid_create_parameters? && event_does_not_exist?
-    event = Event.new
+    event = Event.new(data_import: true)
     event.assign_attributes(@json['event'])
+
+    return unless Event.find_by_code(event.code).nil?
 
     if event.max_participants.blank? || event.max_participants == 0
       event.max_participants = GetSetting.max_participants(event.location)
     end
     event.max_observers = GetSetting.max_observers(event.location)
 
+    if event.time_zone.blank?
+      tz = GetSetting.location(event.location, 'Timezone')
+      event.time_zone = tz.blank? ? GetSetting.default_timezone : tz
+    end
+
     respond_to do |format|
       if event.save
+        SyncEventMembersJob.perform_later(event.id)
         format.json { head :created }
       else
+        StaffMailer.notify_sysadmin(nil, event.errors).deliver_now
         format.json { render json: event.errors, status: :unprocessable_entity }
       end
     end
@@ -47,7 +56,8 @@ class Api::V1::EventsController < Api::V1::BaseController
     super
   end
 
-  def respond_to_missing?
+  def respond_to_missing?(method_name, include_private = false)
+    Rails.logger.debug "\n\n******** Api::V1::EventsController missing method: #{method_name} ********\n\n"
     super
   end
 

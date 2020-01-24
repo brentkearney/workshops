@@ -61,7 +61,8 @@ end
       'Address' => "123 Example Street\nExampletown, Exampleton",
       'lock_staff_schedule' => '15.days',
       'max_participants' => 42,
-      'max_observers' => 5
+      'max_observers' => 5,
+      'billing_codes' => "{'default' => 'EO1', 'USA' => 'EO2'}"
     }
   }
 # end

@@ -82,7 +82,7 @@ GEM
       sassc-rails (>= 2.0.0)
     brakeman (4.7.2)
     builder (3.2.4)
-    byebug (11.0.1)
+    byebug (11.1.0)
     capistrano (3.11.2)
       airbrussh (>= 1.0.0)
       i18n
@@ -257,7 +257,7 @@ GEM
       activerecord (>= 4.2)
       request_store (~> 1.1)
     parallel (1.19.1)
-    parser (2.6.5.0)
+    parser (2.7.0.2)
       ast (~> 2.4.0)
     passenger (6.0.4)
       rack
@@ -337,10 +337,10 @@ GEM
     rbnacl (6.0.1)
       ffi
     rdoc (6.2.1)
-    reek (5.5.0)
+    reek (5.6.0)
       codeclimate-engine-rb (~> 0.4.0)
       kwalify (~> 0.7.0)
-      parser (>= 2.5.0.0, < 2.7, != 2.5.1.1)
+      parser (>= 2.5.0.0, < 2.8, != 2.5.1.1)
       psych (~> 3.1.0)
       rainbow (>= 2.0, < 4.0)
     regexp_parser (1.6.0)
@@ -372,10 +372,10 @@ GEM
       rspec-mocks (~> 3.9.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.2)
-    rubocop (0.78.0)
+    rubocop (0.79.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
-      parser (>= 2.6)
+      parser (>= 2.7.0.1)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.7)
@@ -468,7 +468,7 @@ GEM
     websocket-extensions (0.1.4)
     wicked_pdf (1.4.0)
       activesupport
-    wkhtmltopdf-binary (0.12.5)
+    wkhtmltopdf-binary (0.12.5.1)
     xpath (3.2.0)
       nokogiri (~> 1.8)
 

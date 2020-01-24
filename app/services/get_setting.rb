@@ -15,6 +15,12 @@ class GetSetting
     setting.blank? ? not_set : setting
   end
 
+  def self.location(location, setting)
+    settings_hash = Setting.Locations[location]
+    return '' if settings_hash[setting].blank?
+    settings_hash[setting]
+  end
+
   def self.no_setting(setting_string)
     parts = setting_string.scan(/\w+-?\w*/) # include hyphenated words
     settings_hash = Setting.send(parts[0]) # i.e. Locations
@@ -42,6 +48,12 @@ class GetSetting
   def self.org_name(location)
     return location if no_setting("Locations['#{location}']['Name']")
     Setting.Locations[location]['Name']
+  end
+
+  def self.billing_code(location, country)
+    return '' if no_setting("Locations['#{location}']['billing_codes']")
+    billing = eval(Setting.Locations[location]['billing_codes'])[country]
+    billing ||= eval(Setting.Locations[location]['billing_codes'])['default']
   end
 
   def self.max_participants(location)

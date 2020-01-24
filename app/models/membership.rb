@@ -70,7 +70,8 @@ class Membership < ApplicationRecord
 
   def set_billing
     return unless billing.blank? && !self.person.country.blank?
-    self.billing = is_usa?(self.person.country) ? 'USBIRS' : 'BIRS'
+    country = is_usa?(self.person.country) ? 'USA' : self.person.country
+    self.billing = GetSetting.billing_code(self.event.location, country)
   end
 
   def set_guests
