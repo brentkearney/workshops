@@ -115,6 +115,14 @@ module EventDecorators
     memberships.where("role LIKE '%Organizer%'").map {|m| m.person }
   end
 
+  def contact_organizers
+    organizers = []
+    memberships.where(role: 'Contact Organizer').each do |org_member|
+      organizers << org_member.person
+    end
+    organizers
+  end
+
   def staff
     staff = User.where(role: 1, location: self.location).map {|s| s.person }
     admins = User.where('role > 1').map {|a| a.person }

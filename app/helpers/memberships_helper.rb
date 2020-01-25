@@ -122,9 +122,7 @@ module MembershipsHelper
     text = '<ul>'
     member.invite_reminders.each do |k,v|
       start_date = member.event.start_date.in_time_zone(tz)
-      reply_by = rsvp_by(start_date, k.in_time_zone(tz))
-      text << "<li><b>On #{k.strftime('%Y-%m-%d %H:%M %Z')}</b><br>by #{v}.<br>
-              &nbsp;&nbsp;&bull; Reply-by: #{reply_by}</li>".squish
+      text << "<li><b>On #{k.strftime('%Y-%m-%d %H:%M %Z')}</b><br>by #{v}.</li>"
     end
     text << '</ul>'
   end
@@ -146,25 +144,25 @@ module MembershipsHelper
 
   def show_invited_on_date(member, no_td = false)
     column = no_td ? '' : '<td class="rowlink-skip no-print">'
-    if show_invited_on?(member.attendance)
-      if member.invited_on.blank?
-        column << '(not set)'
-      else
-        tz = member.event.time_zone
-        start_date = member.event.start_date.in_time_zone(tz)
-        invited_on = member.invited_on.in_time_zone(tz)
-        column << '<a class="invitation-dates" tabindex="0" title="Invitation Sent"
-          role="button" data-toggle="popover" data-placement="top" data-html="true"
-          data-target="#invitations-' + member.id.to_s + '"
-          data-trigger="hover focus" data-content="By ' +
-          format_invited_by(member) + '<br><b>Reply-by date:</b> ' +
-          rsvp_by(start_date, invited_on) +
-          '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
-      end
-      unless member.invite_reminders.blank?
-        column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"> &nbsp; <i class="fa fa-md fa-repeat"></i></a></span>'.html_safe
-      end
+    return unless show_invited_on?(member.attendance)
+    if member.invited_on.blank?
+      column << '(not set)'
+    else
+      tz = member.event.time_zone
+      start_date = member.event.start_date.in_time_zone(tz)
+      invited_on = member.invited_on.in_time_zone(tz)
+      column << '<a class="invitation-dates" tabindex="0" title="Invitation Sent"
+        role="button" data-toggle="popover" data-placement="top" data-html="true"
+        data-target="#invitations-' + member.id.to_s + '"
+        data-trigger="hover focus" data-content="By ' +
+        format_invited_by(member) + '<br><b>Reply-by date:</b> ' +
+        rsvp_by(start_date, invited_on) +
+        '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
     end
+    unless member.invite_reminders.blank?
+      column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"> &nbsp; <i class="fa fa-md fa-repeat"></i></a></span>'.html_safe
+    end
+
     column << "#{no_td ? '' : '</td>'}"
     column.html_safe
   end

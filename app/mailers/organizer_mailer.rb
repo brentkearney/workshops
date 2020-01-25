@@ -33,14 +33,18 @@ class OrganizerMailer < ApplicationMailer
 
     @member = membership.person
     @event = membership.event
-    @organizer = @event.organizer
     @organization = GetSetting.org_name(@event.location)
 
     from_email = GetSetting.email(@event.location, 'maillist_from')
     reply_to = GetSetting.rsvp_email(@event.location)
     subject = '[' + @event.code + '] Membership invitation reply'
 
-    to_email = '"' + @organizer.name + '" <' + @organizer.email + '>'
+    to_email = ''
+    @event.contact_organizers.each do |organizer|
+      to_email << '"' + organizer.name + '" <' + organizer.email + '>, '
+    end
+    to_email.delete_suffix(', ')
+
     if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
       to_email = GetSetting.site_email('webmaster_email')
     end

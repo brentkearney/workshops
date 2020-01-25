@@ -33,10 +33,10 @@ RSpec.describe OrganizerMailer, type: :mailer do
     end
 
     before :each do
-      args = { 'attendance_was' => 'Invited',
+      @args = { 'attendance_was' => 'Invited',
                'attendance' => 'Confirmed',
                'organizer_message' => 'Foo bar' }
-      OrganizerMailer.rsvp_notice(@participant, args).deliver_now
+      OrganizerMailer.rsvp_notice(@participant, @args).deliver_now
       @header = ActionMailer::Base.deliveries.first
       @mail_object = ActionMailer::Base.deliveries.last
     end
@@ -48,6 +48,17 @@ RSpec.describe OrganizerMailer, type: :mailer do
     it 'To: given organizer, Subject: event_code' do
       expect(@header.to).to include(@organizer.person.email)
       expect(@header.subject).to include(@organizer.event.code)
+    end
+
+    it 'To: includes multiple Contact Organizers' do
+      other_organizer = create(:membership, role: 'Contact Organizer',
+                                           event: @organizer.event)
+      OrganizerMailer.rsvp_notice(@participant, @args).deliver_now
+
+      header = ActionMailer::Base.deliveries.first
+      expect(header.to).to include(@organizer.person.email)
+      header = ActionMailer::Base.deliveries.last
+      expect(header.to).to include(other_organizer.person.email)
     end
 
     it "message body includes participant's name & email" do
