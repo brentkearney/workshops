@@ -273,8 +273,17 @@ describe 'Membership#edit', type: :feature do
       allows_personal_address_editing(@participant)
     end
 
-    it 'allows editing of rsvp fields' do
+    it 'allows editing of RSVP fields' do
       allows_rsvp_info_editing(@participant)
+    end
+
+    it 'if sets num_guests to nil, num_guests gets set to 0' do
+      visit edit_event_membership_path(@event, @participant)
+      fill_in 'membership_num_guests', with: nil
+      click_button 'Update Member'
+
+      updated = Membership.find(@participant.id)
+      expect(updated.num_guests).to eq(0)
     end
 
     it 'changing email signs out user and sends confirmation email' do

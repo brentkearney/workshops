@@ -14,6 +14,7 @@ FactoryBot.define do
     f.room { 'ROOM' + Random.rand(0..1000).to_s }
     f.stay_id { Faker::Lorem.words(1) }
     f.has_guest { %w[true false].sample }
+    f.num_guests { 0 }
     f.own_accommodation { %w[true false].sample }
     f.guest_disclaimer { true }
     f.reviewed { true }

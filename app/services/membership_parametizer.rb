@@ -20,6 +20,7 @@ class MembershipParametizer
   end
 
   def update_membership
+    @form_data['num_guests'] = 0 if @form_data['num_guests'].blank?
     db_member = Membership.find(@membership.id)
     db_member.assign_attributes(@form_data)
     if db_member.changed?

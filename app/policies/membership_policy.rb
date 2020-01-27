@@ -56,6 +56,7 @@ class MembershipPolicy
         :staff_notes]
     else
       [:id, :event_id, :person_id, :share_email, :role, :attendance, :org_notes,
+        :has_guest, :num_guests,
       person_attributes: [:id, :salutation, :firstname, :lastname, :email, :url,
                          :affiliation, :department, :title, :research_areas,
                          :biography, :country]]
