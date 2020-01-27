@@ -275,7 +275,7 @@ module MembershipsHelper
     when "Not Yet Invited"
       '<i class="fa fa-clock-o" aria-hidden="true"></i> Not Yet Invited'
     when "Declined"
-      '<i class="fa fa-thumbs-down" aria-hidden="true"></i> Declined'
+      '<i class="fa fa-times-circle-o" aria-hidden="true"></i> Declined'
     else
       status
     end
