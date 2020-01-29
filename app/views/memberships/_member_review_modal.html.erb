@@ -1,16 +1,9 @@
 <!-- Member Review Modal -->
-<div class="modal fade" id="member-review" tabindex="-1" role="dialog" aria-labelledby="memberReviewLabel" aria-hidden="true">
-  <div class="modal-dialog">
+<div class="modal fade" id="member-review" tabindex="-1" aria-labelledby="memberReviewLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="dialog">
     <div class="modal-content">
       <div id="member-form">
         <%= yield %>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Full Profile</button>
-        <%= link_to "Edit Membership", edit_event_membership_path(@event, @event.memberships.first),
-              class: "btn btn-primary" %>
-        <button type="button" class="btn btn-primary">Update</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

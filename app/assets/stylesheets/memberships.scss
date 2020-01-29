@@ -456,12 +456,15 @@
       width: 100%;
       background: $primary-color;
       color: #fff;
+      padding: 5px;
 
       .close {
         color: #fff;
       }
     }
-
+    .modal-footer {
+      padding: 0;
+    }
   }
 }
 

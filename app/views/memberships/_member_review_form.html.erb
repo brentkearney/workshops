@@ -11,3 +11,14 @@
 
   <p>Here is a variable <%= @yay %>.</p>
 </div>
+<div class="modal-footer d-flex mb-1">
+  <span class="left-buttons p-2 mr-auto">
+  <%= link_to "Profile", event_membership_path(@event, @membership),
+        class: "btn btn-secondary" %>
+  <%= link_to "Edit", edit_event_membership_path(@event, @membership),
+        class: "btn btn-secondary" %>
+    <button type="button" class="btn btn-primary">Update</button>
+  </span>
+  <span class="right-buttons p-2 ml-auto">
+  </span>
+</div>
