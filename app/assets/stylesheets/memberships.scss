@@ -8,12 +8,6 @@
       margin: -8px;
     }
 
-    .observer {
-      a {
-        color: $secondary-text-color;
-      }
-    }
-
     .colheading-right {
       display: block;
       width: 100%;
@@ -67,7 +61,8 @@
       li:nth-child(odd):not(.reply-due) {
         background: lighten( $light-border, 10% );
       }
-      .member-list-item {
+
+      li.member-list-item {
         float: left;
 
         .member-name {
@@ -75,6 +70,20 @@
           white-space: normal;
           word-wrap: normal;
           float: left;
+        }
+
+        .contact-organizer, .organizer {
+          font-weight: bold;
+        }
+
+        .observer {
+          a {
+            color: $secondary-text-color;
+          }
+        }
+
+        .review-link {
+          margin: 0 5px;
         }
 
         .reply-by-date {
@@ -440,6 +449,19 @@
       display: none;
       visibility: hidden;
     }
+  }
+
+  #member-review {
+    .modal-header {
+      width: 100%;
+      background: $primary-color;
+      color: #fff;
+
+      .close {
+        color: #fff;
+      }
+    }
+
   }
 }
 

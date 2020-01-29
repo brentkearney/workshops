@@ -160,7 +160,7 @@ module MembershipsHelper
         '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
     end
     unless member.invite_reminders.blank?
-      column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"> &nbsp; <i class="fa fa-md fa-repeat"></i></a></span>'.html_safe
+      column << ' <span class="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"> &nbsp; <i class="fa fa-md fa-repeat"></i></a></span>'.html_safe
     end
 
     column << "#{no_td ? '' : '</td>'}"
@@ -209,8 +209,6 @@ module MembershipsHelper
     @event.max_participants - @event.num_invited_participants > 0
   end
 
-
-
   def add_email_buttons(status)
     return '' unless policy(@event).show_email_buttons?(status)
     domain = GetSetting.email(@event.location, 'email_domain')
@@ -224,29 +222,6 @@ module MembershipsHelper
       content << mail_to("#{@event.code}-organizers@#{domain}", "#{@event.code}-organizers@#{domain}", title: "Email event organizers", subject: "[#{@event.code}] ").html_safe
     end
     content.html_safe
-  end
-
-  def show_email(member)
-    column = ''
-    if policy(member).show_email_address?
-      column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
-        mail_to(member.person.email, '<span class="glyphicon glyphicon-envelope"></span>'.html_safe,
-          title: "#{member.person.email}", subject: "[#{@event.code}] ") +
-          '</td><td class="hidden-xs hidden-sm rowlink-skip no-print">' +
-          mail_to(member.person.email, member.person.email, subject: "[#{@event.code}] ") +
-          '</td>'
-    elsif policy(member).use_email_addresses?
-          column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
-            mail_to(member.person.email, '<span class="glyphicon glyphicon-lock"></span>'.html_safe, :title => "E-mail not shared with other members", subject: "[#{@event.code}] ") +
-            '</td><td class="hidden-xs hidden-sm rowlink-skip no-print">' +
-            mail_to(member.person.email, '[not shared]', title: "E-mail not shared with other members", subject: "[#{@event.code}] ") +
-            '</td>'
-    elsif policy(member).show_not_shared?
-      column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
-        '<a title="E-mail not shared" class="glyphicon glyphicon-lock"></a></td>' +
-        '<td class="hidden-xs hidden-sm rowlink-skip">[not shared]</td>'
-    end
-    column.html_safe
   end
 
   def add_limits_message
@@ -286,7 +261,18 @@ module MembershipsHelper
   end
 
   def member_link(member)
-    link_to "#{member.person.lname}", event_membership_path(@event, member)
+    if member.confirmed? && policy(member).hotel_and_billing?
+      link_to "#{member.person.lname}",
+              event_membership_member_review_path(@event, member),
+              { remote: true, "data-toggle": "modal",
+                              "data-target": "#member-review" }
+    else
+      link_to "#{member.person.lname}", event_membership_path(@event, member)
+    end
+  end
+
+  def member_affil(member)
+    "(#{member.person.affiliation})" unless member.person.affiliation.blank?
   end
 
   def show_guests(member)

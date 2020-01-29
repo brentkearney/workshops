@@ -115,6 +115,15 @@ class MembershipsController < ApplicationController
     end
   end
 
+  def member_review
+    @modal_title = "#{@event.code}: #{@membership.person.name}"
+    @yay = @membership.attendance
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
+
   def email_change
     @confirmation = ConfirmEmailChange.where(replace_with_id:
                                              @membership.person_id).first

@@ -190,7 +190,7 @@ describe 'Event Membership Page', type: :feature do
         shows_confirmed_members
       end
 
-      it 'hides email links' do
+      it 'hides maillist links' do
         hides_all_maillist_links
       end
 
@@ -270,7 +270,7 @@ describe 'Event Membership Page', type: :feature do
         shows_all_members
       end
 
-      it 'shows email links' do
+      it 'shows mail list links' do
         shows_maillist_links
       end
 
@@ -297,7 +297,7 @@ describe 'Event Membership Page', type: :feature do
         hides_nonconfirmed_members
       end
 
-      it 'hides email links' do
+      it 'hides maillist links' do
         hides_all_maillist_links
         expect(page.body).not_to have_link('Invite Members')
       end
@@ -324,9 +324,10 @@ describe 'Event Membership Page', type: :feature do
       shows_all_members
     end
 
-    it 'shows email links' do
+    it 'shows maillist links' do
       shows_maillist_links
     end
+
 
     it 'shows Add & Invite Member links' do
       expect(page.body).to have_link('Add Members',

@@ -41,30 +41,10 @@ class Membership < ApplicationRecord
   ATTENDANCE = ['Confirmed', 'Invited', 'Undecided', 'Not Yet Invited',
                 'Declined'].freeze
 
+  include MembershipDecorators
   include SharedDecorators
 
-  def shares_email?
-    self.share_email
-  end
 
-  def organizer?
-    role == 'Organizer' || role == 'Contact Organizer'
-  end
-
-  def arrives
-    return 'Not set' if arrival_date.blank?
-    arrival_date.strftime('%b %-d, %Y')
-  end
-
-  def departs
-    return 'Not set' if departure_date.blank?
-    departure_date.strftime('%b %-d, %Y')
-  end
-
-  def rsvp_date
-    return 'N/A' if replied_at.blank?
-    replied_at.in_time_zone(event.time_zone).strftime('%b %-d, %Y %H:%M %Z')
-  end
 
   private
 
