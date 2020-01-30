@@ -457,11 +457,66 @@
       background: $primary-color;
       color: #fff;
       padding: 5px;
+      margin-bottom: 0;
 
       .close {
         color: #fff;
       }
     }
+
+    .modal-body {
+      margin-top: 0;
+
+      p {
+        font-size: 1em;
+        margin: 0;
+        padding: 0;
+
+        strong {
+          margin-right: 5px;
+        }
+      }
+
+      #name {
+        font-size: 1.2em;
+        font-weight: bold;
+      }
+
+      #affil {
+        font-style: italic;
+      }
+
+      #address {
+        margin-top: 10px;
+      }
+
+      #billing {
+        margin-top: 10px;
+      }
+
+      #attendance {
+      }
+
+      #guests {
+        margin-top: 10px;
+      }
+
+      #arrival {
+        margin-top: 10px;
+      }
+
+      #departure {
+      }
+
+      #notes {
+      }
+    }
+
+    .updated-by {
+      padding: 1em;
+      font-size: 0.8em;
+    }
+
     .modal-footer {
       padding: 0;
     }

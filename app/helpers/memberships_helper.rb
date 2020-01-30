@@ -285,4 +285,18 @@ module MembershipsHelper
     return '' if intro.blank?
     intro.html_safe
   end
+
+  def member_notes(member)
+    if policy(member).hotel_and_billing? && !member.staff_notes.blank?
+      simple_format(member.staff_notes)
+    elsif policy(member).organizer? && !member.org_notes.blank?
+      simple_format(member.org_notes)
+    else
+      '<i>none</i>'.html_safe
+    end
+  end
+
+  def reviewed(member)
+    member.reviewed ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>'
+  end
 end

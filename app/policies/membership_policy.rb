@@ -215,6 +215,11 @@ class MembershipPolicy
     @membership.person == @current_user.person
   end
 
+  def organizer?
+    return false if @current_user.nil? || @event.nil?
+    @current_user.is_organizer?(@event)
+  end
+
   private
 
   def confirmed_member
@@ -232,11 +237,6 @@ class MembershipPolicy
 
   def organizer_and_staff
     organizer? || staff_and_admins
-  end
-
-  def organizer?
-    return false if @current_user.nil? || @event.nil?
-    @current_user.is_organizer?(@event)
   end
 
   def staff_and_admins

@@ -116,8 +116,8 @@ class MembershipsController < ApplicationController
   end
 
   def member_review
-    @modal_title = "#{@event.code}: #{@membership.person.name}"
-    @yay = @membership.attendance
+    @person = @membership.person
+
     respond_to do |format|
       format.html
       format.js
