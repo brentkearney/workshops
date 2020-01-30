@@ -10,6 +10,12 @@
   <div class="p-2 flex-fill left-content">
     <p id="name"><%= @person.lastname %>, <%= @person.firstname %></p>
     <p id="affil"><%= @person.affiliation %></p>
+    <% if policy(@membership).use_email_addresses? || policy(@membership).show_email_address? %>
+    <p id="email"><%= mail_to @person.email %></p>
+    <% end %>
+    <% unless @person.url.blank? %>
+    <p id="url"><%= link_to @person.uri.truncate(60), @person.uri %></p>
+    <% end %>
     <p id="address"><strong>Address:</strong><br><%= print_address(@person) %></p>
     <p id="billing"><strong>Billing:</strong><%= @membership.billing %></p>
     <p id="reviewed"><strong>Reviewed:</strong><%= reviewed(@membership).html_safe %></p>
@@ -22,6 +28,11 @@
     <p id="arrival"><strong>Arrives:</strong><%= @membership.arrives %></p>
     <p id="departure"><strong>Departs:</strong><%= @membership.departs %></p>
     <p id="guests"><strong>Guests:</strong><%= show_guests(@membership) %></p>
+    <% unless @membership.special_info.blank? %>
+      <p id="special-info">
+        <strong>Special info:</strong><%= simple_format(@membership.special_info) %>
+      </p>
+    <% end %>
     <p id="notes"><strong>Notes:</strong><%= member_notes(@membership) %></p>
   </div>
 </div>
@@ -37,6 +48,6 @@
     <button type="button" class="btn btn-primary">Update</button>
   </span>
   <span class="right-buttons p-2 ml-auto">
-
+    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
   </span>
 </div>
