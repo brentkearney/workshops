@@ -61,6 +61,15 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@membership.valid?).to be_truthy
   end
 
+  it 'is invalid if confirmed and associated person has no country' do
+    @membership.attendance = 'Confirmed'
+    @membership.person.country = ''
+    expect(@membership.valid?).to be_falsey
+
+    @membership.attendance = 'Declined'
+    expect(@membership.valid?).to be_truthy
+  end
+
   it 'is valid if departure dates are within the period of the event' do
     @membership.departure_date = @event.end_date - 1.days
     expect(@membership.valid?).to be_truthy

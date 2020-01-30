@@ -35,6 +35,7 @@ class Membership < ApplicationRecord
   validate :check_max_observers
   validate :arrival_and_departure_dates
   validate :guest_disclaimer_acknowledgement
+  validate :has_country_if_confirmed
 
   ROLES = ['Contact Organizer', 'Organizer', 'Participant', 'Observer',
            'Backup Participant'].freeze
@@ -156,6 +157,14 @@ class Membership < ApplicationRecord
     return if update_by_staff == true
     if has_guest && guest_disclaimer == false
       errors.add(:guest_disclaimer, "must be acknowledged if bringing a guest.")
+    end
+  end
+
+  def has_country_if_confirmed
+    return true unless attendance == 'Confirmed'
+    if self.person.country.blank?
+      errors.add(:person, '- country must be set for confirmed members')
+      self.person.errors.add(:country, :invalid)
     end
   end
 
