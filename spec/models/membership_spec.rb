@@ -70,6 +70,22 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@membership.valid?).to be_truthy
   end
 
+  it 'is invalid if confirmed and is organizer with no full address' do
+    @membership.role = 'Contact Organizer'
+    @membership.attendance = 'Confirmed'
+    @membership.person.country = 'France'
+    @membership.person.address1 = ''
+    @membership.person.city = ''
+    expect(@membership.valid?).to be_falsey
+
+    @membership.role = 'Participant'
+    expect(@membership.valid?).to be_truthy
+
+    @membership.role = 'Organizer'
+    @membership.attendance = 'Declined'
+    expect(@membership.valid?).to be_truthy
+  end
+
   it 'is valid if departure dates are within the period of the event' do
     @membership.departure_date = @event.end_date - 1.days
     expect(@membership.valid?).to be_truthy

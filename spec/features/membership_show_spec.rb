@@ -95,6 +95,7 @@ describe 'Membership#show', type: :feature do
     expect(page.body).to have_css('div#profile-address')
     expect(page.body).to have_text(member.person.address1)
     expect(page.body).to have_text(member.person.city)
+    expect(page.body).to have_text(member.person.region)
     expect(page.body).to have_text(member.person.postal_code)
     expect(page.body).to have_text(member.person.country)
   end

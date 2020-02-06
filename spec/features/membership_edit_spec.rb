@@ -94,7 +94,7 @@ describe 'Membership#edit', type: :feature do
     expect(person.phd_year).to eq('1987')
   end
 
-  def allows_personal_address_editing(member)
+  def allows_country_region_editing(member)
     fill_in 'membership_person_attributes_country', with: 'Canada'
     fill_in 'membership_person_attributes_region', with: 'BC'
 
@@ -103,6 +103,35 @@ describe 'Membership#edit', type: :feature do
     person = Person.find(member.person_id)
     expect(person.country).to eq('Canada')
     expect(person.region).to eq('BC')
+  end
+
+  def allows_address_editing(member)
+    fill_in 'membership_person_attributes_address1', with: '123 Privacy St.'
+    fill_in 'membership_person_attributes_address2', with: 'Unit 6'
+    fill_in 'membership_person_attributes_address3', with: 'Around back'
+    fill_in 'membership_person_attributes_city', with: 'Privacyville'
+    fill_in 'membership_person_attributes_region', with: 'AB'
+    fill_in 'membership_person_attributes_country', with: 'Canada'
+    fill_in 'membership_person_attributes_postal_code', with: 'X01 4Y3'
+
+    click_button 'Update Member'
+
+    person = Person.find(member.person_id)
+    expect(person.address1).to eq('123 Privacy St.')
+    expect(person.address2).to eq('Unit 6')
+    expect(person.address3).to eq('Around back')
+    expect(person.city).to eq('Privacyville')
+    expect(person.region).to eq('AB')
+    expect(person.country).to eq('Canada')
+    expect(person.postal_code).to eq('X01 4Y3')
+  end
+
+  def does_not_have_address_fields
+    expect(page.has_no_field?('membership_person_attributes_address1'))
+    expect(page.has_no_field?('membership_person_attributes_address2'))
+    expect(page.has_no_field?('membership_person_attributes_address3'))
+    expect(page.has_no_field?('membership_person_attributes_city'))
+    expect(page.has_no_field?('membership_person_attributes_postal_code'))
   end
 
   def allows_membership_info_editing(member)
@@ -205,7 +234,7 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).not_to have_field 'membership_person_attributes_country'
   end
 
-  def disallows_personal_address_editing
+  def disallows_country_region_editing
     expect(page.body).not_to have_field 'membership_person_attributes_country'
     expect(page.body).not_to have_field 'membership_person_attributes_region'
   end
@@ -270,16 +299,39 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'allows editing of personal address fields' do
-      allows_personal_address_editing(@participant)
+      allows_address_editing(@participant)
     end
 
     it 'allows editing of RSVP fields' do
       allows_rsvp_info_editing(@participant)
     end
 
-    it 'if sets num_guests to nil, num_guests gets set to 0' do
+    it 'if user sets num_guests to nil, sets num_guests to 0' do
       visit edit_event_membership_path(@event, @participant)
       fill_in 'membership_num_guests', with: nil
+      uncheck 'membership[has_guest]'
+      click_button 'Update Member'
+
+      updated = Membership.find(@participant.id)
+      expect(updated.num_guests).to eq(0)
+    end
+
+    it 'if user checks has_guests, sets num_guests to 1' do
+      @participant.num_guests = 0
+      @participant.save
+      visit edit_event_membership_path(@event, @participant)
+      check 'membership[has_guest]'
+      click_button 'Update Member'
+
+      updated = Membership.find(@participant.id)
+      expect(updated.num_guests).to eq(1)
+    end
+
+    it 'if user unchecks has_guests, sets num_guests to 0' do
+      @participant.num_guests = 2
+      @participant.save
+      visit edit_event_membership_path(@event, @participant)
+      uncheck 'membership[has_guest]'
       click_button 'Update Member'
 
       updated = Membership.find(@participant.id)
@@ -513,8 +565,12 @@ describe 'Membership#edit', type: :feature do
       disallows_personal_info_editing
     end
 
-    it 'disallows editing of personal address' do
-      disallows_personal_address_editing
+    it 'disallows editing of country & region' do
+      disallows_country_region_editing
+    end
+
+    it 'does not show address fields' do
+      does_not_have_address_fields
     end
 
     it 'allows changing email to one taken by another record with
@@ -696,8 +752,9 @@ describe 'Membership#edit', type: :feature do
       allows_person_editing(@participant)
     end
 
+
     it 'allows editing of personal address' do
-      allows_personal_address_editing(@participant)
+      allows_address_editing(@participant)
     end
 
     it 'allows editing of personal info' do
@@ -794,7 +851,7 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'allows editing of personal address' do
-      allows_personal_address_editing(@participant)
+      allows_address_editing(@participant)
     end
 
     it 'allows editing of arrival & departure dates' do

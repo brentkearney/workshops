@@ -82,11 +82,9 @@ class ErrorReport
                 error_messages << "* #{@event.code} membership has no associated
                   person record!\n\n#{membership.inspect}\n"
               else
-                legacy_url = Setting.Site['legacy_person'] +
-                  "#{membership.person.legacy_id}" + '&ps=events'
-                error_messages << "* Membership of #{membership.person.name}:
-                  #{message}\n".squish
-                error_messages << "   -> #{legacy_url}\n\n"
+                error_messages << "\n\n* Membership of #{membership.person.name}:\n   --> "
+                error_messages << 'https://' + ENV['APPLICATION_HOST'] + "/events/#{@event.code}"
+                error_messages << "/memberships/#{membership.id}\n\n"
               end
             end
           end

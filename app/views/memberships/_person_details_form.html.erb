@@ -97,8 +97,8 @@
         <%= person.label :gender, "Gender: " %>
       </div>
       <%= person.select :gender,
-        { "Male" => "M", "Female" => "F", "Other" => "O" },
-        { include_blank: false }, { class: 'form-control' } %>
+        { "" => "", "Male" => "M", "Female" => "F", "Other" => "O" },
+        { include_blank: true }, { class: 'form-control' } %>
     </div>
 
     <% if policy(@membership).show_address? %>
@@ -112,14 +112,12 @@
       <div class="control-label">
         <%= person.label :address, "Address: " %>
       </div>
-      <%= person.text_field :country, class: 'form-control', placeholder: 'Country' %>
+      <%= person.text_field :address1, class: 'form-control', placeholder: 'Address line 1' %>
+      <%= person.text_field :address2, class: 'form-control', placeholder: 'Address line 2' %>
+      <%= person.text_field :address3, class: 'form-control', placeholder: 'Address line 3' %>
+      <%= person.text_field :city, class: 'form-control', placeholder: 'City' %>
       <%= person.text_field :region, class: 'form-control', placeholder: 'Region' %>
-    </div>
-    <% else %>
-    <div class="form-group">
-      <div class="control-label">
-        <%= person.label :country, "Country: " %>
-      </div>
+      <%= person.text_field :postal_code, class: 'form-control', placeholder: 'Postal Code' %>
       <%= person.text_field :country, class: 'form-control', placeholder: 'Country' %>
     </div>
     <% end %>

@@ -98,6 +98,12 @@ class MembershipsController < ApplicationController
               clicking the confirmation link that we sent to your new email
               address.'.squish
           else
+            if @membership.warn_guest
+              flash[:warning] = '<strong>Note:</strong> number of guests was
+              changed to 0, since the "bringing a guest" option was not
+              selected. If guests are coming, please select the "bringing a
+              guest" option.'.squish
+            end
             redirect_to event_membership_path(@event, @membership),
                         success: 'Membership successfully updated.'
           end

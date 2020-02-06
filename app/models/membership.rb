@@ -7,7 +7,7 @@
 # See the COPYRIGHT file for details and exceptions.
 #
 class Membership < ApplicationRecord
-  attr_accessor :sync_memberships, :update_by_staff, :update_remote, :is_rsvp
+  attr_accessor :sync_memberships, :update_by_staff, :update_remote, :is_rsvp, :warn_guest
 
   belongs_to :event
   belongs_to :person
@@ -35,7 +35,7 @@ class Membership < ApplicationRecord
   validate :check_max_observers
   validate :arrival_and_departure_dates
   validate :guest_disclaimer_acknowledgement
-  validate :has_country_if_confirmed
+  validate :has_address_if_confirmed
 
   ROLES = ['Contact Organizer', 'Organizer', 'Participant', 'Observer',
            'Backup Participant'].freeze
@@ -76,7 +76,9 @@ class Membership < ApplicationRecord
   end
 
   def set_guests
-    self.num_guests = 1 if has_guest && num_guests == 0
+    self.warn_guest = true if has_guest === false && num_guests > 0
+    self.num_guests = 0 if has_guest === false
+    self.num_guests = 1 if has_guest && (num_guests.blank? || num_guests == 0)
     self.has_guest = true if num_guests > 0
   end
 
@@ -160,8 +162,22 @@ class Membership < ApplicationRecord
     end
   end
 
-  def has_country_if_confirmed
+  def organizer_address_error(field)
+    errors.add(:person, "- #{field} is required for confirmed organizers")
+  end
+
+  def has_full_address
+    address_fields = %w(address1 city region country postal_code)
+    person = self.person
+    address_fields.each do |field|
+      organizer_address_error(field) if person.send(field.to_sym).blank?
+    end
+  end
+
+  def has_address_if_confirmed
+    return if self.person.nil?
     return true unless attendance == 'Confirmed'
+    return has_full_address if role =~ /Organizer/
     if self.person.country.blank?
       errors.add(:person, '- country must be set for confirmed members')
       self.person.errors.add(:country, :invalid)
