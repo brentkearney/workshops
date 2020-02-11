@@ -180,7 +180,7 @@ describe "SyncMembers" do
         local_person = create(:person, lastname: 'Localperson', updated_at: updated)
         local_person.legacy_id = 666
         local_person.save
-        updated_fields = { lastname: 'RemotePerson', address1: 'foo' }
+        updated_fields = { lastname: 'RemotePerson', country: 'Iceland' }
         test_update(local_person: local_person, fields: updated_fields)
       end
     end

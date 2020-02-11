@@ -70,20 +70,90 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@membership.valid?).to be_truthy
   end
 
-  it 'is invalid if confirmed and is organizer with no full address' do
-    @membership.role = 'Contact Organizer'
-    @membership.attendance = 'Confirmed'
-    @membership.person.country = 'France'
-    @membership.person.address1 = ''
-    @membership.person.city = ''
-    expect(@membership.valid?).to be_falsey
+  context 'Mailing addresses' do
+    before do
+      @event.start_date = @event.start_date + 1.year
+      @event.end_date = @event.end_date + 1.year
+      @event.save
 
-    @membership.role = 'Participant'
-    expect(@membership.valid?).to be_truthy
+      @membership.role = 'Contact Organizer'
+      @membership.attendance = 'Confirmed'
+      @membership.person.country = 'France'
+      @membership.person.region = ''
+      @membership.person.address1 = ''
+      @membership.person.city = ''
+      @membership.person.postal_code = ''
+    end
 
-    @membership.role = 'Organizer'
-    @membership.attendance = 'Declined'
-    expect(@membership.valid?).to be_truthy
+
+    it 'are required if event is next year and current date is < May' do
+      january = Time.zone.today.beginning_of_year.advance(weeks: 1).to_date
+      allow(Date).to receive(:today).and_return(january)
+
+      expect(@membership.person.city).to be_blank
+      expect(@membership.valid?).to be_falsey
+    end
+
+    it 'are not required if current date is > April and event is next year' do
+      may = Time.zone.today.beginning_of_year.advance(months: 5).to_date
+      allow(Date).to receive(:today).and_return(may)
+
+      expect(@membership.person.city).to be_blank
+      expect(@membership.valid?).to be_truthy
+    end
+
+    it 'are not required if event is before next year' do
+      start_date = Time.zone.today.beginning_of_year.advance(weeks: 3).to_date
+      end_date = start_date + 5.days
+      @event.start_date = start_date
+      @event.end_date = end_date
+      @event.save
+
+      feb = Time.zone.today.beginning_of_year.advance(months: 2).to_date
+      allow(Date).to receive(:today).and_return(feb)
+
+      expect(@membership.person.city).to be_blank
+      expect(@membership.valid?).to be_truthy
+    end
+
+    it 'is required if event is greater than 1 year in advance' do
+      may = Time.zone.today.beginning_of_year.advance(months: 5).to_date
+      allow(Date).to receive(:today).and_return(may)
+      @event.start_date = @event.start_date + 3.years
+      @event.end_date = @event.end_date + 3.years
+      @event.save
+
+      expect(@membership.person.city).to be_blank
+      expect(@membership.valid?).to be_falsey
+    end
+
+    it 'does not require region if country is not USA or Canada' do
+      january = Time.zone.today.beginning_of_year.advance(weeks: 1).to_date
+      allow(Date).to receive(:today).and_return(january)
+      @membership.person.region = ''
+      @membership.person.address1 = '123 Privacy St.'
+      @membership.person.city = 'Paris'
+      @membership.person.postal_code = '75000'
+
+      expect(@membership.valid?).to be_truthy
+    end
+
+    it 'requires region if country is USA or Canada' do
+      january = Time.zone.today.beginning_of_year.advance(weeks: 1).to_date
+      allow(Date).to receive(:today).and_return(january)
+      @membership.person.country = 'United States'
+      @membership.person.region = ''
+      @membership.person.address1 = '123 Privacy St.'
+      @membership.person.city = 'Paris'
+      @membership.person.postal_code = '75000'
+
+      expect(@membership.valid?).to be_falsey
+    end
+
+    it 'does not require full address if is not an organizer' do
+      @membership.role = 'Participant'
+      expect(@membership.valid?).to be_truthy
+    end
   end
 
   it 'is valid if departure dates are within the period of the event' do
@@ -205,11 +275,11 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(@membership.num_guests).to eq(1)
   end
 
-  it 'sets has_guests if false but num_guests > 0' do
+  it 'sets num_guests = 0 if has_guests is false' do
     @membership.has_guest = false
     @membership.num_guests = 2
     @membership.save
-    expect(@membership.has_guest).to eq(true)
+    expect(@membership.num_guests).to eq(0)
   end
 
   it "increases associated event's confirmed_cache when Confirmed member is

@@ -79,7 +79,6 @@ class Membership < ApplicationRecord
     self.warn_guest = true if has_guest === false && num_guests > 0
     self.num_guests = 0 if has_guest === false
     self.num_guests = 1 if has_guest && (num_guests.blank? || num_guests == 0)
-    self.has_guest = true if num_guests > 0
   end
 
   def set_role
@@ -166,11 +165,24 @@ class Membership < ApplicationRecord
     errors.add(:person, "- #{field} is required for confirmed organizers")
   end
 
+  def mailout_sent
+    # BIRS requires mailing address only for April mailout, a year in advance
+    self.event.start_date.year <= Date.today.year ||
+      (self.event.start_date.year == Date.today.next_year.year &&
+      Date.today.month > 4)
+  end
+
+  def org_address_fields
+    country = person.country
+    address_fields = %w(address1 city country postal_code)
+    address_fields << 'region' if is_usa?(country) || country == 'Canada'
+    address_fields
+  end
+
   def has_full_address
-    address_fields = %w(address1 city region country postal_code)
-    person = self.person
-    address_fields.each do |field|
-      organizer_address_error(field) if person.send(field.to_sym).blank?
+    return true if mailout_sent
+    org_address_fields.each do |field|
+      organizer_address_error(field) if self.person.send(field.to_sym).blank?
     end
   end
 
