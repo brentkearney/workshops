@@ -77,6 +77,7 @@ class LegacyConnector
   # add or update person record
   def add_person(person)
     return if @rest_url.blank?
+    person.grants = person.grants.join(', ') unless person.grants.blank?
     JSON.parse((RestClient.post "#{@rest_url}/add_person",
                                 person.to_json,
                                 content_type: :json, accept: :json))
@@ -85,6 +86,7 @@ class LegacyConnector
   # add new member to event
   def add_member(membership:, event_code:, person:, updated_by:)
     return if @rest_url.blank?
+    person.grants = person.grants.join(', ') unless person.grants.blank?
     remote_membership = membership.attributes.merge(
       workshop_id: event_code,
       member_id: membership.id,
