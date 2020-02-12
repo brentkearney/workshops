@@ -210,6 +210,10 @@
     #canadian-grants {
       h4 {
         color: $grey-heading;
+        small {
+          font-style: italic;
+          color: lighten($grey-heading, 15);
+        }
       }
       p {
         font-size: 1.2em;

@@ -164,7 +164,7 @@ class RsvpController < ApplicationController
         :affiliation, :department, :title, :academic_status, :phd_year, :email,
         :url, :phone, :address1, :address2, :address3, :city, :region,
         :postal_code, :country, :emergency_contact, :emergency_phone,
-        :biography, :research_areas, :grant_id],
+        :biography, :research_areas, grants: []],
     )
   end
 

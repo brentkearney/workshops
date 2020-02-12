@@ -209,26 +209,17 @@
         <div class="row" id="canadian-grants">
           <div class="col-md-12">
             <h2 class="rsvp-section midpage">Canadian Research Grants</h2>
-            <p>The Canadian Natural Sciences and Engineering Research Council (NSERC) is now asking institutions who apply for grants to <em>prove</em> that they are <em>interdisciplinary</em>. NSERC's grants are critical to the survival of BIRS, so we ask that, if you hold an NSERC, CIHR or SSHRC grant, to please select the Evaluation Group that your grant belongs to, from the form below.
+            <p>The Canadian Natural Sciences and Engineering Research Council (NSERC) is now asking institutions who apply for grants to <strong>prove that they are interdisciplinary</strong>. NSERC's grants are critical to the survival of BIRS, so we ask that, if you hold an NSERC, CIHR or SSHRC grant, to please select the NSERC Evaluation Groups that your grants belongs to, and/or CIHR/SSHRC if applicable, from the form below.
             </p>
             <p><strong>If you do not hold an NSERC, CIHR or SSHRC grant</strong>, please do not select anything.</p>
-            <h4>NSERC Evaluation Groups:</h4>
+            <h4>NSERC Evaluation Groups, CIHR, SSHRC grants:<br>
+                <small>Hold down CTRL/Cmd to select multiple options</small></h4>
+
             <div class='form-group'>
-              <select class="form-control" name="rsvp[person][grant_id]" id="rsvp_person_grant_id">
-                <option value="">Select the NSERC Evaluation Group for your grant (if applicable)</option>
-                <option value="1501">1501 - Genes, Cells and Molecules</option>
-                <option value="1502">1502 - Biological Systems and Functions</option>
-                <option value="1503">1503 - Evolution and Ecology</option>
-                <option value="1504">1504 - Chemistry</option>
-                <option value="1505">1505 - Physics</option>
-                <option value="1506">1506 - Geosciences</option>
-                <option value="1507">1507 - Computer Science</option>
-                <option value="1508">1508 - Mathematics and Statistics</option>
-                <option value="1509">1509 - Civil, Industrial and Systems Engineering</option>
-                <option value="1510">1510 - Electrical and Computer Engineering</option>
-                <option value="1511">1511 - Materials and Chemical Engineering</option>
-                <option value="1512">1512 - Mechanical Engineering</option>
-              </select>
+              <%= p.select :grants, options_for_select(@rsvp.grant_list, @rsvp.person.grants),
+              { include_blank: false, include_hidden: false },
+              { class: 'form-control', multiple: true, size: @rsvp.grant_list.size } %>
+
             </div>
             <p>A comprehensive table of the Research Topics under each Evaluation Group can be found <a href="http://www.nserc-crsng.gc.ca/Professors-Professeurs/Grants-Subs/DGPList-PSDListe_eng.asp" target="_new">here</a>. Thank you.</p>
           </div>
