@@ -18,12 +18,12 @@ class RsvpForm < ComplexForms
     @person = @membership.person
     @person.is_rsvp = true
     @person.is_organizer_rsvp = true if @membership.role =~ /Organizer/
-
     @event = @membership.event
+    @grant_list = RsvpForm.grant_list
     self
   end
 
-  def grant_list
+  def self.grant_list
     [
       ["1501 - Genes, Cells and Molecules", "NSERC:1501"],
       ["1502 - Biological Systems and Functions", "NSERC:1502"],

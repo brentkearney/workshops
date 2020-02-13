@@ -4,7 +4,9 @@
     <% if @membership.person_id.blank? %>
       <h3>New Member</h3>
     <% else %>
-      <h3 id="personal"><%= @membership.person.name %>'s Personal Details</h3>
+      <h3 id="personal"><%= @membership.person.name %>'s Personal Details<br>
+        <small>Last updated by <%= @membership.person.updated_by %> at
+          <%= @membership.person.updated_at %></small></h3>
     <% end %>
   </div>
   <div class="card-body">
@@ -150,6 +152,23 @@
       </div>
       <%= person.text_field :research_areas, class: 'form-control', placeholder: 'An optional comma-separated list of your areas of research (tags)' %>
     </div>
+    <% if policy(@membership).self_edit? %>
+    <div class="p-2" id="canadian-grants">
+      <h2 class="rsvp-section midpage">Canadian Research Grants</h2>
+      <p class="description">The Canadian Natural Sciences and Engineering Research Council (NSERC) is now asking institutions who apply for grants to <strong>prove that they are interdisciplinary</strong>. NSERC's grants are critical to the survival of BIRS, so we ask that, if you hold an NSERC, CIHR or SSHRC grant, to please select the NSERC Evaluation Groups that your grants belongs to, and/or CIHR/SSHRC, if applicable, from the list below.
+      </p>
+      <p class="description"><strong>If you do not hold an NSERC, CIHR or SSHRC grant</strong>, please do not select anything.</p>
+      <h4>NSERC Evaluation Groups, CIHR, SSHRC grants:<br>
+          <small>Hold down CTRL/Cmd to select multiple options</small></h4>
+
+      <div class='form-group'>
+        <%= person.select :grants, options_for_select(@grant_list, @grants),
+        { include_blank: false, include_hidden: false },
+        { class: 'form-control', multiple: true, size: @grant_list.size } %>
+      </div>
+      <p class="description">A comprehensive table of the Research Topics under each Evaluation Group can be found <a href="http://www.nserc-crsng.gc.ca/Professors-Professeurs/Grants-Subs/DGPList-PSDListe_eng.asp" target="_new">here</a>. Thank you.</p>
+    </div><!-- id="canadian-grants" -->
+    <% end %>
     <% end # fields_for person %>
   </div><!-- ./card-body -->
 </div> <!-- ./card person-form -->

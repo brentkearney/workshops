@@ -53,7 +53,7 @@ class MembershipPolicy
   def organizer_fields
     if self_edit?
       all_fields - [:id, :event_id, :person_id, :room, :reviewed, :billing,
-        :staff_notes]
+        :staff_notes, :grants]
     else
       [:id, :event_id, :person_id, :share_email, :role, :attendance, :org_notes,
         :has_guest, :num_guests,
@@ -74,7 +74,7 @@ class MembershipPolicy
                          :academic_status, :research_areas, :biography, :id,
                          :address1, :address2, :address3, :city, :region,
                          :postal_code, :country, :phd_year, :emergency_contact,
-                         :emergency_phone, :grant_id, :updated_by, :updated_at]]
+                         :emergency_phone, :updated_by, :updated_at, grants: []]]
   end
 
   def attendance_options

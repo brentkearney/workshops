@@ -55,6 +55,8 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships/1/edit
   def edit
     authorize @membership
+    @grant_list = RsvpForm.grant_list || []
+    @grants = @membership.person.grants || []
   end
 
   # POST /events/:event_id/memberships
