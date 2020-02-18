@@ -152,7 +152,7 @@
       </div>
       <%= person.text_field :research_areas, class: 'form-control', placeholder: 'An optional comma-separated list of your areas of research (tags)' %>
     </div>
-    <% if policy(@membership).self_edit? %>
+    <% if policy(@membership).show_grants? %>
     <div class="p-2" id="canadian-grants">
       <h2 class="rsvp-section midpage">Canadian Research Grants</h2>
       <p class="description">The Canadian Natural Sciences and Engineering Research Council (NSERC) is now asking institutions who apply for grants to <strong>prove that they are interdisciplinary</strong>. NSERC's grants are critical to the survival of BIRS, so we ask that, if you hold an NSERC, CIHR or SSHRC grant, to please select the NSERC Evaluation Groups that your grants belongs to, and/or CIHR/SSHRC, if applicable, from the list below.
@@ -162,7 +162,7 @@
           <small>Hold down CTRL/Cmd to select multiple options</small></h4>
 
       <div class='form-group'>
-        <%= person.select :grants, options_for_select(@grant_list, @grants),
+        <%= person.select :grants, options_for_select(@grant_list, @membership.person.grants),
         { include_blank: false, include_hidden: false },
         { class: 'form-control', multiple: true, size: @grant_list.size } %>
       </div>

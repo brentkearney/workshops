@@ -316,14 +316,14 @@ describe 'RSVP', type: :feature do
     context 'Confirm Email' do
       before do
         reset_database
-        allow(SyncMember).to receive(:new).with(@membership)
+        allow(SyncMember).to receive(:new).with(@membership, is_rsvp: true)
         @rsvp = RsvpForm.new(@invitation)
         visit rsvp_otp_path(@invitation.code)
         click_link "Yes"
       end
 
       it 'syncs membership with legacy db' do
-        expect(SyncMember).to have_received(:new).with(@membership)
+        expect(SyncMember).to have_received(:new).with(@membership, is_rsvp: true)
       end
 
       it 'presents email confirmation form' do
@@ -376,7 +376,7 @@ describe 'RSVP', type: :feature do
       before do
         reset_database
         @other_person = create(:person, email: 'foo@bar.com')
-        allow(SyncMember).to receive(:new).with(@membership)
+        allow(SyncMember).to receive(:new).with(@membership, is_rsvp: true)
         expect(@membership.person.email).not_to eq('foo@bar.com')
 
         visit rsvp_email_path(@invitation.code)
@@ -693,7 +693,7 @@ describe 'RSVP', type: :feature do
           it 'updates legacy database' do
             allow(SyncMembershipJob).to receive(:perform_later)
             reset_database
-            allow(SyncMember).to receive(:new).with(@membership)
+            allow(SyncMember).to receive(:new).with(@membership, is_rsvp: true)
 
             visit rsvp_yes_path(@invitation.code)
             click_button 'Confirm Attendance'

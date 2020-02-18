@@ -55,8 +55,7 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships/1/edit
   def edit
     authorize @membership
-    @grant_list = RsvpForm.grant_list || []
-    @grants = @membership.person.grants || []
+    @grant_list = RsvpForm.grant_list
   end
 
   # POST /events/:event_id/memberships
@@ -85,6 +84,7 @@ class MembershipsController < ApplicationController
   # PATCH/PUT /events/:event_id/memberships/1.json
   def update
     authorize @membership
+    @grant_list = RsvpForm.grant_list
     member_params = MembershipParametizer.new(@membership, membership_params,
                                               @current_user)
 

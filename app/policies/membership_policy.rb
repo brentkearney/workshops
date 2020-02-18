@@ -184,6 +184,10 @@ class MembershipPolicy
     @current_user.is_admin? || @membership.person == @current_user.person
   end
 
+  def show_grants?
+    show_address?
+  end
+
   def edit_personal_info?
     show_personal_info?
   end

@@ -778,6 +778,7 @@ describe 'Membership#edit', type: :feature do
 
     it 'disallows changing email to one taken by another record with a
       different name'.squish do
+      @participant.person.grants = []
       expect(@other_person.name).not_to eq(@participant.person.name)
 
       fill_in 'membership_person_attributes_email', with: @other_person.email

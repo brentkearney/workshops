@@ -482,7 +482,7 @@ describe "SyncMembers" do
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         sync_errors = ErrorReport.new('SyncMembers', @event)
-        expect(ErrorReport).to receive(:new).and_return(sync_errors)
+        expect(ErrorReport).to receive(:new).and_return(sync_errors).twice
 
         membership.valid?
         expect(Rails.logger).to receive(:error)
