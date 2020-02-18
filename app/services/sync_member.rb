@@ -24,8 +24,9 @@ class SyncMember
   attr_reader :membership
   include Syncable
 
-  def initialize(membership)
+  def initialize(membership, is_rsvp: false)
     @membership = membership
+    @membership.is_rsvp = is_rsvp
     sync_member
   end
 

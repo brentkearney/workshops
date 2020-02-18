@@ -276,7 +276,9 @@ module Syncable
       Rails.logger.error "\n\n" + "* Error saving #{membership.event.code} membership for
         #{membership.person.name}:
         #{membership.errors.full_messages}".squish + "\n"
-      sync_errors.add(membership)
+        sync_errors = ErrorReport.new(self.class, @event)
+        sync_errors.add(membership)
+        sync_errors.send_report
     end
     membership
   end

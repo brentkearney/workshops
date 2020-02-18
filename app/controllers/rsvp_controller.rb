@@ -28,7 +28,7 @@ class RsvpController < ApplicationController
     end
 
     render 'confirm_email' and return if @person.pending_replacement?
-    SyncMember.new(@invitation.membership)
+    SyncMember.new(@invitation.membership, is_rsvp: true)
   end
 
   # GET /rsvp/confirm_email/:otp

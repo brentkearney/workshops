@@ -35,7 +35,7 @@ class Membership < ApplicationRecord
   validate :check_max_observers
   validate :arrival_and_departure_dates
   validate :guest_disclaimer_acknowledgement
-  validate :has_address_if_confirmed
+  validate :has_address_if_confirmed, unless: :is_rsvp
 
   ROLES = ['Contact Organizer', 'Organizer', 'Participant', 'Observer',
            'Backup Participant'].freeze
@@ -190,7 +190,7 @@ class Membership < ApplicationRecord
     return if self.person.nil?
     return true unless attendance == 'Confirmed'
     return has_full_address if role =~ /Organizer/
-    if self.person.country.blank?
+    if self.person.country.blank? && self.attendance == 'Confirmed'
       errors.add(:person, '- country must be set for confirmed members')
       self.person.errors.add(:country, :invalid)
     end
