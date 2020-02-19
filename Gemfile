@@ -1,9 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2.2.1'
+gem 'rails', '~> 5.2.4.1'
+gem 'dry-configurable', '~> 0.9.0'
 gem 'pg', '1.1.3'
-gem 'sass-rails', '~> 5.0.7'
-gem 'bootstrap', '~> 4.3.1'
+gem 'sass-rails', '~> 5.1.0'
+gem 'bootstrap', '~> 4.4.1'
 gem 'uglifier'
 gem 'coffee-rails'
 gem 'jquery-rails'
@@ -15,13 +16,13 @@ gem 'sdoc', group: :doc
 gem 'bcrypt'
 gem 'activerecord-session_store'
 gem 'momentjs-rails'
-# gem 'bootstrap3-datetimepicker-rails'
 gem 'paper_trail'
 gem 'rest-client'
 gem 'email_validator', '~> 1.6.0'
-gem 'devise'
+gem 'devise', '~> 4.7.1'
 gem 'devise-encryptable'
-gem 'devise_invitable'
+gem 'devise_invitable', '~> 2.0.1'
+gem 'devise-jwt', '~> 0.6.0'
 gem 'pundit'
 gem 'sucker_punch'
 gem 'passenger'
@@ -36,7 +37,6 @@ gem 'rack-cors', require: 'rack/cors'
 gem 'listen'
 gem 'bootsnap'
 gem 'administrate'
-gem 'devise-jwt', '~> 0.5.9'
 gem 'popper_js', '~> 1.14.5'
 
 
@@ -73,7 +73,6 @@ group :development do
   gem 'pronto-poper'
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-rails', '~> 1.4', require: false
-  #gem 'rbnacl-libsodium'
   gem 'rbnacl', '~> 6.0'
   gem 'bcrypt_pbkdf', '~> 1.0'
 end
