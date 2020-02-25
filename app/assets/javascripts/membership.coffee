@@ -56,16 +56,17 @@ $(document).on 'turbolinks:load', ->
     $('#Undecided-legend').show()
 
   # Show/hide grants on self edit form
-  country = $('#membership_person_attributes_country').val().toLowerCase();
-  if country != 'canada'
-    $('#canadian-grants').hide();
-
-  $('#membership_person_attributes_country').change ->
-    country = $('#membership_person_attributes_country').val().toLowerCase();
-    if country == 'canada'
-      $('#canadian-grants').show();
-    else
+  country = $('#membership_person_attributes_country').val()
+  if country
+    if country.toLowerCase() != 'canada'
       $('#canadian-grants').hide();
+
+    $('#membership_person_attributes_country').change ->
+      country = $('#membership_person_attributes_country').val().toLowerCase();
+      if country == 'canada'
+        $('#canadian-grants').show();
+      else
+        $('#canadian-grants').hide();
 
   # Memberships invite page buttons
   # Check All
