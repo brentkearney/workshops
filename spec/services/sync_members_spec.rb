@@ -180,7 +180,7 @@ describe "SyncMembers" do
         local_person = create(:person, lastname: 'Localperson', updated_at: updated)
         local_person.legacy_id = 666
         local_person.save
-        updated_fields = { lastname: 'RemotePerson', address1: 'foo' }
+        updated_fields = { lastname: 'RemotePerson', country: 'Iceland' }
         test_update(local_person: local_person, fields: updated_fields)
       end
     end
@@ -482,7 +482,7 @@ describe "SyncMembers" do
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
         sync_errors = ErrorReport.new('SyncMembers', @event)
-        expect(ErrorReport).to receive(:new).and_return(sync_errors)
+        expect(ErrorReport).to receive(:new).and_return(sync_errors).twice
 
         membership.valid?
         expect(Rails.logger).to receive(:error)

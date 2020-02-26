@@ -21,6 +21,7 @@ class Person < ApplicationRecord
 
   before_validation :downcase_email
   before_save :clean_data, :set_usa
+  serialize :grants
 
   validates :email, presence: true,
                     case_sensitive: false,

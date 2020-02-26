@@ -138,12 +138,12 @@ class FakeLegacyConnector
           'gender' => m.person.gender, 'affiliation' => m.person.affiliation,
           'salutation' => nil, 'url' => nil, 'phone' => nil, 'fax' => nil,
           'address1' => m.person.address1, 'address2' => nil, 'address3' => nil,
-          'city' => nil, 'region' => nil, 'country' => nil, 'title' => nil,
-          'postal_code' => nil, 'academic_status' => nil, 'department' => nil,
-          'phd_year' => nil, 'biography' => nil, 'research_areas' => nil,
-          'updated_at' => Time.now, 'legacy_id' => m.person.legacy_id,
-          'emergency_contact' => nil, 'emergency_phone' => nil,
-          'updated_by' => 'FakeLegacyConnector'
+          'city' => nil, 'region' => nil, 'country' => 'New Zealand',
+          'title' => nil,'postal_code' => nil, 'academic_status' => nil,
+          'department' => nil, 'phd_year' => nil, 'biography' => nil,
+          'research_areas' => nil, 'updated_at' => Time.now,
+          'legacy_id' => m.person.legacy_id, 'emergency_contact' => nil,
+          'emergency_phone' => nil, 'updated_by' => 'FakeLegacyConnector'
         }
     remote_membership = {
           'arrival_date' => m.arrival_date, 'role' => m.role,

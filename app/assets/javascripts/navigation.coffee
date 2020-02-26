@@ -57,7 +57,6 @@ $(document).on 'turbolinks:load', ->
         expand_menu(item)
         item.addClass('active')
 
-
   $('.treeview-item').click (e) ->
     remove_active()
     year_location()
@@ -65,3 +64,10 @@ $(document).on 'turbolinks:load', ->
 
   page_class = $('#current-page').attr('class')
   update_active(page_class)
+
+  if $(window).width() < 600
+    toggle_sidebar_cookie(false)
+    $('.app').removeClass('sidenav-toggled');
+
+  if $('.app').hasClass('sidenav-toggled')
+    $('.toggle-arrows').addClass('fa-rotate-180')

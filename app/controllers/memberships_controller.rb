@@ -55,6 +55,7 @@ class MembershipsController < ApplicationController
   # GET /events/:event_id/memberships/1/edit
   def edit
     authorize @membership
+    @grant_list = RsvpForm.grant_list
   end
 
   # POST /events/:event_id/memberships
@@ -83,6 +84,7 @@ class MembershipsController < ApplicationController
   # PATCH/PUT /events/:event_id/memberships/1.json
   def update
     authorize @membership
+    @grant_list = RsvpForm.grant_list
     member_params = MembershipParametizer.new(@membership, membership_params,
                                               @current_user)
 
@@ -98,6 +100,12 @@ class MembershipsController < ApplicationController
               clicking the confirmation link that we sent to your new email
               address.'.squish
           else
+            if @membership.warn_guest
+              flash[:warning] = '<strong>Note:</strong> number of guests was
+              changed to 0, since the "bringing a guest" option was not
+              selected. If guests are coming, please select the "bringing a
+              guest" option.'.squish
+            end
             redirect_to event_membership_path(@event, @membership),
                         success: 'Membership successfully updated.'
           end

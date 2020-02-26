@@ -2,7 +2,9 @@
   <div class="card" id="membership-details">
     <div class="card-title">
       <h3 id="membership">
-        <%= @event.code %> Participation Details
+        <%= @event.code %> Participation Details<br>
+        <small>Last updated by <%= @membership.updated_by %> at
+          <%= @membership.updated_at %></small>
       </h3>
     </div>
     <div class="card-body">
@@ -12,7 +14,7 @@
       <div class="p-2">
         <h2 class="rsvp-section">Arrival & Departure Dates<br>
           <small>Event dates: <%= @event.dates(:long) %></small></h2>
-          <p class="rsvp-instructions">
+          <p class="description">
             <%= rsvp_setting('rsvp_dates_intro', @event.location) %>
           </p>
       </div>
@@ -33,7 +35,7 @@
 
       <div class="p-2">
         <h2 class="rsvp-section midpage">Accommodation</h2>
-        <p class="rsvp-instructions">
+        <p class="description">
           <%= rsvp_setting('rsvp_accommodation_intro', @event.location) %>
         </p>
       </div>
@@ -54,7 +56,7 @@
 
       <div class="p-2">
         <h2 class="rsvp-section midpage">Guests</h2>
-        <p class="rsvp-instructions">
+        <p class="description">
           <%= rsvp_setting('rsvp_guests_intro', @event.location) %>
         </p>
       </div>
@@ -76,14 +78,13 @@
 
       <div class="p-2">
         <h2 class="rsvp-section midpage">Special Considerations</h2>
-        <p class="rsvp-instructions">
+        <p class="description">
           <%= GetSetting.rsvp_special_intro(@event.location).html_safe %>
         </p>
       </div>
       <div class="p-2 form-group">
         <%= f.text_area :special_info, size: "100x4", class: "form-control", placeholder: 'Notes to staff' %>
       </div>
-
     </div><!-- ./card-body -->
   </div><!-- ./card -->
   <% end # policy edit membership %>
