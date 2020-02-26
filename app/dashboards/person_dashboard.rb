@@ -42,7 +42,7 @@ class PersonDashboard < Administrate::BaseDashboard
     updated_by: Field::String,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
-    grant_id: Field::Number,
+    grants: Field::String,
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -93,7 +93,7 @@ class PersonDashboard < Administrate::BaseDashboard
     :updated_by,
     :created_at,
     :updated_at,
-    :grant_id,
+    :grants,
     :events,
   ].freeze
 
@@ -130,7 +130,7 @@ class PersonDashboard < Administrate::BaseDashboard
     :research_areas,
     :legacy_id,
     :updated_by,
-    :grant_id,
+    :grants,
   ].freeze
 
   # Overwrite this method to customize how people are displayed
