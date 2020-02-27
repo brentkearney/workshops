@@ -264,8 +264,8 @@ module MembershipsHelper
     if member.confirmed? && policy(member).hotel_and_billing?
       link_to "#{member.person.lname}",
               event_membership_member_review_path(@event, member),
-              { remote: true, "data-toggle": "modal",
-                              "data-target": "#member-review" }
+              { remote: true, "data-toggle": "popover",
+                              "data-content": "#{render 'member_review_modal'}" }
     else
       link_to "#{member.person.lname}", event_membership_path(@event, member)
     end
