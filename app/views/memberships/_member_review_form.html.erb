@@ -23,7 +23,7 @@
   <div class="p-2 flex-fill right-content">
     <p id="attendance"><strong>Attendance:</strong><%= @membership.attendance %></p>
     <% unless @membership.replied_at.blank? %>
-      <p id="rsvp-date"><strong>RSVP date:</strong><%= @membership.rsvp_date %></p>
+      <p id="rsvp-date"><strong>RSVP date:</strong><br><%= @membership.rsvp_date %></p>
     <% end %>
     <p id="arrival"><strong>Arrives:</strong><%= @membership.arrives %></p>
     <p id="departure"><strong>Departs:</strong><%= @membership.departs %></p>
