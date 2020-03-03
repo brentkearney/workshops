@@ -300,7 +300,7 @@ module Syncable
   end
 
   def fixtime(val)
-    return DateTime.current.in_time_zone(@event.time_zone) if blank_time?(val)
+    return DateTime.current.in_time_zone(event.time_zone) if blank_time?(val)
     val
   end
 
