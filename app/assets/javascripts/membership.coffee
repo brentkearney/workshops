@@ -49,6 +49,9 @@ $(document).on 'turbolinks:load', ->
   $('[data-toggle="popover"]').popover()
   $('[data-toggle="tooltip"]').tooltip()
 
+ # $('.popover-close').click (e) ->
+  #  $('#popover-5570').popover('close')
+
   # Show legend for invited & undecided overdue replies
   if $('.invited-members').find('.reply-due').length > 0
     $('#Invited-legend').show()

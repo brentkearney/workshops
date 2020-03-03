@@ -1,1 +1,9 @@
-$("#member-form").html("<%= escape_javascript(render 'member_review_form') %>");
+$(".popovers").popover('hide');
+$("#popover-<%= @membership.id %>").popover({
+    placement: "right",
+    trigger: "click focus",
+    html: true,
+    content: "<%= escape_javascript(render 'member_review_form').html_safe %>"
+  })
+$("#popover-<%= @membership.id %>").popover('show');
+$(".popover-close").click(function(){ $("#popover-<%= @membership.id %>").popover('hide'); });

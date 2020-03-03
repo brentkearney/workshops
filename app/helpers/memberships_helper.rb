@@ -261,11 +261,19 @@ module MembershipsHelper
   end
 
   def member_link(member)
-    if member.confirmed? && policy(member).hotel_and_billing?
+    if policy(member).hotel_and_billing?
+      #
+      # link_to "#{member.person.lname}",
+      #         event_membership_member_review_path(@event, member),
+      #         { remote: true,
+      #           "data-toggle": "popover",
+      #           "data-html": "true",
+      #           "data-placement": "right",
+      #           "data-trigger": "focus",
+      #           "data-content": "<div id='popover-#{member.id}' class='popover'></div>".html_safe }
       link_to "#{member.person.lname}",
-              event_membership_member_review_path(@event, member),
-              { remote: true, "data-toggle": "popover",
-                              "data-content": "#{render 'member_review_modal'}" }
+        event_membership_member_review_path(@event, member),
+        { remote: true, id: "popover-#{member.id}", class: 'popovers' }
     else
       link_to "#{member.person.lname}", event_membership_path(@event, member)
     end

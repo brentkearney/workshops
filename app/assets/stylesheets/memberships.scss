@@ -452,21 +452,30 @@
   }
 
   #member-review {
-    .modal-header {
+    max-width: 100%;
+    min-width: 500px;
+
+    .popover-header {
       width: 100%;
       background: $primary-color;
       color: #fff;
-      padding: 5px;
       margin-bottom: 0;
+      font-size: 0.9em;
 
-      .close {
+      #x-close {
+        background: $primary-color;
         color: #fff;
+        border: 0;
+        font-size: 1.8em;
       }
     }
 
-    .modal-body {
-      margin-top: 0;
+    .popover-body {
+      max-width: 100%;
+      min-width: 500px;
+      background: #fff;
 
+      font-size: 1.5em;
       p {
         font-size: 1em;
         margin: 0;
@@ -515,10 +524,13 @@
     .updated-by {
       padding: 1em;
       font-size: 0.8em;
+      background: #fff;
     }
 
-    .modal-footer {
+    .popover-footer {
       padding: 0;
+      max-width: 100%;
+      min-width: 500px;
     }
   }
 }
