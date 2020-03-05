@@ -282,7 +282,8 @@
   }
 
   .popover {
-      width: 250px;
+      /* width: 250px; */
+      max-width: 100%;
       ul {
         margin-left: 10px;
         padding-left: 10px;
@@ -456,7 +457,8 @@
     min-width: 500px;
 
     .popover-header {
-      width: 100%;
+      margin: -9px 1px 0px -12px;
+      width: 105%;
       background: $primary-color;
       color: #fff;
       margin-bottom: 0;
@@ -523,14 +525,15 @@
 
     .updated-by {
       padding: 1em;
-      font-size: 0.8em;
+      font-size: 0.9em;
       background: #fff;
     }
 
     .popover-footer {
+      width: 100%;
+      float: left;
+      background: #fff;
       padding: 0;
-      max-width: 100%;
-      min-width: 500px;
     }
   }
 }

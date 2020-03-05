@@ -1,6 +1,8 @@
 <div id="member-review" role="tooltip" tabindex="-1" aria-labelledby="memberReviewLabel" aria-hidden="true">
   <div class="popover-header">
-    <button type="button" class="popover-close" id="x-close" aria-hidden="true">×</button>
+    <span class="d-flex flex-row-reverse">
+      <button type="button" class="popover-close" id="x-close" aria-hidden="true">×</button>
+    </span>
     <h2 id="memberReviewLabel">
       <%= @event.code %>: <%= @person.name %>
     </h2>
