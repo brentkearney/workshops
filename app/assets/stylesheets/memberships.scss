@@ -282,8 +282,7 @@
   }
 
   .popover {
-      /* width: 250px; */
-      max-width: 100%;
+      max-width: 80%;
       ul {
         margin-left: 10px;
         padding-left: 10px;
@@ -468,6 +467,11 @@
         background: lighten($primary-color, 10%);
         color: #fff;
         border: 0;
+        font-size: 1.2em;
+        margin-top: -8px;
+        margin-bottom: -20px;
+        padding-top: 0px;
+        padding-bottom: 0px;
       }
     }
 

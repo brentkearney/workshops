@@ -1,16 +1,15 @@
 $(".popovers").popover('hide');
 
-function setWidth({instance: {reference, popper}}) {
-  // box-sizing: border-box
-  popper.style.width = `${reference.offsetWidth}px`;
-}
-
-$("#popover-<%= @membership.id %>").popover({
+if ($(window).width() < 767) {
+  window.location.href = "<%= event_membership_path(@event, @membership) %>";
+} else {
+  $("#popover-<%= @membership.id %>").popover({
     placement: "right",
     trigger: "click focus",
     html: true,
     container: 'article',
     content: "<%= escape_javascript(render 'member_review_form').html_safe %>"
   })
-$("#popover-<%= @membership.id %>").popover('show');
+  $("#popover-<%= @membership.id %>").popover('show');
+}
 $(".popover-close").click(function(){ $("#popover-<%= @membership.id %>").popover('hide'); });
