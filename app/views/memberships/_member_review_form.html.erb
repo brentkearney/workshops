@@ -1,13 +1,11 @@
-<div id="member-review" role="tooltip" tabindex="-1" aria-labelledby="memberReviewLabel" aria-hidden="true">
-  <div class="popover-header">
+<div class="card p-2" id="member-preview">
+  <h4 class="card-title">
     <span class="d-flex flex-row-reverse">
       <button type="button" class="popover-close" id="x-close" aria-hidden="true">×</button>
     </span>
-    <h2 id="memberReviewLabel">
-      <%= @event.code %>: <%= @person.name %>
-    </h2>
-  </div>
-  <div class="popover-body d-flex">
+    <%= @event.code %>: <%= @person.name %>
+  </h4>
+  <div class="card-body d-flex">
     <div class="p-2 flex-fill left-content">
       <p id="name"><%= @person.lastname %>, <%= @person.firstname %></p>
       <p id="affil"><%= @person.affiliation %></p>
@@ -45,9 +43,7 @@
     <%= link_to "Profile", event_membership_path(@event, @membership),
           class: "btn btn-secondary" %>
     <%= link_to "Edit", edit_event_membership_path(@event, @membership),
-          class: "btn btn-secondary" %>
-      <button type="button" class="btn btn-primary">Update</button>
-    </span>
+          class: "btn btn-secondary" %>    </span>
     <span class="right-buttons p-2 ml-auto">
       <button type="button" class="btn btn-primary popover-close">Close</button>
     </span>
