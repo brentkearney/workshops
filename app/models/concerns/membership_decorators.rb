@@ -30,6 +30,10 @@ module MembershipDecorators
     replied_at.in_time_zone(event.time_zone).strftime('%b %-d, %Y %H:%M %Z')
   end
 
+  def last_updated
+    updated_at.in_time_zone(event.time_zone).strftime('%b %-d, %Y %H:%M %Z')
+  end
+
   def confirmed?
     attendance == 'Confirmed'
   end

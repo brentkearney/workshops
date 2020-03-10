@@ -19,7 +19,7 @@ describe 'Event Membership Page', type: :feature do
   end
 
   def links_to_profile(member)
-    expect(page).to have_link(nil, href: event_membership_path(@event, member))
+    expect(page).to have_link(nil, href: event_membership_member_preview_path(@event, member))
   end
 
   def does_not_list_members

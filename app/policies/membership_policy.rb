@@ -95,8 +95,8 @@ class MembershipPolicy
   def preview_role
     return if @current_user.nil?
     role = @current_user.role
+    return 'staff' if role == 'admin'
     role = 'member' if role == 'staff' && !staff_at_location
-    role = 'staff' if role == 'admin'
     role = 'organizer' if organizer?
     role = 'participant' if role == 'member'
     role

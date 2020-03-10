@@ -22,9 +22,6 @@
     <div class="p-2 flex-fill right-content">
       <p id="role"><strong>Role:</strong><i><%= @membership.role %></p></i>
       <p id="attendance"><strong>Attendance:</strong><%= @membership.attendance %></p>
-      <% unless @membership.replied_at.blank? %>
-        <p id="rsvp-date"><strong>RSVP date:</strong><br><%= @membership.rsvp_date %></p>
-      <% end %>
       <p id="arrival"><strong>Arrives:</strong><%= @membership.arrives %></p>
       <p id="departure"><strong>Departs:</strong><%= @membership.departs %></p>
       <p id="guests"><strong>Guests:</strong><%= show_guests(@membership) %></p>
@@ -37,7 +34,10 @@
     </div>
   </div>
   <div class="d-flex flex-row-reverse updated-by">
-    Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at.in_time_zone(@membership.event.time_zone) %>
+    <% unless @membership.replied_at.blank? %>
+      RSVP date: <%= @membership.rsvp_date %><br>
+    <% end %>
+    Last updated by: <%= @membership.updated_by %> on <%= @membership.last_updated %>
   </div>
   <div class="popover-footer d-flex mb-1">
     <span class="left-buttons p-2 mr-auto">
