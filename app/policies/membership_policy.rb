@@ -134,12 +134,6 @@ class MembershipPolicy
   end
 
   def is_member_and_shared
-    Rails.logger.debug "\n\n**********************************************\n\n"
-    Rails.logger.debug "Membership: #{@membership.person.name}\n"
-    Rails.logger.debug "@current_user.is_confirmed_member?(@event): #{@current_user.is_confirmed_member?(@event)}\n"
-    Rails.logger.debug "@membership.share_email: #{@membership.share_email}\n"
-    Rails.logger.debug "@membership.attendance == 'Confirmed': #{@membership.attendance == 'Confirmed'}\n"
-    Rails.logger.debug "\n\n**********************************************\n\n"
     @current_user.is_confirmed_member?(@event) && @membership.share_email &&
       @membership.attendance == 'Confirmed'
   end

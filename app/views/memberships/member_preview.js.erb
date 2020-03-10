@@ -11,6 +11,7 @@ if ($(window).width() < 767) {
     content: "<%= escape_javascript(render @member_preview_template).html_safe %>"
   })
   $("#popover-<%= @membership.id %>").popover('show');
+  window.setTimeout(function(){ $("#popover-<%= @membership.id %>").popover('hide'); }, 30000);
 }
 
 $(".close-button").click(function(){ $("#popover-<%= @membership.id %>").popover('hide'); });
