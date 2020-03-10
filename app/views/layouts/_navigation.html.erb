@@ -22,6 +22,11 @@
           <i class="fa fa-user fa-lg"></i>
         </a>
         <ul class="dropdown-menu settings-menu dropdown-menu-right">
+          <li>
+            <%= link_to member_profile_path(current_user), class: 'dropdown-item' do -%>
+              <i class="fa fa-user fa-lg"></i> <%= current_user.person.name %>
+            <% end %>
+          </li>
           <% if current_user.is_admin? %>
           <li>
             <%= link_to settings_path, class: 'dropdown-item' do -%>
@@ -38,7 +43,7 @@
           <% end %>
           <li>
             <%= link_to edit_user_registration_path, class: 'dropdown-item' do -%>
-              <i class="fa fa-user fa-lg"></i> Change Password
+              <i class="fa fa-lock fa-lg"></i> Change Password
             <% end %>
           </li>
           <li>

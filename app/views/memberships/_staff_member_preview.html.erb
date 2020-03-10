@@ -9,7 +9,7 @@
     <div class="p-2 flex-fill left-content">
       <p id="name"><%= @person.lastname %>, <%= @person.firstname %></p>
       <p id="affil"><%= @person.affiliation %></p>
-      <% if policy(@membership).use_email_addresses? || policy(@membership).show_email_address? %>
+      <% if policy(@membership).show_email_address? %>
       <p id="email"><%= mail_to @person.email %></p>
       <% end %>
       <% unless @person.url.blank? %>
@@ -46,8 +46,8 @@
     <%= link_to "Edit", edit_event_membership_path(@event, @membership),
           class: "btn btn-secondary" %>
     </span>
-    <span class="right-buttons p-2 ml-auto close-button">
-      <button type="button" class="btn btn-primary popover-close">Close</button>
+    <span class="right-buttons p-2 ml-auto popover-close">
+      <button type="button" class="btn btn-primary close-button">Close</button>
     </span>
   </div>
 </div>

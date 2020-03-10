@@ -15,6 +15,12 @@ module ApplicationHelper
     "#{sentence}#{messages}"
   end
 
+  def member_profile_path(user)
+    membership = user.person.memberships.last
+    return event_future_path if membership.blank?
+    event_membership_path(membership.event, membership)
+  end
+
   def page_title
     case request.path
     when events_future_path

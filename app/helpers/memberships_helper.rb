@@ -286,7 +286,7 @@ module MembershipsHelper
   end
 
   def member_notes(member)
-    if policy(member).hotel_and_billing? && !member.staff_notes.blank?
+    if policy(member).show_staff_notes? && !member.staff_notes.blank?
       simple_format(member.staff_notes)
     elsif policy(member).organizer? && !member.org_notes.blank?
       simple_format(member.org_notes)

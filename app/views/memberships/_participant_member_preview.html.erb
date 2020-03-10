@@ -9,17 +9,19 @@
     <div class="p-2 flex-fill left-content">
       <p id="name"><%= @person.lastname %>, <%= @person.firstname %></p>
       <p id="affil"><%= @person.affiliation %></p>
-      <% if policy(@membership).use_email_addresses? || policy(@membership).show_email_address? %>
-      <p id="email"><%= mail_to @person.email %></p>
+      <% if policy(@membership).show_email_address? %>
+        <p id="email"><%= mail_to @person.email %></p>
       <% end %>
       <% unless @person.url.blank? %>
-      <p id="url"><%= link_to @person.uri.truncate(60), @person.uri %></p>
+        <p id="url"><%= link_to @person.uri.truncate(60), @person.uri %></p>
       <% end %>
       <% unless @person.biography.blank? %>
-      <p id="biography"><strong>Biography:</strong><br><%= @person.biography %></p>
+        <p id="biography"><strong>Biography:</strong><br>
+          <%= @person.biography %></p>
       <% end %>
       <% unless @person.research_areas.blank? %>
-      <p id="research_areas"><strong>Research Areas:</strong><br><%= @person.research_areas %></p>
+        <p id="research_areas"><strong>Research Areas:</strong><br>
+          <%= @person.research_areas %></p>
       <% end %>
     </div>
     <div class="p-2 flex-fill right-content">

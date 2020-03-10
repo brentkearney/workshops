@@ -13,7 +13,7 @@ if ($(window).width() < 767) {
   $("#popover-<%= @membership.id %>").popover('show');
 }
 
-$(".popover-close").click(function(){ $("#popover-<%= @membership.id %>").popover('hide'); });
+$(".close-button").click(function(){ $("#popover-<%= @membership.id %>").popover('hide'); });
 
 document.addEventListener("turbolinks:before-cache", function () {
     $("#popover-<%= @membership.id %>").popover('hide');

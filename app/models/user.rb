@@ -43,7 +43,7 @@ class User < ApplicationRecord
   end
 
   def is_confirmed_member?(event)
-    person.memberships.where("event_id=#{event.id}
+    self.person.memberships.where("event_id=#{event.id}
       AND attendance = 'Confirmed'").count > 0
   end
 
