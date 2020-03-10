@@ -1,0 +1,43 @@
+<div class="card p-2" id="member-preview">
+  <h4 class="card-title">
+    <span class="d-flex flex-row-reverse">
+      <button type="button" class="btn popover-close" id="x-close" aria-hidden="true">×</button>
+    </span>
+    <%= @event.code %>: <%= @person.name %>
+  </h4>
+  <div class="card-body d-flex">
+    <div class="p-2 flex-fill left-content">
+      <p id="name"><%= @person.lastname %>, <%= @person.firstname %></p>
+      <p id="affil"><%= @person.affiliation %></p>
+      <% if policy(@membership).use_email_addresses? || policy(@membership).show_email_address? %>
+      <p id="email"><%= mail_to @person.email %></p>
+      <% end %>
+      <% unless @person.url.blank? %>
+      <p id="url"><%= link_to @person.uri.truncate(60), @person.uri %></p>
+      <% end %>
+      <% unless @person.biography.blank? %>
+      <p id="biography"><strong>Biography:</strong><br><%= @person.biography %></p>
+      <% end %>
+      <% unless @person.research_areas.blank? %>
+      <p id="research_areas"><strong>Research Areas:</strong><br><%= @person.research_areas %></p>
+      <% end %>
+    </div>
+    <div class="p-2 flex-fill right-content">
+      <p id="role"><strong>Role:</strong><i><%= @membership.role %></p></i>
+      <p id="attendance"><strong>Attendance:</strong><%= @membership.attendance %></p>
+    </div>
+  </div>
+  <div class="popover-footer d-flex mb-1">
+    <span class="left-buttons p-2 mr-auto">
+    <%= link_to "Profile", event_membership_path(@event, @membership),
+          class: "btn btn-secondary" %>
+    <% if policy(@membership).edit? %>
+      <%= link_to "Edit", edit_event_membership_path(@event, @membership),
+          class: "btn btn-secondary" %>
+    <% end %>
+    </span>
+    <span class="right-buttons p-2 ml-auto popover-close">
+      <button type="button" class="btn btn-primary close-button">Close</button>
+    </span>
+  </div>
+</div>

@@ -8,8 +8,13 @@ if ($(window).width() < 767) {
     trigger: "click focus",
     html: true,
     container: 'article',
-    content: "<%= escape_javascript(render 'member_review_form').html_safe %>"
+    content: "<%= escape_javascript(render @member_preview_template).html_safe %>"
   })
   $("#popover-<%= @membership.id %>").popover('show');
 }
+
 $(".popover-close").click(function(){ $("#popover-<%= @membership.id %>").popover('hide'); });
+
+document.addEventListener("turbolinks:before-cache", function () {
+    $("#popover-<%= @membership.id %>").popover('hide');
+});

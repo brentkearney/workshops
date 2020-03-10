@@ -123,8 +123,10 @@ class MembershipsController < ApplicationController
     end
   end
 
-  def member_review
+  def member_preview
     @person = @membership.person
+    role = policy(@membership).preview_role
+    @member_preview_template = "#{role}_member_preview"
 
     respond_to do |format|
       format.html

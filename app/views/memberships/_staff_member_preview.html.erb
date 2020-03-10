@@ -1,0 +1,53 @@
+<div class="card p-2" id="member-preview">
+  <h4 class="card-title">
+    <span class="d-flex flex-row-reverse">
+      <button type="button" class="btn popover-close" id="x-close" aria-hidden="true">×</button>
+    </span>
+    <%= @event.code %>: <%= @person.name %>
+  </h4>
+  <div class="card-body d-flex">
+    <div class="p-2 flex-fill left-content">
+      <p id="name"><%= @person.lastname %>, <%= @person.firstname %></p>
+      <p id="affil"><%= @person.affiliation %></p>
+      <% if policy(@membership).use_email_addresses? || policy(@membership).show_email_address? %>
+      <p id="email"><%= mail_to @person.email %></p>
+      <% end %>
+      <% unless @person.url.blank? %>
+      <p id="url"><%= link_to @person.uri.truncate(60), @person.uri %></p>
+      <% end %>
+      <p id="address"><strong>Address:</strong><br><%= print_address(@person) %></p>
+      <p id="billing"><strong>Billing:</strong><%= @membership.billing %></p>
+      <p id="reviewed"><strong>Reviewed:</strong><%= reviewed(@membership).html_safe %></p>
+    </div>
+    <div class="p-2 flex-fill right-content">
+      <p id="role"><strong>Role:</strong><i><%= @membership.role %></p></i>
+      <p id="attendance"><strong>Attendance:</strong><%= @membership.attendance %></p>
+      <% unless @membership.replied_at.blank? %>
+        <p id="rsvp-date"><strong>RSVP date:</strong><br><%= @membership.rsvp_date %></p>
+      <% end %>
+      <p id="arrival"><strong>Arrives:</strong><%= @membership.arrives %></p>
+      <p id="departure"><strong>Departs:</strong><%= @membership.departs %></p>
+      <p id="guests"><strong>Guests:</strong><%= show_guests(@membership) %></p>
+      <% unless @membership.special_info.blank? %>
+        <p id="special-info">
+          <strong>Special info:</strong><%= simple_format(@membership.special_info) %>
+        </p>
+      <% end %>
+      <p id="notes"><strong>Notes:</strong><%= member_notes(@membership) %></p>
+    </div>
+  </div>
+  <div class="d-flex flex-row-reverse updated-by">
+    Last updated by: <%= @membership.updated_by %> on <%= @membership.updated_at.in_time_zone(@membership.event.time_zone) %>
+  </div>
+  <div class="popover-footer d-flex mb-1">
+    <span class="left-buttons p-2 mr-auto">
+    <%= link_to "Profile", event_membership_path(@event, @membership),
+          class: "btn btn-secondary" %>
+    <%= link_to "Edit", edit_event_membership_path(@event, @membership),
+          class: "btn btn-secondary" %>
+    </span>
+    <span class="right-buttons p-2 ml-auto close-button">
+      <button type="button" class="btn btn-primary popover-close">Close</button>
+    </span>
+  </div>
+</div>

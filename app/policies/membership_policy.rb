@@ -92,6 +92,16 @@ class MembershipPolicy
     [@membership.attendance]
   end
 
+  def preview_role
+    return if @current_user.nil?
+    role = @current_user.role
+    role = 'member' if role == 'staff' && !staff_at_location
+    role = 'staff' if role == 'admin'
+    role = 'organizer' if @membership.role =~ /Organizer/
+    role = 'participant' if role == 'member'
+    role
+  end
+
   def index?
     true
   end
@@ -211,6 +221,11 @@ class MembershipPolicy
   end
 
   def hotel_and_billing?
+    staff_and_admins
+  end
+
+  def show_preview?
+    return true
     staff_and_admins
   end
 
