@@ -263,7 +263,7 @@ module MembershipsHelper
   def member_link(member)
     if policy(member).show_preview?
       link_to "#{member.person.lname}",
-        event_membership_member_preview_path(@event, member),
+        event_membership_preview_path(@event, member),
         { remote: true, id: "popover-#{member.id}", class: 'popovers' }
     else
       link_to "#{member.person.lname}", event_membership_path(@event, member)
@@ -293,6 +293,12 @@ module MembershipsHelper
     else
       '<i>none</i>'.html_safe
     end
+  end
+
+  def edit_link(field)
+    link = '<a href="#" id="edit-' + field + '" class="edit" data-action="member_review#edit">'
+    link << '<i class="fa fa-pencil" aria-hidden="true"></i></a>'
+    link.html_safe
   end
 
   def reviewed(member)

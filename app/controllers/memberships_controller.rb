@@ -123,7 +123,8 @@ class MembershipsController < ApplicationController
     end
   end
 
-  def member_preview
+  # GET /events/:event_id/memberships/:membership_id/preview
+  def preview
     @person = @membership.person
     role = policy(@membership).preview_role
     @member_preview_template = "#{role}_member_preview"
@@ -132,6 +133,10 @@ class MembershipsController < ApplicationController
       format.html
       format.js
     end
+  end
+
+  def preview_update
+
   end
 
   def email_change

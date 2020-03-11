@@ -455,16 +455,17 @@
     max-width: 100%;
     min-width: 500px;
     font-size: 1em;
+    $preview_bg: lighten($primary-color, 10%);
 
     .card-title {
       margin: -8px;
-      background: lighten($primary-color, 10%);
+      background: $preview_bg;
       color: #fff;
       margin-bottom: 0;
       font-size: 2em;
 
       #x-close {
-        background: lighten($primary-color, 10%);
+        background: $preview_bg;
         color: #fff;
         border: 0;
         font-size: 1.2em;
@@ -501,6 +502,12 @@
         strong {
           margin-right: 5px;
         }
+      }
+
+      .edit {
+        text-decoration: none;
+        font-size: 0.7em;
+        margin-left: 10px;
       }
 
       #name {
@@ -560,7 +567,7 @@
       padding: 0;
 
       .popover-close {
-        $new: lighten($primary-color, 10%);
+        $new: $preview_bg;
 
         .btn-primary {
             @include button-variant($new, darken($new, 7.5%), darken($new, 10%), lighten($new,5%), lighten($new, 10%), darken($new,30%));

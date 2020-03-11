@@ -54,7 +54,7 @@ Rails.application.routes.draw do
     resources :memberships do
       match 'email_change' => 'memberships#email_change', as: :email_change, via: [:get, :post]
       get 'cancel_email_change' =>  'memberships#cancel_email_change', as: :email_cancel
-      get "member_preview" => 'memberships#member_preview', :as => :member_preview
+      get "preview" => 'memberships#preview', :as => :preview
       collection do
         match 'add', via: [:get, :post]
         post 'process_new'

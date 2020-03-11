@@ -120,6 +120,12 @@ class MembershipPolicy
     self_organizer_staff
   end
 
+  def destroy?
+    return true if staff_and_admins
+    return false unless organizer?
+    @membership.attendance == 'Not Yet Invited'
+  end
+
   def add?
     organizer_and_staff
   end
@@ -155,12 +161,6 @@ class MembershipPolicy
 
   def edit_membership?
     self_organizer_staff
-  end
-
-  def delete_membership?
-    return true if staff_and_admins
-    return false unless organizer?
-    @membership.attendance == 'Not Yet Invited'
   end
 
   def edit_role?

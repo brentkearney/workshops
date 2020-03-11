@@ -1,4 +1,5 @@
-<div class="card p-2" id="member-preview">
+<div class="card p-2" id="member-preview" data-controller="member_preview">
+  <%= form_with model: [@event, @membership], html: { data: { type: "html", action: "ajax:success->member_review#onPostSuccess" } } do |f| %>
   <h4 class="card-title">
     <span class="d-flex flex-row-reverse">
       <button type="button" class="btn close-button" id="x-close" aria-hidden="true">×</button>
@@ -7,7 +8,9 @@
   </h4>
   <div class="card-body d-flex">
     <div class="p-2 flex-fill left-content">
-      <p id="name"><%= @person.lastname %>, <%= @person.firstname %></p>
+      <p id="name">
+        <%= @person.lastname %>, <%= @person.firstname %>
+      </p>
       <p id="affil"><%= @person.affiliation %></p>
       <% if policy(@membership).show_email_address? %>
       <p id="email"><%= mail_to @person.email %></p>
@@ -21,7 +24,14 @@
     </div>
     <div class="p-2 flex-fill right-content">
       <p id="role"><strong>Role:</strong><i><%= @membership.role %></p></i>
-      <p id="attendance"><strong>Attendance:</strong><%= @membership.attendance %></p>
+
+
+      <p id="attendance">
+        <strong>Attendance:</strong><%= @membership.attendance %>
+        <%= edit_link('attendance') %>
+      </p>
+
+
       <p id="arrival"><strong>Arrives:</strong><%= @membership.arrives %></p>
       <p id="departure"><strong>Departs:</strong><%= @membership.departs %></p>
       <p id="guests"><strong>Guests:</strong><%= show_guests(@membership) %></p>
@@ -50,4 +60,5 @@
       <button type="button" class="btn btn-primary close-button">Close</button>
     </span>
   </div>
+  <% end %>
 </div>
