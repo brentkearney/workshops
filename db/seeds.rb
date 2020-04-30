@@ -34,8 +34,13 @@ def generate_events(start_year, end_year)
        time_zone: 'Mountain Time (US & Canada)'
       }
 
-      event = Event.create!(event_data)
-      puts "Created event #{event.code}"
+      event = Event.find_by_code(code)
+      if event.blank?
+        event = Event.create!(event_data)
+        puts "Created event #{event.code}"
+      else
+        puts "Found event #{event.code}"
+      end
       add_new_members(event, [*25..50].sample)
     end
   end
@@ -53,16 +58,21 @@ def generate_people(num)
       email: email,
       affiliation: Faker::University.name,
       country: Faker::Address.country,
+      academic_status: ['Post Doc', 'Professor', 'Graduate Student', 'Undergraduate'].sample,
       legacy_id: Random.rand(1000..9999),
       salutation: %w[Mr. Mrs. Ms. Prof. Dr.].sample,
       gender: %w[M F O].sample,
-      updated_by: 'Seeds'
+      updated_by: 'Seeds',
+      member_import: true,
+      is_rsvp: true
     }
     Person.create!(person_data)
   end
 end
 
 def add_new_members(event, num)
+  return if event.num_participants > event.max_participants / 2
+
   num_people = Person.count
   create_member(event, 'Contact Organizer', num_people)
   2.times do
@@ -80,7 +90,8 @@ def random_time(event, attendance)
   return unless attendance == 'Confirmed'
   date1 = event.start_date - rand(1..12).months
   date2 = event.start_date - 1.week
-  Time.at((date2.to_f - date1.to_f)*rand + date1.to_f)
+  # Time.at((date2 - date1)*rand + date1)
+  Time.at(date2 - date1)
 end
 
 def create_member(event, role, num_people)
@@ -99,7 +110,8 @@ def create_member(event, role, num_people)
     arrival_date: event.start_date,
     departure_date: event.end_date,
     update_remote: false,
-    updated_by: 'Seeds'
+    updated_by: 'Seeds',
+    is_rsvp: true
   }
   Membership.create!(member_data)
 end
@@ -109,7 +121,10 @@ def create_schedule_template(year)
   start_date = Date.new(year,1,7).beginning_of_week(:sunday)
   end_date = start_date + 5.days
 
-  event = Event.find_by_code('event_code') || Event.create!({code: event_code, name: "5 Day Workshop Schedule Template", short_name: "Schedule Template", start_date: start_date, end_date: end_date, event_type: "5 Day Workshop", location: "BIRS", description: "A template for BIRS staff to configure the default schedules for 5-Day Workshops at BIRS.", press_release: "", max_participants: 5, door_code: nil, booking_code: "", updated_by: "db seed", template: true, time_zone: 'Mountain Time (US & Canada)'})
+  event = Event.find_by_code(event_code)
+  if event.blank?
+    event = Event.create!({code: event_code, name: "5 Day Workshop Schedule Template", short_name: "Schedule Template", start_date: start_date, end_date: end_date, event_type: "5 Day Workshop", location: "BIRS", description: "A template for BIRS staff to configure the default schedules for 5-Day Workshops at BIRS.", press_release: "", max_participants: 5, door_code: nil, booking_code: "", updated_by: "db seed", template: true, time_zone: 'Mountain Time (US & Canada)'})
+  end
 
   t = Time.parse(start_date.to_s)
   Schedule.create!([
@@ -153,12 +168,12 @@ def create_schedule_template(year)
 end
 
 # Generate a bunch of Person records
-#generate_people(1000)
+generate_people(1000)
 
 # Generate 3 years worth of events, populated by random people
-#start_year = Time.new.year - 5
-#end_year = start_year + 0
-#generate_events(start_year, end_year)
+start_year = Time.new.year - 1
+end_year = start_year + 2
+generate_events(start_year, end_year)
 
 # Create a schedule template event, and add admin user to it
 start_year = (Time.new + 6.months).year
@@ -167,5 +182,10 @@ event = create_schedule_template(start_year)
 puts "Created event #{event.code}"
 User.where(role: :staff).or(User.where(role: :admin)).or(User.where(role: :super_admin)).each do |u|
   u.person.update_columns(country: 'France')
-  Membership.create!(event: event, person: u.person, role: 'Organizer', attendance: 'Confirmed', updated_by: 'Seed')
+  membership = Membership.where(event: event, person: u.person).first
+  if membership.blank?
+    Membership.create!(event: event, person: u.person, role: 'Organizer', attendance: 'Confirmed', updated_by: 'Seed')
+  else
+    membership.update_columns(role: 'Organizer', attendance: 'Confirmed', updated_by: 'Seed')
+  end
 end
