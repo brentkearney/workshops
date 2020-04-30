@@ -28,10 +28,22 @@
     <section class="login-content d-flex flex-column">
       <div class="login-title p-2">
         <div class="d-flex flex-row align-items-center">
-          <%= image_tag(GetSetting.site_setting('logo'), class: 'img-thumbnail p-2') %>
+          <% unless GetSetting.site_setting('logo') == "logo not set" %>
+            <%= image_tag(GetSetting.site_setting('logo'), class: 'img-thumbnail p-2') %>
+          <% end %>
         </div>
         <div id="app-title" class="d-flex flex-row justify-content-center">
-          <h1><%= GetSetting.site_setting('title') %></h1>
+          <% if GetSetting.site_setting('title') == "title not set" %>
+          <div class="login-box" style="padding: 1em;">
+            <h2>No Title Set!</h2>
+            <p>You may need to run <tt>rake ws:init_settings</tt><br> to add default settings.</p>
+            <p>You may also need to create admin accounts by running:<br>
+              rake ws:create_admins RAILS_ENV=development</p>
+            <p>See the <tt>lib/tasks/ws.rake</tt> script for details.</p>
+          </div>
+          <% else %>
+            <h1><%= GetSetting.site_setting('title') %></h1>
+          <% end %>
         </div>
       </div>
       <%= yield %>
