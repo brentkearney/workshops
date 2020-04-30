@@ -36,7 +36,7 @@ gem 'wkhtmltopdf-binary'
 gem 'rack-cors', require: 'rack/cors'
 gem 'listen'
 gem 'bootsnap'
-gem 'administrate'
+gem "administrate", ">= 0.13.0"
 gem 'popper_js', '~> 1.14.5'
 
 
