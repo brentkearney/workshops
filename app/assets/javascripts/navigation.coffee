@@ -1,7 +1,7 @@
 $(document).on 'turbolinks:load', ->
 
-  # Display new feature modal
-  $('#new-feature-notice').modal('show');
+  # Display new feature modal?
+  #$('#new-feature-notice').modal('show');
 
   $('#sidebar-toggle').click (e) ->
     $('.toggle-arrows').toggleClass('fa-rotate-180')

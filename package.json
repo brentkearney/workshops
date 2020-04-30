@@ -3,12 +3,12 @@
   "private": true,
   "license": "SEE LICENSE IN GNU-AGPL-3.0",
   "dependencies": {
-    "@rails/webpacker": "^4.0.7",
-    "stimulus": "^1.0.1",
-    "vali-admin": "^2.4.1"
+    "@rails/webpacker": "^5.1.1",
+    "stimulus": "^1.1.1",
+    "vali-admin": "^3.0.0"
   },
   "devDependencies": {
-    "webpack": "^4.28.4",
-    "webpack-dev-server": "^3.2.1"
+    "webpack": "^4.43.0",
+    "webpack-dev-server": "^3.10.3"
   }
 }
