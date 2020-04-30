@@ -25,6 +25,8 @@ dpkg-reconfigure --frontend noninteractive tzdata
 # /usr/local/rvm/bin/rvm gemset use ruby-2.6.2@global
 # /usr/local/rvm/bin/rvm cleanup all
 # /usr/local/rvm/bin/rvm reload
+# su - app -c "yarn install"
+# su - app -c "yarn add webpack-cli -D"
 
 # echo
 # echo "Installing latest bundler..."
@@ -73,8 +75,11 @@ chown -R app:app /home/app/workshops
 
 echo
 echo "Compiling Assets..."
-yarn
+su - app -c "yarn add webpack-cli -D"
+su - app -c yarn
+su - app -c "yarn upgrade --latest"
 su - app -c "cd /home/app/workshops; RAILS_ENV=development SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
+su - app -c yarn
 
 echo
 echo "Starting web server..."
