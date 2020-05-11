@@ -70,6 +70,7 @@ module ApplicationHelper
   end
 
   def display_new_feature_notice?
+    return
     return if current_user.nil?
     return if cookies[:read_notice2]
     current_user.sign_in_count > 1 && Date.current < Date.parse('2020-06-30')
