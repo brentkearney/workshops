@@ -261,13 +261,9 @@ module MembershipsHelper
   end
 
   def member_link(member)
-    if policy(member).show_preview?
-      link_to "#{member.person.lname}",
-        event_membership_preview_path(@event, member),
-        { remote: true, id: "popover-#{member.id}", class: 'popovers' }
-    else
-      link_to "#{member.person.lname}", event_membership_path(@event, member)
-    end
+    link_to "#{member.person.lname}",
+      event_membership_preview_path(@event, member),
+      { remote: true, id: "popover-#{member.id}", class: 'popovers' }
   end
 
   def member_affil(member)
@@ -277,6 +273,11 @@ module MembershipsHelper
   def show_guests(member)
     return 'No' unless member.has_guest
     member.num_guests
+  end
+
+  def show_phd_year(member)
+    return '<i>not set</i>'.html_safe if member.person.phd_year.blank?
+    member.person.phd_year
   end
 
   def rsvp_setting(setting, location)

@@ -2,7 +2,9 @@
   <div class="card" id="membership-details">
     <div class="card-title">
       <h3 id="membership">
-        <%= @event.code %> Membership Details
+        <%= @event.code %> Membership Details<br>
+        <small>Last updated by <%= @membership.updated_by %> at
+          <%= @membership.updated_at %></small>
       </h3>
     </div>
     <div class="card-body">

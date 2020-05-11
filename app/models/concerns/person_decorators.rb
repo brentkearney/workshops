@@ -55,6 +55,10 @@ module PersonDecorators
     end
   end
 
+  def last_updated(event)
+    updated_at.in_time_zone(event.time_zone).strftime('%b %-d, %Y %H:%M %Z')
+  end
+
   def affil
     return '' if affiliation.nil?
     affil_with_department = String.new(affiliation) # new object necessary here

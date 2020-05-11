@@ -80,6 +80,7 @@ class StaffMailer < ApplicationMailer
   end
 
   def confirmation_notice(membership, msg, to)
+    return if ENV['RAILS_ENV'] == 'development'
     staff_email = GetSetting.email(membership.event.location, to)
     @membership = membership
     @person = membership.person

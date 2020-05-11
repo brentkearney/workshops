@@ -18,7 +18,7 @@
       <% unless @person.url.blank? %>
       <p id="url"><%= link_to @person.uri.truncate(60), @person.uri %></p>
       <% end %>
-      <p id="address"><strong>Address:</strong><br><%= print_address(@person) %></p>
+      <p id="address"><%= print_address(@person) %></p>
       <p id="billing"><strong>Billing:</strong><%= @membership.billing %></p>
       <p id="reviewed"><strong>Reviewed:</strong><%= reviewed(@membership).html_safe %></p>
     </div>
@@ -28,13 +28,13 @@
 
       <p id="attendance">
         <strong>Attendance:</strong><%= @membership.attendance %>
-        <%= edit_link('attendance') %>
       </p>
 
 
       <p id="arrival"><strong>Arrives:</strong><%= @membership.arrives %></p>
       <p id="departure"><strong>Departs:</strong><%= @membership.departs %></p>
       <p id="guests"><strong>Guests:</strong><%= show_guests(@membership) %></p>
+      <p id="phd_year"><strong>PhD Year:</strong><%= show_phd_year(@membership) %></p>
       <% unless @membership.special_info.blank? %>
         <p id="special-info">
           <strong>Special info:</strong><%= simple_format(@membership.special_info) %>
@@ -47,7 +47,8 @@
     <% unless @membership.replied_at.blank? %>
       RSVP date: <%= @membership.rsvp_date %><br>
     <% end %>
-    Last updated by: <%= @membership.updated_by %> on <%= @membership.last_updated %>
+    Person updated by <%= @membership.person.updated_by %> on <%= @membership.person.last_updated(@event) %><br>
+    Membership updated by <%= @membership.updated_by %> on <%= @membership.last_updated %>
   </div>
   <div class="popover-footer d-flex mb-1">
     <span class="left-buttons p-2 mr-auto">
