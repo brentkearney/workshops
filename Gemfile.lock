@@ -480,7 +480,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-session_store
-  administrate
+  administrate (>= 0.13.0)
   bcrypt
   bcrypt_pbkdf (~> 1.0)
   bootsnap
