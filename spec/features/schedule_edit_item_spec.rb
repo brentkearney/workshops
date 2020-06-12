@@ -47,8 +47,7 @@ describe 'Editing a Schedule Item', type: :feature do
       item = @event.schedules.first
       visit event_schedule_edit_path(@event, item)
 
-      sidebar_item = @event.schedules.select { |i| i.start_time.hour == 11 }
-                           .first
+      sidebar_item = @event.schedules.detect { |i| i.start_time.hour == 11 }
       click_link sidebar_item.name
       expect(current_path).to eq(event_schedule_edit_path(@event, sidebar_item))
     end

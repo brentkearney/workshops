@@ -86,7 +86,7 @@ describe 'DefaultSchedule' do
 
         it 'changes the template schedule dates to match the given event' do
           @tevent.schedules.each do |t_item|
-            e_item = @event.schedules.select { |i| i.name == t_item.name }.first
+            e_item = @event.schedules.detect { |i| i.name == t_item.name }
             expect(e_item.start_time.hour).to eq(t_item.start_time.hour)
             expect(e_item.start_time.min).to eq(t_item.start_time.min)
             expect(e_item.end_time.hour).to eq(t_item.end_time.hour)

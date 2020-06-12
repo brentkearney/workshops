@@ -1,4 +1,3 @@
-
 # Copyright (c) 2016 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
 # the GNU Affero General Public License as published by the
@@ -125,7 +124,7 @@ describe Api::V1::LecturesController, type: :request do
           json = JSON.parse(response.body)
 
           Lecture.all.each do |lecture|
-            record = json.select {|item| item['lecture']['id'].to_i == lecture.id }.first
+            record = json.detect {|item| item['lecture']['id'].to_i == lecture.id }
             expect(record['lecture']['title']).to eq(lecture.title)
             expect(record['scheduled_for']['start_time']).to eq(record['lecture']['start_time'])
           end

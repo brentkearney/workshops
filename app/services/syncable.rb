@@ -37,9 +37,9 @@ module Syncable
     end.first
 
     if local_membership.nil?
-      local_membership = local_members.select do |membership|
+      local_membership = local_members.detect do |membership|
         membership.person.email == remote_member['Person']['email']
-      end.first
+      end
       if !local_membership.nil? && local_membership.person.legacy_id.blank?
         local_membership.person.legacy_id = remote_member['Person']['legacy_id']
       end

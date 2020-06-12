@@ -93,7 +93,7 @@ class InvitationForm < ComplexForms
   end
 
   def organizer(event)
-    om = event.memberships.select { |m| m.role == 'Contact Organizer' }.first
+    om = event.memberships.detect { |m| m.role == 'Contact Organizer' }
     link = ''
     if om.nil?
       event_url = Setting.Site['events_url'] + event.code

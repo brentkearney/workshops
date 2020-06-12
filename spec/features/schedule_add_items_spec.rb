@@ -49,7 +49,7 @@ describe "Adding a Schedule Item", type: :feature do
     page.fill_in 'schedule_location', with: 'Australia'
     click_button 'Add New Schedule Item'
 
-    new_item = event.schedules.select { |s| s.name == 'Testing TZ' }.first
+    new_item = event.schedules.detect { |s| s.name == 'Testing TZ' }
     expect(new_item.start_time.time_zone.name).to eq(event.time_zone)
     expect(new_item.end_time.time_zone.name).to eq(event.time_zone)
   end
@@ -66,7 +66,7 @@ describe "Adding a Schedule Item", type: :feature do
     page.fill_in 'schedule_name', with: 'Another item for testing'
     page.fill_in 'schedule_location', with: 'Somewhere'
     click_button 'Add New Schedule Item'
-    new_item = @event.schedules.select {|s| s.name == 'Another item for testing'}.first
+    new_item = @event.schedules.detect {|s| s.name == 'Another item for testing'}
     expect(new_item.start_time.to_date).to eq(new_day)
   end
 

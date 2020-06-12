@@ -222,7 +222,7 @@ class ScheduleItem
   end
 
   def slot_taken(start_time)
-    @todays_schedule.select {|item| item.start_time == start_time}.first
+    @todays_schedule.detect {|item| item.start_time == start_time}
   end
 
   def set_default_end_time
@@ -231,7 +231,7 @@ class ScheduleItem
 
     # If end_time pushes into the next scheduled item, set it to the start time of that item
     unless @todays_schedule.empty?
-      next_item = @todays_schedule.select {|item| item.start_time > @schedule.start_time}.first
+      next_item = @todays_schedule.detect {|item| item.start_time > @schedule.start_time}
       if next_item && end_time > next_item.start_time
         end_time = next_item.start_time
       end

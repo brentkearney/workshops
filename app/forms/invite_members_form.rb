@@ -81,14 +81,15 @@ class InviteMembersForm < ComplexForms
   end
 
   def max_participants?
-    invited = @memberships.select { |m| m.attendance == 'Not Yet Invited' &&
-      m.role != 'Observer' }.count
+    invited = @memberships.count { |m| m.attendance == 'Not Yet Invited' &&
+      m.role != 'Observer' }
+
     @event.num_invited_participants + invited > @event.max_participants
   end
 
   def max_observers?
-    invited_observers = @memberships.select { |m| m.role == 'Observer' &&
-      m.attendance == 'Not Yet Invited' }.count
+    invited_observers = @memberships.count { |m| m.role == 'Observer' &&
+      m.attendance == 'Not Yet Invited' }
     return false if invited_observers == 0
     @event.num_invited_observers + invited_observers > @event.max_observers
   end

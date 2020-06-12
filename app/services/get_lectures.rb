@@ -45,7 +45,7 @@ class GetLectures
       lecture_ids[ lecture.id ] = (lecture_time.to_i - now.to_i).abs
     end
     return '' if lecture_ids.empty?
-    lectures.select {|l| l.id == lecture_ids.key(lecture_ids.values.min) }.last
+    lectures.reverse.detect {|l| l.id == lecture_ids.key(lecture_ids.values.min) }
   end
 
   # returns the first lecture in the next 15 days
@@ -53,7 +53,7 @@ class GetLectures
     time_zone = find_timezone
     lectures = todays_lectures
     now = Time.current.in_time_zone(time_zone) - calculate_tolerance(lectures)
-    lecture = lectures.select {|l| l.start_time.in_time_zone(time_zone) > now }.first
+    lecture = lectures.detect {|l| l.start_time.in_time_zone(time_zone) > now }
     return lecture unless lecture.blank?
 
     (1..15).each do |n|

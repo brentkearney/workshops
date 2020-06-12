@@ -106,13 +106,13 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
     end
 
     context 'POST with valid token but invalid post format' do
-      it 'responds with bad request' do
+      it 'responds with not_acceptable' do
         mail = incoming_email.dup
         mail.delete("X-Mailgun-Incoming")
 
         post :incoming, params: mail
 
-        expect(response).to be_a_bad_request
+        expect(response.status).to eq(406)
       end
     end
   end
@@ -183,7 +183,7 @@ RSpec.describe Griddler::AuthenticationController, type: :controller do
 
         post :bounces, params: post_params
 
-        expect(response).to be_a_bad_request
+        expect(response.status).to eq(406)
       end
     end
   end

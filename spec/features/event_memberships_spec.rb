@@ -225,12 +225,12 @@ describe 'Event Membership Page', type: :feature do
         href: invite_event_memberships_path(@event))
     end
 
-    it 'hides Add & Invite Member links if workshop has already started' do
+    it 'hides Add & Invite Member links if workshop has already ended' do
       original_start = @event.start_date.dup
       original_end = @event.end_date.dup
-      @event.start_date = Date.current
-      @event.end_date = @event.start_date + 5.days
-      @event.save
+      @event.end_date = Date.current - 1.days
+      @event.start_date = @event.end_date - 5.days
+      @event.save!
 
       visit event_memberships_path(@event)
 

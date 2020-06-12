@@ -53,7 +53,7 @@ describe 'EventMaillist' do
     it 'sends one email per participant of specified attendance status' do
       num_participants = event.attendance(status).count
       expect(num_participants).to be > 0
-      expect(@mailer).to receive(:deliver_now!).exactly(num_participants).times
+      expect(@mailer).to receive(:deliver_now).exactly(num_participants).times
 
       @maillist.send_message
 
@@ -77,7 +77,7 @@ describe 'EventMaillist' do
       maillist = EventMaillist.new(subject, list_params)
       mailer = double('MaillistMailer')
       allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
-      expect(mailer).to receive(:deliver_now!).exactly(1).times
+      expect(mailer).to receive(:deliver_now).exactly(1).times
 
       maillist.send_message
 
@@ -95,7 +95,7 @@ describe 'EventMaillist' do
       maillist = EventMaillist.new(subject, list_params)
       mailer = double('MaillistMailer')
       allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
-      expect(mailer).to receive(:deliver_now!).exactly(1).times
+      expect(mailer).to receive(:deliver_now).exactly(1).times
 
       maillist.send_message
 
@@ -115,7 +115,7 @@ describe 'EventMaillist' do
       maillist = EventMaillist.new(subject, list_params)
       mailer = double('MaillistMailer')
       allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
-      expect(mailer).to receive(:deliver_now!).exactly(member_count).times
+      expect(mailer).to receive(:deliver_now).exactly(member_count).times
 
       maillist.send_message
 

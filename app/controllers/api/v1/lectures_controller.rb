@@ -81,7 +81,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
     data = []
     lectures.each do |lecture|
       # scheduled time may differ from (actual) lecture time
-      schedule = schedules.select {|s| s.lecture_id == lecture.id}.first
+      schedule = schedules.detect {|s| s.lecture_id == lecture.id}
       start_time = schedule.nil? ? '' : schedule.start_time
       end_time = schedule.nil? ? '' : schedule.end_time
       scheduled_for = { start_time: start_time, end_time: end_time }
