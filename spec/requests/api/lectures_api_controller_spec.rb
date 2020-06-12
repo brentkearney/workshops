@@ -138,7 +138,7 @@ describe Api::V1::LecturesController, type: :request do
 
           get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@room)}.json"
           json = JSON.parse(response.body)
-          lecture = json.select {|j| j['lecture']['id'].to_i == @lecture.id }.first
+          lecture = json.detect {|j| j['lecture']['id'].to_i == @lecture.id }
 
           expect(lecture['scheduled_for']['start_time']).to be_empty
           expect(lecture['scheduled_for']['end_time']).to be_empty

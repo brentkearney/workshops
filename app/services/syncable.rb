@@ -32,9 +32,9 @@ module Syncable
   end
 
   def find_local_membership(remote_member)
-    local_membership = local_members.select do |membership|
+    local_membership = local_members.detect do |membership|
       membership.person.legacy_id == remote_member['Person']['legacy_id']
-    end.first
+    end
 
     if local_membership.nil?
       local_membership = local_members.detect do |membership|

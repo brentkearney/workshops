@@ -121,7 +121,7 @@ module MembershipsHelper
 
     text = '<ul>'
     member.invite_reminders.each do |k,v|
-      start_date = member.event.start_date.in_time_zone(tz)
+      #start_date = member.event.start_date.in_time_zone(tz)
       text << "<li><b>On #{k.strftime('%Y-%m-%d %H:%M %Z')}</b><br>by #{v}.</li>"
     end
     text << '</ul>'
@@ -294,8 +294,8 @@ module MembershipsHelper
     member.num_guests
   end
 
-  def rsvp_setting(setting, location)
-    intro = GetSetting.send(setting, @event.location)
+  def rsvp_setting(setting, location = @event.location)
+    intro = GetSetting.send(setting, location)
     return '' if intro.blank?
     intro.html_safe
   end

@@ -26,7 +26,7 @@ class ComplexForms
     send(key)
   end
 
-  def self.human_attribute_name(attr, options = {})
+  def self.human_attribute_name(attr, _options = {})
     attr
   end
 

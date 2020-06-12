@@ -28,7 +28,7 @@ $(document).on 'turbolinks:load', ->
       if element.id
         $('#' + element.id).removeClass('active')
 
-  expand_menu =(item) =>
+  expand_menu =(item) ->
     item.closest('li').addClass('is-expanded')
 
   year_location =->
