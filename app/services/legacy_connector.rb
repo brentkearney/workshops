@@ -23,7 +23,8 @@ class LegacyConnector
   require 'rest_client'
 
   def initialize
-    @rest_url = Setting.Site['legacy_api']
+    @rest_url = GetSetting.site_setting('legacy_api')
+    @rest_url = nil if @rest_url == 'legacy_api not set'
     @rest_url = nil if ENV['APPLICATION_HOST'].include?('staging')
     @rest_url = nil if ENV['RAILS_ENV'] == 'development'
   end

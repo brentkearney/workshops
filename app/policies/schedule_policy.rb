@@ -36,7 +36,15 @@ class SchedulePolicy
   end
 
   def create?
-    event_organizer || staff_or_admin
+    staff_or_organizers
+  end
+
+  def start_recording?
+    staff_or_organizers
+  end
+
+  def stop_recording?
+    start_recording?
   end
 
   # Only organizers and admins can change event schedules
@@ -46,6 +54,10 @@ class SchedulePolicy
     else
       event_organizer || staff_or_admin
     end
+  end
+
+  def staff_or_organizers
+    staff_or_admin || event_organizer
   end
 
   def staff_or_unlocked_organizers
@@ -59,8 +71,7 @@ class SchedulePolicy
 
   def event_organizer
     return false unless @current_user
-    @current_user.is_organizer?(@event) ||
-      @event.code == '20w5144' && @current_user.email == 'kilianr@kth.se'
+    @current_user.is_organizer?(@event)
   end
 
   def staff_or_admin

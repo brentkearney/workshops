@@ -50,6 +50,7 @@ Rails.application.routes.draw do
     get 'schedule/:id' => 'schedule#edit', as: :schedule_edit
     post 'schedule/create' => 'schedule#create'
     post 'schedule/publish_schedule' => 'schedule#publish_schedule'
+    post 'schedule/:id/recording/:record_action' => 'schedule#recording', as: :recording
     resources :schedule
     resources :memberships do
       match 'email_change' => 'memberships#email_change', as: :email_change, via: [:get, :post]

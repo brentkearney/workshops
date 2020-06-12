@@ -46,4 +46,19 @@ module ScheduleHelper
       concat hidden_field_tag 'latest_minute', schedule.latest.strftime('%M')
     end
   end
+
+  def start_or_stop_recording_button(schedule)
+    return if schedule.start_time.day != DateTime.now.day
+    return if schedule.lecture_id.blank?
+    lecture = Lecture.find(schedule.lecture_id)
+    return if lecture.blank?
+
+    recording_lecture = Lecture.find_by(event_id: @event.id, is_recording: true)
+
+    if recording_lecture.blank?
+      link_to "Start Recording", { controller: "schedule", action: "recording", event_id: @event.code, id: schedule.id, record_action: :start }, method: "post", remote: true, class: 'btn btn-sm btn-success'
+    elsif lecture.id == recording_lecture.id
+      link_to "Stop Recording", { controller: "schedule", action: "recording", event_id: @event.code, id: schedule.id, record_action: :stop }, method: "post", remote: true, class: "btn btn-sm btn-danger"
+    end
+  end
 end

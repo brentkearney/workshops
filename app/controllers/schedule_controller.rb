@@ -166,6 +166,28 @@ class ScheduleController < ApplicationController
     end
   end
 
+  # POST /events/:event_id/schedule/:id/start_recording/:lecture_id
+  def recording
+    schedule = Schedule.find_by_id(recording_params[:id])
+    return if schedule.blank?
+    authorize schedule
+
+    lecture = schedule.lecture
+    return if lecture.blank?
+
+    action = recording_params[:record_action]
+    LectureRecording.new(lecture).send(action)
+
+    respond_to do |format|
+      format.html do
+        redirect_to event_schedule_index_path(@event),
+                    notice: "#{action == "start" ? "Starting" : "Stopping"}
+                    recording for #{lecture.person.name}: #{lecture.title}..."
+      end
+      format.json { head :no_content }
+    end
+  end
+
   private
 
   def set_lock_time
@@ -178,7 +200,7 @@ class ScheduleController < ApplicationController
   end
 
   def set_schedule
-    @schedule = Schedule.find(params[:id])
+    @schedule = Schedule.find(schedule_params[:id])
   end
 
   def schedule_params
@@ -187,6 +209,10 @@ class ScheduleController < ApplicationController
                   :name, :description, :location, :day, :staff_item,
                   lecture_attributes: [:person_id, :id, :keywords,
                                        :do_not_publish])
+  end
+
+  def recording_params
+    params.permit(:event_id, :id, :record_action)
   end
 
   def flash_notice
