@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2.4.1'
+gem 'rails', '~> 5.2.4.3'
 gem 'dry-configurable', '~> 0.9.0'
 gem 'pg', '1.1.3'
-gem 'sass-rails', '~> 5.1.0'
-gem 'bootstrap', '~> 4.4.1'
+gem 'sassc-rails'
+gem 'bootstrap', '~> 4.5.0'
 gem 'uglifier'
 gem 'coffee-rails'
 gem 'jquery-rails'
@@ -37,7 +37,8 @@ gem 'rack-cors', require: 'rack/cors'
 gem 'listen'
 gem 'bootsnap'
 gem "administrate", ">= 0.13.0"
-gem 'popper_js', '~> 1.14.5'
+gem 'popper_js', '~> 1.16.0'
+gem 'webpacker', '~> 5.1.1'
 
 
 group :development, :test do

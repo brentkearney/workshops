@@ -60,3 +60,10 @@ public/icons/*
 node_modules/
 public/packs/
 yarn-error.log
+
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity

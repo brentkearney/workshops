@@ -70,6 +70,7 @@ class AddMembersForm < ComplexForms
 
   def get_a_person(data, i)
     email = data[:email].downcase.strip
+    data[:email] = email
     return if email.blank?
     if EmailValidator.valid?(email)
       find_person(data) || add_new_person(data, i)
