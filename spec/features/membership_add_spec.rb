@@ -140,6 +140,15 @@ describe 'Membership#add', type: :feature do
       expect(page).to have_text(@person.lastname)
     end
 
+    it 'adds existing local records even if email is different case' do
+      fill_in 'add_members_form[add_members]', with: @person.email.upcase
+      click_button 'Add These Members'
+
+      expect(page).to have_text('New members added')
+      expect(current_path).to eq(event_memberships_path(@event))
+      expect(page).to have_text(@person.lastname)
+    end
+
     it 'imports remote records based on email match' do
       email = 'test@email.com'
       person = Person.find_by_email(email)
