@@ -73,8 +73,9 @@ class EventMaillist
       recipient = GetSetting.site_email('webmaster_email')
     end
 
-    resp = MaillistMailer.workshop_maillist(message, recipient).deliver_now!
-    if resp.respond_to?(:code) && resp.code != 200
+    begin
+      resp = MaillistMailer.workshop_maillist(message, recipient).deliver_now
+    rescue
       StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
     end
   end

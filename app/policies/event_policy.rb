@@ -100,7 +100,7 @@ class EventPolicy
 
   def send_invitations?
     return false if current_user.nil?
-    return false if Date.current + 2.days > event.start_date
+    return false if Date.current > event.end_date
     organizers_and_staff
   end
 

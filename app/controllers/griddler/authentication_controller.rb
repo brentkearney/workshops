@@ -6,12 +6,12 @@ class Griddler::AuthenticationController < Griddler::EmailsController
 
   def incoming
     create and return if valid_incoming_format
-    bad_request
+    not_acceptable
   end
 
   def bounces
     process_bounce and return if valid_bounce_format
-    bad_request
+    not_acceptable
   end
 
   private
@@ -26,8 +26,8 @@ class Griddler::AuthenticationController < Griddler::EmailsController
     head :unauthorized and return
   end
 
-  def bad_request
-    head :bad_request and return
+  def not_acceptable
+    head :not_acceptable and return
   end
 
   def is_ok
