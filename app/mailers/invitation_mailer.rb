@@ -58,6 +58,12 @@ class InvitationMailer < ApplicationMailer
 
     pdf_template_file = "#{template_path}/#{@template_name}.pdf.erb"
     pdf_template = "invitation_mailer/#{@event.location}/#{@template_name}.pdf.erb"
+
+    if @event.start_date < Date.parse("Sep 1 2020")
+      @template_name = "Virtual " + @template_name
+      pdf_template_file = 'not_applicable.pdf'
+    end
+
     text_template_file = "#{template_path}/#{@template_name}.text.erb"
     text_template = "invitation_mailer/#{@event.location}/#{@template_name}.text.erb"
 

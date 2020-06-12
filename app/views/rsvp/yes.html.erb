@@ -16,6 +16,13 @@
       <h2 class="rsvp-section">Please share your plans, then click the green button.<br>
         <small>You may return any time to update this information.</small>
       </h2>
+
+      <!-- temporary, until we know more about pandemic outcome -->
+      <p><font color="red">Note:</font> during the pandemic closure, BIRS workshops will
+        be taking place online, and not physically. We are working hard to update our systems,
+        but in the mean time, please accept the default values for hotel questions on this form.
+      </p>
+
       <%= form_for @rsvp, as: :rsvp,
          url: rsvp_yes_path(@rsvp.invitation.code), method: :post,
         html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |rsvp| %>

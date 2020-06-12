@@ -32,6 +32,12 @@ class ParticipantMailer < ApplicationMailer
       file_attachment = "#{pdf_path}/#{@event.location}-Observer.pdf"
       template << "-Observer"
     end
+
+    if @event.start_date < Date.parse("Sep 1 2020")
+      template = "Virtual " + template
+      file_attachment = "#{pdf_path}/#{@event.location}/not_applicable.pdf"
+    end
+
     if File.exist?("#{file_attachment}") # spaces in file name
       attachments["#{@event.location}-arrival-info.pdf"] = {
         mime_type: 'application/pdf',
