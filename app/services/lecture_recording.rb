@@ -42,6 +42,7 @@ class LectureRecording
   end
 
   def tell_recording_system(command)
+    return if ENV['RAILS_ENV'] == 'development' || ENV['RAILS_ENV'] == 'staging'
     start_stop_cmd = "RECORD-START\n" if command == :start
     start_stop_cmd = "RECORD-STOP\n" if command == :stop
     return if start_stop_cmd.blank? || @recording_host.nil?
