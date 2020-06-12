@@ -32,9 +32,12 @@ class LectureRecording
   def update_lecture(start_stop)
     case start_stop
     when :start
-      @lecture.update_columns(start_time: DateTime.now, is_recording: true)
+      talk_length = ((@lecture.end_time - @lecture.start_time) * 24 * 60).to_i.abs
+      new_end = @lecture.end_time + talk_length.minutes
+
+      @lecture.update_columns(start_time: DateTime.now, end_time: new_end, is_recording: true)
     when :stop
-      @lecture.update_columns(end_time: DateTime.now, is_recording: false)
+      @lecture.update_columns(is_recording: false)
     end
   end
 
