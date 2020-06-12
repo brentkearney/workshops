@@ -4,12 +4,19 @@
   "license": "SEE LICENSE IN GNU-AGPL-3.0",
   "dependencies": {
     "@rails/webpacker": "5.1.1",
+    "kind-of": "^6.0.3",
     "minimist": "^1.2.5",
+    "node-sass": "^4.14.1",
     "stimulus": "^1.1.1",
-    "vali-admin": "^3.0.0"
+    "vali-admin": "^3.0.0",
+    "websocket-extensions": "^0.1.4"
   },
   "devDependencies": {
     "webpack": "^4.43.0",
     "webpack-dev-server": "^3.11.0"
+  },
+  "resolutions": {
+    "**/kind-of": "^6.0.3",
+    "chokidar": "^3.4.0"
   }
 }
