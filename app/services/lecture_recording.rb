@@ -8,46 +8,42 @@
 class LectureRecording
   require 'socket'
 
-  def initialize(lecture)
+  def initialize(lecture, user)
     @lecture = lecture
+    @user = user
     @recording_host = GetSetting.site_setting('recording_api')
     @recording_host = nil if @recording_host == 'recording_api not set'
   end
 
   def start
     return if @recording_host.nil?
-    update_lecture(:start)
     tell_recording_system(:start)
   end
 
   def stop
     return if @recording_host.nil?
-    update_lecture(:stop)
     tell_recording_system(:stop)
   end
 
 
   private
 
-  def update_lecture(start_stop)
-    case start_stop
-    when :start
-      talk_length = ((@lecture.end_time - @lecture.start_time) * 24 * 60).to_i.abs
-      new_end = @lecture.end_time + talk_length.minutes
-
-      @lecture.update_columns(start_time: DateTime.now, end_time: new_end, is_recording: true)
-    when :stop
-      @lecture.update_columns(is_recording: false)
-    end
-  end
 
   def tell_recording_system(command)
     return if ENV['RAILS_ENV'] == 'development' || ENV['RAILS_ENV'] == 'staging'
-    start_stop_cmd = "RECORD-START\n" if command == :start
-    start_stop_cmd = "RECORD-STOP\n" if command == :stop
-    return if start_stop_cmd.blank? || @recording_host.nil?
-    host_info = @recording_host.split(':')
+    if command == :start
+      start_stop_cmd = "RECORD-START\n"
+      @lecture.update_columns(is_recording: true, updated_by: @user)
+    elsif command == :stop
+      start_stop_cmd = "RECORD-STOP\n"
+      @lecture.update_columns(is_recording: false, updated_by: @user)
+    end
 
+    return if start_stop_cmd.blank? || @recording_host.nil?
+    execute_commands(start_stop_cmd, @recording_host.split(':'))
+  end
+
+  def execute_commands(start_stop_cmd, host_info)
     Thread.new do
       begin
         socket = TCPSocket.new host_info.first, host_info.last.to_i
