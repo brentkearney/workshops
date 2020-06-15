@@ -6,7 +6,7 @@
 
 class ScheduleController < ApplicationController
   before_action :set_event, :set_attendance, :set_time_zone
-  before_action :set_schedule, only: [:show, :update, :destroy]
+  before_action :set_schedule, only: [:show, :update]
   before_action :set_lock_time, only: [:new, :edit, :update, :create]
 
   before_action :authenticate_user!, except: [:index]
@@ -146,15 +146,15 @@ class ScheduleController < ApplicationController
   # DELETE /schedule/1
   # DELETE /schedule/1.json
   def destroy
-    authorize @schedule
-    if @schedule.notify_staff?
-      ScheduleNotice.new(schedule: @schedule,
+    schedule = Schedule.find(other_params[:id])
+    if schedule.notify_staff?
+      ScheduleNotice.new(schedule: schedule,
                          changed_similar: params[:change_similar]).destroy
     end
-    if @schedule.lecture.blank?
-      @schedule.destroy
+    if schedule.lecture.blank?
+      schedule.destroy
     else
-      @schedule.lecture.destroy # dependent: :destroy
+      schedule.lecture.destroy # dependent: :destroy
     end
 
     respond_to do |format|
@@ -168,14 +168,14 @@ class ScheduleController < ApplicationController
 
   # POST /events/:event_id/schedule/:id/start_recording/:lecture_id
   def recording
-    schedule = Schedule.find_by_id(recording_params[:id])
+    schedule = Schedule.find_by_id(other_params[:id])
     return if schedule.blank?
     authorize schedule
 
     lecture = schedule.lecture
     return if lecture.blank?
 
-    action = recording_params[:record_action]
+    action = other_params[:record_action]
     LectureRecording.new(lecture).send(action)
 
     respond_to do |format|
@@ -211,7 +211,7 @@ class ScheduleController < ApplicationController
                                        :do_not_publish])
   end
 
-  def recording_params
+  def other_params
     params.permit(:event_id, :id, :record_action)
   end
 
