@@ -42,7 +42,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
     data = {}
     # Use legacy_id until legacy system is fully depreciated
     lecture = Lecture.find_by_legacy_id(@lecture_id)
-    lecture = Lecture.find_by_id(@lecture_id) if Rails.env.test?
+    lecture = Lecture.find_by_id(@lecture_id) if lecture.blank? || Rails.env.test?
     unless lecture.blank?
       person = {
         salutation: lecture.person.salutation,
