@@ -8,53 +8,39 @@
 class LectureRecording
   require 'socket'
 
-  def initialize(lecture)
+  def initialize(lecture, users_name)
     @lecture = lecture
+    @users_name = users_name
     @recording_host = GetSetting.site_setting('recording_api')
     @recording_host = nil if @recording_host == 'recording_api not set'
   end
 
   def start
     return if @recording_host.nil?
-    update_lecture(:start)
     tell_recording_system(:start)
   end
 
   def stop
     return if @recording_host.nil?
-    update_lecture(:stop)
     tell_recording_system(:stop)
   end
 
 
   private
 
-  def update_lecture(start_stop)
-    case start_stop
-    when :start
-      @lecture.update_columns(start_time: DateTime.now, is_recording: true)
-    when :stop
-      @lecture.update_columns(end_time: DateTime.now, is_recording: false)
-    end
-  end
 
   def tell_recording_system(command)
-    start_stop_cmd = "RECORD-START\n" if command == :start
-    start_stop_cmd = "RECORD-STOP\n" if command == :stop
-    return if start_stop_cmd.blank? || @recording_host.nil?
-    host_info = @recording_host.split(':')
-
-    Thread.new do
-      begin
-        socket = TCPSocket.new host_info.first, host_info.last.to_i
-        socket.puts start_stop_cmd
-        socket.close
-      rescue Errno::ETIMEDOUT, Errno::ECONNREFUSED, IOError => e
-        Rails.logger.debug "\n\nError connecting to recording system: #{e.message}\n\n"
-        msg = e.message + "\n\n"
-        msg << e.backtrace.to_s
-        StaffMailer.notify_sysadmin(@lecture.event, msg).deliver_now
-      end
+    return if ENV['RAILS_ENV'] == 'development' || ENV['APPLICATION_HOST'].include?('staging')
+    if command == :start
+      start_stop_cmd = "RECORD-START\n"
+      @lecture.update_columns(is_recording: true, updated_by: @users_name)
+    elsif command == :stop
+      start_stop_cmd = "RECORD-STOP\n"
+      @lecture.update_columns(is_recording: false, updated_by: @users_name)
     end
+
+    return if start_stop_cmd.blank? || @recording_host.nil?
+    host_ip, port = @recording_host.split(':')
+    ConnectToRecordingSystemJob.perform_later(start_stop_cmd, host_ip, port)
   end
 end

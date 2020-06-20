@@ -1,6 +1,7 @@
 <%= render "shared/errors", object: @schedule %>
 <div class="card" id="schedule-form-page">
-<%= form_for @schedule, url: {action: "#{@form_action}"}, :html => { :role => "form", :class => "form" } do |f| %>
+<%= form_with model: @schedule, url: schedule_form_with_path, class: "form" do |f| %>
+<%= f.hidden_field :id %>
 <%= f.hidden_field :event_id %>
 <%= time_limits(@schedule) %>
 <div class="card-title">

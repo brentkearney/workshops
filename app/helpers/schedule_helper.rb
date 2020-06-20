@@ -61,4 +61,15 @@ module ScheduleHelper
       link_to "Stop Recording", { controller: "schedule", action: "recording", event_id: @event.code, id: schedule.id, record_action: :stop }, method: "post", remote: true, class: "btn btn-sm btn-danger"
     end
   end
+
+  def schedule_form_with_path
+    case request.path
+    when /new/
+      event_schedule_create_path
+    when /create/
+      new_event_schedule_path
+    else
+      event_schedule_path
+    end
+  end
 end
