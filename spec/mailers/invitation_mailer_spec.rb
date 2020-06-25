@@ -84,37 +84,38 @@ RSpec.describe InvitationMailer, type: :mailer do
       expect(body).to have_text("before #{rsvp_date}")
     end
 
-    it 'sets date to Tuesday before workshop if event is < 10 days away' do
-      @event.start_date = @today + 8.days
-      @event.end_date = @event.start_date + 5.days
-      @event.save
+    # This is suspended during the pandemic, for virtual workshops
+    # it 'sets date to Tuesday before workshop if event is < 10 days away' do
+    #   @event.start_date = @today + 8.days
+    #   @event.end_date = @event.start_date + 5.days
+    #   @event.save
 
-      InvitationMailer.invite(@invitation, @template).deliver_now
-      delivery = ActionMailer::Base.deliveries.first
-      body = delivery.body.empty? ? delivery.text_part : delivery.body
-      rsvp_date = @event.start_date.prev_week(:tuesday)
+    #   InvitationMailer.invite(@invitation, @template).deliver_now
+    #   delivery = ActionMailer::Base.deliveries.first
+    #   body = delivery.body.empty? ? delivery.text_part : delivery.body
+    #   rsvp_date = @event.start_date.prev_week(:tuesday)
 
-      # unless Tuesday is in the past. In which case, set reply-by to tomorrow
-      if rsvp_date < @today
-        tomorrow = (@today + 1.day).strftime('%B %-d, %Y')
-        expect(body).to have_text("before #{tomorrow}")
-      else
-        expect(body).to have_text("before #{rsvp_date.strftime('%B %-d, %Y')}")
-      end
-    end
+    #   # unless Tuesday is in the past. In which case, set reply-by to tomorrow
+    #   if rsvp_date < @today
+    #     tomorrow = (@today + 1.day).strftime('%B %-d, %Y')
+    #     expect(body).to have_text("before #{tomorrow}")
+    #   else
+    #     expect(body).to have_text("before #{rsvp_date.strftime('%B %-d, %Y')}")
+    #   end
+    # end
+    #
+    # it 'sets date to 10 days in advance if event is < 2 months away' do
+    #   @event.start_date = @today + 1.month + 3.weeks
+    #   @event.end_date = @event.start_date + 5.days
+    #   @event.save
 
-    it 'sets date to 10 days in advance if event is < 2 months away' do
-      @event.start_date = @today + 1.month + 3.weeks
-      @event.end_date = @event.start_date + 5.days
-      @event.save
+    #   InvitationMailer.invite(@invitation, @template).deliver_now
+    #   delivery = ActionMailer::Base.deliveries.first
+    #   body = delivery.body.empty? ? delivery.text_part : delivery.body
 
-      InvitationMailer.invite(@invitation, @template).deliver_now
-      delivery = ActionMailer::Base.deliveries.first
-      body = delivery.body.empty? ? delivery.text_part : delivery.body
-
-      rsvp_date = (@today + 10.days).strftime('%B %-d, %Y')
-      expect(body).to have_text("before #{rsvp_date}")
-    end
+    #   rsvp_date = (@today + 10.days).strftime('%B %-d, %Y')
+    #   expect(body).to have_text("before #{rsvp_date}")
+    # end
 
     it 'sets date to 21 days in advance if event is < 3 months, 5 days away' do
       @event.start_date = @today + 3.months

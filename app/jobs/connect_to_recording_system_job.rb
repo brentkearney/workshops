@@ -10,8 +10,8 @@
 class ConnectToRecordingSystemJob < ApplicationJob
   queue_as :urgent
 
-  rescue_from(Errno::ETIMEDOUT, Errno::ECONNREFUSED, IOError) do |e|
-    Rails.logger.debug "\n\nError connecting to AVRS: #{e.message}\n\n"
+  rescue_from(StandardError) do |e|
+    Rails.logger.debug "\n\nError connecting to recording sys: #{e.message}\n\n"
     msg = e.message + "\n\n"
     msg << e.backtrace.to_s
     StaffMailer.notify_sysadmin(nil, msg).deliver_now

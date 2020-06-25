@@ -169,7 +169,7 @@ RSpec.describe MembershipsController, type: :controller do
         it 'POST responds with redirect and error message' do
           post :invite, params: { event_id: 1, invite_members_form:{ "12": "1" }}
 
-          expect(response).to redirect_to(events_path)
+          expect(response).to redirect_to(events_future_path)
           expect(flash[:error]).to be_present
         end
       end
