@@ -52,7 +52,11 @@ module ScheduleHelper
     return if schedule.lecture_id.blank?
     lecture = Lecture.find(schedule.lecture_id)
     return if lecture.blank?
+    return unless lecture.filename.blank?
+    show_record_button(schedule)
+  end
 
+  def show_record_button(schedule)
     recording_lecture = Lecture.find_by(event_id: @event.id, is_recording: true)
 
     if recording_lecture.blank?

@@ -30,7 +30,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
         format.json { head :created }
       else
         format.json do
-          render json: @lecture.errors,
+          render json: @lecture.errors.full_messages.to_json,
                  status: :unprocessable_entity
         end
       end

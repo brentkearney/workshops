@@ -8,6 +8,7 @@
 
 # Connects to video recording system to start/stop recording
 class ConnectToRecordingSystemJob < ApplicationJob
+  require 'socket'
   queue_as :urgent
 
   rescue_from(StandardError) do |e|

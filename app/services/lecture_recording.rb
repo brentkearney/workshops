@@ -6,8 +6,6 @@
 
 # Sends signals to the BIRS Automated Video Recording System
 class LectureRecording
-  require 'socket'
-
   def initialize(lecture, users_name)
     @lecture = lecture
     @users_name = users_name
@@ -28,17 +26,19 @@ class LectureRecording
 
   private
 
+  def update_and_get_cmd(command)
+    if command == :start
+      @lecture.update_columns(is_recording: true, updated_by: @users_name)
+      return "RECORD-START\n"
+    elsif command == :stop
+      @lecture.update_columns(is_recording: false, updated_by: @users_name)
+      "RECORD-STOP\n"
+    end
+  end
 
   def tell_recording_system(command)
     return if ENV['RAILS_ENV'] == 'development' || ENV['APPLICATION_HOST'].include?('staging')
-    if command == :start
-      start_stop_cmd = "RECORD-START\n"
-      @lecture.update_columns(is_recording: true, updated_by: @users_name)
-    elsif command == :stop
-      start_stop_cmd = "RECORD-STOP\n"
-      @lecture.update_columns(is_recording: false, updated_by: @users_name)
-    end
-
+    start_stop_cmd = update_and_get_cmd(command)
     return if start_stop_cmd.blank? || @recording_host.nil?
     host_ip, port = @recording_host.split(':')
     ConnectToRecordingSystemJob.perform_later(start_stop_cmd, host_ip, port)
