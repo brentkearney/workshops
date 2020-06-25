@@ -179,7 +179,7 @@ class ScheduleController < ApplicationController
     respond_to do |format|
       format.html do
         redirect_to event_schedule_index_path(@event),
-                    notice: "#{action == "start" ? "Starting" : "Stopping"}
+                    notice: "#{start_stop == "start" ? "Starting" : "Stopping"}
                     recording for #{lecture.person.name}: #{lecture.title}..."
       end
       format.json { head :no_content }
