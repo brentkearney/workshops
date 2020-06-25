@@ -166,14 +166,14 @@ class ScheduleController < ApplicationController
 
   # POST /events/:event_id/schedule/:id/start_recording/:lecture_id
   def recording
-    schedule = Schedule.find_by_id(recording_params[:id])
+    schedule = Schedule.find_by_id(other_params[:id])
     return if schedule.blank?
     authorize schedule
 
     lecture = schedule.lecture
     return if lecture.blank?
 
-    action = recording_params[:record_action]
+    action = other_params[:record_action]
     LectureRecording.new(lecture, current_user.name).send(action)
 
     respond_to do |format|
@@ -211,10 +211,6 @@ class ScheduleController < ApplicationController
   end
 
   def other_params
-    params.permit(:event_id, :id, :record_action)
-  end
-
-  def recording_params
     params.permit(:event_id, :id, :record_action)
   end
 
