@@ -6,6 +6,7 @@
 
 # Sends signals to the BIRS Automated Video Recording System
 class LectureRecording
+
   def initialize(lecture, users_name)
     @lecture = lecture
     @users_name = users_name
