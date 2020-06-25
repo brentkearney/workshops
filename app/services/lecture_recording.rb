@@ -32,15 +32,15 @@ class LectureRecording
       return "RECORD-START\n"
     elsif command == :stop
       @lecture.update_columns(is_recording: false, updated_by: @users_name)
-      "RECORD-STOP\n"
+      return "RECORD-STOP\n"
     end
   end
 
   def tell_recording_system(command)
-    return if ENV['RAILS_ENV'] == 'development' || ENV['APPLICATION_HOST'].include?('staging')
-    start_stop_cmd = update_and_get_cmd(command)
-    return if start_stop_cmd.blank? || @recording_host.nil?
+    return if %w(test development).include? ENV['RAILS_ENV'] ||
+      ENV['APPLICATION_HOST'].include?('staging')
     host_ip, port = @recording_host.split(':')
-    ConnectToRecordingSystemJob.perform_later(start_stop_cmd, host_ip, port)
+    ConnectToRecordingSystemJob.perform_later(update_and_get_cmd(command),
+      host_ip, port)
   end
 end
