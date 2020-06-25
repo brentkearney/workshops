@@ -173,8 +173,8 @@ class ScheduleController < ApplicationController
     lecture = schedule.lecture
     return if lecture.blank?
 
-    action = other_params[:record_action]
-    LectureRecording.new(lecture, current_user.name).send(action)
+    start_stop = other_params[:record_action]
+    LectureRecording.new(lecture, current_user.name).send(start_stop)
 
     respond_to do |format|
       format.html do
