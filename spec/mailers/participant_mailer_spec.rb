@@ -51,5 +51,30 @@ RSpec.describe ParticipantMailer, type: :mailer do
       filename = @membership.event.location + '-arrival-info.pdf'
       expect(@sent_message.attachments.first.filename).to eq(filename)
     end
+
+    it 'uses default template for physical meetings' do
+      expect(@sent_message.text_part.body.to_s).to include('attend the event')
+    end
+  end
+
+  describe '.rsvp_confirmation for online meetings' do
+    before do
+      event = create(:event, name: 'Test Online Event')
+      @membership = create(:membership, event: event)
+      create(:invitation, membership: @membership)
+    end
+
+    before :each do
+      ParticipantMailer.rsvp_confirmation(@membership).deliver_now
+      @sent_message = ActionMailer::Base.deliveries.first
+    end
+
+    it 'uses "Virtual" template for online meetings' do
+      expect(@sent_message.body.to_s).to include('attend the online event')
+    end
+
+    it 'does not include PDF attachment for online meetings' do
+      expect(@sent_message.attachments).to be_empty
+    end
   end
 end

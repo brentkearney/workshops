@@ -33,7 +33,7 @@ class ParticipantMailer < ApplicationMailer
       template << "-Observer"
     end
 
-    if @event.start_date < Date.parse("Sep 1 2020")
+    if @event.name =~ /Online/
       template = "Virtual " + template
       file_attachment = "#{pdf_path}/#{@event.location}/not_applicable.pdf"
     end
@@ -61,7 +61,7 @@ class ParticipantMailer < ApplicationMailer
            from: from_email,
            subject: subject,
            template_path: "participant_mailer/rsvp/#{@event.location}",
-           template_name: @event.event_type)
+           template_name: template)
     else
       error_msg = { problem: 'Participant RSVP confirmation not sent.',
                     cause: 'Email template file missing.',
