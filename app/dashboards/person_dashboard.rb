@@ -36,8 +36,8 @@ class PersonDashboard < Administrate::BaseDashboard
     postal_code: Field::String,
     academic_status: Field::String,
     phd_year: Field::String,
-    biography: Field::Text,
-    research_areas: Field::Text,
+    biography: Field::String,
+    research_areas: Field::String,
     legacy_id: Field::Number,
     updated_by: Field::String,
     created_at: Field::DateTime,
@@ -52,9 +52,9 @@ class PersonDashboard < Administrate::BaseDashboard
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = [
     :id,
-    :email,
     :lastname,
     :firstname,
+    :email,
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES

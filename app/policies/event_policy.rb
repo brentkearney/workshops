@@ -102,7 +102,7 @@ class EventPolicy
     return false if current_user.nil?
     return false if Date.current > event.end_date
     if @event.location == 'BIRS' || @event.location == 'EO' ||
-      @event.start_date > Date.parse('Jan 1, 2021')
+      @event.start_date < Date.parse('Jan 1, 2021')
       organizers_and_staff
     end
   end
