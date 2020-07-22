@@ -38,13 +38,25 @@ class MembershipPolicy
     when 'admin', 'super_admin'
       all_fields
     when 'staff'
-      staff_at_location ? all_fields - [:org_notes, :address1, :address2,
-        :address3, :city, :region, :postal_code, :phone] : []
+      staff_fields
     when 'member'
-      return organizer_fields if organizer?
-      return [] unless self_edit?
-      all_fields - [:id, :event_id, :person_id, :role, :room, :room_notes,
-                    :attendance, :reviewed, :billing, :staff_notes, :org_notes]
+      member_fields
+    else
+      []
+    end
+  end
+
+  def member_fields
+    return organizer_fields if organizer?
+    return [] unless self_edit?
+    all_fields - [:id, :event_id, :person_id, :role, :room, :room_notes,
+                  :attendance, :reviewed, :billing, :staff_notes, :org_notes]
+  end
+
+  def staff_fields
+    if staff_at_location
+      all_fields - [:org_notes, :address1, :address2, :address3, :city, :region,
+        :postal_code, :phone]
     else
       []
     end

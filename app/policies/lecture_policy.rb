@@ -13,7 +13,7 @@ class LecturePolicy
   end
 
   # Only organizers and admins can change lectures
-  def method_missing(name, *args)
+  def method_missing(*)
     if @current_user
       @current_user.is_organizer?(@lecture.event) || @current_user.is_admin?
     end

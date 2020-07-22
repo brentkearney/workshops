@@ -117,11 +117,8 @@ module MembershipsHelper
   end
 
   def parse_reminders(member)
-    tz = member.event.time_zone
-
     text = '<ul>'
     member.invite_reminders.each do |k,v|
-      #start_date = member.event.start_date.in_time_zone(tz)
       text << "<li><b>On #{k.strftime('%Y-%m-%d %H:%M %Z')}</b><br>by #{v}.</li>"
     end
     text << '</ul>'

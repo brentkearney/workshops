@@ -53,7 +53,7 @@ class GetSetting
   def self.billing_code(location, country)
     return '' if no_setting("Locations['#{location}']['billing_codes']")
     billing = eval(Setting.Locations[location]['billing_codes'])[country]
-    billing ||= eval(Setting.Locations[location]['billing_codes'])['default']
+    billing || eval(Setting.Locations[location]['billing_codes'])['default']
   end
 
   def self.max_participants(location)
