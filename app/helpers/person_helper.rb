@@ -32,18 +32,20 @@ module PersonHelper
   def construct_address(person)
     address = city_and_region(person, street_address(person))
     address += "<br />\n" + person.country unless person.country.blank?
+    address
   end
 
   def country_or_street(person)
     if !no_address?(person) && policy(@membership).show_full_address?
-      address = construct_address(person)
+      construct_address(person)
     elsif person.country && policy(@membership).show_address?
-      address = "<strong>Country:</strong>&nbsp; #{person.country}<br />\n"
+      "<strong>Country:</strong>&nbsp; #{person.country}<br />\n"
+    else
+      ''
     end
   end
 
   def print_address(person)
-    address = ''
     no_address = no_address?(person)
     return '' if person.country.blank? && no_address
     address = country_or_street(person)
