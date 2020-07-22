@@ -58,7 +58,7 @@
   top: 50px;
   text-align: center;
   padding: 0;
-  @media(min-width: 768px) { margin-left: $sidebar-width; }
+  @media (min-width: 768px) { margin-left: $sidebar-width; }
 }
 
 .notify-alert {
