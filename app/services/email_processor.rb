@@ -13,6 +13,7 @@ class EmailProcessor
   end
 
   def process
+    return if @email.subject.match?(/[Bounce notice|Out of Office]/)
     extract_recipients.each do |list_params|
       EventMaillist.new(@email, list_params).send_message
     end
@@ -27,6 +28,7 @@ class EmailProcessor
     recipients = @email.to + @email.cc + @email.bcc
 
     recipients.each do |recipient|
+      return if recipient.match?(/(.+)=(.+)@/)
       to_email = recipient[:email]
       code = recipient[:token] # part before the @
       group = 'Confirmed'

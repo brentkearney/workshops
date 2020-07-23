@@ -77,7 +77,7 @@ class Api::V1::EventsController < Api::V1::BaseController
 
   def valid_event_id?
     return false if @json['event_id'].nil?
-    @json['event_id'] =~ /#{GetSetting.code_pattern}/
+    @json['event_id'].match?(/#{GetSetting.code_pattern}/)
   end
 
   def valid_create_parameters?
