@@ -76,15 +76,15 @@ class EmailParser
     @inline_attachments = {}
     return @inline_attachments if params['_json'].blank?
     raw_email = params['_json'][0]['msys']['relay_message']['content']['email_rfc822']
-    if raw_email =~ /Content-Disposition: inline/
+    if raw_email.match?(/Content-Disposition: inline/)
       filename = ''
       content_id = ''
       capture = false
       raw_email.each_line do |line|
-        capture = true if line =~ /Content-Disposition: inline/i
+        capture = true if line.match?(/Content-Disposition: inline/i)
         if capture
-          filename = line.split('=').last.strip if line =~ /filename/i
-          content_id = line.split(':').last.tr('<>', '').strip if line =~ /Content-Id/i
+          filename = line.split('=').last.strip if line.match?(/filename/i)
+          content_id = line.split(':').last.tr('<>', '').strip if line.match?(/Content-Id/i)
         end
         if !filename.empty? && !content_id.empty?
           @inline_attachments[filename] = content_id

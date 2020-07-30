@@ -13,13 +13,20 @@ class EmailProcessor
   end
 
   def process
-    return if @email.subject.match?(/[Bounce notice|Out of Office]/)
+    return if skip_vacation_notices
+
     extract_recipients.each do |list_params|
       EventMaillist.new(@email, list_params).send_message
     end
   end
 
   private
+
+  def skip_vacation_notices
+    subject = @email.subject.downcase
+    subject.match?("bounce notice") || subject.match?("out of office") ||
+      subject.match?("vacation notice") || subject.match?("away notice")
+  end
 
   # assembles valid maillists from To: and Cc: fields
   def extract_recipients
@@ -28,13 +35,14 @@ class EmailProcessor
     recipients = @email.to + @email.cc + @email.bcc
 
     recipients.each do |recipient|
-      return if recipient.match?(/(.+)=(.+)@/)
+      # Skip Outlook webmaster=webmaster@ auto-replies
+      return [] if recipient[:full].match?(/(.+)=(.+)@/)
       to_email = recipient[:email]
       code = recipient[:token] # part before the @
       group = 'Confirmed'
-      code, group = code.split('-') if code =~ /-/
+      code, group = code.split('-') if code.match?(/-/)
 
-      if code =~ /#{GetSetting.code_pattern}/
+      if code.match?(/#{GetSetting.code_pattern}/)
         event = Event.find(code)
         unless event.blank?
           if valid_sender?(event, to_email, group)

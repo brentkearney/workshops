@@ -35,8 +35,8 @@ module ActionMailer
       skip = false
       message.each_line do |line|
         new_message << line unless skip
-        skip = true if line =~ /Content-Disposition: attachment;/
-        skip = false if skip && line =~ /----==_mimepart/
+        skip = true if line.match?(/Content-Disposition: attachment;/)
+        skip = false if skip && line.match?(/----==_mimepart/)
       end
       new_message
     end

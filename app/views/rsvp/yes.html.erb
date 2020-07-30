@@ -175,7 +175,7 @@
           <%= p.telephone_field :phone, class: "form-control", autocomplete: "tel" %>
         </div>
         <div class="form-group" id="address-fields">
-          <% if @rsvp.membership.role =~ /Organizer/ %>
+          <% if @rsvp.membership.role.match?(/Organizer/) %>
             <%= render partial: 'mailing_address', locals: { p: p } %>
           <% else %>
           <div class="row">

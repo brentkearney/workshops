@@ -84,8 +84,8 @@ class Invitation < ApplicationRecord
       #                        .in_time_zone(event.time_zone).beginning_of_day
       #                        - EXPIRES_BEFORE
       # pandemic
-      self.expires = DateTime.parse(event.end_date)
-                             .in_time_zone(event.time_zone).end_of_day
+      self.expires = event.end_date.to_time
+                          .in_time_zone(event.time_zone).end_of_day
     end
   end
 

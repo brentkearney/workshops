@@ -11,7 +11,7 @@
   </header>
   <ul>
     <% object.errors.full_messages.each do |message| %>
-      <% unless message =~ /is invalid/ %>
+      <% unless message.match?(/is invalid/) %>
       <li><%= message.html_safe %></li>
       <% end %>
     <% end %>

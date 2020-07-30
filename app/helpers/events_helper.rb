@@ -67,7 +67,7 @@ module EventsHelper
   end
 
   def year_link(event, direction)
-    return if event.blank? || request.path =~ /events\/my_events/
+    return if event.blank? || request.path.match?(/events\/my_events/)
     if direction == :previous
       year = event.year.to_i - 1
       return link_to("← #{year}", events_year_path(year))

@@ -36,7 +36,7 @@ class Event < ApplicationRecord
   end
 
   def self.find(param)
-    param =~ /\D/ ? find_by_code(param) : super
+    param.to_s.match?(/\D/) ? find_by_code(param) : super
   end
 
   scope :past, -> do

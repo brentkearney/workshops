@@ -33,7 +33,7 @@ class ParticipantMailer < ApplicationMailer
       template << "-Observer"
     end
 
-    if @event.name =~ /Online/
+    if @event.name.match?(/Online/)
       template = "Virtual " + template
       file_attachment = "#{pdf_path}/#{@event.location}/not_applicable.pdf"
     end

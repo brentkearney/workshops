@@ -15,7 +15,7 @@ class EventPolicy
   def method_missing(name, *args)
     if current_user
       if staff_at_location
-        event.template && name =~ /edit|update/
+        event.template && name.match?(/edit|update/)
       else
         current_user.is_admin?
       end

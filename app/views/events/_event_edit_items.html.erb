@@ -1,5 +1,5 @@
 <div class="row">
-  <% if field_name =~ /max_|door/ %>
+  <% if field_name.match?(/max_|door/) %>
     <div class='col-md-2 form-group'>
   <% else %>
     <div class='col-md-12 form-group'>
@@ -11,7 +11,7 @@
     <%= form.label "#{field_name.titleize}" %>
     <% if %w(description press_release).include?(field_name) %>
       <%= form.text_area field_name, rows: 12, class: 'form-control' %>
-    <% elsif field_name =~ /max_|door/ %>
+    <% elsif field_name.match?(/max_|door/) %>
       <%= form.number_field field_name, class: 'form-control' %>
     <% else %>
       <%= form.text_field field_name, class: 'form-control' %>

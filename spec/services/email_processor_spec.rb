@@ -23,7 +23,6 @@ describe 'EmailProcessor' do
   let(:event) { create(:event) }
   let(:person) { create(:person) }
   let(:membership) { create(:membership, event: event, person: person) }
-  # let(:membership) { create(:membership, event: event) }
   let(:organizer) { create(:membership, event: event, role: 'Contact Organizer') }
 
   it '.initialize' do
@@ -31,7 +30,7 @@ describe 'EmailProcessor' do
   end
 
   context 'validates recipient' do
-    it 'sends bounce email if no recipients are event codes' do
+    it 'sends bounce email if no recipients contain event codes' do
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(Griddler::Email.new(params)).process
       expect(EmailInvalidCodeBounceJob).to have_received(:perform_later)
@@ -81,6 +80,48 @@ describe 'EmailProcessor' do
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
       expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
+    end
+
+    it 'does not bounce email if recipient contains =' do
+      params[:to] = ['webmaster=webmaster@example.com']
+      email = Griddler::Email.new(params)
+      allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
+      EmailProcessor.new(email).process
+      expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
+    end
+  end
+
+  context 'validates subject' do
+    context 'does not send message if subject contains' do
+      before do
+        maillist = double('EventMaillist')
+        expect(maillist).not_to receive(:send_message)
+        allow(EventMaillist).to receive(:new).and_return(maillist)
+      end
+
+      it 'Out of Office' do
+        params[:subject] = "Re: Out of Office"
+        email = Griddler::Email.new(params)
+        expect(EventMaillist).not_to have_received(:new)
+      end
+
+      it 'Bounce notice' do
+        params[:subject] = "[Bounce notice]"
+        email = Griddler::Email.new(params)
+        expect(EventMaillist).not_to have_received(:new)
+      end
+
+      it 'Vacation Notice' do
+        params[:subject] = "Vacation Notice"
+        email = Griddler::Email.new(params)
+        expect(EventMaillist).not_to have_received(:new)
+      end
+
+      it 'Away notice' do
+        params[:subject] = "Re: Away notice"
+        email = Griddler::Email.new(params)
+        expect(EventMaillist).not_to have_received(:new)
+      end
     end
   end
 

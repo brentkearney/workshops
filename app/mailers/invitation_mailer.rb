@@ -32,7 +32,7 @@ class InvitationMailer < ApplicationMailer
     @event_start = @event.start_date.in_time_zone.strftime('%A, %B %-d')
     @event_end = @event.end_date.in_time_zone.strftime('%A, %B %-d, %Y')
 
-    @rsvp_deadline = RsvpDeadline.new(@event.start_date).rsvp_by
+    @rsvp_deadline = RsvpDeadline.new(@event).rsvp_by
 
     @organizers = ''
     @event.organizers.each do |org|
@@ -46,7 +46,7 @@ class InvitationMailer < ApplicationMailer
     subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
 
     bcc_email = GetSetting.rsvp_email(@event.location)
-    bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email =~ /</
+    bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email.match?(/</)
     to_email = '"' + @person.name + '" <' + @person.email + '>'
 
     if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')

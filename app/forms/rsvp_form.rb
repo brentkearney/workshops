@@ -17,7 +17,7 @@ class RsvpForm < ComplexForms
     @membership = invitation.membership
     @person = @membership.person
     @person.is_rsvp = true
-    @person.is_organizer_rsvp = true if @membership.role =~ /Organizer/
+    @person.is_organizer_rsvp = true if @membership.role.match?(/Organizer/)
     @event = @membership.event
     @grant_list = RsvpForm.grant_list
     self

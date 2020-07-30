@@ -47,7 +47,7 @@ class EventsController < ApplicationController
   # GET /events/year/:year.json
   def year
     @year = params[:year]
-    if @year =~ /^\d{4}$/
+    if @year.match?(/^\d{4}$/)
       @events = policy_scope(Event).year(@year)
       remove_locations
       render :index unless performed?
@@ -91,7 +91,7 @@ class EventsController < ApplicationController
       @members = []
       @event.memberships.order('role asc')
             .includes(:person).order('people.lastname').each do |member|
-        if member.role =~ /Organizer/
+        if member.role.match?(/Organizer/)
           @organizers << @event.member_info(member.person)
         end
         if member.attendance == 'Confirmed'
