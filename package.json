@@ -4,7 +4,9 @@
   "license": "SEE LICENSE IN GNU-AGPL-3.0",
   "dependencies": {
     "@rails/webpacker": "5.1.1",
+    "chokidar": "^3.4.0",
     "kind-of": "^6.0.3",
+    "lodash": "^4.17.19",
     "minimist": "^1.2.5",
     "node-sass": "^4.14.1",
     "stimulus": "^1.1.1",
