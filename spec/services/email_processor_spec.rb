@@ -82,7 +82,7 @@ describe 'EmailProcessor' do
       expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
     end
 
-    it 'does not bounce email if recipient contains =' do
+    it 'does not bounce email if recipient contains =' do # Outlook bug
       params[:to] = ['webmaster=webmaster@example.com']
       email = Griddler::Email.new(params)
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)

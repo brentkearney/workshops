@@ -31,6 +31,8 @@ class EventMaillist
       send_to_orgs(message)
     elsif @group == 'all'
       send_to_all(message)
+    elsif @group == 'speakers'
+      send_to_speakers(message)
     else
       send_to_attendance_group(message)
     end
@@ -46,6 +48,12 @@ class EventMaillist
     ['Confirmed', 'Invited', 'Undecided'].each do |status|
       @group = status
       send_to_attendance_group(message)
+    end
+  end
+
+  def send_to_speakers(message)
+    @event.lectures.each do |lecture|
+      email_member(lecture.person, message)
     end
   end
 
