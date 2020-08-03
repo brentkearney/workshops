@@ -149,7 +149,8 @@ class Api::V1::LecturesController < Api::V1::BaseController
       event_code: lecture.event.code,
       firstname: lecture.person.firstname,
       lastname: lecture.person.lastname,
-      affiliation: lecture.person.affiliation
+      affiliation: lecture.person.affiliation,
+      scheduled_time: Schedule.where(lecture: lecture).first.start_time
     }
     lecture.attributes.merge(extras)
   end

@@ -178,6 +178,7 @@ describe Api::V1::LecturesController, type: :request do
       end
 
       it "lectures_current returns an empty hash if there isn't one" do
+
         get "/api/v1/lectures_current/#{ERB::Util.url_encode(@room)}.json"
         json = JSON.parse(response.body)
         expect(json).to eq({})
@@ -223,6 +224,7 @@ describe Api::V1::LecturesController, type: :request do
         json = JSON.parse(response.body)
 
         expect(json['title']).to eq(@lecture.title)
+        expect(json['scheduled_time']).not_to be_nil
       end
 
       it 'lectures_last returns the last lecture of the day, if there is one' do
