@@ -144,13 +144,14 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
   def compose_data(lecture)
     return {} if lecture.blank?
-
+    schedule = Schedule.where(lecture: lecture).first
+    start_time = schedule.nil? ? '' : schedule.start_time
     extras = {
       event_code: lecture.event.code,
       firstname: lecture.person.firstname,
       lastname: lecture.person.lastname,
       affiliation: lecture.person.affiliation,
-      scheduled_time: Schedule.where(lecture: lecture).first.start_time
+      scheduled_time: start_time
     }
     lecture.attributes.merge(extras)
   end

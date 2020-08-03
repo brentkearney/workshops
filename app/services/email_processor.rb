@@ -13,7 +13,7 @@ class EmailProcessor
   end
 
   def process
-    return if skip_vacation_notices
+    return if @email.nil? || skip_vacation_notices
 
     extract_recipients.each do |list_params|
       EventMaillist.new(@email, list_params).send_message
@@ -69,6 +69,8 @@ class EmailProcessor
   def member_group(group)
     return 'orgs' if group.downcase == 'orgs' || group.downcase == 'organizers'
     return 'all' if group.downcase == 'all'
+    return 'speakers' if group.downcase == 'speakers'
+
     Membership::ATTENDANCE.each do |status|
       return status if group.titleize == status
     end

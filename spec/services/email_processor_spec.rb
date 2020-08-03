@@ -176,8 +176,14 @@ describe 'EmailProcessor' do
       params[:to] = ["#{event.code}-declined@example.com"]
       email = Griddler::Email.new(params)
       allow(UnauthorizedSubgroupBounceJob).to receive(:perform_later)
+
       EmailProcessor.new(email).process
-      expect(UnauthorizedSubgroupBounceJob).to have_received(:perform_later)
+      expect(UnauthorizedSubgroupBounceJob).to have_received(:perform_later).once
+
+      params[:to] = ["#{event.code}-speakers@example.com"]
+      email = Griddler::Email.new(params)
+      EmailProcessor.new(email).process
+      expect(UnauthorizedSubgroupBounceJob).to have_received(:perform_later).twice
     end
 
     it 'does not bounce email if non-organizer sends to authorized sub-group' do
@@ -297,6 +303,20 @@ describe 'EmailProcessor' do
         group: 'orgs'
       }
 
+      EmailProcessor.new(email).process
+      expect(EventMaillist).to have_received(:new).with(email, list_params)
+    end
+
+    it 'passes "speakers" from recipient email to EventMaillist, for orgs' do
+      params[:to] = ["#{event.code}-speakers@example.com"]
+      params[:from] = "#{organizer.person.name} <#{organizer.person.email}>"
+      email = Griddler::Email.new(params)
+
+      list_params = {
+                event: event,
+                destination: params[:to].first,
+                group: 'speakers'
+              }
       EmailProcessor.new(email).process
       expect(EventMaillist).to have_received(:new).with(email, list_params)
     end
