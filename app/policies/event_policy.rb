@@ -101,10 +101,7 @@ class EventPolicy
   def send_invitations?
     return false if current_user.nil?
     return false if Date.current > event.end_date
-    if @event.location == 'BIRS' || @event.location == 'EO' ||
-      @event.start_date < Date.parse('Jan 1, 2021')
-      organizers_and_staff
-    end
+    organizers_and_staff
   end
 
   def sync?
