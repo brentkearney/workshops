@@ -46,7 +46,7 @@ class DefaultSchedule
       next if used_items.include?(item)
       next if item.start_time.wday != eday.wday
 
-      @event.schedules.create!(item.attributes
+      @event.schedules.create(item.attributes
         .merge(id: nil,
                event_id: @event.id,
                start_time: change_to_event_date(item.start_time, eday),

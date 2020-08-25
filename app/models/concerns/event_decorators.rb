@@ -12,10 +12,11 @@ module EventDecorators
   end
 
   def days
-    day = DateTime.parse(start_date.to_s).noon #- 1.day
+    day = start_date.to_time.in_time_zone(time_zone).beginning_of_day
     days = [day]
     # Compare date strings so TZ issues don't interfere
-    datestring = DateTime.parse(end_date.to_s).strftime('%Y%m%d').to_s
+    end_of_ws = end_date.to_time.in_time_zone(time_zone).end_of_day
+    datestring = end_of_ws.strftime('%Y%m%d').to_s
     until day.strftime('%Y%m%d').to_s == datestring
       day += 1.day
       days << day
