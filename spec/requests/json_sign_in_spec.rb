@@ -48,6 +48,7 @@ RSpec.describe 'JSON API Sign-in', type: :request do
     )
     post url, params: params
     expect(response.header['Authorization']).to be_blank
+    expect(response.body).to eq('{"errors":{"status":"401","message":"Authentication failed."}}')
   end
 end
 

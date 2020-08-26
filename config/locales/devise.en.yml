@@ -16,7 +16,7 @@ en:
       last_attempt: "You have one more attempt before your account is locked."
       not_found_in_database: "Invalid %{authentication_keys} or password."
       timeout: "Your session expired. Please sign in again to continue."
-      unauthenticated: "You need to sign in or sign up before continuing."
+      unauthenticated: "Authentication failed."
       unconfirmed: "Please search your email (including spam/junk mail folders) for a message with the Subject: 'BIRS Workshops account confirmation', and click the link we sent you, to confirm your identity."
     mailer:
       confirmation_instructions:
