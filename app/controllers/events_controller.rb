@@ -8,7 +8,8 @@ class EventsController < ApplicationController
   before_action :set_event, :set_time_zone, :set_attendance,
                 only: [:show, :edit, :update, :destroy]
   before_action :authenticate_user!,
-                only: [:my_events, :new, :edit, :create, :update, :destroy]
+                only: [:my_events, :org_events, :new, :edit, :create, :update,
+                  :destroy]
   after_action :verify_policy_scoped, only: [:index, :past, :future, :kind]
 
   include EventsHelper
@@ -19,9 +20,17 @@ class EventsController < ApplicationController
     @events = policy_scope(Event)
   end
 
-  # Get /events/my_events
+  # GET /events/my_events
   def my_events
     @events = current_user.person.events.order(:start_date)
+    render :index unless performed?
+  end
+
+  # GET /events/org_events
+  def org_events
+    @events = current_user.person.memberships
+                          .select(&:organizer?).collect(&:event)
+
     render :index unless performed?
   end
 

@@ -47,11 +47,6 @@ class User < ApplicationRecord
       AND attendance = 'Confirmed'").count > 0
   end
 
-  def allow_api_access?
-    return true if self.staff?
-    person.memberships.where("role LIKE '%Org%'").count > 0
-  end
-
   def name
     person.name
   end

@@ -194,7 +194,43 @@
           expect(assigns(:events)).to eq([@past_event])
         end
       end
+    end
 
+    describe '#org_events' do
+      context 'as an unauthenticated user' do
+        it 'redirects to sign-in page' do
+          get :org_events
+
+          expect(response).to redirect_to(new_user_session_path)
+        end
+      end
+
+      context 'as an authenticated member user' do
+        let(:person) { build(:person) }
+        let(:user) { build(:user, person: person, role: 'member') }
+
+        before do
+          allow(request.env['warden']).to receive(:authenticate!).and_return(user)
+          allow(controller).to receive(:current_user).and_return(user)
+        end
+
+        it 'responds with success code' do
+          get :org_events
+
+          expect(response).to be_successful
+        end
+
+        it "assigns @events to events user is an organizer of" do
+          create(:membership, person: person, event: @event,
+            role: 'Participant')
+          create(:membership, person: person, event: @future_event,
+            role: 'Organizer')
+
+          get :org_events
+
+          expect(assigns(:events)).to match_array([@future_event])
+        end
+      end
     end
 
     describe '#past' do
