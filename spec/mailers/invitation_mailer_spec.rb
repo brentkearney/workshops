@@ -117,17 +117,17 @@ RSpec.describe InvitationMailer, type: :mailer do
     #   expect(body).to have_text("before #{rsvp_date}")
     # end
 
-    it 'sets date to 21 days in advance if event is < 3 months, 5 days away' do
-      @event.start_date = @today + 3.months
-      @event.end_date = @event.start_date + 5.days
-      @event.save
+    # it 'sets date to 21 days in advance if event is < 3 months, 5 days away' do
+    #   @event.start_date = @today + 3.months
+    #   @event.end_date = @event.start_date + 5.days
+    #   @event.save
 
-      InvitationMailer.invite(@invitation, @template).deliver_now
-      delivery = ActionMailer::Base.deliveries.first
-      body = delivery.body.empty? ? delivery.text_part : delivery.body
+    #   InvitationMailer.invite(@invitation, @template).deliver_now
+    #   delivery = ActionMailer::Base.deliveries.first
+    #   body = delivery.body.empty? ? delivery.text_part : delivery.body
 
-      rsvp_date = (@today + 21.days).strftime('%B %-d, %Y')
-      expect(body).to have_text("before #{rsvp_date}")
-    end
+    #   rsvp_date = (@today + 21.days).strftime('%B %-d, %Y')
+    #   expect(body).to have_text("before #{rsvp_date}")
+    # end
   end
 end
