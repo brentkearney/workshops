@@ -22,7 +22,7 @@ class Api::SessionsController < Devise::SessionsController
     sign_in(resource_name, resource)
     respond_with resource, location: after_sign_in_path_for(resource) do |format|
       format.json { render status: 200,
-                             json: { success: true, jwt: current_token,
+                             json: { success: 'true', jwt: current_token,
                                   message: "Authentication successful" } }
     end
   end
@@ -36,14 +36,14 @@ class Api::SessionsController < Devise::SessionsController
   def check_request_format
     unless request.format == :json
       sign_out
-      render status: 406, json: { success: false, message: "JSON requests only." } and return
+      render status: 406, json: { success: 'false', message: "JSON requests only." } and return
     end
   end
 
   def sign_out_and_respond(resource)
     revoke_token(resource)
     sign_out(resource)
-    render status: 401, json: { success: false, message: "No API access allowed." }
+    render status: 401, json: { success: 'false', message: "No API access allowed." }
   end
 
   def current_token
