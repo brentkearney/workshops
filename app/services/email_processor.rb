@@ -28,23 +28,25 @@ class EmailProcessor
       subject.match?("vacation notice") || subject.match?("away notice")
   end
 
-  # assembles valid maillists from To: and Cc: fields
+  # assembles valid maillists from To:, Cc:, Bcc: fields
   def extract_recipients
     maillists = []
     invalid_sender = false
     recipients = @email.to + @email.cc + @email.bcc
+    problem = ''
 
     recipients.each do |recipient|
       # Skip Outlook webmaster=webmaster@ auto-replies
       return [] if recipient[:full].match?(/(.+)=(.+)@/)
-      to_email = recipient[:email]
-      code = recipient[:token] # part before the @
-      group = 'Confirmed'
-      code, group = code.split('-') if code.match?(/-/)
+      to_email, code, group = extract_recipient(recipient)
 
-      if code.match?(/#{GetSetting.code_pattern}/)
+      unless code.match?(/#{GetSetting.code_pattern}/)
+        problem = 'Event code does not match valid code pattern.'
+      else
         event = Event.find(code)
-        unless event.blank?
+        if event.blank?
+          problem = 'Event with given code not found.'
+        else
           if valid_sender?(event, to_email, group)
             maillists << {
               event: event,
@@ -60,16 +62,25 @@ class EmailProcessor
 
     if maillists.empty? && !invalid_sender
       EmailInvalidCodeBounceJob.perform_later(email_params)
-      send_report({ recipients: recipients })
+      send_report({ problem: problem, recipients: recipients })
     end
 
     maillists
   end
 
+  def extract_recipient(recipient)
+    to_email = recipient[:email]
+    code = recipient[:token] # part before the @
+    group = 'Confirmed'
+    code, group = code.split('-') if code.match?(/-/)
+    return [to_email, code, group]
+  end
+
   def member_group(group)
-    return 'orgs' if group.downcase == 'orgs' || group.downcase == 'organizers'
-    return 'all' if group.downcase == 'all'
-    return 'speakers' if group.downcase == 'speakers'
+    group.downcase!
+    return 'orgs' if group == 'orgs' || group == 'organizers'
+    return 'all' if group == 'all'
+    return 'speakers' if group == 'speakers'
 
     Membership::ATTENDANCE.each do |status|
       return status if group.titleize == status
@@ -79,8 +90,8 @@ class EmailProcessor
   def valid_sender?(event, to_email, group)
     from_email = @email.from[:email].downcase.strip
     unless EmailValidator.valid?(from_email)
-      problem = { problem: "From: email is invalid: #{from_email}" }
-      send_report(problem)
+      Rails.logger.debug "\n\n*** Invalid from email: #{from_email}\n\n"
+      send_report({ problem: "From: email is invalid: #{from_email}" })
       return false
     end
     person = Person.find_by_email(from_email)
@@ -107,13 +118,13 @@ class EmailProcessor
     event.organizers + event.staff
   end
 
-  def send_report(other_info = nil)
+  def send_report(problem = nil)
     msg = {
-            problem: 'Mail list submission with invalid sender address',
+            problem: 'Unknown',
             email_params: email_params,
             email_object: @email.inspect
           }
-    msg.merge(other_info) unless other_info.nil?
+    msg.merge!(problem) unless problem.nil?
     StaffMailer.notify_sysadmin(@event, msg).deliver_now
   end
 

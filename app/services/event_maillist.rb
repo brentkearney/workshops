@@ -4,7 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# Receives Griddler:Email object, distributes message to confirmed members
+# Receives Griddler:Email object, distributes message to destination
 class EventMaillist
   def initialize(email, mailist_params)
     @email       = email
@@ -43,9 +43,6 @@ class EventMaillist
   end
 
   def send_to_orgs(message)
-    # @event.organizers.each do |member|
-    #   email_member(member, message)
-    # end
     to = ''
     @event.contact_organizers.each do |org|
       to << %Q("#{org.name}" <#{org.email}>, )

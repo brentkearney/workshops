@@ -62,7 +62,12 @@ class MaillistMailer < ApplicationMailer
   def workshop_organizers(message, recipients)
     location = message[:location]
     from = message[:from]
-    unless from.include?(GetSetting.site_setting('email_domain'))
+    bcc = ''
+
+    # If message is from staff, leave From: alone, and Bcc: from
+    if from.include?(GetSetting.site_setting('email_domain'))
+      bcc = from
+    else
       from = GetSetting.email(location, 'maillist_from')
     end
     reply_to = message[:from]
@@ -86,7 +91,7 @@ class MaillistMailer < ApplicationMailer
     Rails.logger.debug "to: #{to}\n\n"
     Rails.logger.debug "cc: #{cc}\n\n"
 
-    mail(to: to, cc: cc, from: from, reply_to: reply_to,
+    mail(to: to, cc: cc, bcc: bcc, from: from, reply_to: reply_to,
       subject: subject) do |format|
       format.html { render html: @html_body.html_safe } unless @html_body.blank?
       format.text { render text: @text_body }
