@@ -30,11 +30,6 @@ module ScheduleHelper
     link_text.html_safe
   end
 
-  def skip_day?(day)
-    day == @event.days.first && @current_user && @current_user.is_staff? &&
-      @event.location == 'BIRS'
-  end
-
   def time_limits(schedule)
     return unless schedule.staff_item
     unless schedule.earliest.nil?
