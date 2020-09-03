@@ -22,7 +22,11 @@
 class MaillistMailer < ApplicationMailer
   def workshop_maillist(message, recipient)
     location = message[:location]
-    from = GetSetting.email(location, 'maillist_from')
+    from = message[:from]
+    unless from.include?(GetSetting.site_setting('email_domain'))
+      from = GetSetting.email(location, 'maillist_from')
+    end
+
     reply_to = message[:from]
     subject = message[:subject]
     email_parts = message[:email_parts]
@@ -49,6 +53,40 @@ class MaillistMailer < ApplicationMailer
     end
 
     mail(to: recipient, from: from, reply_to: reply_to,
+      subject: subject) do |format|
+      format.html { render html: @html_body.html_safe } unless @html_body.blank?
+      format.text { render text: @text_body }
+    end
+  end
+
+  def workshop_organizers(message, recipients)
+    location = message[:location]
+    from = message[:from]
+    unless from.include?(GetSetting.site_setting('email_domain'))
+      from = GetSetting.email(location, 'maillist_from')
+    end
+    reply_to = message[:from]
+    subject = message[:subject]
+    email_parts = message[:email_parts]
+    @text_body = email_parts[:text_body]
+    @html_body = email_parts[:html_body]
+    inline_attachments = email_parts[:inline_attachments]
+
+    to = recipients[:to]
+    cc = recipients[:cc]
+    if to.blank?
+      to = cc
+      cc = ''
+    end
+
+    Rails.logger.debug "\n\nMaillistMailer.workshop_organizers received:\n"
+    Rails.logger.debug "message: #{message.inspect}\n\n"
+    Rails.logger.debug "recipients: #{recipients.inspect}\n\n"
+    Rails.logger.debug "from: #{from}\n\n"
+    Rails.logger.debug "to: #{to}\n\n"
+    Rails.logger.debug "cc: #{cc}\n\n"
+
+    mail(to: to, cc: cc, from: from, reply_to: reply_to,
       subject: subject) do |format|
       format.html { render html: @html_body.html_safe } unless @html_body.blank?
       format.text { render text: @text_body }

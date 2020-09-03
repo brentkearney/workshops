@@ -12,6 +12,21 @@ RSpec.describe MaillistMailer, type: :mailer do
     expect(ActionMailer::Base.deliveries.count).to eq(1)
   end
 
+  before do
+    @msg = {
+      location: 'EO',
+      from: '"Email Sender" <sender@domain.com>',
+      to: '"Workshop Maillist" <19w5020@example.com>',
+      subject: '[19w5020] Test subject',
+      body: 'This is a test message.',
+      email_parts: {
+        text_body: 'This is a test message.',
+        html_body: '',
+        inline_attachments: {}
+      }
+    }
+  end
+
   before :each do
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
@@ -23,20 +38,51 @@ RSpec.describe MaillistMailer, type: :mailer do
     Event.destroy_all
   end
 
+  describe '.workshop_organizers' do
+    before do
+      @recipients = { to: %Q("Contact Organizer" <contact@example.com>), cc: %Q("Supporting Organizer 1" <org1@example.com>, "Supporting Organizer 2" <org2@example.com>) }
+      @resp = MaillistMailer.workshop_organizers(@msg, @recipients).deliver_now
+      @sent_message = ActionMailer::Base.deliveries.first
+    end
+
+    it 'sends email' do
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+    end
+
+    it 'responds with a Mail::Message object' do
+      expect(@resp.class).to eq(Mail::Message)
+    end
+
+    it 'From: is specified in Settings:Email:maillist_from' do
+      location = @msg[:location]
+      from_email = GetSetting.email(location, 'maillist_from')
+      email_obj = Mail::Address.new(from_email)
+      expect(@sent_message.from).to eq([email_obj.address])
+    end
+
+    it 'From: is the same as the original sender, if domain matches local' do
+      domain = GetSetting.site_setting('email_domain')
+      from_address = "staff@#{domain}"
+      @msg.merge!({from: from_address})
+      resp = MaillistMailer.workshop_organizers(@msg, @recipients).deliver_now
+      expect(ActionMailer::Base.deliveries.last.from).to eq(["#{from_address}"])
+    end
+
+    it 'Reply-to: is the sender' do
+      expect(@msg[:from]).to include(@sent_message.reply_to.first)
+    end
+
+    it 'To: is the given recipient' do
+      expect(@sent_message.to).to eq(@sent_message.to_addrs)
+    end
+
+    it 'Message body is the passed-in body' do
+      expect(@sent_message.body.raw_source.strip).to eq(@msg[:body].strip)
+    end
+  end
+
   describe '.workshop_maillist' do
     before do
-      @msg = {
-        location: 'EO',
-        from: '"Email Sender" <sender@domain.com>',
-        to: '"Workshops" <workshops@example.com>',
-        subject: '[19w5020] Test subject',
-        body: 'This is a test message.',
-        email_parts: {
-          text_body: 'This is a test message.',
-          html_body: '',
-          inline_attachments: {}
-        }
-      }
       @recipient = %Q("Test User" <testuser@example.com>)
       @resp = MaillistMailer.workshop_maillist(@msg, @recipient).deliver_now
       @sent_message = ActionMailer::Base.deliveries.first
@@ -57,6 +103,14 @@ RSpec.describe MaillistMailer, type: :mailer do
       expect(@sent_message.from).to eq([email_obj.address])
     end
 
+    it 'From: is the same as the original sender, if domain matches local' do
+      domain = GetSetting.site_setting('email_domain')
+      from_address = "staff@#{domain}"
+      @msg.merge!({from: from_address})
+      resp = MaillistMailer.workshop_maillist(@msg, @recipient).deliver_now
+      expect(ActionMailer::Base.deliveries.last.from).to eq(["#{from_address}"])
+    end
+
     it 'Reply-to: is the sender' do
       expect(@msg[:from]).to include(@sent_message.reply_to.first)
     end
@@ -66,7 +120,7 @@ RSpec.describe MaillistMailer, type: :mailer do
     end
 
     it 'Message body is the passed-in body' do
-      expect(@sent_message.body.raw_source.chomp).to eq(@msg[:body])
+      expect(@sent_message.body.raw_source.strip).to eq(@msg[:body].strip)
     end
   end
 end

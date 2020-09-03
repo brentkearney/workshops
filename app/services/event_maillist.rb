@@ -38,9 +38,34 @@ class EventMaillist
     end
   end
 
+  def remove_trailing_comma(str)
+      str.blank? ? '' : str.chomp(",")
+  end
+
   def send_to_orgs(message)
-    @event.organizers.each do |member|
-      email_member(member, message)
+    # @event.organizers.each do |member|
+    #   email_member(member, message)
+    # end
+    to = ''
+    @event.contact_organizers.each do |org|
+      to << %Q("#{org.name}" <#{org.email}>, )
+    end
+    to = remove_trailing_comma(to)
+    cc = ''
+    @event.supporting_organizers.each do |org|
+      cc << %Q("#{org.name}" <#{org.email}>, )
+    end
+    cc = remove_trailing_comma(cc)
+    recipients = { to: to, cc: cc }
+
+    if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
+      recipients = { to: GetSetting.site_email('webmaster_email'), cc: '' }
+    end
+
+    begin
+      resp = MaillistMailer.workshop_organizers(message, recipients).deliver_now
+    rescue
+      StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
     end
   end
 

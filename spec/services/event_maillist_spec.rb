@@ -94,12 +94,12 @@ describe 'EventMaillist' do
 
       maillist = EventMaillist.new(subject, list_params)
       mailer = double('MaillistMailer')
-      allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
+      allow(MaillistMailer).to receive(:workshop_organizers).and_return(mailer)
       expect(mailer).to receive(:deliver_now).exactly(1).times
 
       maillist.send_message
 
-      expect(MaillistMailer).to have_received(:workshop_maillist)
+      expect(MaillistMailer).to have_received(:workshop_organizers)
                                   .exactly(1).times
     end
 

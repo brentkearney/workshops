@@ -124,8 +124,16 @@ module EventDecorators
     organizers
   end
 
+  def supporting_organizers
+    organizers = []
+    memberships.where(role: 'Organizer').each do |org_member|
+      organizers << org_member.person
+    end
+    organizers
+  end
+
   def staff
-    staff = User.where(role: 1, location: self.location).map {|s| s.person }
+    staff = User.where(role: :staff, location: self.location).map {|s| s.person }
     admins = User.where('role > 1').map {|a| a.person }
     staff + admins
   end

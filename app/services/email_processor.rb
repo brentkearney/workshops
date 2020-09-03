@@ -78,7 +78,11 @@ class EmailProcessor
 
   def valid_sender?(event, to_email, group)
     from_email = @email.from[:email].downcase.strip
-    send_report and return false unless EmailValidator.valid?(from_email)
+    unless EmailValidator.valid?(from_email)
+      problem = { problem: "From: email is invalid: #{from_email}" }
+      send_report(problem)
+      return false
+    end
     person = Person.find_by_email(from_email)
 
     return true if organizers_and_staff(event).include?(person)
