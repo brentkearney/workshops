@@ -37,6 +37,10 @@
             <%= f.time_select :end_time, {}, { class: 'form-control' } %>
           </td>
         </tr>
+        <tr>
+          <td class="form-group">Timezone:</td>
+          <td class="form-group select-times"><%= @event.time_zone %>, <%= @event.days.first.strftime('%Z') %> (UTC<%= @event.days.first.strftime('%z') %>)</td>
+        </tr>
       </table>
     </div>
     <!-- /.form-group .col-xl-6 -->
