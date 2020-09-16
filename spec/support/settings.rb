@@ -25,6 +25,7 @@ if Setting.find_by(var: 'Site').blank?
     'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'],
     'rsvp_expiry' => '1.month',
     'email_domain' => 'workshops.example.com',
+    'maillist_domain' => 'lists.example.com',
     'LECTURES_API_KEY' => '0123456789',
     'EVENTS_API_KEY' => '0123456789',
     'SPARKPOST_AUTH_TOKEN' => '1234'

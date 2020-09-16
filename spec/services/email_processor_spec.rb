@@ -53,7 +53,7 @@ describe 'EmailProcessor' do
 
     it 'does not bounce email if at least one of multiple recipients is valid' do
       params[:to] = ['any@example.com', 'thing@example.com', "#{event.code}@example.com"]
-      email = Griddler::Email.new(params)
+      email = Griddler::Email.new(params.merge(from: organizer.person.email))
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
       expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
@@ -68,7 +68,7 @@ describe 'EmailProcessor' do
 
     it 'does not bounce email if valid address is in the Cc: field' do
       params.merge!(cc: ["#{event.code}@example.com", 'foo@bar.com'])
-      email = Griddler::Email.new(params)
+      email = Griddler::Email.new(params.merge(from: organizer.person.email))
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
       expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
@@ -76,7 +76,7 @@ describe 'EmailProcessor' do
 
     it 'does not bounce email if valid address is in the Bcc: field' do
       params.merge!(bcc: ["#{event.code}@example.com", 'foo@bar.com'])
-      email = Griddler::Email.new(params)
+      email = Griddler::Email.new(params.merge(from: organizer.person.email))
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
       expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
@@ -102,6 +102,7 @@ describe 'EmailProcessor' do
       it 'Out of Office' do
         params[:subject] = "Re: Out of Office"
         email = Griddler::Email.new(params)
+        EmailProcessor.new(email).process
         expect(EventMaillist).not_to have_received(:new)
       end
 
@@ -247,11 +248,12 @@ describe 'EmailProcessor' do
       params[:from] = 'invalid-email@foo'
       email = Griddler::Email.new(params)
       mailer = double('StaffMailer')
-      expect(mailer).to receive(:deliver_now)
+      # once for invalid email, another for not being a valid sender
+      expect(mailer).to receive(:deliver_now).twice
       allow(StaffMailer).to receive(:notify_sysadmin).and_return(mailer)
 
       EmailProcessor.new(email).process
-      expect(StaffMailer).to have_received(:notify_sysadmin)
+      expect(StaffMailer).to have_received(:notify_sysadmin).twice
     end
   end
 

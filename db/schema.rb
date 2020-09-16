@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_12_182731) do
+ActiveRecord::Schema.define(version: 2020_09_16_002807) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -183,6 +183,17 @@ ActiveRecord::Schema.define(version: 2020_06_12_182731) do
     t.datetime "earliest"
     t.datetime "latest"
     t.index ["event_id"], name: "index_schedules_on_event_id"
+  end
+
+  create_table "sentmails", force: :cascade do |t|
+    t.string "message_id"
+    t.string "sender"
+    t.string "recipient"
+    t.string "subject"
+    t.datetime "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_id"], name: "index_sentmails_on_message_id"
   end
 
   create_table "sessions", id: :serial, force: :cascade do |t|

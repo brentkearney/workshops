@@ -53,6 +53,12 @@ class BounceMailer < ApplicationMailer
     mail(to: @email_from, from: @webmaster, subject: @subject)
   end
 
+  def bounce_or_vacation_notice?(subject)
+    subject = subject.downcase
+    subject.include?("bounce notice: bounce notice") || subject.include?("out of office") ||
+      subject.include?("vacation notice") || subject.include?("away notice")
+  end
+
   def bounced_email(params)
     @webmaster = GetSetting.site_email('webmaster_email')
     bounce_address = GetSetting.site_email('bounce_address')
@@ -60,6 +66,7 @@ class BounceMailer < ApplicationMailer
     @email_from = params[:from]
     @email_to = params[:recipient]
     @email_subject = params[:subject] || 'no subject'
+    return if bounce_or_vacation_notice?(@email_subject)
     @email_date = params[:date]
     @attachments = params[:attachments]
     @status = params[:status]
