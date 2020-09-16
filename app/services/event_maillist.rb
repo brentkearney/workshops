@@ -36,6 +36,18 @@ class EventMaillist
     else
       send_to_attendance_group(message)
     end
+
+    record_sent_mail(subject)
+  end
+
+  def record_sent_mail(subject)
+    Sentmail.create(
+      message_id: @email.headers["Message-Id"],
+      sender: @email.from[:full],
+      recipient: @email.to[0][:full],
+      subject: subject,
+      date: DateTime.now
+    )
   end
 
   def remove_trailing_comma(str)
@@ -106,7 +118,11 @@ class EventMaillist
     begin
       resp = MaillistMailer.workshop_maillist(message, recipient).deliver_now
     rescue
-      StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
+      msg = { problem: 'MaillistMailer.workshop_maillist failed.',
+              recipient: recipient,
+              message: message,
+              response: resp }
+      StaffMailer.notify_sysadmin(@event.id, msg).deliver_now
     end
   end
 end

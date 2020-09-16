@@ -126,6 +126,30 @@ describe 'EmailProcessor' do
     end
   end
 
+
+  context 'validates Message-Id' do
+    it "does not send message if it has already been sent" do
+      message_id = 'b901cee7-e49a-4330-9ee2-3fc28c6343cb@domain.edu'
+      params[:headers] = {'Message-Id' => message_id}
+      params[:to] = ["#{event.code}@example.com"]
+      params[:from] = organizer.person.email
+
+      ActionMailer::Base.deliveries.clear
+      allow(MaillistMailer).to receive(:workshop_maillist).and_call_original
+      EmailProcessor.new(Griddler::Email.new(params)).process
+      expect(MaillistMailer).to have_received(:workshop_maillist)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+
+      message_record = Sentmail.find_by_message_id(message_id)
+      expect(message_record).not_to be_nil
+
+      allow(EventMaillist).to receive(:new)
+      EmailProcessor.new(Griddler::Email.new(params)).process
+      expect(EventMaillist).not_to have_received(:new)
+    end
+  end
+
+
   context 'validates sender' do
     before do
       params[:to] = ["#{event.code}@example.com"]
@@ -256,6 +280,7 @@ describe 'EmailProcessor' do
       expect(StaffMailer).to have_received(:notify_sysadmin).twice
     end
   end
+
 
   context '.process delivers email to maillist' do
     before do

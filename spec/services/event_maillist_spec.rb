@@ -14,7 +14,8 @@ describe 'EventMaillist' do
     from: 'Webby Webmaster <webmaster@example.net>',
     subject: 'Testing email processing',
     text: 'A Test Message.',
-    Date: "Tue, 25 Sep 2018 16:17:17 -0600"
+    Date: "Tue, 25 Sep 2018 16:17:17 -0600",
+    headers: {'Message-Id' => '1234-safas-98y6@uni.edu'}
   }
   end
 
@@ -148,6 +149,22 @@ describe 'EventMaillist' do
       maillist.send_message
       expect(MaillistMailer).to have_received(:workshop_maillist)
                                   .exactly(speaker_count).times
+    end
+
+
+    it "records the email's Message-Id in the database when message is sent" do
+      num_participants = event.attendance(status).count
+      expect(@mailer).to receive(:deliver_now).exactly(num_participants).times
+      @maillist.send_message
+
+      message_id = params[:headers]['Message-Id']
+      message_record = Sentmail.find_by_message_id(message_id)
+
+      expect(message_record).not_to be_nil
+      expect(message_record.sender).to eq(params[:from])
+      expect(message_record.recipient).to eq(params[:to].first)
+      updated_subject = "[#{event.code}] #{params[:subject]}"
+      expect(message_record.subject).to eq(updated_subject)
     end
   end
 end

@@ -13,7 +13,7 @@ class EmailProcessor
   end
 
   def process
-    return if @email.nil? || skip_vacation_notices
+    return if @email.nil? || skip_vacation_notices || already_delivered
 
     extract_recipients.each do |list_params|
       EventMaillist.new(@email, list_params).send_message
@@ -26,6 +26,11 @@ class EmailProcessor
     subject = @email.subject.downcase
     subject.include?("bounce notice") || subject.include?("out of office") ||
       subject.include?("vacation notice") || subject.include?("away notice")
+  end
+
+  def already_delivered
+    message_id = @email.headers["Message-Id"]
+    !Sentmail.find_by_message_id(message_id).nil?
   end
 
   # assembles valid maillists from To:, Cc:, Bcc: fields
