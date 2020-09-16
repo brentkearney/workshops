@@ -59,30 +59,38 @@ Installation instructions are below.
    [Administrate](https://github.com/thoughtbot/administrate) gem. Allows for easy searching, adding, and editing of database records.
 
 ## Upcoming Features:
-*  E-mail Template Management - an interface for creating, editing, managing various e-mail templates used in the application, to be
+*  [E-mail Template Management](https://github.com/brentkearney/workshops/projects/1#card-18591813) - an interface for creating, editing, managing various e-mail templates used in the application, to be
    stored in the database instead of static files. Associate letter templates with types of events, roles of event participants, or other criteria. Schedule automated sending of certain letters to certain groups based on arbitrary conditions.
+   
+*  [Task scheduler](https://github.com/brentkearney/workshops/projects/1#card-18591759), to allow automated performance of tasks such as sending reminder emails for participants to RSVP, sending emails after events end to request feedback, etc.
 
-*  After-event feedback forms - automatically mail participants after an event, with one-click URL for providing feedback on the event.
+*  [Feedback form](https://github.com/brentkearney/workshops/projects/1#card-18590622) for participants after an event, with one-click URL for providing feedback on their experience of an event.
 
-*  Drag & drop interface for scheduling features.
+*  [Nametag creator](https://github.com/brentkearney/workshops/projects/1#card-18734072) for creating branded conference name-tags.
 
-*  Payment system for accepting credit card or cryptocurrency payments/contributions
+*  [Group photos](https://github.com/brentkearney/workshops/projects/1#card-18734194) - an interface for uploading official group photos, and possibly for participants to upload other photos from the event.
 
-*  Staff can assign hotel rooms, generate reports for hotel room bookings, and manage other hospitality details for workshop participants.
+*  [Rooming feature](https://github.com/brentkearney/workshops/projects/1#card-18590652) - Staff can assign hotel rooms, generate reports for hotel room bookings, and manage other hospitality details for workshop participants.
 
-*  Task scheduler, to allow automated performance of tasks such as reminder emails for participants to RSVP, after event feedback requests, etc.
+*  [New schedule interface](https://github.com/brentkearney/workshops/projects/1#card-18590699), with drag & drop of schedule items.
+
+*  Easier participant management for staff - update status of a selection of participants at once, i.e. changing them from Invited to Confirmed attendance status, [quick-view on name click](https://github.com/brentkearney/workshops/tree/member_review) to see essential details in a pop-up, edit staff notes, etc.
+
+*  Lecture video management interface - so participants can easily view their recorded talks, sign consent forms, add slides files, update abstracts.
+
+*  Payment system for accepting credit card or cryptocurrency payments, as donations or registration fee.
 
 *  Admin users can manage other users (add/remove/change passwords, etc) - currently they can only change their own passwords.
 
 *  When organizers schedule a participant to give a talk, members optionally get notified with a link to fill in the talk title and abstract.
 
-*  Interface for managing Lectures, so participants can easily view all of the talks they've recorded, sign consent forms, add slides files, update abstracts.
-
 *  API integration with the Visual One room booking software, used by many hotels and conference centers, for automatic room booking.
 
-*  Addition of integrated forum software for each workshop, such as [Discourse](http://www.discourse.org), or possiblly Slack-alternative [Mattermost](https://mattermost.com).
+*  Addition of integrated forum software for each workshop, such as [Discourse](http://www.discourse.org), or possiblly Slack-alternative [Mattermost](https://mattermost.com) or [Zulip](https://zulipchat.com).
 
 *  Crowd-sourcing feature for workshop participants to post open problems to the public, soliciting solutions.
+
+
 
 ## Installation Instructions
 
