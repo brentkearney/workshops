@@ -8,4 +8,12 @@
 
 class Sentmail < ApplicationRecord
   validates :message_id, presence: true
+  validate :one_message_per_recipient
+
+
+  def one_message_per_recipient
+    if Sentmail.where(message_id: message_id, recipient: recipient).count > 0
+      errors.add(:message_id, "message already sent to #{recipient}")
+    end
+  end
 end

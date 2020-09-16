@@ -41,21 +41,29 @@ class EventMaillist
   end
 
   def record_sent_mail(subject)
-    message_id_key = @email.headers.keys.detect { |k| k.downcase == 'message-id' }
+    msg_id_key = @email.headers.keys.detect { |k| k.downcase == 'message-id' }
+    msg_id = @email.headers[msg_id_key]
+    if msg_id.blank?
+      Rails.logger.debug "\n\nNo Message-ID found in email! Cannot log it.\n\n"
+      return
+    end
+    message_id = msg_id.match?('<') ? msg_id.match(/\<(.*)\>/)[1] : msg_id
     message = {
-      message_id: @email.headers[message_id_key],
+      message_id: message_id,
       sender: @email.from[:full],
       recipient: @email.to[0][:full],
       subject: subject,
       date: DateTime.now
     }
 
-    begin
-      Sentmail.create!(message)
-    rescue
+    record = Sentmail.new(message)
+    if record.valid?
+      record.save
+    else
       msg = {
         problem: 'Failed to create Sentmail record for mail list posting.',
         data: message,
+        error: record.errors.full_messages,
         email: @email
       }
       StaffMailer.notify_sysadmin(@event.id, msg).deliver_now

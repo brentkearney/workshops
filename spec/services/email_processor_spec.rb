@@ -14,7 +14,8 @@ describe 'EmailProcessor' do
     from: 'Webmaster <webmaster@example.net>',
     subject: 'Testing email processing',
     text: 'A Test Message.',
-    Date: "Tue, 25 Sep 2018 16:17:17 -0600"
+    Date: "Tue, 25 Sep 2018 16:17:17 -0600",
+    headers: {'Message-Id' => 'b901cee7-e49a-4330-9ee2-3fc28c6343cb@domain.edu'}
   }
   end
 
@@ -128,7 +129,7 @@ describe 'EmailProcessor' do
 
 
   context 'validates Message-Id' do
-    it "does not send message if it has already been sent" do
+    it "does not send workshop maillist message if it has already been sent" do
       message_id = 'b901cee7-e49a-4330-9ee2-3fc28c6343cb@domain.edu'
       params[:headers] = {'Message-Id' => message_id}
       params[:to] = ["#{event.code}@example.com"]
@@ -138,6 +139,28 @@ describe 'EmailProcessor' do
       allow(MaillistMailer).to receive(:workshop_maillist).and_call_original
       EmailProcessor.new(Griddler::Email.new(params)).process
       expect(MaillistMailer).to have_received(:workshop_maillist)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+
+      message_record = Sentmail.find_by_message_id(message_id)
+      expect(message_record).not_to be_nil
+
+      allow(EventMaillist).to receive(:new)
+      EmailProcessor.new(Griddler::Email.new(params)).process
+      expect(EventMaillist).not_to have_received(:new)
+    end
+
+    it "does not send workshop organizer maillist message more than once" do
+      message_id = 'saA3H-4330-9ee2-7y4flasd025@domain.edu'
+      params[:headers] = {'Message-Id' => message_id}
+      params[:to] = ["#{event.code}-organizers@example.com"]
+      membership.attendance = 'Confirmed'
+      membership.save
+      params[:from] = membership.person.email
+
+      ActionMailer::Base.deliveries.clear
+      allow(MaillistMailer).to receive(:workshop_organizers).and_call_original
+      EmailProcessor.new(Griddler::Email.new(params)).process
+      expect(MaillistMailer).to have_received(:workshop_organizers)
       expect(ActionMailer::Base.deliveries.count).to eq 1
 
       message_record = Sentmail.find_by_message_id(message_id)
@@ -216,7 +239,7 @@ describe 'EmailProcessor' do
       membership.person = person
       membership.attendance = 'Confirmed'
       membership.save
-      params[:to] = ["#{event.code}-all@example.com"]
+      params[:to] = ["#{event.code}@example.com"]
       email = Griddler::Email.new(params)
       allow(UnauthorizedSubgroupBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
@@ -350,6 +373,7 @@ describe 'EmailProcessor' do
 
     it 'passes "all" from recipient email to EventMaillist' do
       params[:to] = ["#{event.code}-all@example.com"]
+      params[:from] = organizer.person.email
       email = Griddler::Email.new(params)
       list_params = {
         event: event,

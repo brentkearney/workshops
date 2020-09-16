@@ -13,9 +13,10 @@ class EmailProcessor
   end
 
   def process
-    return if @email.nil? || skip_vacation_notices || already_delivered
+    return if @email.nil? || skip_vacation_notices
 
     extract_recipients.each do |list_params|
+      next if already_delivered?(list_params[:destination])
       EventMaillist.new(@email, list_params).send_message
     end
   end
@@ -28,16 +29,19 @@ class EmailProcessor
       subject.include?("vacation notice") || subject.include?("away notice")
   end
 
-  def already_delivered
+  def already_delivered?(recipient)
     msg_id_key = @email.headers.keys.detect { |k| k.downcase == 'message-id' }
-    !Sentmail.find_by_message_id(@email.headers[msg_id_key]).nil?
+    msg_id = @email.headers[msg_id_key]
+    return if msg_id.blank?
+    message_id = msg_id.match?('<') ? msg_id.match(/\<(.*)\>/)[1] : msg_id
+    !Sentmail.where(message_id: message_id, recipient: recipient).empty?
   end
 
   # assembles valid maillists from To:, Cc:, Bcc: fields
   def extract_recipients
     recipients = @email.to + @email.cc + @email.bcc
 
-    unless @email.recipient.blank?
+    unless @email.recipient.blank? || recipients.include?(@email.recipient)
       rcpt = @email.recipient
       email = rcpt.match?('<') ? rcpt.match(/\<(.*)\>/)[1] : rcpt
       email_name = rcpt.match?('<') ? rcpt.match(/^(.*)\</)[1] : ''
@@ -81,7 +85,7 @@ class EmailProcessor
       # Skip Outlook webmaster=webmaster@ auto-reply messages
       next if recipient[:full].match?(/(.+)=(.+)@/)
 
-      # maillist_domain sends a list of Workshops maillists, skip it
+      # messages from maillist_domain include a list of Workshops mailists
       next if recipient[:email].include?("#{maillist_domain}")
 
       to_email, code, group = extract_recipient(recipient)
@@ -135,8 +139,8 @@ class EmailProcessor
       send_report({ problem: "From: email is invalid: #{from_email}." })
       return false
     end
-    person = Person.find_by_email(from_email)
 
+    person = Person.find_by_email(from_email)
     return true if organizers_and_staff(event).include?(person)
 
     params = email_params.merge(event_code: event.code, to: to_email)
@@ -152,7 +156,7 @@ class EmailProcessor
 
   # groups that Confirmed participants (non-organizers) may send to
   def allowed_group?(group)
-    %w(confirmed all orgs organizers).include?(group.downcase)
+    %w(confirmed orgs organizers).include?(group.downcase)
   end
 
   def organizers_and_staff(event)
