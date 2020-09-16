@@ -29,8 +29,8 @@ class EmailProcessor
   end
 
   def already_delivered
-    message_id = @email.headers["Message-Id"]
-    !Sentmail.find_by_message_id(message_id).nil?
+    msg_id_key = @email.headers.keys.detect { |k| k.downcase == 'message-id' }
+    !Sentmail.find_by_message_id(@email.headers[msg_id_key]).nil?
   end
 
   # assembles valid maillists from To:, Cc:, Bcc: fields

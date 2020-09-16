@@ -41,13 +41,25 @@ class EventMaillist
   end
 
   def record_sent_mail(subject)
-    Sentmail.create(
-      message_id: @email.headers["Message-Id"],
+    message_id_key = @email.headers.keys.detect { |k| k.downcase == 'message-id' }
+    message = {
+      message_id: @email.headers[message_id_key],
       sender: @email.from[:full],
       recipient: @email.to[0][:full],
       subject: subject,
       date: DateTime.now
-    )
+    }
+
+    begin
+      Sentmail.create!(message)
+    rescue
+      msg = {
+        problem: 'Failed to create Sentmail record for mail list posting.',
+        data: message,
+        email: @email
+      }
+      StaffMailer.notify_sysadmin(@event.id, msg).deliver_now
+    end
   end
 
   def remove_trailing_comma(str)
