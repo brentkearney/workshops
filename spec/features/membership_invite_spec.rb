@@ -137,7 +137,7 @@ describe 'Invite Members', type: :feature do
     end
 
     it 'shows the "Reply-by" date' do
-      expect(page).to have_text(RsvpDeadline.new(@event.start_date).rsvp_by)
+      expect(page).to have_text(RsvpDeadline.new(@event).rsvp_by)
     end
 
     it 'shows how many spots are left, given max participants' do

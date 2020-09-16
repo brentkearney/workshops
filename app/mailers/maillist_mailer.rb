@@ -22,7 +22,14 @@
 class MaillistMailer < ApplicationMailer
   def workshop_maillist(message, recipient)
     location = message[:location]
-    from = GetSetting.email(location, 'maillist_from')
+    from = message[:from]
+
+    # Unless message is from staff, use maillist_from setting
+    local_domain = GetSetting.site_setting('email_domain')
+    unless local_domain.blank? || from.include?("#{local_domain}")
+      from = GetSetting.email(location, 'maillist_from')
+    end
+
     reply_to = message[:from]
     subject = message[:subject]
     email_parts = message[:email_parts]
@@ -49,6 +56,41 @@ class MaillistMailer < ApplicationMailer
     end
 
     mail(to: recipient, from: from, reply_to: reply_to,
+      subject: subject) do |format|
+      format.html { render html: @html_body.html_safe } unless @html_body.blank?
+      format.text { render text: @text_body }
+    end
+  end
+
+  def workshop_organizers(message, recipients)
+    location = message[:location]
+    from = message[:from]
+    bcc = ''
+
+    # Unless message is from staff, use maillist_from setting
+    local_domain = GetSetting.site_setting('email_domain')
+    unless local_domain.blank? || from.include?("#{local_domain}")
+      from = GetSetting.email(location, 'maillist_from')
+    end
+
+    reply_to = message[:from]
+    subject = message[:subject]
+    email_parts = message[:email_parts]
+    @text_body = email_parts[:text_body]
+    @html_body = email_parts[:html_body]
+    inline_attachments = email_parts[:inline_attachments]
+
+    to = recipients[:to]
+    cc = recipients[:cc]
+    if to.blank?
+      to = cc
+      cc = ''
+    end
+
+    # Use local mail server for these
+    self.delivery_method = :smtp
+
+    mail(to: to, cc: cc, bcc: bcc, from: from, reply_to: reply_to,
       subject: subject) do |format|
       format.html { render html: @html_body.html_safe } unless @html_body.blank?
       format.text { render text: @text_body }

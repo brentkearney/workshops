@@ -48,6 +48,34 @@ RSpec.describe 'JSON API Sign-in', type: :request do
     )
     post url, params: params
     expect(response.header['Authorization']).to be_blank
+    expect(response.body).to eq('{"errors":{"status":"401","message":"Authentication failed. You need to sign in or sign up before continuing."}}')
+  end
+
+  it 'does not allow API access for non-staff, non-organizers' do
+    @user.member!
+    post url, params: @valid_params
+    resp = JSON.parse(response.body.as_json)
+
+    expect(resp['success']).to eq("false")
+    expect(resp['message']).to eq('No API access allowed.')
+    @user.staff!
+  end
+
+  it 'allows API access for organizers' do
+    organizer = @event.organizers.sample
+    user = create(:user, email: organizer.email, person: organizer)
+    params = @valid_params.merge(
+      api_user: {
+        email: user.email,
+        password: user.password
+      }
+    )
+    post url, params: params
+    resp = JSON.parse(response.body.as_json)
+
+    expect(resp['success']).to eq("true")
+    expect(resp['message']).to eq('Authentication successful')
+    expect(resp['jwt']).not_to be_blank
   end
 end
 

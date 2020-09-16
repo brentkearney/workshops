@@ -28,12 +28,8 @@ class ApplicationController < ActionController::Base
 
   def set_event
     event_id = validate_event_id
-    if event_id.nil?
-      redirect_to events_future_path, error: 'Invalid event id.'
-    else
-      @event = Event.find(event_id)
-      redirect_to events_future_path, error: 'Invalid event id.' if @event.nil?
-    end
+    @event = event_id.nil? ? nil : Event.find(event_id)
+    redirect_to events_future_path, error: 'Invalid event id.' if @event.nil?
   end
 
   def set_time_zone
@@ -49,7 +45,7 @@ class ApplicationController < ActionController::Base
   private
 
   def not_found
-    redirect_to events_path, error: 'Record not found.'
+    redirect_to events_future_path, error: 'Record not found.'
   end
 
   def authenticate_user!(*args)
@@ -59,8 +55,8 @@ class ApplicationController < ActionController::Base
 
   def validate_event_id
     event_id = params[:event_id] || params[:id]
-    (event_id =~ /\A\d+\Z/ ||
-      event_id =~ /#{Setting.Site['code_pattern']}/) ? event_id : nil
+    (event_id.match?(/\A\d+\Z/) ||
+      event_id.match?(/#{Setting.Site['code_pattern']}/)) ? event_id : nil
   end
 
   def invalid_auth_token

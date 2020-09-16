@@ -43,7 +43,7 @@ nav, .footer, .add-item-buttons, .delete-item-buttons,
 
 /* Remove printing of URLs */
 @media print {
-  a[href]:after {
+  a[href]::after {
     content: none !important;
   }
   .no-print { display:none }

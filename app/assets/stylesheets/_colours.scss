@@ -1,28 +1,28 @@
-$background: #E5E5E5;
-$foreground: #FFFFFF;
+$background: #e5e5e5;
+$foreground: #fff;
 
-$logo: #073A6B;
+$logo: #073a6b;
 $grey-heading: #535353;
-$grey-border: #7D7D7D;
+$grey-border: #7d7d7d;
 $blue-border: #183660;
-$light-border: #cccccc;
+$light-border: #ccc;
 
 $dark-text: #262626;
 
-$primary-background-color: #F5F5F5;
-$secondary-background-color: #237CBE;
+$primary-background-color: #f5f5f5;
+$secondary-background-color: #237cbe;
 $primary-text-color: #444;
 $secondary-text-color: #777;
-$primary-link-color: #2E6AA0;
-$secondary-link-color: #FFF;
-$errors-background-color: #FFC;
-$errors-text-color: #DC3D3D;
+$primary-link-color: #2e6aa0;
+$secondary-link-color: #fff;
+$errors-background-color: #ffc;
+$errors-text-color: #dc3d3d;
 $subdued-color: darken($primary-background-color, 20%);
-$flash-notice-color: #DBFFDD;
-$flash-alert-color:  #FFE1DE;
-$accent-color: #FAFBFF;
+$flash-notice-color: #dbffdd;
+$flash-alert-color:  #ffe1de;
+$accent-color: #fafbff;
 $fieldset-color: lighten($secondary-background-color, 50%);
-$flash-message-color: #FFA715;
+$flash-message-color: #ffa715;
 
-$tooltip-bg: #237CBE;
+$tooltip-bg: #237cbe;
 $tooltip-color: $subdued-color;

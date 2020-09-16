@@ -65,7 +65,7 @@ class Invitation < ApplicationRecord
 
   def self.invalid_rsvp_setting
     Setting.Site.blank? || Setting.Site['rsvp_expiry'].blank? ||
-      Setting.Site['rsvp_expiry'] !~ /\A\d+\.\w+$/
+      !Setting.Site['rsvp_expiry'].match?(/\A\d+\.\w+$/)
   end
 
   def self.duration_setting
@@ -80,7 +80,12 @@ class Invitation < ApplicationRecord
   def update_times
     self.invited_on = DateTime.current
     if self.expires.blank?
-      self.expires = self.membership.event.start_date - EXPIRES_BEFORE
+      # self.expires = DateTime.parse(event.start_date)
+      #                        .in_time_zone(event.time_zone).beginning_of_day
+      #                        - EXPIRES_BEFORE
+      # pandemic
+      self.expires = event.end_date.to_time
+                          .in_time_zone(event.time_zone).end_of_day
     end
   end
 

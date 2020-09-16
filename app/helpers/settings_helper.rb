@@ -10,7 +10,7 @@ module SettingsHelper
   end
 
   def addr_suffix(field)
-    return "<br>\n" if field =~ /address/
+    return "<br>\n" if field.match?(/address/)
   end
 
   def addr_prefix(field)

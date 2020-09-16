@@ -6,7 +6,7 @@
 
 class ScheduleController < ApplicationController
   before_action :set_event, :set_attendance, :set_time_zone
-  before_action :set_schedule, only: [:show, :update, :destroy]
+  before_action :set_schedule, only: [:show, :update]
   before_action :set_lock_time, only: [:new, :edit, :update, :create]
 
   before_action :authenticate_user!, except: [:index]
@@ -46,8 +46,6 @@ class ScheduleController < ApplicationController
                    start_time: @day.in_time_zone, updated_by: current_user.name }
     @schedule = ScheduleItem.new(new_params).schedule
     @members = @event.members
-
-    @form_action = 'create'
   end
 
   # GET /schedule/1/edit
@@ -55,7 +53,6 @@ class ScheduleController < ApplicationController
     @schedule = ScheduleItem.get(params[:id])
     authorize @schedule
     @day = @schedule.day
-    @form_action = 'update'
     session[:return_to] = request.referer
   end
 
@@ -80,8 +77,7 @@ class ScheduleController < ApplicationController
         format.json { render :show, status: :created, location: @schedule }
       else
         @day = Date.parse(params[:day])
-        @form_action = 'create'
-        prefill_lecture_fields if @schedule.lecture
+        prefill_lecture_fields unless @schedule.lecture.blank?
         format.html { render :new }
         format.json do
           render json: @schedule.errors, status: :unprocessable_entity
@@ -134,7 +130,7 @@ class ScheduleController < ApplicationController
           @schedule.name = @schedule.lecture.title
           @schedule.description = @schedule.lecture.abstract
         end
-        @form_action = 'update'
+        #@form_action = 'update'
         format.html { render :edit }
         format.json do
           render json: @schedule.errors, status: :unprocessable_entity
@@ -146,21 +142,45 @@ class ScheduleController < ApplicationController
   # DELETE /schedule/1
   # DELETE /schedule/1.json
   def destroy
-    authorize @schedule
-    if @schedule.notify_staff?
-      ScheduleNotice.new(schedule: @schedule,
+    schedule = Schedule.find(other_params[:id])
+    authorize schedule
+
+    if schedule.notify_staff?
+      ScheduleNotice.new(schedule: schedule,
                          changed_similar: params[:change_similar]).destroy
     end
-    if @schedule.lecture.blank?
-      @schedule.destroy
+    if schedule.lecture.blank?
+      schedule.destroy
     else
-      @schedule.lecture.destroy # dependent: :destroy
+      schedule.lecture.destroy # dependent: :destroy
     end
 
     respond_to do |format|
       format.html do
         redirect_to event_schedule_index_path(@event),
                     notice: 'Schedule item was successfully removed.'
+      end
+      format.json { head :no_content }
+    end
+  end
+
+  # POST /events/:event_id/schedule/:id/start_recording/:lecture_id
+  def recording
+    schedule = Schedule.find_by_id(other_params[:id])
+    return if schedule.blank?
+    authorize schedule
+
+    lecture = schedule.lecture
+    return if lecture.blank?
+
+    start_stop = other_params[:record_action]
+    LectureRecording.new(lecture, current_user.name).send(start_stop)
+
+    respond_to do |format|
+      format.html do
+        redirect_to event_schedule_index_path(@event),
+                    notice: "#{start_stop == "start" ? "Starting" : "Stopping"}
+                    recording for #{lecture.person.name}: #{lecture.title}..."
       end
       format.json { head :no_content }
     end
@@ -178,15 +198,20 @@ class ScheduleController < ApplicationController
   end
 
   def set_schedule
-    @schedule = Schedule.find(params[:id])
+    id = other_params[:id].blank? ? schedule_params[:id] : other_params[:id]
+    @schedule = Schedule.find(id)
   end
 
   def schedule_params
     params.require(:schedule)
           .permit(:id, :event_id, :start_time, :end_time, :earliest, :latest,
-                  :name, :description, :location, :day, :staff_item,
+                  :name, :description, :location, :day, :staff_item, :updated_by,
                   lecture_attributes: [:person_id, :id, :keywords,
                                        :do_not_publish])
+  end
+
+  def other_params
+    params.permit(:event_id, :id, :record_action)
   end
 
   def flash_notice

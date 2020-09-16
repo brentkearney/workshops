@@ -26,11 +26,13 @@ class InvitationMailer < ApplicationMailer
     @rsvp_url = invitation.rsvp_url
     @invitation_date = invitation.invited_on.strftime('%A, %B %-d, %Y')
 
-    return if @event.start_date.to_time.to_i < Time.now.to_i
-    @event_start = @event.start_date.to_time.strftime('%A, %B %-d')
-    @event_end = @event.end_date.to_time.strftime('%A, %B %-d, %Y')
+    Time.zone = @event.time_zone
+    # disabled during pandemic
+    # return if @event.start_date.in_time_zone < Time.now
+    @event_start = @event.start_date.in_time_zone.strftime('%A, %B %-d')
+    @event_end = @event.end_date.in_time_zone.strftime('%A, %B %-d, %Y')
 
-    @rsvp_deadline = RsvpDeadline.new(@event.start_date).rsvp_by
+    @rsvp_deadline = RsvpDeadline.new(@event).rsvp_by
 
     @organizers = ''
     @event.organizers.each do |org|
@@ -44,7 +46,7 @@ class InvitationMailer < ApplicationMailer
     subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
 
     bcc_email = GetSetting.rsvp_email(@event.location)
-    bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email =~ /</
+    bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email.match?(/</)
     to_email = '"' + @person.name + '" <' + @person.email + '>'
 
     if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
@@ -59,7 +61,7 @@ class InvitationMailer < ApplicationMailer
     pdf_template_file = "#{template_path}/#{@template_name}.pdf.erb"
     pdf_template = "invitation_mailer/#{@event.location}/#{@template_name}.pdf.erb"
 
-    if @event.start_date < Date.parse("Sep 1 2020")
+    if @event.start_date < Date.parse("Jan 1 2021")
       @template_name = "Virtual " + @template_name
       pdf_template_file = 'not_applicable.pdf'
     end

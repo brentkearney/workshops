@@ -4,6 +4,8 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   before_action :authenticate
   respond_to :json
 
+  # Override to add authentication (before_action) & very basic validation
+  # https://github.com/thoughtbot/griddler/blob/master/app/controllers/griddler/emails_controller.rb
   def incoming
     create and return if valid_incoming_format
     not_acceptable

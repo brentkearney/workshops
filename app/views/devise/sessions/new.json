@@ -1,8 +1,6 @@
 {
-  "login_format": {
-    "api_user": {
-      "email": "user@email.edu",
-      "password": "*******************"
-    }
-  }
+  "login failure": {
+    "status": "401",
+   "message": "Authentication failed."
+ }
 }

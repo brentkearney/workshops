@@ -94,12 +94,12 @@ describe 'EventMaillist' do
 
       maillist = EventMaillist.new(subject, list_params)
       mailer = double('MaillistMailer')
-      allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
+      allow(MaillistMailer).to receive(:workshop_organizers).and_return(mailer)
       expect(mailer).to receive(:deliver_now).exactly(1).times
 
       maillist.send_message
 
-      expect(MaillistMailer).to have_received(:workshop_maillist)
+      expect(MaillistMailer).to have_received(:workshop_organizers)
                                   .exactly(1).times
     end
 
@@ -121,6 +121,33 @@ describe 'EventMaillist' do
 
       expect(MaillistMailer).to have_received(:workshop_maillist)
                                   .exactly(member_count).times
+    end
+
+    it '"speakers" sends to scheduled speakers' do
+      event2 = create(:event_with_members)
+      speaker_count = 3
+      hour = 8
+      event2.attendance('Confirmed').sample(speaker_count).each do |speaker|
+        hour += 1
+        start_time = (event2.start_date + 1.days).to_time
+                            .in_time_zone(event2.time_zone)
+                            .change({ hour: hour, min:0})
+        end_time = start_time + 45.minutes
+        create(:lecture, person: speaker.person, event: event2,
+                         start_time: start_time, end_time: end_time)
+      end
+
+      list_params[:event] = event2
+      list_params[:group] = 'speakers'
+
+      maillist = EventMaillist.new(subject, list_params)
+      mailer = double('MaillistMailer')
+      allow(MaillistMailer).to receive(:workshop_maillist).and_return(mailer)
+      expect(mailer).to receive(:deliver_now).exactly(speaker_count).times
+
+      maillist.send_message
+      expect(MaillistMailer).to have_received(:workshop_maillist)
+                                  .exactly(speaker_count).times
     end
   end
 end

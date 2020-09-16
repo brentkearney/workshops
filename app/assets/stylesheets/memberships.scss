@@ -65,7 +65,7 @@
         max-width: 560px;
       }
       li:nth-child(odd):not(.reply-due) {
-        background: lighten( $light-border, 10% );
+        background: lighten($light-border, 10%);
       }
       .member-list-item {
         float: left;
@@ -87,11 +87,24 @@
     }
   }
 
+  #new-people-header {
+    h2 {
+      font-size: 1.2em;
+    }
+    small {
+      margin-left: 0.9em;
+      font-size: 0.8em;
+    }
+    p {
+      font-size: 0.8em;
+    }
+  }
+
   .member-show {
     .card {
       border: 1px solid $light-border;
       max-width: 550px;
-      margin: 0px 10px 10px 0;
+      margin: 0 10px 10px 0;
     }
 
     .card-title {
@@ -165,7 +178,6 @@
       label {
         font-weight: bold;
       }
-
     }
 
     #membership-details {
@@ -227,7 +239,6 @@
 
   #reply-by {
     margin: 0 10px 20px 0;
-
     padding: 0.5em;
     font-size: 1.2em;
     background-color: white;
@@ -284,7 +295,7 @@
   }
 
   .limits-message {
-    text-align: center;
+    text-align: middle;
     margin-top: 15px;
   }
 
@@ -359,21 +370,6 @@
     padding-bottom: 20px;
   }
 
-  #new-people-header {
-    h2 {
-      font-size: 1.2em;
-    }
-    small {
-      margin-left: 0.9em;
-      font-size: 0.8em;
-    }
-    p {
-      font-size: 0.8em;
-    }
-  }
-
-
-
   td.select, th.select {
     text-align: center;
   }
@@ -411,7 +407,8 @@
 
   @media print {
     .no-print { display:none }
-    a[href]:after {
+
+    a[href]::after {
       content: none !important;
     }
     a:link {

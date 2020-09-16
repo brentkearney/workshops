@@ -11,7 +11,12 @@ class ApiUser < User
   devise :jwt_authenticatable, jwt_revocation_strategy: self
 
   validates :jti, presence: true
-  validate :staff?
+  validate :allow_api_access?
+
+  def allow_api_access?
+    self.staff? ||
+      person.memberships.select(&:organizer?).count > 0
+  end
 
   def generate_jwt
     JWT.encode({ id: id,

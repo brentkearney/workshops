@@ -195,7 +195,7 @@ class MembershipsController < ApplicationController
   end
 
   def select_organizers
-    @memberships.values[0].select { |m| m.role =~ /Organizer/ }
+    @memberships.values[0].select { |m| m.role.match?(/Organizer/) }
   end
 
   def other_memberships

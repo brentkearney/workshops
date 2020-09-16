@@ -13,6 +13,8 @@ class EmailProcessor
   end
 
   def process
+    return if @email.nil? || skip_vacation_notices
+
     extract_recipients.each do |list_params|
       EventMaillist.new(@email, list_params).send_message
     end
@@ -20,45 +22,103 @@ class EmailProcessor
 
   private
 
-  # assembles valid maillists from To: and Cc: fields
+  def skip_vacation_notices
+    subject = @email.subject.downcase
+    subject.include?("bounce notice") || subject.include?("out of office") ||
+      subject.include?("vacation notice") || subject.include?("away notice")
+  end
+
+  # assembles valid maillists from To:, Cc:, Bcc: fields
   def extract_recipients
-    maillists = []
-    invalid_sender = false
     recipients = @email.to + @email.cc + @email.bcc
 
-    recipients.each do |recipient|
-      to_email = recipient[:email]
-      code = recipient[:token] # part before the @
-      group = 'Confirmed'
-      code, group = code.split('-') if code =~ /-/
+    unless @email.recipient.blank?
+      rcpt = @email.recipient
+      email = rcpt.match?('<') ? rcpt.match(/\<(.*)\>/)[1] : rcpt
+      email_name = rcpt.match?('<') ? rcpt.match(/^(.*)\</)[1] : ''
+      recipient = {
+        token: rcpt.match(/^(.*)@/)[1],
+        host:  rcpt.match(/@(.*)$/)[1],
+        email: email,
+        full: rcpt,
+        name: email_name
+      }
+      recipients << recipient
+    end
 
-      if code =~ /#{GetSetting.code_pattern}/
-        event = Event.find(code)
-        unless event.blank?
-          if valid_sender?(event, to_email, group)
-            maillists << {
-              event: event,
-              group: member_group(group),
-              destination: to_email
-            }
-          else
-            invalid_sender = true
-          end
-        end
+    compose_maillists(recipients)
+  end
+
+  def validate_parameters(to_email, code, group)
+    code_pattern = GetSetting.code_pattern
+    unless code.match?(/#{code_pattern}/)
+      return 'Event code does not match valid code pattern.'
+    end
+
+    event = Event.find(code)
+    if event.blank?
+      return "No event found with code: #{code}."
+    end
+
+    unless valid_sender?(event, to_email, group)
+      from_email = @email.from[:email].downcase.strip
+      return "#{to_email} is not authorized for #{code}-#{group}."
+    end
+
+    return ''
+  end
+
+  def compose_maillists(recipients)
+    maillist_domain = GetSetting.site_setting('maillist_domain')
+    valid_destinations = []
+    problems = []
+    recipients.uniq.each do |recipient|
+      # Skip Outlook webmaster=webmaster@ auto-reply messages
+      next if recipient[:full].match?(/(.+)=(.+)@/)
+
+      # maillist_domain sends a list of Workshops maillists, skip it
+      next if recipient[:email].include?("#{maillist_domain}")
+
+      to_email, code, group = extract_recipient(recipient)
+
+      problem = validate_parameters(to_email, code, group)
+      if problem.empty?
+        valid_destinations << {
+          event: Event.find(code),
+          group: member_group(group),
+          destination: to_email
+        }
+      else
+        problems << problem
       end
     end
 
-    if maillists.empty? && !invalid_sender
-      EmailInvalidCodeBounceJob.perform_later(email_params)
-      send_report({ recipients: recipients })
+    if valid_destinations.empty?
+      message = problems.join(", ")
+      send_report({ problem: message })
+      if message.include?("code")
+        EmailInvalidCodeBounceJob.perform_later(email_params)
+      end
+      return []
     end
 
-    maillists
+    valid_destinations
+  end
+
+  def extract_recipient(recipient)
+    to_email = recipient[:email]
+    code = recipient[:token] # part before the @
+    group = 'Confirmed'
+    code, group = code.split('-') if code.match?(/-/)
+    return [to_email, code, group]
   end
 
   def member_group(group)
-    return 'orgs' if group.downcase == 'orgs' || group.downcase == 'organizers'
-    return 'all' if group.downcase == 'all'
+    group.downcase!
+    return 'orgs' if group == 'orgs' || group == 'organizers'
+    return 'all' if group == 'all'
+    return 'speakers' if group == 'speakers'
+
     Membership::ATTENDANCE.each do |status|
       return status if group.titleize == status
     end
@@ -66,7 +126,10 @@ class EmailProcessor
 
   def valid_sender?(event, to_email, group)
     from_email = @email.from[:email].downcase.strip
-    send_report and return false unless EmailValidator.valid?(from_email)
+    unless EmailValidator.valid?(from_email)
+      send_report({ problem: "From: email is invalid: #{from_email}." })
+      return false
+    end
     person = Person.find_by_email(from_email)
 
     return true if organizers_and_staff(event).include?(person)
@@ -91,13 +154,13 @@ class EmailProcessor
     event.organizers + event.staff
   end
 
-  def send_report(other_info = nil)
+  def send_report(problem = nil)
     msg = {
-            problem: 'Mail list submission with invalid sender address',
+            problem: 'Unknown',
             email_params: email_params,
             email_object: @email.inspect
           }
-    msg.merge(other_info) unless other_info.nil?
+    msg.merge!(problem) unless problem.nil?
     StaffMailer.notify_sysadmin(@event, msg).deliver_now
   end
 

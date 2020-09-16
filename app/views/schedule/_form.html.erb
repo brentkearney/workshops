@@ -1,7 +1,8 @@
 <%= render "shared/errors", object: @schedule %>
 <div class="card" id="schedule-form-page">
-<%= form_for @schedule, url: {action: "#{@form_action}"}, :html => { :role => "form", :class => "form" } do |f| %>
+<%= form_with model: @schedule, url: schedule_form_with_path, class: "form" do |f| %>
 <%= f.hidden_field :event_id %>
+<%= f.hidden_field :id %>
 <%= time_limits(@schedule) %>
 <div class="card-title">
   <h4><%= f.object.new_record? ? '<i class="fa fa-calendar-plus-o" aria-hidden="true"></i> Add'.html_safe : '<i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit'.html_safe %> Schedule Item</h4>
@@ -35,6 +36,10 @@
           <td class="form-group select-times">
             <%= f.time_select :end_time, {}, { class: 'form-control' } %>
           </td>
+        </tr>
+        <tr>
+          <td class="form-group">Timezone:</td>
+          <td class="form-group select-times"><%= @event.time_zone %>, <%= @event.days.first.strftime('%Z') %> (UTC<%= @event.days.first.strftime('%z') %>)</td>
         </tr>
       </table>
     </div>

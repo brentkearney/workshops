@@ -36,7 +36,7 @@ class SettingUpdater
   def keep_arrays
     if @setting.value.is_a?(Hash)
       @setting.value.each do |param_name, param_value|
-        if param_value =~ /^\[(.+)\]$/
+        if param_value.to_s.match?(/^\[(.+)\]$/)
           param_value = param_value.gsub(/^\[|"|'|\]$/, '').
             split(',').map(&:strip)
           @setting.value = @setting.value.merge(param_name => param_value)

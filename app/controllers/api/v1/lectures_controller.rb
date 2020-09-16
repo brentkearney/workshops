@@ -30,7 +30,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
         format.json { head :created }
       else
         format.json do
-          render json: @lecture.errors,
+          render json: @lecture.errors.full_messages.to_json,
                  status: :unprocessable_entity
         end
       end
@@ -42,7 +42,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
     data = {}
     # Use legacy_id until legacy system is fully depreciated
     lecture = Lecture.find_by_legacy_id(@lecture_id)
-    lecture = Lecture.find_by_id(@lecture_id) if Rails.env.test?
+    lecture = Lecture.find_by_id(@lecture_id) if lecture.blank? || Rails.env.test?
     unless lecture.blank?
       person = {
         salutation: lecture.person.salutation,
@@ -73,7 +73,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
     end
   end
 
-  # GET /api/v1/lectures_on_date/room/date.json
+  # GET /api/v1/lectures_on/room/date.json
   def lectures_on
     lectures = GetLectures.on(@date, @room)
     schedules = Schedule.where(lecture_id: lectures.pluck(:id))
@@ -144,12 +144,14 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
   def compose_data(lecture)
     return {} if lecture.blank?
-
+    schedule = Schedule.where(lecture: lecture).first
+    start_time = schedule.nil? ? '' : schedule.start_time
     extras = {
       event_code: lecture.event.code,
       firstname: lecture.person.firstname,
       lastname: lecture.person.lastname,
-      affiliation: lecture.person.affiliation
+      affiliation: lecture.person.affiliation,
+      scheduled_time: start_time
     }
     lecture.attributes.merge(extras)
   end

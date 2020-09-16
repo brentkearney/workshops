@@ -1,6 +1,6 @@
 # See: https://github.com/phusion/passenger-docker
 # Latest image versions: https://github.com/phusion/passenger-docker/blob/master/CHANGELOG.md
-FROM phusion/passenger-ruby26:1.0.8
+FROM phusion/passenger-ruby26:1.0.10
 
 ENV HOME /root
 
@@ -55,6 +55,6 @@ RUN rm entrypoint.sh
 RUN chmod 755 /sbin/entrypoint.sh
 RUN mkdir -p /etc/my_init.d
 RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
-RUN echo 'export PATH=$PATH:./bin:/usr/local/rvm/rubies/ruby-2.6.3/bin' >> /root/.bashrc
+RUN echo 'export PATH=$PATH:./bin:/usr/local/rvm/rubies/ruby-2.6.6/bin' >> /root/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /root/.bashrc
 ENTRYPOINT ["/sbin/entrypoint.sh"]

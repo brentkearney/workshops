@@ -189,7 +189,7 @@ class Membership < ApplicationRecord
   def has_address_if_confirmed
     return if self.person.nil?
     return true unless attendance == 'Confirmed'
-    return has_full_address if role =~ /Organizer/
+    return has_full_address if role.match?(/Organizer/)
     if self.person.country.blank? && self.attendance == 'Confirmed'
       errors.add(:person, '- country must be set for confirmed members')
       self.person.errors.add(:country, :invalid)

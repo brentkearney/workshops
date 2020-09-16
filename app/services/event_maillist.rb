@@ -4,7 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# Receives Griddler:Email object, distributes message to confirmed members
+# Receives Griddler:Email object, distributes message to destination
 class EventMaillist
   def initialize(email, mailist_params)
     @email       = email
@@ -31,14 +31,38 @@ class EventMaillist
       send_to_orgs(message)
     elsif @group == 'all'
       send_to_all(message)
+    elsif @group == 'speakers'
+      send_to_speakers(message)
     else
       send_to_attendance_group(message)
     end
   end
 
+  def remove_trailing_comma(str)
+      str.blank? ? '' : str.chomp(",")
+  end
+
   def send_to_orgs(message)
-    @event.organizers.each do |member|
-      email_member(member, message)
+    to = ''
+    @event.contact_organizers.each do |org|
+      to << %Q("#{org.name}" <#{org.email}>, )
+    end
+    to = remove_trailing_comma(to)
+    cc = ''
+    @event.supporting_organizers.each do |org|
+      cc << %Q("#{org.name}" <#{org.email}>, )
+    end
+    cc = remove_trailing_comma(cc)
+    recipients = { to: to, cc: cc }
+
+    if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
+      recipients = { to: GetSetting.site_email('webmaster_email'), cc: '' }
+    end
+
+    begin
+      resp = MaillistMailer.workshop_organizers(message, recipients).deliver_now
+    rescue
+      StaffMailer.notify_sysadmin(@event.id, resp).deliver_now
     end
   end
 
@@ -46,6 +70,12 @@ class EventMaillist
     ['Confirmed', 'Invited', 'Undecided'].each do |status|
       @group = status
       send_to_attendance_group(message)
+    end
+  end
+
+  def send_to_speakers(message)
+    @event.lectures.each do |lecture|
+      email_member(lecture.person, message)
     end
   end
 

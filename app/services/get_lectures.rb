@@ -30,7 +30,11 @@ class GetLectures
   end
 
   # Nearest talk to present time, within tolerance range
+  # Or the one where is_recording is true
   def current
+    recording_lecture = Lecture.find_by(is_recording: true)
+    return recording_lecture unless recording_lecture.blank?
+
     time_zone = find_timezone
     now = Time.current.in_time_zone(time_zone)
     lectures = todays_lectures

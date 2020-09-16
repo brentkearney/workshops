@@ -115,7 +115,9 @@ class MembershipParametizer
   end
 
   def numeric_phd_year?
-    person_data['phd_year'] = nil unless person_data['phd_year'] =~ /\A[0-9]*\Z/
+    year = person_data['phd_year']
+    return if year.nil?
+    person_data['phd_year'] = nil unless year.match?(/\A[0-9]*\Z/)
   end
 
   def update_gender?

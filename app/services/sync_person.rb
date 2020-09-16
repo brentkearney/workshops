@@ -95,7 +95,7 @@ class SyncPerson
       end
       confirmation = ConfirmEmailChange.create!(params)
     rescue ActiveRecord::RecordInvalid => e
-      return person if e.message =~ /Validation failed/
+      return person if e.message.match?(/Validation failed/)
       msg = { problem: 'Unable to create! new ConfirmEmailChange',
               source: 'SyncPerson.create_change_confirmation',
               person: "#{person.name} (id: #{person.id}",

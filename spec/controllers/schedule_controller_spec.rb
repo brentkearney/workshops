@@ -229,11 +229,12 @@ RSpec.describe ScheduleController, type: :controller do
       it 'updates the schedule' do
         put :update, params: { event_id: @event.id, id: @schedule.to_param,
                      schedule: new_attributes }
-        @schedule.reload
 
-        expect(@schedule.name).to eq('A new name')
-        expect(@schedule.location).to eq('Back of the bus')
-        expect(@schedule.updated_by).to eq(@user.name)
+        schedule = Schedule.find(@schedule.id)
+
+        expect(schedule.name).to eq('A new name')
+        expect(schedule.location).to eq('Back of the bus')
+        expect(schedule.updated_by).to eq(@user.name)
       end
 
       it "assigns @schedule" do

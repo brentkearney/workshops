@@ -185,6 +185,39 @@
   .item-description {
     display: none;
     padding: 1em;
+
+    section {
+      h1 {
+        font-size: 1.5em;
+        margin: 1.5em 0 1em 0;
+      }
+      h2 {
+        font-size: 1.1em;
+        margin: 1em 0 0.5em 0;
+        small {
+          font-size: 0.9em;
+          i {
+            margin-right: 0.3em;
+          }
+        }
+      }
+      h3 {
+        font-size: 1.1em;
+        margin: 1em 0 0.5em 0;
+        font-style: italic;
+        font-weight: normal;
+      }
+
+      details {
+        margin-top: 1em;
+        margin-bottom: 2.5em;
+        p {
+          font-size: 1em;
+          margin-left: 1.3em;
+          text-align: justify;
+        }
+      }
+    }
   }
 
   td a:hover {

@@ -111,17 +111,14 @@ module MembershipsHelper
     invited_by.html_safe
   end
 
-  def rsvp_by(event_start, invited_on)
-    rsvp_by = RsvpDeadline.new(event_start, invited_on).rsvp_by
+  def rsvp_by(event, invited_on)
+    rsvp_by = RsvpDeadline.new(event, invited_on).rsvp_by
     DateTime.parse(rsvp_by).strftime('%b. %e, %Y')
   end
 
   def parse_reminders(member)
-    tz = member.event.time_zone
-
     text = '<ul>'
     member.invite_reminders.each do |k,v|
-      #start_date = member.event.start_date.in_time_zone(tz)
       text << "<li><b>On #{k.strftime('%Y-%m-%d %H:%M %Z')}</b><br>by #{v}.</li>"
     end
     text << '</ul>'
@@ -136,10 +133,8 @@ module MembershipsHelper
   end
 
   def show_reply_by_date(member)
-    tz = member.event.time_zone
-    start_date = member.event.start_date.in_time_zone(tz)
-    invited_on = last_invited(member, tz)
-    DateTime.parse(rsvp_by(start_date, invited_on)).strftime("%Y-%m-%d")
+    invited_on = last_invited(member, member.event.time_zone)
+    DateTime.parse(rsvp_by(member.event, invited_on)).strftime("%Y-%m-%d")
   end
 
   def show_invited_on_date(member, no_td = false)
@@ -148,15 +143,13 @@ module MembershipsHelper
     if member.invited_on.blank?
       column << '(not set)'
     else
-      tz = member.event.time_zone
-      start_date = member.event.start_date.in_time_zone(tz)
-      invited_on = member.invited_on.in_time_zone(tz)
+      invited_on = member.invited_on.in_time_zone(member.event.time_zone)
       column << '<a class="invitation-dates" tabindex="0" title="Invitation Sent"
         role="button" data-toggle="popover" data-placement="top" data-html="true"
         data-target="#invitations-' + member.id.to_s + '"
         data-trigger="hover focus" data-content="By ' +
         format_invited_by(member) + '<br><b>Reply-by date:</b> ' +
-        rsvp_by(start_date, invited_on) +
+        rsvp_by(member.event, invited_on) +
         '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
     end
     unless member.invite_reminders.blank?
@@ -180,7 +173,7 @@ module MembershipsHelper
       rsvp_by_date = member.invite_reminders.keys.last.in_time_zone(tz)
     end
 
-    RsvpDeadline.new(member.event.start_date, rsvp_by_date).rsvp_by
+    RsvpDeadline.new(member.event, rsvp_by_date).rsvp_by
   end
 
   def reply_due?(member)
