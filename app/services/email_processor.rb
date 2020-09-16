@@ -67,7 +67,7 @@ class EmailProcessor
 
     unless valid_sender?(event, to_email, group)
       from_email = @email.from[:email].downcase.strip
-      return "#{to_email} is not authorized for #{code}-#{group}."
+      return "#{from_email} is not authorized to send to #{code}-#{group}."
     end
 
     return ''
