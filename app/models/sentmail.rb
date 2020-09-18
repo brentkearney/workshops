@@ -13,7 +13,7 @@ class Sentmail < ApplicationRecord
 
   def one_message_per_recipient
     if Sentmail.where(message_id: message_id, recipient: recipient).count > 0
-      errors.add(:message_id, "message already sent to #{recipient}")
+      errors.add(:message_id, "this message was already sent to #{recipient}.")
     end
   end
 end

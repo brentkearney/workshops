@@ -6,6 +6,8 @@
 
 # Receives Griddler:Email object, distributes message to destination
 class EventMaillist
+  include Sendable
+
   def initialize(email, mailist_params)
     @email       = email
     @event       = mailist_params[:event]
@@ -14,6 +16,7 @@ class EventMaillist
   end
 
   def send_message
+    return if already_sent?(@destination)
     subject = @email.subject
     subject = "[#{@event.code}] #{subject}" unless subject.include?(@event.code)
     email_parts = EmailParser.new(@email, @destination, @event).parse
@@ -21,7 +24,7 @@ class EventMaillist
     message = {
       location: @event.location,
       from: @email.from[:full],
-      to: @email.to[0][:full],
+      to: @destination,
       subject: subject,
       email_parts: email_parts,
       attachments: @email.attachments,
@@ -37,38 +40,9 @@ class EventMaillist
       send_to_attendance_group(message)
     end
 
-    record_sent_mail(subject)
+    record_sent_mail(subject, @destination)
   end
 
-  def record_sent_mail(subject)
-    msg_id_key = @email.headers.keys.detect { |k| k.downcase == 'message-id' }
-    msg_id = @email.headers[msg_id_key]
-    if msg_id.blank?
-      Rails.logger.debug "\n\nNo Message-ID found in email! Cannot log it.\n\n"
-      return
-    end
-    message_id = msg_id.match?('<') ? msg_id.match(/\<(.*)\>/)[1] : msg_id
-    message = {
-      message_id: message_id,
-      sender: @email.from[:full],
-      recipient: @email.to[0][:full],
-      subject: subject,
-      date: DateTime.now
-    }
-
-    record = Sentmail.new(message)
-    if record.valid?
-      record.save
-    else
-      msg = {
-        problem: 'Failed to create Sentmail record for mail list posting.',
-        data: message,
-        error: record.errors.full_messages,
-        email: @email
-      }
-      StaffMailer.notify_sysadmin(@event.id, msg).deliver_now
-    end
-  end
 
   def remove_trailing_comma(str)
       str.blank? ? '' : str.chomp(",")

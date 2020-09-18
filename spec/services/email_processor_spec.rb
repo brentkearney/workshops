@@ -124,6 +124,12 @@ describe 'EmailProcessor' do
         email = Griddler::Email.new(params)
         expect(EventMaillist).not_to have_received(:new)
       end
+
+      it 'Automatic reply' do
+        params[:subject] = "Automatic reply: #{params[:subject]}"
+        email = Griddler::Email.new(params)
+        expect(EventMaillist).not_to have_received(:new)
+      end
     end
   end
 

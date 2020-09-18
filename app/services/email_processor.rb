@@ -7,6 +7,7 @@
 # Griddler class for processing incoming email
 class EmailProcessor
   attr_accessor :valid_email
+  include Sendable
 
   def initialize(email)
     @email = email
@@ -16,7 +17,7 @@ class EmailProcessor
     return if @email.nil? || skip_vacation_notices
 
     extract_recipients.each do |list_params|
-      next if already_delivered?(list_params[:destination])
+      next if already_sent?(list_params[:destination])
       EventMaillist.new(@email, list_params).send_message
     end
   end
@@ -26,16 +27,11 @@ class EmailProcessor
   def skip_vacation_notices
     subject = @email.subject.downcase
     subject.include?("bounce notice") || subject.include?("out of office") ||
-      subject.include?("vacation notice") || subject.include?("away notice")
+      subject.include?("vacation notice") || subject.include?("away notice") ||
+      subject.include?("automatic reply")
   end
 
-  def already_delivered?(recipient)
-    msg_id_key = @email.headers.keys.detect { |k| k.downcase == 'message-id' }
-    msg_id = @email.headers[msg_id_key]
-    return if msg_id.blank?
-    message_id = msg_id.match?('<') ? msg_id.match(/\<(.*)\>/)[1] : msg_id
-    !Sentmail.where(message_id: message_id, recipient: recipient).empty?
-  end
+
 
   # assembles valid maillists from To:, Cc:, Bcc: fields
   def extract_recipients
