@@ -77,6 +77,11 @@ class Griddler::AuthenticationController < Griddler::EmailsController
   end
 
   def encoded_token
+    if ENV['MAILGUN_API_KEY'].nil?
+      Rails.logger.debug "\n\nGriddler::AuthenticationController: no Mailgun API key set!\n\n"
+      StaffMailer.notify_sysadmin(nil, {'problem: No Mailgun API key set!'}).deliver_now
+      unauthorized and return
+    end
     digest = OpenSSL::Digest.new('sha256')
     OpenSSL::HMAC.hexdigest(digest, ENV['MAILGUN_API_KEY'], posted_token)
   end
