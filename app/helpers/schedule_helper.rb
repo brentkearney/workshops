@@ -52,6 +52,7 @@ module ScheduleHelper
   end
 
   def show_record_button(schedule, lecture)
+    return '' unless lecture.room == 'Online'
     recording_lecture = Lecture.find_by(event_id: @event.id, is_recording: true)
 
     if recording_lecture.blank?
