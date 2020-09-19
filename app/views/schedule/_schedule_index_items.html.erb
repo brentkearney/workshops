@@ -6,7 +6,7 @@
         <%= schedule_link(item) %>
         <span class="location">(<%= item[:location] %>)</span>
       </td>
-      <% if policy(@schedule_policy).start_recording? %>
+      <% if policy(item).show_recording_buttons? %>
       <td width="130">
         <div class="recording-buttons no-print">
           <%= start_or_stop_recording_button(item) %>

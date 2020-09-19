@@ -47,6 +47,10 @@ class SchedulePolicy
     !schedule.lecture.blank? && lecture_today?
   end
 
+  def show_recording_buttons?
+    staff_or_organizers
+  end
+
   def start_recording?
     staff_or_organizers && valid_schedule_item
   end
