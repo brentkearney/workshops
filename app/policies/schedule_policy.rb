@@ -39,8 +39,16 @@ class SchedulePolicy
     staff_or_organizers
   end
 
+  def lecture_today?
+    !@schedule.start_time.nil? && @schedule.start_time.day == DateTime.now.day
+  end
+
+  def valid_schedule_item
+    !schedule.lecture.blank? && lecture_today?
+  end
+
   def start_recording?
-    staff_or_organizers
+    staff_or_organizers && valid_schedule_item
   end
 
   def stop_recording?

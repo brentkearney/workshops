@@ -169,9 +169,7 @@ class ScheduleController < ApplicationController
     schedule = Schedule.find_by_id(other_params[:id])
     return if schedule.blank?
     authorize schedule
-
     lecture = schedule.lecture
-    return if lecture.blank?
 
     start_stop = other_params[:record_action]
     LectureRecording.new(lecture, current_user.name).send(start_stop)

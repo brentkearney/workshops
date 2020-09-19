@@ -47,12 +47,11 @@ module ScheduleHelper
     return if schedule.lecture_id.blank?
     lecture = Lecture.find(schedule.lecture_id)
     return if lecture.blank?
-    return unless lecture.filename.blank?
+    return unless lecture.filename.blank? && lecture.room == 'Online'
     show_record_button(schedule, lecture)
   end
 
   def show_record_button(schedule, lecture)
-    return '' unless lecture.room == 'Online'
     recording_lecture = Lecture.find_by(event_id: @event.id, is_recording: true)
 
     if recording_lecture.blank?
