@@ -12,6 +12,7 @@ class ScheduleController < ApplicationController
   before_action :authenticate_user!, except: [:index]
   after_action :flash_notice, only: [:create, :update, :edit]
 
+
   # GET /events/:event_id/schedule
   # GET /events/:event_id/schedule.json
   def index
@@ -167,10 +168,9 @@ class ScheduleController < ApplicationController
   # POST /events/:event_id/schedule/:id/start_recording/:lecture_id
   def recording
     schedule = Schedule.find_by_id(other_params[:id])
-    return if schedule.blank?
-    authorize schedule
-    lecture = schedule.lecture
+    return if schedule.blank? || recording_not_allowed?(schedule)
 
+    lecture = schedule.lecture
     start_stop = other_params[:record_action]
     LectureRecording.new(lecture, current_user.name).send(start_stop)
 
@@ -178,13 +178,20 @@ class ScheduleController < ApplicationController
       format.html do
         redirect_to event_schedule_index_path(@event),
                     notice: "#{start_stop == "start" ? "Starting" : "Stopping"}
-                    recording for #{lecture.person.name}: #{lecture.title}..."
+                    recording for #{lecture.person.name}:
+                    #{lecture.title}...".squish
       end
       format.json { head :no_content }
     end
   end
 
   private
+
+  def recording_not_allowed?(schedule)
+    return false if policy(schedule).start_recording?
+    flash[:alert] = "Permission denied. Wrong day?"
+    redirect_to(event_schedule_index_path(@event)) and return true
+  end
 
   def set_lock_time
     @lock_time = GetSetting.schedule_lock_time(@event.location)

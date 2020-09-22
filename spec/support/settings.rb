@@ -26,6 +26,7 @@ if Setting.find_by(var: 'Site').blank?
     'rsvp_expiry' => '1.month',
     'email_domain' => 'workshops.example.com',
     'maillist_domain' => 'lists.example.com',
+    'recording_api' => 'http://localhost:666',
     'LECTURES_API_KEY' => '0123456789',
     'EVENTS_API_KEY' => '0123456789',
     'SPARKPOST_AUTH_TOKEN' => '1234'

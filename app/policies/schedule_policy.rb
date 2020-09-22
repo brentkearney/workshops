@@ -44,7 +44,7 @@ class SchedulePolicy
   end
 
   def valid_schedule_item
-    !schedule.lecture.blank? && lecture_today?
+    !@schedule.lecture.blank? && lecture_today?
   end
 
   def show_recording_buttons?

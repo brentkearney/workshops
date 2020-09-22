@@ -21,6 +21,8 @@ class ConnectToRecordingSystemJob < ApplicationJob
   end
 
   def perform(scommand, host_ip, host_port)
+    return if %w(test development).include? ENV['RAILS_ENV'] ||
+      ENV['APPLICATION_HOST'].include?('staging')
     socket = TCPSocket.new host_ip, host_port.to_i
     socket.puts scommand
     socket.close

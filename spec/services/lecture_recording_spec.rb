@@ -7,12 +7,12 @@
 require 'rails_helper'
 
 describe "LectureRecording" do
-  context '.initialize' do
-    before do
-      @event = add_lectures_on(Date.current)
-      @lecture = @event.lectures.first
-    end
+  before do
+    @event = add_lectures_on(Date.current)
+    @lecture = @event.lectures.first
+  end
 
+  context '.initialize' do
     it "initializes with lecture, user's name parameter" do
       lr = LectureRecording.new(@lecture, 'Some User')
       expect(lr).to be_a(LectureRecording)
@@ -25,18 +25,45 @@ describe "LectureRecording" do
     end
 
     it 'returns nil if recording_api Setting is not set' do
-      expect(@lr.start).to be_nil
+      expect(GetSetting).to receive(:site_setting).with('recording_api').and_return(nil)
+      expect(LectureRecording.new(@lecture, 'Some User').start).to be_nil
     end
 
-    it 'runs .tell_recording_system(:start)' do
-      expect(GetSetting).to receive(:site_setting).with('recording_api').and_return('host')
-      ActiveJob::Base.queue_adapter = :test
+    it 'updates lecture.is_recording to true' do
+      expect(@lecture.is_recording).to be_falsey
+      @lr.start
+      expect(@lecture.is_recording).to be_truthy
+    end
 
-      expect {
-        @lr.start
-      }.to change {
-        ActiveJob::Base.queue_adapter.enqueued_jobs.count
-      }.by 1
+    it 'launches ConnectToRecordingSystemJob' do
+      allow(ConnectToRecordingSystemJob).to receive(:perform_later)
+      @lr.start
+      expect(ConnectToRecordingSystemJob).to have_received(:perform_later)
+    end
+  end
+
+  context '.stop' do
+    before do
+      @lecture.is_recording = true
+      @lecture.save
+      @lr = LectureRecording.new(@lecture, 'Some User')
+    end
+
+    it 'returns nil if recording_api Setting is not set' do
+      expect(GetSetting).to receive(:site_setting).with('recording_api').and_return(nil)
+      expect(LectureRecording.new(@lecture, 'Some User').start).to be_nil
+    end
+
+    it 'updates lecture.is_recording to false' do
+      expect(@lecture.is_recording).to be_truthy
+      @lr.stop
+      expect(@lecture.is_recording).to be_falsey
+    end
+
+    it 'launches ConnectToRecordingSystemJob' do
+      allow(ConnectToRecordingSystemJob).to receive(:perform_later)
+      @lr.start
+      expect(ConnectToRecordingSystemJob).to have_received(:perform_later)
     end
   end
 end

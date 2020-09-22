@@ -553,4 +553,73 @@ RSpec.describe ScheduleController, type: :controller do
       expect(response).to redirect_to(event_schedule_index_path(@event))
     end
   end
+
+  describe 'POST recording' do
+    let(:lecture_recording) { instance_double(LectureRecording) }
+    before do
+      @event.schedules.destroy_all
+      @event.start_date = Date.today
+      @event.end_date = Date.today + 5.days
+      @event.save
+
+      speaker = create(:membership, event: @event).person
+      talk = create(:lecture, event: @event, person: speaker,
+                      title: 'Test talk', room: 'Online',
+                 start_time: DateTime.now.change({ hour:12, min:0}),
+                   end_time:  DateTime.now.change({ hour:12, min:30}))
+
+      @schedule_item = create(:schedule, event: @event, lecture: talk,
+                              name: talk.title, location: talk.room,
+                        start_time: talk.start_time,
+                          end_time: talk.end_time)
+
+      @start_params = { "event_id": "#{@event.code}",
+                              "id": "#{@schedule_item.id}",
+                   "record_action": "start" }
+
+
+      allow(LectureRecording).to receive(:new).and_return(lecture_recording)
+      allow(lecture_recording).to receive(:start)
+    end
+
+    context 'as a non-organizer member' do
+      it 'denies access' do
+        @membership.role = 'Participant'
+        @membership.save
+        post :recording, params: @start_params
+        expect(lecture_recording).not_to have_received(:start)
+        expect(response).to redirect_to(event_schedule_index_path(@event))
+        expect(flash[:alert]).to include("Permission denied")
+      end
+    end
+
+    context 'as an organizer' do
+      before do
+        @membership.role = 'Organizer'
+        @membership.save
+      end
+
+      it 'starts recording' do
+        post :recording, params: @start_params
+
+        expect(lecture_recording).to have_received(:start)
+        expect(response).to redirect_to(event_schedule_index_path(@event))
+        expect(flash[:notice]).to include("Starting recording")
+      end
+
+      context 'on a day other than today' do
+        it 'denies access' do
+          @schedule_item.start_time = DateTime.now.tomorrow.change({ hour:12, min:0})
+          @schedule_item.end_time = DateTime.now.tomorrow.change({ hour:12, min:30})
+          @schedule_item.save
+
+          post :recording, params: @start_params
+
+          expect(lecture_recording).not_to have_received(:start)
+          expect(response).to redirect_to(event_schedule_index_path(@event))
+          expect(flash[:alert]).to include("Permission denied")
+        end
+      end
+    end
+  end
 end
