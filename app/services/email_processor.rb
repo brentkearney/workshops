@@ -31,8 +31,6 @@ class EmailProcessor
       subject.include?("automatic reply")
   end
 
-
-
   # assembles valid maillists from To:, Cc:, Bcc: fields
   def extract_recipients
     recipients = @email.to + @email.cc + @email.bcc
@@ -57,7 +55,7 @@ class EmailProcessor
   def validate_parameters(to_email, code, group)
     code_pattern = GetSetting.code_pattern
     unless code.match?(/#{code_pattern}/)
-      return 'Event code does not match valid code pattern.'
+      return "Event code \"#{code}\" does not match pattern \"#{code_pattern}\"."
     end
 
     event = Event.find(code)
@@ -112,7 +110,7 @@ class EmailProcessor
 
   def extract_recipient(recipient)
     to_email = recipient[:email]
-    code = recipient[:token] # part before the @
+    code = recipient[:token].strip # part before the @
     group = 'Confirmed'
     code, group = code.split('-') if code.match?(/-/)
     return [to_email, code, group]
@@ -137,17 +135,23 @@ class EmailProcessor
     end
 
     person = Person.find_by_email(from_email)
+    non_member_bounce(event, to_email) and return false if person.blank?
+
     return true if organizers_and_staff(event).include?(person)
 
-    params = email_params.merge(event_code: event.code, to: to_email)
     unless event.confirmed.include?(person)
-      EmailFromNonmemberBounceJob.perform_later(params)
+      non_member_bounce(event, to_email)
       return false
     end
 
     return true if allowed_group?(group)
     UnauthorizedSubgroupBounceJob.perform_later(params)
     return false
+  end
+
+  def non_member_bounce(event, to_email)
+    params = email_params.merge(event_code: event.code, to: to_email)
+    EmailFromNonmemberBounceJob.perform_later(params)
   end
 
   # groups that Confirmed participants (non-organizers) may send to
