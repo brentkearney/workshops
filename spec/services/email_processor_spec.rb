@@ -11,6 +11,7 @@ describe 'EmailProcessor' do
   let(:params) do
   {
     to: ['some-identifier@example.com'],
+    recipient: 'some-identifier@example.com',
     from: 'Webmaster <webmaster@example.net>',
     subject: 'Testing email processing',
     text: 'A Test Message.',
@@ -46,6 +47,7 @@ describe 'EmailProcessor' do
 
     it 'does not send invalid code bounce if recipient event code is valid' do
       params[:to] = ["#{event.code}@example.com"]
+      params[:recipient] = "#{event.code}@example.com"
       email = Griddler::Email.new(params)
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
@@ -85,6 +87,16 @@ describe 'EmailProcessor' do
 
     it 'does not bounce email if recipient contains =' do # Outlook bug
       params[:to] = ['webmaster=webmaster@example.com']
+      params[:recipient] = 'webmaster=webmaster@example.com'
+      email = Griddler::Email.new(params)
+      allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
+      EmailProcessor.new(email).process
+      expect(EmailInvalidCodeBounceJob).not_to have_received(:perform_later)
+    end
+
+    it 'does not bounce email if recipient address is angle bracketed' do
+      params[:to] = ["<#{event.code}@example.com>"]
+      params[:recipient] = "<#{event.code}@example.com>"
       email = Griddler::Email.new(params)
       allow(EmailInvalidCodeBounceJob).to receive(:perform_later)
       EmailProcessor.new(email).process
@@ -321,6 +333,7 @@ describe 'EmailProcessor' do
       membership.attendance = 'Confirmed'
       membership.save
       params[:from] = "#{person.name} <#{person.email}>"
+      @event2 = create(:event)
     end
 
     it 'invokes EventMaillist if sender and recipient are valid' do
@@ -392,9 +405,8 @@ describe 'EmailProcessor' do
     end
 
     it 'invokes EventMaillist once for each event in the To: field' do
-      event2 = create(:event)
-      create(:membership, event: event2, person: person)
-      params[:to] = ["#{event.code}@example.com", "#{event2.code}@example.com"]
+      create(:membership, event: @event2, person: person)
+      params[:to] = ["#{event.code}@example.com", "#{@event2.code}@example.com"]
       email = Griddler::Email.new(params)
 
       EmailProcessor.new(email).process
@@ -402,10 +414,9 @@ describe 'EmailProcessor' do
     end
 
     it 'invokes EventMaillist once for each event in the Cc: field' do
-      event2 = create(:event)
-      create(:membership, event: event2, person: person)
+      create(:membership, event: @event2, person: person)
       params[:to] = ['myfriend@example.com']
-      params[:cc] = ["#{event.code}@example.com", "#{event2.code}@example.com"]
+      params[:cc] = ["#{event.code}@example.com", "#{@event2.code}@example.com"]
       email = Griddler::Email.new(params)
 
       EmailProcessor.new(email).process
@@ -414,8 +425,7 @@ describe 'EmailProcessor' do
 
     it 'invokes EventMaillist once and EmailFromNonmemberBounceJob once if
       sender is confirmed for one event in To: but not another' do
-      event2 = create(:event)
-      params[:to] = ["#{event.code}@example.com", "#{event2.code}@example.com"]
+      params[:to] = ["#{event.code}@example.com", "#{@event2.code}@example.com"]
       email = Griddler::Email.new(params)
       allow(EmailFromNonmemberBounceJob).to receive(:perform_later)
 
@@ -423,6 +433,19 @@ describe 'EmailProcessor' do
 
       expect(EventMaillist).to have_received(:new).exactly(1).times
       expect(EmailFromNonmemberBounceJob).to have_received(:perform_later).exactly(1).times
+    end
+
+    it 'handles comma-separated emails in the recipient field' do
+      params[:to] = ["#{event.code}@example.com"]
+      create(:membership, person: person, event: @event2, attendance: 'Confirmed')
+      params[:recipient] = "#{event.code}-orgs@example.com, #{@event2.code}@example.com"
+      email = Griddler::Email.new(params)
+      allow(EmailFromNonmemberBounceJob).to receive(:perform_later)
+
+      EmailProcessor.new(email).process
+
+      expect(EventMaillist).to have_received(:new).exactly(3).times
+      expect(EmailFromNonmemberBounceJob).not_to have_received(:perform_later)
     end
   end
 end

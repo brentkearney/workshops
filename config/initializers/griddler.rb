@@ -1,9 +1,14 @@
 # config/initializers/griddler.rb
 
 
-# Add Mailgun recipient param to @email[:recipient], for delivery
-# from maillists that contain @workshops addresses
-# https://github.com/jwkratz/griddler-stripped-text
+# Add Mailgun recipient param to @email[:recipient]. In some
+# cases, Mailgun will POST with a different To: address than
+# the actual intended recipient. For example, if the original
+# email had To: custom-maillist@workshops.birs.ca, where
+# "custom-maillist" is a Mailgun-hosted mail list that contains
+# legit Workshops mail list addresses, i.e. 20w5014-invited@...
+# This will add the legit Workshops address to params[:recipient]
+# Code from: https://github.com/jwkratz/griddler-stripped-text
 module GriddlerMailgunAdapterExtensions
   def normalize_params
     normalized_params = super

@@ -31,25 +31,45 @@ class EmailProcessor
       subject.include?("automatic reply")
   end
 
-  # assembles valid maillists from To:, Cc:, Bcc: fields
+  def parse_angle_brackets(rcpt)
+    email_address = rcpt.match?('<') ? rcpt.match(/\<(.*)\>/)[1] : rcpt
+    email_name = rcpt.match?('<') ? rcpt.match(/^(.*)\</)[1] : ''
+    [email_address.strip, email_name.strip]
+  end
+
+  def recipient_hash(recipient_email)
+    email_address, email_name = parse_angle_brackets(recipient_email)
+    {
+      token: email_address.match(/^(.*)@/)[1].strip,
+      host:  email_address.match(/@(.*)$/)[1].strip,
+      email: email_address.strip,
+      full: recipient_email.strip,
+      name: email_name.strip
+    }
+  end
+
+  def already_added?(recipients, email_address)
+    !recipients.detect { |r| r[:email] == email_address }.blank?
+  end
+
+  # @email.recipient was added at config/initializers/griddler.rb
+  def recipient_field(recipients)
+    return if @email.recipient.blank?
+    new_recipients = []
+    @email.recipient.split(',').each do |recipient_email|
+      email_address, _email_name = parse_angle_brackets(recipient_email)
+      unless already_added?(recipients, email_address)
+        new_recipients << recipient_hash(recipient_email)
+      end
+    end
+    new_recipients
+  end
+
+  # assembles valid maillists from To:, Cc:, Bcc:, and :recipient fields
   def extract_recipients
     recipients = @email.to + @email.cc + @email.bcc
-
-    unless @email.recipient.blank? || recipients.include?(@email.recipient)
-      rcpt = @email.recipient
-      email = rcpt.match?('<') ? rcpt.match(/\<(.*)\>/)[1] : rcpt
-      email_name = rcpt.match?('<') ? rcpt.match(/^(.*)\</)[1] : ''
-      recipient = {
-        token: rcpt.match(/^(.*)@/)[1],
-        host:  rcpt.match(/@(.*)$/)[1],
-        email: email,
-        full: rcpt,
-        name: email_name
-      }
-      recipients << recipient
-    end
-
-    compose_maillists(recipients)
+    recipients = recipients + recipient_field(recipients)
+    compose_maillists(recipients.reject(&:blank?))
   end
 
   def validate_parameters(to_email, code, group)
@@ -135,7 +155,7 @@ class EmailProcessor
     end
 
     person = Person.find_by_email(from_email)
-    non_member_bounce(event, to_email) and return false if person.blank?
+    # non_member_bounce(event, to_email) and return false if person.blank?
 
     return true if organizers_and_staff(event).include?(person)
 
@@ -145,7 +165,7 @@ class EmailProcessor
     end
 
     return true if allowed_group?(group)
-    UnauthorizedSubgroupBounceJob.perform_later(params)
+    UnauthorizedSubgroupBounceJob.perform_later(email_params)
     return false
   end
 
