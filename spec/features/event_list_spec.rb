@@ -120,6 +120,15 @@ describe 'Event List', type: :feature do
 
       expect(confirmed_counts).to eq(['0', '3', '0'])
     end
+
+    it 'indicates whether an event is cancelled' do
+      @future.cancelled = true
+      @future.save
+
+      visit events_path
+
+      expect(page.body).to have_css("tr.cancelled", count: 1)
+    end
   end
 
   describe 'My Events' do

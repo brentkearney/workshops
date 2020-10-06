@@ -7,7 +7,7 @@
           <tbody>
           <tr>
             <td class="label">Event Code:</td>
-            <td><%= @event.code %></td>
+            <td><%= @event.code %> <%= "(Cancelled)" if @event.cancelled %></td>
             <% if policy(@event).event_staff? %>
             <td class="label">Booking Code:</td>
             <td><%= @event.booking_code %></td>

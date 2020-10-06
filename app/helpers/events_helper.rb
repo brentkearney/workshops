@@ -77,4 +77,8 @@ module EventsHelper
       return link_to("#{year} →", events_year_path(year))
     end
   end
+
+  def event_cancelled?(event)
+    return ' class="cancelled"'.html_safe if event.cancelled
+  end
 end

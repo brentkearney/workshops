@@ -80,6 +80,13 @@ describe 'Event Show Page', type: :feature do
     it 'has no edit button' do
       has_no_edit_button
     end
+
+    it 'says "(Cancelled)" after the event code, if the event is cancelled' do
+      @event.cancelled = true
+      @event.save
+      visit event_path(@event)
+      expect(page.body).to have_text("#{@event.code} (Cancelled)")
+    end
   end
 
   context 'As a logged-in user who is not a member of the event' do

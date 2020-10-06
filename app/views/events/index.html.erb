@@ -10,7 +10,7 @@
       </thead>
       <tbody>
     	<% @events.each do |event| %>
-    	<tr>
+    	<tr<%= event_cancelled?(event) %>>
           <td><%= image_tag("flags/#{event.country}.png", height: 18) %></td>
     	    <td><%= link_to event.code, event_path(event), { title: event.name } %></td>
     	    <td class="d-none d-sm-table-cell"><%= link_to event.name, event_path(event), id: event.code %></td>
