@@ -71,6 +71,7 @@
 
 table#events-list {
   tr.cancelled {
+    color: $cancelled-events-link-color;
     td {
       a:link { color: $cancelled-events-link-color; }
       a:visited { color: $cancelled-events-link-color; }

@@ -22,6 +22,21 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class='col-md-12'>
+          <div class="form-group checkbox">
+            <%= f.label :cancelled %>: &nbsp;
+            <label>
+              <%= f.check_box :cancelled %> &nbsp;
+              <% if @event.cancelled %>
+                ⬅︎ Uncheck this box to unmark the event as cancelled.
+              <% else %>
+                ⬅︎ Check this box to mark the event as cancelled.
+              <% end %>
+            </label>
+          </div>
+        </div>
+      </div>
 
       <div class="row event-dates">
         <div class='col-md-3'>
