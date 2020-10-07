@@ -157,7 +157,6 @@ class Api::V1::LecturesController < Api::V1::BaseController
   end
 
   def find_lecture
-    @lecture = nil
     return if bad_params
     begin
       event = Event.find(@json['event_id'])
@@ -165,7 +164,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
     rescue ActiveRecord::RecordNotFound
       go_away && return
     end
-    @lecture = lecture if confirm_legacy_db_consistency(event, lecture)
+    @lecture = confirm_legacy_db_consistency(event, lecture)
   end
 
   def bad_params
@@ -176,7 +175,11 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
   # safety check due to legacy_db SNAFU
   def confirm_legacy_db_consistency(event, lecture)
-    event && lecture && lecture.event_id == event.id || go_away && false
+    if event && lecture && lecture.event_id == event.id
+      return lecture
+    else
+      go_away && return
+    end
   end
 
   def authenticated?
