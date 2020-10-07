@@ -24,7 +24,7 @@
       it 'assigns @events to all events' do
         get :index
 
-        expect(assigns(:events)).to eq([@past_event, @event, @future_event])
+        expect(assigns(:events)).to eq([@future_event, @event, @past_event])
       end
 
       def excludes_template_events_test
@@ -33,7 +33,7 @@
 
         get :index
 
-        expect(assigns(:events)).to eq([@past_event, @event])
+        expect(assigns(:events)).to eq([@event, @past_event])
 
         @future_event.template = false
         @future_event.save
@@ -74,7 +74,7 @@
           it "@events includes all events" do
             get :index
 
-            expect(assigns(:events)).to eq([@past_event, @event, @future_event])
+            expect(assigns(:events)).to eq([@future_event, @event, @past_event])
           end
 
           it "@events includes template events at user's location" do
@@ -122,7 +122,7 @@
 
             get :index
 
-            expect(assigns(:events)).to match_array([@past_event, @event, @future_event])
+            expect(assigns(:events)).to match_array([@future_event, @event, @past_event])
 
             @past_event.location = org_loc
             @past_event.save
@@ -285,7 +285,7 @@
 
           get :past
 
-          expect(assigns(:events)).to eq([@past_event, @event])
+          expect(assigns(:events)).to eq([@event, @past_event])
         end
 
         it "staff: @events includes all past events" do
@@ -293,7 +293,7 @@
 
           get :past
 
-          expect(assigns(:events)).to eq([@past_event, @event])
+          expect(assigns(:events)).to eq([@event, @past_event])
         end
 
         it "admin: @events includes all past events" do
@@ -301,7 +301,7 @@
 
           get :past
 
-          expect(assigns(:events)).to eq([@past_event, @event])
+          expect(assigns(:events)).to eq([@event, @past_event])
         end
 
         it "super_admin: @events includes all past events" do
@@ -309,7 +309,7 @@
 
           get :past
 
-          expect(assigns(:events)).to eq([@past_event, @event])
+          expect(assigns(:events)).to eq([@event, @past_event])
         end
       end
     end
@@ -515,7 +515,7 @@
 
           get :kind, params: { kind: invalid_type }
 
-          expect(assigns(:events)).to eq([@past_event, @event, @future_event])
+          expect(assigns(:events)).to eq([@future_event, @event, @past_event])
           expect(response).to render_template(:index)
         end
       end

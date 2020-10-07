@@ -85,11 +85,19 @@ module EventsHelper
     return if event.blank? || request.path.match?(/events\/my_events/)
     if direction == :previous
       year = event.year.to_i - 1
-      return link_to("← #{year}", events_year_path(year))
+      path = events_year_path(year)
+      unless @kind.blank?
+        path = "/events/kind/#{@kind}/year/#{year}"
+      end
+      return link_to("← #{year}", path)
     end
     if direction == :next
       year = event.year.to_i + 1
-      return link_to("#{year} →", events_year_path(year))
+      path = events_year_path(year)
+      unless @kind.blank?
+        path = "/events/kind/#{@kind}/year/#{year}"
+      end
+      return link_to("#{year} →", path)
     end
   end
 

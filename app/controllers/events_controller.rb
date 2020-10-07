@@ -56,7 +56,6 @@ class EventsController < ApplicationController
   # GET /events/year/:year
   # GET /events/year/:year.json
   def year
-    @year = allowed_params[:year]
     if @year.match?(/^\d{4}$/)
       @events = policy_scope(Event).year(@year)
       remove_locations
@@ -74,7 +73,7 @@ class EventsController < ApplicationController
     unless Setting.Locations.keys.include?(@location)
       @location = Setting.Locations.keys.first
     end
-    @events = Event.location(@location).order(:start_date)
+    @events = Event.location(@location).order(:start_date).limit(100)
     render :index unless performed?
   end
 
@@ -89,9 +88,12 @@ class EventsController < ApplicationController
       end
     end
 
-    @events = policy_scope(Event).kind(kind)
-    remove_years
-    remove_locations
+    if @year.blank?
+      @events = policy_scope(Event).kind(kind)
+    else
+      @events = policy_scope(Event).year(@year).kind(kind)
+    end
+
     render :index unless performed?
   end
 
@@ -226,6 +228,6 @@ class EventsController < ApplicationController
   end
 
   def remove_kinds
-    @events = @events.select {|e| e.event_type == @kind } unless @kind.blank?
+    @events = @events.select {|e| e.event_type == @kind.titleize } unless @kind.blank?
   end
 end
