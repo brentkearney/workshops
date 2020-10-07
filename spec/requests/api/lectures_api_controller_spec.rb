@@ -228,12 +228,12 @@ describe Api::V1::LecturesController, type: :request do
       end
 
       it 'lectures_last returns the last lecture of the day, if there is one' do
-        @lecture.start_time = Time.current + 60.minutes
-        @lecture.end_time = Time.current + 90.minutes
+        @lecture.start_time = Time.current.change({ hour:21, min:0})
+        @lecture.end_time = Time.current.change({ hour:22, min:0})
         @lecture.save
         other_lecture = create(:lecture, event: @lecture.event,
-                                start_time: Time.current + 120.minutes,
-                                end_time: Time.current + 150.minutes)
+                                start_time: Time.current.change({ hour:22, min:0}),
+                                end_time: Time.current.change({ hour:22, min:30}))
 
         get "/api/v1/lectures_last/#{ERB::Util.url_encode(@room)}.json"
         json = JSON.parse(response.body)

@@ -83,20 +83,24 @@ class LecturesController < ApplicationController
 
   private
 
-    def schedule_url_and_room(lecture)
-      schedule_url = events_future_url
-      room = room_param
-      unless lecture.blank?
-        lecture = lecture.first unless lecture.is_a?(Lecture)
-        schedule_url = event_schedule_index_url(lecture.event)
-        room = lecture.room
-      end
-      [schedule_url, room]
+  def schedule_url_and_room(lecture)
+    schedule_url = events_future_url
+    room = room_param
+    unless lecture.blank?
+      lecture = lecture.first unless lecture.is_a?(Lecture)
+      schedule_url = event_schedule_index_url(lecture.event)
+      room = lecture.room
     end
+    [schedule_url, room]
+  end
 
-    def set_lecture
-      @lecture = Lecture.find_by_id(params[:id])
-    end
+  def set_lecture
+    @lecture = Lecture.find_by_id(lecture_id_param)
+  end
+
+  def lecture_id_param
+    params.require(:id).to_i
+  end
 
   def lecture_params
     params.require(:lecture).permit(:event_id, :person_id, :title, :start_time, :end_time, :abstract, :notes, :filename, :room, :publish, :tweeted, :hosting_license, :archiving_license, :hosting_release, :archiving_release, :authors, :copyright_owners, :publication_details, :keywords, :updated_by)
