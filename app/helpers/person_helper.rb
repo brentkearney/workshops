@@ -7,12 +7,11 @@
 
 module PersonHelper
   def street_address(person)
+    lines = [person.address1, person.address2, person.address3].uniq
     address = ''
-    address += person.address1 + "<br />\n" unless person.address1.blank?
-    address += person.address2 + "<br />\n" unless person.address2.blank? ||
-      person.address2 == person.address1
-    address += person.address3 + "<br />\n" unless person.address3.blank? ||
-      person.address3 == person.address1 || person.address3 == person.address2
+    lines.each do |line|
+      address += line + "<br />\n" unless line.blank?
+    end
     address
   end
 
