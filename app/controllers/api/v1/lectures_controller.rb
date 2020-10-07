@@ -157,19 +157,21 @@ class Api::V1::LecturesController < Api::V1::BaseController
   end
 
   def find_lecture
-    return if request.request_method == 'GET'
     @lecture = nil
-    go_away && return unless valid_parameters?
-
+    return if bad_params
     begin
       event = Event.find(@json['event_id'])
       lecture = Lecture.find(@json['lecture_id'])
     rescue ActiveRecord::RecordNotFound
       go_away && return
     end
-    if confirm_legacy_db_consistency(event, lecture)
-      @lecture = lecture
-    end
+    @lecture = lecture if confirm_legacy_db_consistency(event, lecture)
+  end
+
+  def bad_params
+    return true if request.request_method == 'GET'
+    go_away && return true unless valid_parameters?
+    return false
   end
 
   # safety check due to legacy_db SNAFU

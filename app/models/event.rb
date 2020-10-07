@@ -72,10 +72,10 @@ class Event < ApplicationRecord
   end
 
   def check_event_type
-    if Setting.Site['event_types'].include?(event_type)
+    if GetSetting.site_setting('event_types').include?(event_type)
       return true
     else
-      types = Setting.Site['event_types'].join(', ')
+      types = GetSetting.site_setting('event_types').join(', ')
       errors.add(:event_type, "- event type must be one of: #{types}")
       return false
     end
@@ -115,7 +115,7 @@ class Event < ApplicationRecord
       self.name = self.name + " (Cancelled)"
     end
     if !cancelled && self.name.include?('(Cancelled)')
-      self.name.gsub!("(Cancelled)", "")
+      self.name.gsub!("(Cancelled)", "").strip!
     end
   end
 
