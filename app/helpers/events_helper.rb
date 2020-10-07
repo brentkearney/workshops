@@ -38,7 +38,13 @@ module EventsHelper
       year = request.path.match(/year\/(\w+)/)
       title = year[1]
     end
-    title << " Events"
+
+    if !@kind.blank?
+      title = "#{@kind.titleize.pluralize}"
+      title += " in #{@year}" unless @year.blank?
+    else
+      title << " Events"
+    end
 
     location = request.path.match(/location\/(\w+)/)
     title[/Events/] = "#{location[1]} Events" unless location.blank?
@@ -50,20 +56,29 @@ module EventsHelper
     when /past|future/
       '/events/' + action_name + "/location/#{location}"
     when /year/
-      year = request.path.match(/year\/(\w+)/)
-      "/events/year/#{year[1]}/location/#{location}"
+      "/events/year/#{@year}/location/#{location}"
     else
       events_location_path(location)
     end
   end
 
-  def year_url(year)
-    location = request.path.match(/location\/(\w+)/)
-    if location.blank?
-      events_year_path(year)
+  def kind_url(event_type)
+    kind = event_type.parameterize
+    if @year.blank?
+      "/events/kind/#{kind}"
     else
-      "/events/year/#{year}/location/#{location[1]}"
+      "/events/kind/#{kind}/year/#{@year}"
     end
+  end
+
+  def year_url(year)
+    url = events_year_path(year)
+    if !@location.blank?
+      url = "/events/year/#{year}/location/#{@location}"
+    elsif !@kind.blank?
+      url = "/events/kind/#{@kind}/year/#{year}"
+    end
+    url
   end
 
   def year_link(event, direction)

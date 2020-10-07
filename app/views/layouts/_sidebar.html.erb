@@ -105,6 +105,19 @@
         <% end %>
       </ul>
     </li>
+    <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview" id="type-events">
+      <i class="app-menu__icon fa fa-tags"></i><span class="app-menu__label">Event Types</span>
+      <i class="treeview-indicator fa fa-angle-right"></i></a>
+      <ul class="treeview-menu">
+        <% Setting.Site['event_types'].each do |event_type| %>
+        <li id="event_type-<%= event_type %>">
+          <%= link_to %Q(<i class="fa fa-tag fa-fw"></i>
+          <span class="app-menu__label">#{event_type.pluralize}</span>).html_safe,
+          kind_url(event_type), class: 'treeview-item event_type-link' %>
+        </li>
+        <% end %>
+      </ul>
+    </li>
     <% end # end if @event else... %>
   </ul>
 </aside>

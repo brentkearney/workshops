@@ -7,6 +7,7 @@
 class EventsController < ApplicationController
   before_action :set_event, :set_time_zone, :set_attendance,
                 only: [:show, :edit, :update, :destroy]
+  before_action :set_params, only: [:past, :future, :year, :location, :kind]
   before_action :authenticate_user!,
                 only: [:my_events, :org_events, :new, :edit, :create, :update,
                   :destroy]
@@ -55,10 +56,11 @@ class EventsController < ApplicationController
   # GET /events/year/:year
   # GET /events/year/:year.json
   def year
-    @year = params[:year]
+    @year = allowed_params[:year]
     if @year.match?(/^\d{4}$/)
       @events = policy_scope(Event).year(@year)
       remove_locations
+      remove_kinds
       render :index unless performed?
     else
       redirect_to events_path
@@ -68,7 +70,7 @@ class EventsController < ApplicationController
   # GET /events/location/:location
   # GET /events/location/:location.json
   def location
-    @location = params[:location]
+    @location = allowed_params[:location]
     unless Setting.Locations.keys.include?(@location)
       @location = Setting.Locations.keys.first
     end
@@ -78,7 +80,7 @@ class EventsController < ApplicationController
 
   # GET /events/kind/:kind
   def kind
-    kind = params[:kind].titleize
+    kind = allowed_params[:kind].titleize
     if kind == 'Research In Teams'
       kind = 'Research in Teams'
     else
@@ -88,6 +90,8 @@ class EventsController < ApplicationController
     end
 
     @events = policy_scope(Event).kind(kind)
+    remove_years
+    remove_locations
     render :index unless performed?
   end
 
@@ -203,12 +207,25 @@ class EventsController < ApplicationController
                                   :updated_by, :max_observers, :cancelled)
   end
 
-  def location_params
-    params.permit(:location)
+  def allowed_params
+    params.permit(:location, :year, :kind)
+  end
+
+  def set_params
+    @location = allowed_params[:location]
+    @year = allowed_params[:year]
+    @kind = allowed_params[:kind]
   end
 
   def remove_locations
-    @location = location_params['location']
     @events = @events.select {|e| e.location == @location} unless @location.blank?
+  end
+
+  def remove_years
+    @events = @events.select {|e| e.year == @year } unless @year.blank?
+  end
+
+  def remove_kinds
+    @events = @events.select {|e| e.event_type == @kind } unless @kind.blank?
   end
 end

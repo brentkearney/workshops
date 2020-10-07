@@ -43,7 +43,7 @@ Rails.application.routes.draw do
   get 'events/future(/location/:location)' => 'events#future', as: :events_future
   get 'events/year/:year(/location/:location)' => 'events#year', as: :events_year
   get 'events/location/:location(/year/:year)' => 'events#location', as: :events_location
-  get 'events/kind/:kind' => 'events#kind', as: :events_kind
+  get 'events/kind/:kind(/year/:year)' => 'events#kind', as: :events_kind
 
   resources :events do
     get 'schedule/new/:day' => 'schedule#new', as: :schedule_day
