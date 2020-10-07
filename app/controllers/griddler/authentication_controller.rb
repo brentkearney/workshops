@@ -61,9 +61,8 @@ class Griddler::AuthenticationController < Griddler::EmailsController
     params['signature']['signature']
   end
 
-  def posted_token
+  def parse_params
     timestamp = token = nil
-
     if params['timestamp'] && params['signature'].class == String
       timestamp = params['timestamp']
       token = params['token']
@@ -71,7 +70,11 @@ class Griddler::AuthenticationController < Griddler::EmailsController
       timestamp = params['signature']['timestamp']
       token = params['signature']['token']
     end
+    return [timestamp, token]
+  end
 
+  def posted_token
+    timestamp, token = parse_params
     return '' unless timestamp && token
     timestamp + token
   end

@@ -169,7 +169,10 @@ class Api::V1::LecturesController < Api::V1::BaseController
 
   def bad_params
     return true if request.request_method == 'GET'
-    go_away && return true unless valid_parameters?
+    unless valid_parameters?
+      go_away
+      return true
+    end
     return false
   end
 
