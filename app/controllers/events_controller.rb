@@ -89,7 +89,7 @@ class EventsController < ApplicationController
     end
 
     if @year.blank?
-      @events = policy_scope(Event).kind(kind)
+      @events = policy_scope(Event).future.kind(kind)
     else
       @events = policy_scope(Event).year(@year).kind(kind)
     end

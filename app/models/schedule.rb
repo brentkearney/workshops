@@ -36,7 +36,7 @@ class Schedule < ApplicationRecord
   private
 
   def strip_html
-    self.name = ActionController::Base.helpers.strip_tags(name)
+    self.name = ActionController::Base.helpers.strip_tags(name).gsub(/&amp;/, '&')
   end
 
   def time_limits

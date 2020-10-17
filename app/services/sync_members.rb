@@ -25,7 +25,7 @@ class SyncMembers
 
   def initialize(event)
     @event = event
-    return if event.nil? || recently_synced? || event.event_type == 'Career Fair'
+    return if event.nil? || recently_synced?
     @sync_errors = ErrorReport.new(self.class, @event)
     @remote_members = retrieve_remote_members
     @local_members = event.memberships.includes(:person)
