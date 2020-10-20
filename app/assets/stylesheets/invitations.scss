@@ -1,6 +1,5 @@
 // Page: Login Material
 
-
 .invitation-content {
   display: flex;
   flex-direction: column;
@@ -36,16 +35,19 @@
       white-space: pre-wrap;
 
       option {
+
         /* wrap text in compatible browsers */
         -moz-white-space: pre-wrap;
         -o-white-space: pre-wrap;
         white-space: pre-wrap;
+
         /* hide text that can't wrap with an ellipsis */
         overflow: hidden;
         text-overflow: ellipsis;
+
         /* add border after every option */
-        border-bottom: 1px solid #DDD;
-    }
+        border-bottom: 1px solid #ddd;
+      }
     }
   }
 
@@ -57,7 +59,6 @@
   }
 }
 
-
-.invitation-errors ul {
+.invitation-errors ul, li {
   line-spacing: 1.3em;
 }

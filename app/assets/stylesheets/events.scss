@@ -2,10 +2,10 @@
 
 .event-details {
   .event-page {
-     background-color: white;
-     padding: 1em;
-     border: 1px solid $light-border;
-   }
+    background-color: white;
+    padding: 1em;
+    border: 1px solid $light-border;
+  }
 
   p {
     margin: 1em;
@@ -30,8 +30,9 @@
   @media only screen and (max-width: 767px) {
     .table >tbody >tr >td {
       display: block;
-      min-width: 100%!important;
+      min-width: 100% !important;
     }
+
     td.label {
       text-align: left;
     }
@@ -72,6 +73,7 @@
 table#events-list {
   tr.cancelled {
     color: $cancelled-events-link-color;
+
     td {
       a:link { color: $cancelled-events-link-color; }
       a:visited { color: $cancelled-events-link-color; }

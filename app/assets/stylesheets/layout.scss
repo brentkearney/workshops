@@ -1,5 +1,21 @@
-// Top Navbar
+// Events pages
+.page-header-subtitle {
+  margin-bottom: 15px;
 
+  img {
+    margin-right: 5px;
+    vertical-align: -25%;
+  }
+
+  h4 {
+    display: inline-block;
+    .small-bullet {
+      font-size: 1.3em;
+    }
+  }
+}
+
+// Top Navbar
 .app-header {
   @extend .navbar;
   height: 50px;
@@ -22,6 +38,7 @@
     display: block;
     height: 100%;
     vertical-align: middle;
+
     @extend .d-none, .d-md-block;
 
     img {
@@ -46,19 +63,15 @@
     font-size: 1.2em;
     color: white;
   }
-
-  // User menu
-  ul.app-nav {
-  }
 }
 
 // Alerts
 .flash-messages {
+  @media (min-width: 768px) { margin-left: $sidebar-width; }
   position: relative;
   top: 50px;
   text-align: center;
   padding: 0;
-  @media (min-width: 768px) { margin-left: $sidebar-width; }
 }
 
 .notify-alert {
@@ -92,7 +105,7 @@
 
 // Side Navbar
 .app-sidebar__overlay {
-  @media(max-width: 767px) {
+  @media (max-width: 767px) {
     position: fixed;
     top: 0;
     left: 0;
@@ -120,6 +133,7 @@
       }
     }
   }
+
   ul.app-menu {
     margin-top: -50px;
   }
@@ -129,24 +143,7 @@ li.nav-second-level {
   margin-left: 5%;
 }
 
-// Events pages
-.page-header-subtitle {
-  margin-bottom: 15px;
-
-  img {
-    margin-right: 5px;
-    vertical-align: -25%;
-  }
-  h4 {
-    display: inline-block;
-    .small-bullet {
-      font-size: 1.3em;
-    }
-  }
-}
-
 // General
-
 .card-title {
   font-size: 1.5em;
   font-weight: bold;
@@ -174,12 +171,15 @@ li.nav-second-level {
   width: 106%;
   text-align: center;
   margin: 0;
-  @media(min-width: 768px) { text-indent: $sidebar-width; }
+
+  @media (min-width: 768px) { text-indent: $sidebar-width; }
 
   padding: 0;
+
   .card-footer {
     font-size: 0.9em;
   }
+
   .powered-by {
     @extend .pull-right;
     margin-right: 2%;

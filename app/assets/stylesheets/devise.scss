@@ -1,6 +1,7 @@
 .devise-flash {
   text-align: center;
-  .alert-alert, .alert-error {
+  .alert-alert,
+  .alert-error {
     @extend .alert-danger;
   }
   margin-bottom: 0;
@@ -11,6 +12,7 @@
   @extend .alert-danger;
 
   text-align: center;
+
   ul {
     text-align: left;
     display: inline-block;
@@ -51,7 +53,8 @@
   }
 }
 
-.login-form, .forget-form {
+.login-form,
+.forget-form {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -73,6 +76,7 @@
 
 #pwchange-form {
   @extend .login-form;
+
   margin-top: 20px;
 }
 
@@ -118,10 +122,8 @@
   @extend .login-head;
 }
 
-
-
 .error {
-  box-shadow: 0 3px 10px rgba(0,0,0,.23),0 3px 10px rgba(0,0,0,.16);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.23), 0 3px 10px rgba(0,0,0,0.16);
   background-color: lighten(theme-color("danger"), 5);
   border: 1px solid darken(theme-color("danger"), 5);
   text-align: middle;

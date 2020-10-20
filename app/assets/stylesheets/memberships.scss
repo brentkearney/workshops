@@ -48,7 +48,7 @@
     }
 
     table.table-striped tr.reply-due td {
-        background-color: lighten( $flash-message-color, 30% );
+      background-color: lighten( $flash-message-color, 30% );
     }
 
     .tooltip-inner {
@@ -91,10 +91,12 @@
     h2 {
       font-size: 1.2em;
     }
+
     small {
       margin-left: 0.9em;
       font-size: 0.8em;
     }
+
     p {
       font-size: 0.8em;
     }
@@ -174,12 +176,6 @@
     #form-page {
     }
 
-    #person-form {
-      label {
-        font-weight: bold;
-      }
-    }
-
     #membership-details {
       .field_with_errors label:before {
         content:"*";color:red;
@@ -217,7 +213,14 @@
         font-weight: normal;
         font-size: 0.9em;
       }
+
       margin-bottom: 1em;
+    }
+
+    #person-form {
+      label {
+        font-weight: bold;
+      }
     }
 
     #member-email {
@@ -260,16 +263,17 @@
     }
   }
 
-
   a.invitation-dates {
     text-decoration: underline;
   }
 
   .invite-buttons {
     margin-top: -5px;
+
     .btn {
       margin: 5px;
     }
+
     .submit-button {
       white-space: normal;
       max-width: 97.5%;
@@ -284,14 +288,15 @@
   }
 
   .popover {
-      width: 250px;
-      ul {
-        margin-left: 10px;
-        padding-left: 10px;
-      }
-      li {
-        margin-bottom: 10px;
-      }
+    width: 250px;
+    ul {
+      margin-left: 10px;
+      padding-left: 10px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
   }
 
   .limits-message {
@@ -307,11 +312,13 @@
     .inline-checkbox {
       margin-top: 10px;
       margin-left: 5px;
+
       p {
         font-size: 1.2em;
         display: inline;
         margin-left: 5px;
       }
+
       .checkbox {
         margin-bottom: 12px;
         display: inline;
@@ -336,6 +343,7 @@
     ul#about-roles-list {
       font-size: 1.2em;
       font-weight: normal;
+
       li {
         margin-bottom: 1.2em;
         line-height: 1.5em;
@@ -361,6 +369,7 @@
   ol#added-members {
     margin: 1em;
     font-size: 1.2em;
+
     li {
       margin-bottom: 1em;
     }
@@ -378,61 +387,71 @@
     td, th {
       font-size: 1.2em;
     }
+
     th.counter {
       width: 40px;
       padding-left: 20px;
     }
+
     td.counter {
       width: 40px;
-      align: center;
       valign: middle;
       vertical-align: center;
       font-size: 12pt;
       padding-top: 20px;
       padding-left: 20px;
     }
+
     td {
       input[type="text"].has-error {
         background-color: #ffb3b3;
       }
     }
+
     td input {
       margin: 5px;
       padding: 5px;
     }
+
     td.last-column {
       padding-right: 20px;
     }
   }
 
   @media print {
-    .no-print { display:none }
+    .no-print { display: none; }
 
     a[href]::after {
       content: none !important;
     }
+
     a:link {
       text-decoration: none;
       color: #000;
     }
+
     a:visited {
       text-decoration: none;
       color: #000;
     }
+
     ol.ordered-member-list {
       li {
         font-size: 1.2em;
         padding: 1px;
       }
     }
+
     .observer {
       a:link {
         color: #000;
       }
+
       a:visited {
         color: #000;
       }
     }
+
     .footer {
       display: none;
       visibility: hidden;
