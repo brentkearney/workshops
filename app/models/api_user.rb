@@ -15,7 +15,7 @@ class ApiUser < User
 
   def allow_api_access?
     self.staff? ||
-      person.memberships.select(&:organizer?).count > 0
+      person.memberships.count(&:organizer?) > 0
   end
 
   def generate_jwt

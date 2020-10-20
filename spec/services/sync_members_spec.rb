@@ -84,15 +84,17 @@ describe "SyncMembers" do
 
   describe '.retrieve_remote_members' do
     context 'with no remote members' do
-      it 'sends email to staff' do
+      it 'does nothing' do
         lc = FakeLegacyConnector.new
         expect(LegacyConnector).to receive(:new).and_return(lc)
 
-        expect{
-          SyncMembers.new(@event)
-        }.to change { ActionMailer::Base.deliveries.count }.by(1)
-        expect(ActionMailer::Base.deliveries.last.body).to include("Unable to
-          retrieve any remote members for #{@event.code}".squish)
+        # expect{
+        #   SyncMembers.new(@event)
+        # }.not_to change { ActionMailer::Base.deliveries.count }.by(1)
+        # expect(ActionMailer::Base.deliveries.last.body).to include("Unable to
+        #   retrieve any remote members for #{@event.code}".squish)
+        sm = SyncMembers.new(@event)
+        expect(sm.remote_members).to be_empty
       end
     end
 

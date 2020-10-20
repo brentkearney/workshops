@@ -1,7 +1,8 @@
 .settings {
   @import "colours";
 
-  #settings-tab, .new-setting {
+  #settings-tab,
+  .new-setting {
     background-color: white;
   }
 
@@ -9,7 +10,8 @@
     margin-bottom: 1em;
   }
 
-  h1.app-settings, h3 {
+  h1.app-settings,
+  h3 {
     margin-bottom: 1em;
   }
 

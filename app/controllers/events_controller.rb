@@ -18,7 +18,7 @@ class EventsController < ApplicationController
   # GET /events
   # GET /events.json
   def index
-    @events = policy_scope(Event)
+    @events = policy_scope(Event).reverse_order
   end
 
   # GET /events/my_events
@@ -39,7 +39,7 @@ class EventsController < ApplicationController
   # GET /events/past.json(/location/:location).json
   def past
     @tense = 'Past'
-    @events = policy_scope(Event).past.reverse_order
+    @events = policy_scope(Event).past
     remove_locations
     render :index unless performed?
   end
@@ -89,7 +89,7 @@ class EventsController < ApplicationController
     end
 
     if @year.blank?
-      @events = policy_scope(Event).future.kind(kind)
+      @events = policy_scope(Event).future.kind(kind).reverse
     else
       @events = policy_scope(Event).year(@year).kind(kind)
     end

@@ -515,7 +515,8 @@
 
           get :kind, params: { kind: invalid_type }
 
-          expect(assigns(:events)).to eq([@future_event, @event, @past_event])
+          # without year specified, defaults to future events
+          expect(assigns(:events)).to eq([@future_event, @event])
           expect(response).to render_template(:index)
         end
       end

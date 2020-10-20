@@ -10,11 +10,17 @@ header {
 
 @page {
   size: auto;
+
   @top-left { content: element(header); }
 }
 
-nav, .footer, .add-item-buttons, .delete-item-buttons,
-.dont-print, .bottom-buttons, .fa-toggle-down {
+nav,
+.footer,
+.add-item-buttons,
+.delete-item-buttons,
+.dont-print,
+.bottom-buttons,
+.fa-toggle-down {
   display: none;
 }
 
@@ -23,7 +29,8 @@ nav, .footer, .add-item-buttons, .delete-item-buttons,
 }
 
 #page-wrapper {
-  width: auto; margin: 0 5%;
+  width: auto;
+  margin: 0 5%;
   padding: 0;
   border: 0;
   float: none !important;
@@ -32,7 +39,7 @@ nav, .footer, .add-item-buttons, .delete-item-buttons,
 }
 
 .table-heading {
-  background-color: #BBBBBB !important;
+  background-color: #bbb !important;
 }
 
 /* Unsuccessful attempt to get striped table rows working */
@@ -46,5 +53,5 @@ nav, .footer, .add-item-buttons, .delete-item-buttons,
   a[href]::after {
     content: none !important;
   }
-  .no-print { display:none }
+  .no-print { display:none; }
 }

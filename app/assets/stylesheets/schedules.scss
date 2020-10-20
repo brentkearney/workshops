@@ -14,17 +14,13 @@
 
   .schedule-times {
     font-size: 1.1em;
-    background-color: #DADADA;
+    background-color: #dadada;
     padding: 5px;
     display: block;
   }
 
-  .schedule-times {
-    display: block;
-  }
-
   .glyphicon-remove {
-    color: #999999;
+    color: #999;
   }
 
   .add-item-buttons {
@@ -42,10 +38,11 @@
   }
 
   .not-striped {
-    background-color: #FFFFFF;
+    background-color: #fff;
   }
+
   .location {
-    color: #999999;
+    color: #999;
   }
 
   #schedule-form-page {
@@ -74,21 +71,26 @@
   table#select-times {
     border: 0;
     margin-bottom: 1.5em;
+
     td {
       text-align: right;
       vertical-align: middle;
       padding: 5px;
     }
+
     select {
       display: inline;
       width: 55px;
     }
+
     select.days {
       width: 205px;
     }
+
     .select-times {
       text-align: left;
     }
+
     .staff-option {
       padding-left: 65px;
     }
@@ -116,11 +118,13 @@
       width: 60px;
       height: 34px;
     }
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -129,10 +133,11 @@
       right: 0;
       bottom: 0;
       background-color: #ccc;
-      -webkit-transition: .4s;
-      transition: .4s;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
     }
-    .slider:before {
+
+    .slider::before {
       position: absolute;
       content: "";
       height: 26px;
@@ -140,24 +145,29 @@
       left: 4px;
       bottom: 4px;
       background-color: white;
-      -webkit-transition: .4s;
-      transition: .4s;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
     }
+
     input:checked + .slider {
-      background-color: #2196F3;
+      background-color: #2196f3;
     }
+
     input:focus + .slider {
-      box-shadow: 0 0 1px #2196F3;
+      box-shadow: 0 0 1px #2196f3;
     }
-    input:checked + .slider:before {
+
+    input::checked + .slider:before {
       -webkit-transform: translateX(26px);
       -ms-transform: translateX(26px);
       transform: translateX(26px);
     }
+
     .slider.round {
       border-radius: 34px;
     }
-    .slider.round:before {
+
+    .slider.round::before {
       border-radius: 50%;
     }
 
@@ -191,16 +201,20 @@
         font-size: 1.5em;
         margin: 1.5em 0 1em 0;
       }
+
       h2 {
         font-size: 1.1em;
         margin: 1em 0 0.5em 0;
+
         small {
           font-size: 0.9em;
+
           i {
             margin-right: 0.3em;
           }
         }
       }
+
       h3 {
         font-size: 1.1em;
         margin: 1em 0 0.5em 0;
@@ -211,6 +225,7 @@
       details {
         margin-top: 1em;
         margin-bottom: 2.5em;
+
         p {
           font-size: 1em;
           margin-left: 1.3em;
@@ -233,12 +248,12 @@
   p#updated_by {
     text-align: right;
     font-size: 0.9em;
-    color: #999999;
+    color: #999;
   }
 
   p#mathjax {
-  	font-size: 1em;
-  	margin-top: 0.8em;
+    font-size: 1em;
+    margin-top: 0.8em;
   }
 
   p#staff_item_locked {
@@ -247,10 +262,9 @@
 
   /* Remove printing of URLs */
   @media print {
-    a[href]:after {
+    a[href]::after {
       content: none !important;
     }
     .no-print { display:none }
   }
 }
-
