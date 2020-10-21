@@ -40,10 +40,11 @@ module EventDecorators
 
   def attendance(status = 'Confirmed', order = 'lastname')
     direction = 'ASC'
+    sort_direction = "#{order} #{direction}"
 
     # We want the order to be the same as the order of Membership::ROLES
     all_members = memberships.joins(:person).where('attendance = ?', status)
-                             .order("#{order} #{direction}")
+                             .order(sort_direction)
     sorted_members = []
     Membership::ROLES.each do |role|
       sorted_members.concat(all_members.select { |member| member.role == role })

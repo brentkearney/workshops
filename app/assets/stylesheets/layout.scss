@@ -77,6 +77,13 @@
   padding: 0;
 }
 
+.alert-alert,
+.alert-notice {
+  @extend .alert-success;
+
+  text-align: center;
+}
+
 .notify-alert {
   box-shadow: none;
   border: 1px;
@@ -99,13 +106,6 @@
   .alert-error {
     @extend .alert-danger;
   }
-}
-
-.alert-alert,
-.alert-notice {
-  @extend .alert-success;
-
-  text-align: center;
 }
 
 // Side Navbar
