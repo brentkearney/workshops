@@ -100,14 +100,14 @@ describe 'Editing a Schedule Item', type: :feature do
         start_date = '2015-08-30'.to_date
         end_date = start_date + 5.days
         new_event = create(:event, start_date: start_date, end_date: end_date)
-
+        start_time = (new_event.start_date + 1.day)
+                               .to_time.in_time_zone(new_event.time_zone)
+                               .change(hour: 9)
         new_item = create(:schedule,
                           event: new_event,
                           name: 'Item at the end of the month',
-                          start_time: (new_event.start_date + 1.day).to_time
-                                                .change(hour: 9),
-                          end_time: (new_event.start_date + 1.day).to_time
-                                              .change(hour: 10))
+                          start_time: start_time,
+                          end_time: start_time.change(hour: 10))
         visit event_schedule_edit_path(new_event, new_item)
         new_day = new_item.start_time.to_date + 3.days
         page.select new_day.strftime('%A'), from: 'schedule_day'
@@ -485,13 +485,13 @@ describe 'Editing a Schedule Item', type: :feature do
         create(:membership, event: new_event, person: @person,
                             attendance: 'Confirmed',
                             role: 'Organizer')
+        start_time = (new_event.start_date + 2.days).to_time
+                      .in_time_zone(new_event.time_zone).change(hour: 9)
         create(:schedule,
                event: new_event,
                name: 'Item at 9',
-               start_time: (new_event.start_date + 2.days).to_time
-                .change(hour: 9),
-               end_time: (new_event.start_date + 2.days).to_time
-                .change(hour: 10))
+               start_time: start_time,
+               end_time: start_time.change(hour: 10))
       end
 
       context 'unpublished schedule' do

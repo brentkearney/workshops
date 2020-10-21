@@ -64,7 +64,7 @@ RSpec.describe MaillistMailer, type: :mailer do
       domain = GetSetting.site_setting('email_domain')
       from_address = "staff@#{domain}"
       @msg.merge!({from: from_address})
-      resp = MaillistMailer.workshop_organizers(@msg, @recipients).deliver_now
+      MaillistMailer.workshop_organizers(@msg, @recipients).deliver_now
       expect(ActionMailer::Base.deliveries.last.from).to eq(["#{from_address}"])
     end
 
@@ -107,7 +107,7 @@ RSpec.describe MaillistMailer, type: :mailer do
       domain = GetSetting.site_setting('email_domain')
       from_address = "staff@#{domain}"
       @msg.merge!({from: from_address})
-      resp = MaillistMailer.workshop_maillist(@msg, @recipient).deliver_now
+      MaillistMailer.workshop_maillist(@msg, @recipient).deliver_now
       expect(ActionMailer::Base.deliveries.last.from).to eq(["#{from_address}"])
     end
 

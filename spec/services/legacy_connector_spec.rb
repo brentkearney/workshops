@@ -54,7 +54,7 @@ describe "LegacyConnector", type: :feature do
 
       expect(event_list).to be_an_instance_of(Array)
       event_list.each do |event_id|
-        expect(event_id).to match /#{Setting.Site['code_pattern']}/
+        expect(event_id).to match(/#{Setting.Site['code_pattern']}/)
       end
     end
 
@@ -69,7 +69,7 @@ describe "LegacyConnector", type: :feature do
       event_list = @lc.list_events('201502', '201503')
 
       expect(event_list).to be_an_instance_of(Array)
-      expect(event_list.first).to match /#{Setting.Site['code_pattern']}/
+      expect(event_list.first).to match(/#{Setting.Site['code_pattern']}/)
     end
   end
 
@@ -88,7 +88,7 @@ describe "LegacyConnector", type: :feature do
     event_data = @lc.get_event_data_for_year('2014')
 
     expect(event_data).to be_an_instance_of(Array)
-    expect(event_data.last['code']).to match /#{Setting.Site['code_pattern']}/
+    expect(event_data.last['code']).to match(/#{Setting.Site['code_pattern']}/)
   end
 
   it '#get_members' do

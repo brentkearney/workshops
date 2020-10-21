@@ -122,24 +122,28 @@ describe 'EmailProcessor' do
       it 'Bounce notice' do
         params[:subject] = "[Bounce notice]"
         email = Griddler::Email.new(params)
+        EmailProcessor.new(email).process
         expect(EventMaillist).not_to have_received(:new)
       end
 
       it 'Vacation Notice' do
         params[:subject] = "Vacation Notice"
         email = Griddler::Email.new(params)
+        EmailProcessor.new(email).process
         expect(EventMaillist).not_to have_received(:new)
       end
 
       it 'Away notice' do
         params[:subject] = "Re: Away notice"
         email = Griddler::Email.new(params)
+        EmailProcessor.new(email).process
         expect(EventMaillist).not_to have_received(:new)
       end
 
       it 'Automatic reply' do
         params[:subject] = "Automatic reply: #{params[:subject]}"
         email = Griddler::Email.new(params)
+        EmailProcessor.new(email).process
         expect(EventMaillist).not_to have_received(:new)
       end
     end
