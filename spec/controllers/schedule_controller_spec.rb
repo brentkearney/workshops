@@ -15,9 +15,7 @@ RSpec.describe ScheduleController, type: :controller do
     start_time = (@event.start_date + 1.days)
                  .to_time.in_time_zone(@event.time_zone)
                  .change(hour: 9, min: 0)
-    end_time = (@event.start_date + 1.days)
-               .to_time.in_time_zone(@event.time_zone)
-               .change(hour: 9, min: 30)
+    end_time = start_time.change(hour: 9, min: 30)
     @valid_attributes = attributes_for(:schedule, event_id: @event.id,
                                                   start_time: start_time,
                                                   end_time: end_time)
@@ -44,9 +42,7 @@ RSpec.describe ScheduleController, type: :controller do
           start_time = (@event.start_date + 1.days)
                        .to_time.in_time_zone(@event.time_zone)
                        .change(hour: hour, min: 0)
-          end_time = (@event.start_date + 1.days)
-                     .to_time.in_time_zone(@event.time_zone)
-                     .change(hour: hour, min: 30)
+          end_time = start_time.change(hour: hour, min: 30)
           name = "Schedule Item at #{hour}"
           create(:schedule, event: @event, start_time: start_time,
                             end_time: end_time, name: name)
@@ -146,8 +142,9 @@ RSpec.describe ScheduleController, type: :controller do
       @membership.role = 'Organizer'
       @membership.save
 
-      start_time = (@event.start_date + 1.days).to_time.change(hour: 9, min: 0)
-      end_time = (@event.start_date + 1.days).to_time.change(hour: 9, min: 30)
+      start_time = (@event.start_date + 1.days).to_time
+                    .in_time_zone(@event.time_zone).change(hour: 9, min: 0)
+      end_time = start_time.change(hour: 9, min: 30)
       schedule = create(:schedule, event: @event,
                                    start_time: start_time, end_time: end_time)
 

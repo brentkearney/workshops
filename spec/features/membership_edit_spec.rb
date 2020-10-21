@@ -210,7 +210,7 @@ describe 'Membership#edit', type: :feature do
     expect(page.body).to have_css('div#profile-departure', text: departure)
   end
 
-  def allows_extended_stays(member)
+  def allows_extended_stays
     arrival = (@event.start_date - 1.day).strftime('%Y-%m-%d')
     select arrival, from: 'membership_arrival_date'
     departure = (@event.end_date + 1.day).strftime('%Y-%m-%d')
@@ -804,7 +804,7 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'allows changing travel dates to outside of event dates' do
-      allows_extended_stays(@participant)
+      allows_extended_stays
     end
 
     it 'hides organizer notes' do
@@ -860,7 +860,7 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'allows changing travel dates to outside of event dates' do
-      allows_extended_stays(@participant)
+      allows_extended_stays
     end
 
     it 'allows editing of membership info' do

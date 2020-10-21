@@ -39,7 +39,7 @@ class EventsController < ApplicationController
   # GET /events/past.json(/location/:location).json
   def past
     @tense = 'Past'
-    @events = policy_scope(Event).past.reverse_order
+    @events = policy_scope(Event).past.reverse_order.to_ary
     remove_locations
     render :index unless performed?
   end

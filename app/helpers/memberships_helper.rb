@@ -128,8 +128,11 @@ module MembershipsHelper
     unless member.invite_reminders.blank?
       return member.invite_reminders.keys.last.in_time_zone(tz)
     end
-    member.invited_on.blank? ? DateTime.current.in_time_zone(tz) :
-                               member.invited_on.in_time_zone(tz)
+    if member.invited_on.blank?
+      DateTime.current.in_time_zone(tz)
+    else
+      member.invited_on.in_time_zone(tz)
+    end
   end
 
   def show_reply_by_date(member)

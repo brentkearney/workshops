@@ -60,9 +60,11 @@ describe 'DefaultSchedule' do
 
       context 'If the event has at least one schedule item' do
         before do
+          start_time = (@event.start_date + 2.days).to_time
+                        .in_time_zone(@event.time_zone).change({ hour: 9 })
           item = build(:schedule, name: 'This one item', event_id: @event.id,
-            start_time: (@event.start_date + 2.days).to_time.change({ hour: 9 }),
-            end_time: (@event.start_date + 2.days).to_time.change({ hour: 10 })
+            start_time: start_time,
+            end_time: start_time.change({ hour: 10 })
           )
           @event.schedules.create(item.attributes)
         end
@@ -108,10 +110,12 @@ describe 'DefaultSchedule' do
       context 'If the event has only "Default Schedule" items' do
         before do
           @event.schedules.delete_all
+
+          start_time = (@event.start_date + 2.days).to_time
+                        .in_time_zone(@event.time_zone).change({ hour: 9 })
           item = build(:schedule, name: 'Default item', event_id: @event.id,
-            start_time: (@event.start_date + 2.days).to_time
-              .change(hour: 9),
-            end_time: (@event.start_date + 2.days).to_time.change(hour: 10),
+            start_time: start_time,
+            end_time: start_time.change(hour: 10),
             updated_by: 'Default Schedule'
           )
           @event.schedules.create(item.attributes)

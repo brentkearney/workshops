@@ -54,9 +54,9 @@ class ApplicationController < ActionController::Base
   end
 
   def validate_event_id
-    event_id = (params[:event_id] || params[:id]).to_s
-    (event_id.match?(/\A\d+\Z/) ||
-      event_id.match?(/#{Setting.Site['code_pattern']}/)) ? event_id : nil
+    id = (params[:event_id] || params[:id]).to_s
+    event_id = id.match?(/#{Setting.Site['code_pattern']}/) ? id : nil
+    id.match?(/\A\d+\Z/) || event_id
   end
 
   def invalid_auth_token

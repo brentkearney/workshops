@@ -74,7 +74,7 @@ describe 'SignIn', type: :feature do
     @user.member!
     @user.person.memberships.destroy_all
     expect(@user.person.memberships).to be_empty
-    m = create(:membership, person: @user.person,
+    create(:membership, person: @user.person,
       attendance: 'Not Yet Invited', role: 'Participant')
     visit sign_in_path
     fill_in_form

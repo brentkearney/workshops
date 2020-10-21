@@ -1,7 +1,8 @@
 
 # Include inside before loop
 def authenticate_user(person = nil, role = 'admin')
-  @person ||= FactoryBot.create(:person)
+  person ||= FactoryBot.create(:person)
+  @person = person
   @user = FactoryBot.create(:user, person: @person, role: role)
   login_as @user, scope: :user
   @user

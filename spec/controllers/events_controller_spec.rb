@@ -285,7 +285,7 @@
 
           get :past
 
-          expect(assigns(:events)).to eq([@event, @past_event])
+          expect(assigns(:events)).to eq([@past_event, @event])
         end
 
         it "staff: @events includes all past events" do
@@ -293,7 +293,7 @@
 
           get :past
 
-          expect(assigns(:events)).to eq([@event, @past_event])
+          expect(assigns(:events)).to eq([@past_event, @event])
         end
 
         it "admin: @events includes all past events" do
@@ -301,7 +301,7 @@
 
           get :past
 
-          expect(assigns(:events)).to eq([@event, @past_event])
+          expect(assigns(:events)).to eq([@past_event, @event])
         end
 
         it "super_admin: @events includes all past events" do
@@ -309,7 +309,7 @@
 
           get :past
 
-          expect(assigns(:events)).to eq([@event, @past_event])
+          expect(assigns(:events)).to eq([@past_event, @event])
         end
       end
     end

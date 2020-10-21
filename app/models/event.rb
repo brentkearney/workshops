@@ -40,23 +40,26 @@ class Event < ApplicationRecord
     param.to_s.match?(/\D/) ? find_by_code(param) : super
   end
 
-  scope :past, -> do
+  scope :past, -> {
     where("end_date < ? AND template = ?",
           Date.current, false).order(:start_date).limit(100)
-  end
-  scope :future, -> do
+  }
+
+  scope :future, -> {
     where("end_date >= ? AND template = ?",
           Date.current, false).order(:start_date)
-  end
-  scope :year, ->(year) do
+  }
+
+  scope :year, ->(year) {
     where("start_date >= '?-01-01' AND end_date <= '?-12-31' AND template = ?",
            year.to_i, year.to_i, false)
-  end
-  scope :location, ->(location) do
-    where("location = ? AND template = ?", location, false)
-  end
+  }
 
-  scope :kind, ->(kind) do
+  scope :location, ->(location) {
+    where("location = ? AND template = ?", location, false)
+  }
+
+  scope :kind, ->(kind) {
     if kind == 'Research in Teams'
       # RITs stay plural
       where("event_type = ? AND template = ?", 'Research in Teams', false)
@@ -65,7 +68,7 @@ class Event < ApplicationRecord
       where("event_type = ? AND template = ?", kind.titleize.singularize, false)
       .order(:start_date)
     end
-  end
+  }
 
   def self.templates
     where('template = ?', true)
