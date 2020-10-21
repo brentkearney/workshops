@@ -72,7 +72,7 @@ namespace :ws do
 
     ## Create Staff/Admin Users
     Person.where(affiliation: 'Example Organization').each do |p|
-      a = User.find_by(email: p.email)
+      u = User.find_by(email: p.email)
       if u.nil?
         puts "Creating an account for #{p.name}"
         user = User.new(
@@ -109,6 +109,28 @@ namespace :ws do
     end
   end
 
+  def update_updated_bys(membership, member)
+    if membership.updated_by.nil?
+      membership.updated_by = 'Workshops Import'
+    end
+    if member["Person"]["updated_by"].nil?
+      member["Person"]["updated_by"] = 'Workshops Import'
+    end
+    [membership, member]
+  end
+
+  def find_or_create_person(member)
+    local_person = Person.find_by(legacy_id: member['Person']['legacy_id'])
+    if local_person.nil?
+      local_person = Person.find_by(email: member['Person']['email'])
+    end
+
+    if local_person.nil?
+      local_person = Person.new(member['Person'])
+    end
+    local_person
+  end
+
   def import_members(lc, code)
     puts
     puts "##################################"
@@ -120,34 +142,9 @@ namespace :ws do
 
     lc.get_members(code).each do |member|
       membership = Membership.new(member["Membership"])
-
-      if membership.updated_by.nil?
-        membership.updated_by = 'Workshops Import'
-      end
-      if member["Person"]["updated_by"].nil?
-        member["Person"]["updated_by"] = 'Workshops Import'
-      end
-
+      membership, member = update_updated_bys(membership, member)
       membership.event = Event.find(code)
-
-      # Check for matching local Person record
-      local_person = Person.find_by(legacy_id: member['Person']['legacy_id'])
-      unless local_person
-        local_person = Person.find_by(email: member['Person']['email'])
-      end
-
-      if local_person
-        # puts "Found! #{local_person.name} has email #{local_person.email}"
-        # if local_person.legacy_id.to_i == member["Person"]["legacy_id"].to_i
-        membership.person = local_person
-        # else
-        #   people_errors.push("Record has matching email but different legacy_id! Remote: #{member['Person']['lastname']}  #{member['Person']['legacy_id']} | Local: [#{local_person.id}]#{local_person.name} #{local_person.legacy_id}")
-        # end
-
-      else
-        # Otherwise create a new person record
-        membership.person = Person.new(member['Person'])
-      end
+      membership.person = find_or_create_person(member)
 
       unless membership.save
         # Skip gender & affiliation checks here -- they will be caught by event sync later
@@ -167,7 +164,7 @@ namespace :ws do
   ## Populate Event data from legacy db
   ##
   desc "Import event and membership data for a given year"
-  task :import_year, [:year] => :environment do |t, args|
+  task :import_year, [:year] => :environment do |_t, args|
     year = args[:year]
     if year.blank?
       abort("\nUse import_year[year]. For example `rake ws:import_year[2015]`\n")
