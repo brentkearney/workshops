@@ -31,26 +31,34 @@ class ScheduleItem
     @schedule
   end
 
-  def self.update(schedule, params)
-    @schedule = schedule
-    @event = @schedule.event
-    new_day = params.delete :day
+  def self.parse_attributes(params)
+    attribs = [nil, nil, nil, nil]
+    return attribs if params.nil? || params[:lecture_attributes].blank?
 
-    if params[:lecture_attributes]
-      lecture_id = params[:lecture_attributes].delete :id unless params[:lecture_attributes][:id].blank?
-      person_id = params[:lecture_attributes].delete :person_id unless params[:lecture_attributes][:person_id].blank?
-      do_not_publish = params[:lecture_attributes].delete :do_not_publish unless params[:lecture_attributes][:do_not_publish].blank?
-      keywords = params[:lecture_attributes].delete :keywords unless params[:lecture_attributes][:keywords].blank?
-    end
+    lecture_id = params[:lecture_attributes].delete :id unless params[:lecture_attributes][:id].blank?
+    person_id = params[:lecture_attributes].delete :person_id unless params[:lecture_attributes][:person_id].blank?
+    do_not_publish = params[:lecture_attributes].delete :do_not_publish unless params[:lecture_attributes][:do_not_publish].blank?
+    keywords = params[:lecture_attributes].delete :keywords unless params[:lecture_attributes][:keywords].blank?
 
-    new_schedule = Schedule.new(params.merge(id: @schedule.id,
-                                             staff_item: @schedule.staff_item))
+    [lecture_id, person_id, do_not_publish, keywords]
+  end
+
+  def self.update_ats(new_schedule)
     if new_schedule.created_at.nil?
-      new_schedule.created_at = DateTime.current
+      new_schedule.created_at = DateTime.current.in_time_zone(@event.time_zone)
     end
     if new_schedule.updated_at.nil?
-      new_schedule.updated_at = DateTime.current
+      new_schedule.updated_at = DateTime.current.in_time_zone(@event.time_zone)
     end
+    new_schedule
+  end
+
+  def self.change_day(new_schedule, params)
+    new_day = params.delete :day
+
+    the_date = { year: new_schedule.start_time.year,
+                month: new_schedule.start_time.month,
+                  day: new_schedule.start_time.mday }
 
     unless new_day.nil?
       the_date = { year: new_day.to_date.year, month: new_day.to_date.month,
@@ -58,7 +66,10 @@ class ScheduleItem
       new_schedule.start_time = new_schedule.start_time.to_time.change(the_date)
       new_schedule.end_time = new_schedule.end_time.to_time.change(the_date)
     end
+    [new_schedule, the_date]
+  end
 
+  def self.set_earliest(new_schedule, params, the_date)
     if params[:'earliest(4i)'] == '' || new_schedule.earliest.nil?
       new_schedule.earliest = nil
     else
@@ -68,6 +79,10 @@ class ScheduleItem
 
       new_schedule.earliest = new_schedule.start_time.change(the_date)
     end
+    new_schedule
+  end
+
+  def self.set_latest(new_schedule, params, the_date)
     if params[:'latest(4i)'] == '' || new_schedule.latest.nil?
       new_schedule.latest = nil
     else
@@ -77,30 +92,59 @@ class ScheduleItem
 
       new_schedule.latest = new_schedule.start_time.change(the_date)
     end
+    new_schedule
+  end
 
-    unless lecture_id.nil?
-      lecture = Lecture.find(lecture_id)
-      # don't update the time if a recording has already been made
-      if lecture.filename.blank?
-        lecture.start_time = new_schedule.start_time
-        lecture.end_time = new_schedule.end_time
-      end
-      lecture.title = new_schedule.name
-      lecture.person = Person.find(person_id) unless person_id.nil?
-      lecture.do_not_publish = do_not_publish
-      lecture.keywords = keywords
-      lecture.updated_by = params[:updated_by]
-      new_schedule.name = "#{lecture.person.name}: #{new_schedule.name}"
-      lecture.abstract = new_schedule.description
-      new_schedule.description = nil
-      lecture.room = new_schedule.location
-      new_schedule.lecture = lecture
-      new_attributes = new_schedule.attributes.merge(lecture_attributes: lecture.attributes.compact).compact
+  def self.update_the_things(new_schedule, params)
+    new_schedule = update_ats(new_schedule)
+    new_schedule, the_date = change_day(new_schedule, params)
+    new_schedule = set_earliest(new_schedule, params, the_date)
+    set_latest(new_schedule, params, the_date)
+  end
+
+  def self.update(schedule, params)
+    @schedule = schedule
+    @event = @schedule.event
+
+    lecture_attribs = parse_attributes(params)
+    new_schedule = Schedule.new(params.merge(id: @schedule.id,
+                                             staff_item: @schedule.staff_item))
+
+    new_schedule = update_the_things(new_schedule, params)
+
+    unless lecture_attribs.first.nil?
+      lecture, new_schedule = setup_lecture(lecture_attribs, new_schedule)
+      new_attributes = new_schedule.attributes
+                        .merge(lecture_attributes: lecture.attributes.compact)
+                        .compact
     else
       new_attributes = new_schedule.attributes
     end
 
     new_attributes
+  end
+
+  def self.setup_lecture(lecture_attribs, new_schedule)
+    lecture_id, person_id, do_not_publish, keywords = lecture_attribs
+    lecture = Lecture.find(lecture_id)
+
+    # don't update the time if a recording has already been made
+    if lecture.filename.blank?
+      lecture.start_time = new_schedule.start_time
+      lecture.end_time = new_schedule.end_time
+    end
+
+    lecture.title = new_schedule.name
+    lecture.person = Person.find(person_id) unless person_id.nil?
+    lecture.do_not_publish = do_not_publish
+    lecture.keywords = keywords
+    lecture.updated_by = new_schedule.updated_by
+    new_schedule.name = "#{lecture.person.name}: #{new_schedule.name}"
+    lecture.abstract = new_schedule.description
+    new_schedule.description = nil
+    lecture.room = new_schedule.location
+    new_schedule.lecture = lecture
+    [lecture, new_schedule]
   end
 
   def self.update_others(original_item, params)
@@ -204,13 +248,13 @@ class ScheduleItem
       times = Hash.new(0)
       last_day = 9
       @lectures.pluck(:start_time, :end_time).each do |t|
-        item_start, item_end = t
+        item_start, _item_end = t
         if item_start.wday != last_day
           times["#{item_start.hour}:#{item_start.min}"] += 1
         end
         last_day = item_start.wday
       end
-      times.sort_by{|k, v| v}.last.first
+      times.sort_by{|_k, v| v}.last.first
     end
   end
 
@@ -268,7 +312,7 @@ class ScheduleItem
         lecture_length = (item_end - item_start).abs.to_i / 60
         times[lecture_length] += 1
       end
-      mfl, _num = times.sort_by{|k, v| v}.last
+      mfl, _num = times.sort_by{|_k, v| v}.last
       mfl.minutes
     end
   end

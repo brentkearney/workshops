@@ -243,6 +243,6 @@ class MembershipsController < ApplicationController
   end
 
   def invite_params
-    params.require(:invite_members_form).reject {|k,v| v == "0"}.keys
+    params.require(:invite_members_form).reject {|_k,v| v == "0"}.keys
   end
 end
