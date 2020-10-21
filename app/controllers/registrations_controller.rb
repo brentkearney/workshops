@@ -9,13 +9,8 @@ class RegistrationsController < Devise::RegistrationsController
   layout "devise"
 
   def create
-    invalid_email_redirect and return unless valid_email?
-    person = Person.find_by_email(user_email)
-    no_person_redirect and return if person.blank?
-
-    membership = person.memberships.where("(role LIKE '%Org%') OR
-          attendance != 'Not Yet Invited'").first
-    not_invited_redirect and return if membership.blank?
+    person = valid_user?
+    return unless person
 
     params[:user][:person_id] = person.id
     super
@@ -30,16 +25,31 @@ class RegistrationsController < Devise::RegistrationsController
 
   private
 
+  def valid_user?
+    return invalid_email_redirect unless valid_email?
+    person = Person.find_by_email(user_email)
+    return no_person_redirect if person.blank?
+
+    membership = person.memberships.where("(role LIKE '%Org%') OR
+          attendance != 'Not Yet Invited'").first
+    return not_invited_redirect if membership.blank?
+
+    return person
+  end
+
   def not_invited_redirect
     redirect_to register_path, error: 'We have no records of pending event invitations for you. Please contact the event organizer.'
+    return false
   end
 
   def no_person_redirect
     redirect_to register_path, error: 'We have no record of that email address. Please check our correspondence with you, to see what email address is in the To: field.'
+    return false
   end
 
   def invalid_email_redirect
     redirect_to register_path, error: 'You must enter a valid e-mail address.'
+    return false
   end
 
   def sign_up_params
