@@ -118,22 +118,33 @@ module Syncable
     local
   end
 
-  # local record, remote hash
-  def update_record(local, remote)
+  def update_record_updateds(local)
     local.updated_at = DateTime.new(1970,1,1) if local.updated_at.blank?
     local.updated_by = 'Workshops Import' if local.updated_by.blank?
-    return update_missing_data(local, remote) if local_is_newer?(local, remote)
+    local
+  end
 
+  def dedupe(local, remote)
     # resolve duplicate person records with mismatched legacy_id or email
     # if its a legacy_id change, also update event associations on legacydb
     # if its an email change, User account may also need updating
     local = resolve_duplicates(local, remote, 'legacy_id')
     local = resolve_duplicates(local, remote, 'email')
+  end
+
+  def skip_update_fields(k)
+    k == 'legacy_id' || k == 'email' || k == 'biography' || k == 'research_areas'
+  end
+
+  # local record, remote hash
+  def update_record(local, remote)
+    local = update_record_updateds(local)
+    return update_missing_data(local, remote) if local_is_newer?(local, remote)
+    local = dedupe(local, remote)
 
     booleans = boolean_fields(local)
     remote.each_pair do |k, v|
-      next if k == 'legacy_id' || k == 'email' || k == 'biography' ||
-        k == 'research_areas'
+      next if skip_update_fields(k)
       v = prepare_value(k, v)
       v = bool_value(v) if booleans.include?(k)
 
@@ -195,8 +206,13 @@ module Syncable
     v
   end
 
-  def prepare_value(k, v)
+  def ids_to_int(k, v)
     v = v.to_i if k.include? '_id'
+    v
+  end
+
+  def prepare_value(k, v)
+    v = ids_to_int(k, v)
     v = update_ats(k, v)
     v = v.strip if v.respond_to? :strip
     v
@@ -302,7 +318,7 @@ module Syncable
   end
 
   def update_updateds(h)
-    h.each do |k, attr|
+    h.each do |_k, attr|
       if attr.key?('updated_by')
         attr['updated_by'] = 'Workshops importer' if attr['updated_by'].blank?
       end

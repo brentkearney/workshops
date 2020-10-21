@@ -122,7 +122,7 @@ class SettingUpdater
     unless section_settings.keys.empty?
       section = section_settings[section_settings.keys.first]
       unless section.blank?
-        section.each do |key, value|
+        section.each do |key, _value|
           empty_fields[key] = ''
         end
       end

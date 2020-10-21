@@ -39,7 +39,7 @@ class FakeLegacyConnector
   end
 
   def search_person(email)
-    build(:person, email: email).attributes
+    #build(:person, email: email).attributes
   end
 
   def replace_person(replace, replace_with)
