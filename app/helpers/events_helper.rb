@@ -20,13 +20,11 @@ module EventsHelper
     field
   end
 
-  def event_list_title
-    return @heading unless @heading.blank?
+  def title_from_path
     title = ''
-    return title if controller_name == 'registrations'
     case request.path
     when /settings/
-      return 'Application Settings'
+      title = 'Application Settings'
     when '/events'
       title = 'All'
     when /events\/my_events/
@@ -38,6 +36,13 @@ module EventsHelper
       year = request.path.match(/year\/(\w+)/)
       title = year[1]
     end
+    title
+  end
+
+  def event_list_title
+    return @heading unless @heading.blank?
+    return '' if controller_name == 'registrations'
+    title = title_from_path
 
     if !@kind.blank?
       title = "#{@kind.titleize.pluralize}"
@@ -81,24 +86,29 @@ module EventsHelper
     url
   end
 
+  def get_year(event, direction)
+    year = event.year.to_i - 1
+    year = event.year.to_i + 1 if direction == :next
+    year
+  end
+
+  def year_arrow(direction, year)
+    return "← #{year}" if direction == :previous
+    "#{year} →"
+  end
+
+  def year_path(direction, year)
+    if @kind.blank?
+      events_year_path(year)
+    else
+      "/events/kind/#{@kind}/year/#{year}"
+    end
+  end
+
   def year_link(event, direction)
     return if event.blank? || request.path.match?(/events\/my_events/)
-    if direction == :previous
-      year = event.year.to_i - 1
-      path = events_year_path(year)
-      unless @kind.blank?
-        path = "/events/kind/#{@kind}/year/#{year}"
-      end
-      return link_to("← #{year}", path)
-    end
-    if direction == :next
-      year = event.year.to_i + 1
-      path = events_year_path(year)
-      unless @kind.blank?
-        path = "/events/kind/#{@kind}/year/#{year}"
-      end
-      return link_to("#{year} →", path)
-    end
+    year = get_year(event, direction)
+    link_to(year_arrow(direction, year), year_path(direction, year))
   end
 
   def event_cancelled?(event)
