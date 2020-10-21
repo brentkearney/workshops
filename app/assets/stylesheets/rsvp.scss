@@ -1,5 +1,56 @@
 @import "colours";
 
+/* also used by memberships#email_change */
+#email-form {
+  text-align: center;
+  overflow: auto;
+
+  p { margin-top: 1.5em; }
+
+  #new_email_form {
+    margin-top: -2em;
+  }
+
+  .verification-msg {
+    @media (min-width: 768px) {
+      text-align: right;
+    }
+
+    padding: 0.4em;
+  }
+
+  .email-code {
+    padding: 0.4em;
+    width: 100vw;
+    position: relative;
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+
+    input {
+      @media (max-width: 768px) {
+        width: 50%;
+      }
+    }
+  }
+
+  #second-row {
+    margin-top: 1.5em;
+  }
+
+  #button-row {
+    margin-top: 1.5em;
+
+    @media (max-width: 413px) {
+      .btn {
+        float: none;
+        margin-bottom: 1em;
+      }
+    }
+  }
+}
+
+/* RSVP Form start */
 .rsvp {
   .btn {
     border: 1px solid lightgrey;
@@ -8,7 +59,7 @@
   }
 
   .invitation-box {
-    box-shadow: 0px 29px 147.5px 102.5px rgba(0, 0, 0, 0.05), 0px 29px 95px;
+    box-shadow: 0 29px 147.5px 102.5px rgba(0, 0, 0, 0.05), 0 29px 95px;
     max-width: 800px;
     padding: 0;
     margin: 0;
@@ -22,6 +73,7 @@
 
   .rsvp-card-title {
     @extend .card-title;
+
     text-align: center;
     border: 2px solid white;
   }
@@ -29,6 +81,7 @@
   h1 {
     color: $grey-heading;
     font-weight: bold;
+
     small {
       font-size: 0.7em;
     }
@@ -80,14 +133,17 @@
       margin-bottom: 1.5em;
       padding: 0 1em;
     }
+
     li {
       font-size: 1.5em;
       line-spacing: 1.3em;
       margin: 0 1em;
     }
+
     h4 {
       margin-top: 2em;
       padding: 0 1.5em;
+
       a {
         text-decoration: underline;
       }
@@ -100,8 +156,15 @@
       margin-bottom: 10px;
       text-align: left;
     }
+
     #message {
       margin-top: 0;
+    }
+  }
+
+  #feedback-form {
+    h1 {
+      margin-bottom: 20px;
     }
   }
 
@@ -120,8 +183,8 @@
     }
 
     .mandatory:after {
-      content:"*";
-      color:red;
+      content: "*";
+      color: red;
     }
 
     #may-return {
@@ -132,12 +195,13 @@
     }
 
     /* Larger text for form inputs & placeholders */
-    input, select {
+    input,
+    select {
       font-size: 16px;
     }
 
     ::-webkit-input-placeholder {
-       font-size: 16px!important;
+      font-size: 16px !important;
     }
 
     :-moz-placeholder { /* Firefox 18- */
@@ -170,6 +234,16 @@
       margin: 10px;
     }
 
+    .field_with_errors {
+      label {
+        color: $errors-text-color;
+      }
+
+      input,select {
+        background-color: #e9d5d5;
+      }
+    }
+
     #accommodation_buttons {
       width: 100%;
       text-align: left;
@@ -194,7 +268,7 @@
 
       .mandatory::before {
         content: "*";
-        color:red;
+        color: red;
         font-size: 1.8em;
         float: right;
         margin-top: -10px;
@@ -214,6 +288,10 @@
       margin-left: 1.5em;
       margin-bottom: 2em;
       line-height: 2em;
+    }
+
+    #errors h4 {
+      color: $grey-heading;
     }
 
     #canadian-grants {
@@ -240,23 +318,6 @@
         padding: 1em;
       }
     }
-
-    .field_with_errors {
-      label {
-        color: $errors-text-color;
-      }
-
-      input,select {
-        background-color: #e9d5d5;
-      }
-    }
-  }
-
-
-  #feedback-form {
-    h1 {
-      margin-bottom: 20px;
-    }
   }
 
   .well {
@@ -278,60 +339,5 @@
       text-decoration: underline;
     }
   }
-
-  #errors h4 {
-    color: $grey-heading;
-  }
 }
 
-/* also used by memberships#email_change */
-#email-form {
-  text-align: center;
-  overflow: auto;
-
-  p { margin-top: 1.5em; }
-
-  #new_email_form {
-    margin-top: -2em;
-  }
-
-  .verification-msg {
-    @media (min-width: 768px) {
-      text-align: right;
-    }
-
-    padding: 0.4em;
-  }
-
-  .email-code {
-    padding: 0.4em;
-
-    width: 100vw;
-    position: relative;
-
-    display: flex;
-    flex-flow: column wrap;
-    align-items: center;
-
-    input {
-      @media (max-width: 768px) {
-        width: 50%;
-      }
-    }
-  }
-
-  #second-row {
-    margin-top: 1.5em;
-  }
-
-  #button-row {
-    margin-top: 1.5em;
-
-    @media (max-width: 413px) {
-      .btn {
-        float: none;
-        margin-bottom: 1em;
-      }
-    }
-  }
-}

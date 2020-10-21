@@ -43,7 +43,7 @@
 
 .event-buttons {
   margin-top: -20px;
-  margin-left: 0px;
+  margin-left: 0;
 
   .btn {
     margin-right: 10px;
@@ -52,6 +52,16 @@
 
 .card-primary .event-date {
   color: #fff;
+}
+
+p {
+  font-size: 1.2em;
+  line-height: 1.6em;
+  margin-bottom: 2em;
+
+  a {
+    text-decoration: underline;
+  }
 }
 
 .card-title {
@@ -66,12 +76,4 @@
   padding: 2em;
 }
 
-p {
-  font-size: 1.2em;
-  line-height: 1.6em;
-  margin-bottom: 2em;
 
-  a {
-    text-decoration: underline;
-  }
-}

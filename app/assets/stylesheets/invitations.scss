@@ -35,7 +35,6 @@
       white-space: pre-wrap;
 
       option {
-
         /* wrap text in compatible browsers */
         -moz-white-space: pre-wrap;
         -o-white-space: pre-wrap;
@@ -59,6 +58,6 @@
   }
 }
 
-.invitation-errors ul, li {
+.invitation-errors li {
   line-spacing: 1.3em;
 }

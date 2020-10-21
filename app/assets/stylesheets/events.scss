@@ -28,7 +28,7 @@
   }
 
   @media only screen and (max-width: 767px) {
-    .table >tbody >tr >td {
+    .table > tbody > tr > td {
       display: block;
       min-width: 100% !important;
     }
@@ -52,7 +52,8 @@
     padding: 5px;
   }
 
-  ul,ol {
+  ul,
+  ol {
     margin: 1em;
   }
 

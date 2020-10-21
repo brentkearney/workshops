@@ -4,7 +4,8 @@
     margin-right: 10px;
     border: 1px solid $light-border;
 
-    h4.card-title, .card-footer {
+    h4.card-title,
+    .card-footer {
       margin: -8px;
     }
 
@@ -23,7 +24,7 @@
     }
 
     .reply-due {
-      background-color: lighten( $flash-message-color, 30% );
+      background-color: lighten($flash-message-color, 30%);
       border-bottom: 1px solid $flash-message-color;
     }
 
@@ -58,15 +59,18 @@
 
     ol.ordered-member-list {
       padding-left: 1em;
+
       li {
         clear: both;
         padding: 5px;
         width: 100%;
         max-width: 560px;
       }
+
       li:nth-child(odd):not(.reply-due) {
         background: lighten($light-border, 10%);
       }
+
       .member-list-item {
         float: left;
 
@@ -102,61 +106,12 @@
     }
   }
 
-  .member-show {
-    .card {
-      border: 1px solid $light-border;
-      max-width: 550px;
-      margin: 0 10px 10px 0;
-    }
-
-    .card-title {
-      margin: -8px;
-
-      h2#profile-name {
-        margin-bottom: 0;
-
-        small {
-          font-size: 0.8rem;
-        }
-      }
-    }
-
-    #profile-url {
-      margin-bottom: 1.5rem;
-    }
-
-    #profile-address {
-      text-align: left;
-      margin-bottom: 1.5rem;
-    }
-
-    #num-guests {
-      margin-left: 5px;
-    }
-
-    #profile-bio {
-      font-size: 0.8rem;
-      margin-left: 0.4rem;
-    }
-
-    #profile-special-info p {
-      font-size: 1rem;
-      margin-left: 0.2rem;
-    }
-
-    .card-footer {
-      margin: -8px;
-      font-size: 0.7rem;
-      text-align: left;
-    }
-  }
-
   .member-edit {
     .card {
       border: 1px solid $light-border;
-      //padding: 8px;
-      margin: 0px 10px 10px 0;
+      margin: 0 10px 10px 0;
     }
+
     .card-title {
       h3 {
         small {
@@ -173,12 +128,10 @@
       margin-top: 1em;
     }
 
-    #form-page {
-    }
-
     #membership-details {
-      .field_with_errors label:before {
-        content:"*";color:red;
+      .field_with_errors label::before {
+        content: "*";
+        color: red;
         font-size: 2em;
         float: left;
         margin-left: -35px;
@@ -192,6 +145,7 @@
       text-align: left;
       line-height: 1.5em;
       margin: -1em 0 0 1em;
+
       @media (min-width: 415px) {
         margin-left: 10%;
       }
@@ -201,9 +155,6 @@
       @media (min-width: 415px) {
         margin-left: 1.5em;
       }
-    }
-
-    #hotel-details {
     }
 
     .checkbox-field {
@@ -282,6 +233,7 @@
 
   .checkboxes {
     @extend .animated-checkbox;
+
     display: inline;
     visibility: visible;
     margin-left: 30px;
@@ -289,6 +241,7 @@
 
   .popover {
     width: 250px;
+
     ul {
       margin-left: 10px;
       padding-left: 10px;
@@ -379,12 +332,14 @@
     padding-bottom: 20px;
   }
 
-  td.select, th.select {
+  td.select,
+  th.select {
     text-align: center;
   }
 
   table#new-people {
-    td, th {
+    td,
+    th {
       font-size: 1.2em;
     }
 
@@ -395,7 +350,6 @@
 
     td.counter {
       width: 40px;
-      valign: middle;
       vertical-align: center;
       font-size: 12pt;
       padding-top: 20px;
@@ -457,6 +411,55 @@
       visibility: hidden;
     }
   }
+
+  .member-show {
+    .card {
+      border: 1px solid $light-border;
+      max-width: 550px;
+      margin: 0 10px 10px 0;
+    }
+
+    .card-title {
+      margin: -8px;
+
+      h2#profile-name {
+        margin-bottom: 0;
+
+        small {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    #profile-url {
+      margin-bottom: 1.5rem;
+    }
+
+    #profile-address {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    #num-guests {
+      margin-left: 5px;
+    }
+
+    #profile-bio {
+      font-size: 0.8rem;
+      margin-left: 0.4rem;
+    }
+
+    #profile-special-info p {
+      font-size: 1rem;
+      margin-left: 0.2rem;
+    }
+
+    .card-footer {
+      margin: -8px;
+      font-size: 0.7rem;
+      text-align: left;
+    }
+  }
 }
 
 #button-row {
@@ -464,4 +467,3 @@
     margin-left: -50px;
   }
 }
-
