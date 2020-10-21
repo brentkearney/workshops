@@ -97,7 +97,7 @@ module EventsHelper
     "#{year} →"
   end
 
-  def year_path(direction, year)
+  def year_path(year)
     if @kind.blank?
       events_year_path(year)
     else
@@ -108,7 +108,7 @@ module EventsHelper
   def year_link(event, direction)
     return if event.blank? || request.path.match?(/events\/my_events/)
     year = get_year(event, direction)
-    link_to(year_arrow(direction, year), year_path(direction, year))
+    link_to(year_arrow(direction, year), year_path(year))
   end
 
   def event_cancelled?(event)

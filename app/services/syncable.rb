@@ -96,14 +96,21 @@ module Syncable
     local.updated_at >= rupdated
   end
 
+  def skip_fields(v,k)
+    v.blank? || k == 'legacy_id' || k == 'email'
+  end
+
   # local is newer, but remote may still have data that local is missing
   def update_missing_data(local, remote)
     remote.each_pair do |k,v|
-      next if v.blank? || k == 'legacy_id' || k == 'email'
+      next if skip_fields(v,k)
+
       local_value = local.send(k)
       next unless local_value.blank?
+
       v = prepare_value(k, v)
       next if v.nil? && local_value.blank?
+
       booleans = boolean_fields(local)
       v = bool_value(v) if booleans.include?(k)
       local.update_column(k.to_s, v) unless v.blank? # avoid updating updated_at
@@ -180,12 +187,17 @@ module Syncable
     replace_with
   end
 
-  def prepare_value(k, v)
-    v = v.to_i if k.include? '_id'
+  def update_ats(k, v)
     if k.to_s.include?('_at')
       v = nil if v == '0000-00-00 00:00:00' || v.blank?
       v = convert_to_time(v) unless v.nil?
     end
+    v
+  end
+
+  def prepare_value(k, v)
+    v = v.to_i if k.include? '_id'
+    v = update_ats(k, v)
     v = v.strip if v.respond_to? :strip
     v
   end

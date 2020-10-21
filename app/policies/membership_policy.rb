@@ -217,11 +217,6 @@ class MembershipPolicy
     self_organizer_staff
   end
 
-  def invite?
-    return true if allow_staff_and_admins
-    current_user.is_organizer?(event)
-  end
-
   def hotel_and_billing?
     staff_and_admins
   end
