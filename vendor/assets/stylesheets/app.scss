@@ -11,6 +11,7 @@ a.app-header__logo {
 }
 
 .app-login-box {
-  @media(max-width: 480px) { display: none; }
+  @media (max-width: 480px;) { display: none; }
+
   align-self: center;
 }

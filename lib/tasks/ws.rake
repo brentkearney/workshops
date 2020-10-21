@@ -207,7 +207,7 @@ namespace :ws do
   end
 
   desc "Import event and membership data for a given month"
-  task :import_month, [:yearmonth] => :environment do |t, args|
+  task :import_month, [:yearmonth] => :environment do |_t, args|
     year_month = args[:yearmonth]
     unless year_month.length == 6
       abort("\nUse import_month[YYYYMM]. For example `rake ws:import_month[201509]`\n")
@@ -246,7 +246,7 @@ namespace :ws do
   ## Add local lectures to legacy db
   ##
   desc "Add lectures to legacy db for a given event"
-  task :add_lectures, [:event_id] => :environment do |t, args|
+  task :add_lectures, [:event_id] => :environment do |_t, args|
     event_id = args[:event_id]
     if event_id.blank?
       abort("\nUse add_lectures[event_code]. For example `rake ws:add_lectures[\"15w5012\"]`\n\n")

@@ -178,8 +178,9 @@ describe "ScheduleItem" do
       context "If there are no scheduled Lectures on the given day" do
         context "and there is a scheduled non-lecture after 09:30" do
           it "should set the start_time to 09:00" do
-            schedule = Schedule.create!(@schedule_attributes.merge(start_time: "#{@event.start_date} 17:00",
-                                                                   end_time: "#{@event.start_date} 17:30"))
+            Schedule.create!(@schedule_attributes
+              .merge(start_time: "#{@event.start_date} 17:00:00",
+                     end_time: "#{@event.start_date} 17:30:00"))
 
             new_item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
             expect(new_item.start_time).to eq(event_timezone_at(9,00))

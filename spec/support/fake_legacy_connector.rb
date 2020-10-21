@@ -286,7 +286,7 @@ class FakeLegacyConnector
 
   end
 
-  def check_rsvp(otp)
+  def check_rsvp(_otp)
     { 'event_code' => Event.last.code }
   end
 
