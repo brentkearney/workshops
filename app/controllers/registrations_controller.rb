@@ -9,7 +9,7 @@ class RegistrationsController < Devise::RegistrationsController
   layout "devise"
 
   def create
-    person = valid_user?
+    person = valid_user?(user_email)
     return unless person
 
     params[:user][:person_id] = person.id
@@ -25,7 +25,7 @@ class RegistrationsController < Devise::RegistrationsController
 
   private
 
-  def valid_user?
+  def valid_user?(user_email)
     return invalid_email_redirect unless valid_email?
     person = Person.find_by_email(user_email)
     return no_person_redirect if person.blank?
