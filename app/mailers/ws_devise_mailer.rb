@@ -22,35 +22,35 @@ class WsDeviseMailer < Devise::Mailer
   include Devise::Mailers::Helpers
   default template_path: 'devise/mailer' # to make sure that your mailer uses the devise views
 
-  @@workshops = GetSetting.site_email('application_email')
+  @workshops = GetSetting.site_email('application_email')
 
   def confirmation_instructions(record, token, opts={})
-    opts[:from] = @@workshops
-    opts[:reply_to] = @@workshops
+    opts[:from] = @workshops
+    opts[:reply_to] = @workshops
     super
   end
 
   def reset_password_instructions(record, token, opts={})
-    opts[:from] = @@workshops
-    opts[:reply_to] = @@workshops
+    opts[:from] = @workshops
+    opts[:reply_to] = @workshops
     super
   end
 
   def unlock_instructions(record, token, opts={})
-    opts[:from] = @@workshops
-    opts[:reply_to] = @@workshops
+    opts[:from] = @workshops
+    opts[:reply_to] = @workshops
     super
   end
 
   def email_changed(record, opts={})
-    opts[:from] = @@workshops
-    opts[:reply_to] = @@workshops
+    opts[:from] = @workshops
+    opts[:reply_to] = @workshops
     super
   end
 
   def password_change(record, opts={})
-    opts[:from] = @@workshops
-    opts[:reply_to] = @@workshops
+    opts[:from] = @workshops
+    opts[:reply_to] = @workshops
     super
   end
 end

@@ -3,7 +3,7 @@ require 'factory_bot_rails'
 require 'faker'
 
 FactoryBot.define do
-  sequence(:code) do |x|
+  sequence(:code) do
     yrw5 = DateTime.current.strftime("%y") + 'w5'
     code = yrw5 + Random.rand(999).to_s.rjust(3, '0')
     while Event.where(code: code).exists?

@@ -164,7 +164,7 @@ RSpec.describe RsvpController, type: :controller do
         person = @invitation.membership.person
         person.email = 'mail@example.com'
         person.save
-        other_person = create(:person, email: 'foo@bar.com')
+        create(:person, email: 'foo@bar.com')
 
         post :email, params: @email_params
 

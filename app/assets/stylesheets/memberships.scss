@@ -1,4 +1,17 @@
 .memberships {
+  .popover {
+    width: 250px;
+
+    ul {
+      margin-left: 10px;
+      padding-left: 10px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+  }
+
   .members-list {
     margin-bottom: 25px;
     margin-right: 10px;
@@ -49,7 +62,7 @@
     }
 
     table.table-striped tr.reply-due td {
-      background-color: lighten( $flash-message-color, 30% );
+      background-color: lighten($flash-message-color, 30%);
     }
 
     .tooltip-inner {
@@ -356,19 +369,6 @@
 
     td.last-column {
       padding-right: 20px;
-    }
-  }
-
-  .popover {
-    width: 250px;
-
-    ul {
-      margin-left: 10px;
-      padding-left: 10px;
-    }
-
-    li {
-      margin-bottom: 10px;
     }
   }
 

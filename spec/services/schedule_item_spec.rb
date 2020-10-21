@@ -195,8 +195,8 @@ describe "ScheduleItem" do
             new_item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
             expect(new_item.start_time).to eq(schedule1.end_time)
 
-            schedule3 = Schedule.create!(@schedule_attributes.merge(start_time: event_timezone_at(9,15),
-                                                                      end_time: event_timezone_at(9,35)))
+            Schedule.create!(@schedule_attributes.merge(start_time: event_timezone_at(9,15),
+                                                        end_time: event_timezone_at(9,35)))
 
             new_item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
             expect(new_item.start_time).to eq(schedule2.end_time)
