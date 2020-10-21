@@ -237,10 +237,6 @@ class FakeLegacyConnector
 
   end
 
-  def search_person(email)
-
-  end
-
   def add_person(person)
 
   end

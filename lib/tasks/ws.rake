@@ -270,7 +270,7 @@ namespace :ws do
   ## Update Event memberships for given event
   ##
   desc "Update membership & person data for a given event"
-  task :update_members, [:code] => :environment do |t, args|
+  task :update_members, [:code] => :environment do |_t, args|
     code = args[:code]
     abort("\nUse update_members[event_code]. For example `rake ws:update_members[15w5069]`\n") if code.blank?
     event = Event.find("#{code}")

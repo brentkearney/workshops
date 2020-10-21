@@ -2,7 +2,8 @@
 
 # Create a template event with default schedule
 def build_lecture_schedule(event = nil)
-  @event ||= create(:event, future: true)
+  event ||= create(:event, future: true)
+  @event = event
 
   @event.days.each do |eday|
     (9..12).each do |hour|
