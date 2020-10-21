@@ -212,7 +212,7 @@ class MembershipsController < ApplicationController
   end
 
   def set_membership
-    membership_id = (params[:id] || params[:membership_id]).to_i
+    membership_id = (id_params[:id] || id_params[:membership_id]).to_i
     @membership = Membership.find(membership_id)
   rescue ActiveRecord::RecordNotFound
     redirect_to event_memberships_path(@event), error: 'Member not found.'
@@ -220,6 +220,10 @@ class MembershipsController < ApplicationController
 
   def set_user
     @current_user = current_user
+  end
+
+  def id_params
+    params.permit(:id, :membership_id)
   end
 
   def membership_params
