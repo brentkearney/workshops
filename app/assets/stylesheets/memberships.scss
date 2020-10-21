@@ -36,7 +36,7 @@
 
       .highlighted {
         padding: 5px;
-        background-color: lighten( $flash-message-color, 30% );
+        background-color: lighten($flash-message-color, 30%);
       }
     }
 
@@ -88,21 +88,6 @@
           margin-left: 1.5em;
         }
       }
-    }
-  }
-
-  #new-people-header {
-    h2 {
-      font-size: 1.2em;
-    }
-
-    small {
-      margin-left: 0.9em;
-      font-size: 0.8em;
-    }
-
-    p {
-      font-size: 0.8em;
     }
   }
 
@@ -191,6 +176,21 @@
     margin-top: 10px;
   }
 
+  #new-people-header {
+    h2 {
+      font-size: 1.2em;
+    }
+
+    small {
+      margin-left: 0.9em;
+      font-size: 0.8em;
+    }
+
+    p {
+      font-size: 0.8em;
+    }
+  }
+
   #reply-by {
     margin: 0 10px 20px 0;
     padding: 0.5em;
@@ -237,19 +237,6 @@
     display: inline;
     visibility: visible;
     margin-left: 30px;
-  }
-
-  .popover {
-    width: 250px;
-
-    ul {
-      margin-left: 10px;
-      padding-left: 10px;
-    }
-
-    li {
-      margin-bottom: 10px;
-    }
   }
 
   .limits-message {
@@ -369,6 +356,19 @@
 
     td.last-column {
       padding-right: 20px;
+    }
+  }
+
+  .popover {
+    width: 250px;
+
+    ul {
+      margin-left: 10px;
+      padding-left: 10px;
+    }
+
+    li {
+      margin-bottom: 10px;
     }
   }
 

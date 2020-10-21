@@ -46,6 +46,7 @@ class SyncMembers
   end
 
   def sync_memberships
+    return if remote_members.blank?
     fixed_remote_members = []
     remote_members.each do |rm|
       remote_member = fix_remote_fields(rm)
