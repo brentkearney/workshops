@@ -1,5 +1,7 @@
 # Workshops
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1cf9b50e035d4fd487209f3d177ba178)](https://www.codacy.com/gh/brentkearney/workshops/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=brentkearney/workshops&amp;utm_campaign=Badge_Grade)
+
 "Workshops" is software for managing scientific meetings, or small conferences. It is made with [Ruby on Rails](http://rubyonrails.org)
 and released under the GPL-A open-source license. The software is intended to be used by institutions/organizations
 who host workshops. It is used at the
@@ -61,7 +63,7 @@ Installation instructions are below.
 ## Upcoming Features:
 *  [E-mail Template Management](https://github.com/brentkearney/workshops/projects/1#card-18591813) - an interface for creating, editing, managing various e-mail templates used in the application, to be
    stored in the database instead of static files. Associate letter templates with types of events, roles of event participants, or other criteria. Schedule automated sending of certain letters to certain groups based on arbitrary conditions.
-   
+
 *  [Task scheduler](https://github.com/brentkearney/workshops/projects/1#card-18591759), to allow automated performance of tasks such as sending reminder emails for participants to RSVP, sending emails after events end to request feedback, etc.
 
 *  [Feedback form](https://github.com/brentkearney/workshops/projects/1#card-18590622) for participants after an event, with one-click URL for providing feedback on their experience of an event.
