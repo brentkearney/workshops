@@ -59,7 +59,7 @@ class SyncMembers
         update_records(local_member, remote_member)
       end
     end
-    remote_members = fixed_remote_members
+    @remote_members = fixed_remote_members
     prune_members
   end
 
@@ -82,13 +82,8 @@ class SyncMembers
     end
   end
 
-  def check_max_participants
-    confirmed = 0
-    invited = 0
-    undecided = 0
-    nyninvited = 0
-    declined = 0
-    observers = 0
+  def membership_counts
+    confirmed = invited = undecided = nyninvited = declined = observers = 0
     Event.find(@event.id).memberships.each do |membership|
       confirmed += 1 if membership.attendance == 'Confirmed'
       invited += 1 if membership.attendance == 'Invited'
@@ -102,9 +97,14 @@ class SyncMembers
         invited -= 1 if membership.attendance == 'Invited'
       end
     end
+    [confirmed, invited, undecided, nyninvited, declined, observers]
+  end
 
-    total_invited = confirmed + invited + undecided
-    if @event.max_participants - total_invited < 0
+  def check_max_participants
+    confirmed, invited, undecided, nyninvited, declined,
+      observers = membership_counts()
+
+    if @event.max_participants - (confirmed + invited + undecided) < 0
       msg = "Membership Totals:\n"
       msg += "Confirmed participants: #{confirmed}\n"
       msg += "Invited participants: #{invited}\n"
