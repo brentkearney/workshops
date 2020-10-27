@@ -76,6 +76,7 @@ class Schedule < ApplicationRecord
   end
 
   def add_overlaps_warning(other)
+    return unless other.event_id == self.event_id
     self.flash_notice = { warning: '' } if flash_notice.blank?
     unless flash_notice[:warning].include? 'overlaps with'
       msg = "<p>#{name} (#{location}) @ #{start_time.strftime('%H:%M')} - "

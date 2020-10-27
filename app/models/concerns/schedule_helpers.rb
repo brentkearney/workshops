@@ -55,7 +55,7 @@ module ScheduleHelpers
   # Schedule items can overlap, but not Lectures
   def errors_or_warnings(field, other)
     if self.is_a?(Schedule)
-      add_overlaps_warning(other) if other.event_id == self.event_id
+      add_overlaps_warning(other)
     else
       field = 'time' if field.to_s.match?("_time")
       add_error(field, other)
