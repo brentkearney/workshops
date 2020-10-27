@@ -53,4 +53,4 @@ document.addEventListener("turbolinks:load", function() {
     $('.login-box').toggleClass('flipped');
     return false;
   });
-})
+});
