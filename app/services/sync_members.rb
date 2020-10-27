@@ -82,37 +82,39 @@ class SyncMembers
     end
   end
 
-  def membership_counts
-    confirmed = invited = undecided = nyninvited = declined = observers = 0
+  def count_observers(counts)
     Event.find(@event.id).memberships.each do |membership|
-      confirmed += 1 if membership.attendance == 'Confirmed'
-      invited += 1 if membership.attendance == 'Invited'
-      undecided += 1 if membership.attendance == 'Undecided'
-      nyninvited += 1 if membership.attendance == 'Not Yet Invited'
-      declined += 1 if membership.attendance == 'Declined'
-
       if membership.role == 'Observer'
-        observers += 1
-        confirmed -= 1 if membership.attendance == 'Confirmed'
-        invited -= 1 if membership.attendance == 'Invited'
+        counts['Observers'] += 1
+        counts['Confirmed'] -= 1 if membership.attendance == 'Confirmed'
+        counts['Invited'] -= 1 if membership.attendance == 'Invited'
       end
     end
-    [confirmed, invited, undecided, nyninvited, declined, observers]
+    counts
+  end
+
+  def membership_counts
+    counts = {'Observers' => 0}
+    current_event = Event.find(@event.id)
+    Membership::ATTENDANCE.each do |a|
+      counts[a] = current_event.num_attendance(a)
+    end
+    count_observers(counts)
   end
 
   def check_max_participants
-    confirmed, invited, undecided, nyninvited, declined,
-      observers = membership_counts()
+    num = membership_counts()
 
-    if @event.max_participants - (confirmed + invited + undecided) < 0
+    total_invited = num['Confirmed'] + num['Invited'] + num['Undecided']
+    if @event.max_participants - total_invited < 0
       msg = "Membership Totals:\n"
-      msg += "Confirmed participants: #{confirmed}\n"
-      msg += "Invited participants: #{invited}\n"
-      msg += "Undecided participants: #{undecided}\n"
-      msg += "Not Yet Invited participants: #{nyninvited}\n"
-      msg += "Declined participants: #{declined}\n\n"
+      msg += "Confirmed participants: #{num['Confirmed']}\n"
+      msg += "Invited participants: #{num['Invited']}\n"
+      msg += "Undecided participants: #{num['Undecided']}\n"
+      msg += "Not Yet Invited participants: #{num['Not Yet Invited']}\n"
+      msg += "Declined participants: #{num['Declined']}\n\n"
       msg += "Total invited participants: #{total_invited}\n"
-      msg += "Total observers: #{observers}\n"
+      msg += "Total observers: #{num['Observers']}\n"
       msg += "#{@event.code} Maximum allowed: #{@event.max_participants}\n"
 
       sync_errors.add(@event, "#{@event.code} is overbooked!\n\n#{msg}")
