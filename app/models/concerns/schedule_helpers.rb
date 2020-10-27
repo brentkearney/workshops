@@ -63,14 +63,11 @@ module ScheduleHelpers
   end
 
   def times_overlap
-    Rails.logger.debug "\n\ntimes_overlap for #{self.class}...\n\n"
-    self.class.where("((start_time, end_time) OVERLAPS (timestamp :start, timestamp :end))
-                      AND id != :myself",
+    self.class.where("((start_time, end_time) OVERLAPS
+                      (timestamp :start, timestamp :end)) AND id != :myself",
                       :start => self.start_time, :end => self.end_time,
                       :myself => self.id.nil? ? 0 : self.id
-    ).order(:start_time).each { |other|
-      Rails.logger.debug "* found: #{other.inspect}"
-      errors_or_warnings(:start_time, other) }
+    ).order(:start_time).each { |other| errors_or_warnings(:start_time, other) }
   end
 
   def clean_data
