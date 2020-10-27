@@ -31,11 +31,15 @@ describe "Adding a Lecture Item to the Schedule", type: :feature do
     Warden.test_reset!
   end
 
-  it 'adds a Lecture' do
-    page.fill_in 'schedule_name', with: 'New test lecture'
-    page.fill_in 'schedule_location', with: 'Lecture room'
+  def add_a_lecture(title:, location:)
+    page.fill_in 'schedule_name', with: "#{title}"
+    page.fill_in 'schedule_location', with: "#{location}"
     select @person.lname, from: "schedule[lecture_attributes][person_id]"
     click_button 'Add New Schedule Item'
+  end
+
+  it 'adds a Lecture' do
+    add_a_lecture(title: "New test lecture", location: "Room 1")
 
     expect(page).to have_content 'successfully scheduled'
     expect(Lecture.last.title == 'New test lecture').to be_truthy
@@ -147,5 +151,74 @@ describe "Adding a Lecture Item to the Schedule", type: :feature do
     expect(page).to have_content 'schedule could not be saved'
     expect(find_field('schedule_name').value).to eq('Lecture 2')
     expect(find_field('schedule_description').value).to eq('Best talk ever!')
+  end
+
+  it 'disallows overlapping lectures in the same location, same event' do
+    add_a_lecture(title: "Test lecture 1", location: "Room 1")
+    lecture = Lecture.last
+    expect(lecture.title == 'Test lecture 1').to be_truthy
+
+    new_member = create(:membership, event: @event)
+
+    visit event_schedule_index_path(@event)
+    click_link "Add an item on #{@weekday}"
+
+    new_start = lecture.start_time - 5.minutes
+    new_stop = lecture.start_time + 5.minutes
+
+    page.fill_in 'schedule_name', with: "Test lecture 2"
+    page.select new_start.strftime('%H'), from: 'schedule_start_time_4i'
+    page.select new_start.strftime('%M'), from: 'schedule_start_time_5i'
+    page.select new_stop.strftime('%H'), from: 'schedule_end_time_4i'
+    page.select new_stop.strftime('%M'), from: 'schedule_end_time_5i'
+    page.fill_in 'schedule_location', with: 'Room 1'
+    select new_member.person.lname,
+        from: "schedule[lecture_attributes][person_id]"
+
+    click_button 'Add New Schedule Item'
+
+    expect(Lecture.last.title).not_to eq("Test lecture 2")
+    error_string = "Lecture time cannot overlap with another lecture "
+    error_string << "at the same location: #{@person.name} at Room 1 during "
+    error_string << "#{lecture.start_time.strftime('%H:%M')} - "
+    error_string << "#{lecture.end_time.strftime('%H:%M')}"
+    expect(find('div.alert-danger').text)
+      .to include("#{error_string}")
+  end
+
+  it 'disallows overlapping lectures in the same location, different event' do
+    add_a_lecture(title: "Test lecture 1", location: "Room 1")
+    lecture = Lecture.last
+
+    new_event = create(:event, start_date: @event.start_date,
+                                 end_date: @event.end_date)
+    new_member = create(:membership, event: new_event)
+    visit event_schedule_index_path(new_event)
+    click_link "Add an item on #{lecture.start_time.strftime("%A")}"
+
+    new_start = lecture.start_time - 5.minutes
+    new_stop = lecture.start_time + 10.minutes
+
+    page.fill_in 'schedule_name', with: "Test lecture 2"
+    page.select new_start.strftime('%H'), from: 'schedule_start_time_4i'
+    page.select new_start.strftime('%M'), from: 'schedule_start_time_5i'
+    page.select new_stop.strftime('%H'), from: 'schedule_end_time_4i'
+    page.select new_stop.strftime('%M'), from: 'schedule_end_time_5i'
+    page.fill_in 'schedule_location', with: 'Room 1'
+    select new_member.person.lname,
+        from: "schedule[lecture_attributes][person_id]"
+
+    click_button 'Add New Schedule Item'
+
+    expect(page.body).not_to have_content 'successfully scheduled'
+    expect(Lecture.last.title).not_to eq("Test lecture 2")
+    error_string = "Lecture time cannot overlap with another lecture "
+    error_string << "at the same location: #{@person.name} at Room 1 during "
+    error_string << "#{lecture.start_time.strftime('%H:%M')} - "
+    error_string << "#{lecture.end_time.strftime('%H:%M')}"
+    expect(find('div.alert-danger').text).to include("#{error_string}")
+
+    other_schedule = "See the #{@event.code} schedule for details."
+    expect(find('div.alert-danger').text).to include("#{other_schedule}")
   end
 end

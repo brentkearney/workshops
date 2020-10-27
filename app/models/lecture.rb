@@ -22,6 +22,8 @@ class Lecture < ApplicationRecord
   validate :times_within_event, unless: :missing_data
   validate :times_overlap, unless: [:missing_data, :from_api, :in_the_past]
 
+  delegate :url_helpers, to: 'Rails.application.routes'
+
   # app/models/concerns/schedule_helpers.rb
   include ScheduleHelpers
 
@@ -35,12 +37,22 @@ class Lecture < ApplicationRecord
     self.title = ActionController::Base.helpers.strip_tags(title)
   end
 
+  def link_to_other_event_schedule(other)
+    return '' unless other.event_id != self.event_id
+    url = "/events/#{other.event.code}/schedule"
+    " See the <a href=\"#{url}\"><u>#{other.event.code} schedule</u></a>
+    for details."
+  end
+
   def add_error(field, other)
-    if room == other.room
-      msg = '<strong>cannot overlap with another lecture in the same room:</strong> '
-      msg << "#{other.person.name} in #{other.room} at #{other.start_time.strftime('%H:%M')} - #{other.end_time.strftime('%H:%M')}"
-      errors.add(field, msg)
-    end
+    return unless room == other.room
+    msg = '<strong>cannot overlap with another lecture at the same
+      location:</strong> '
+    msg << "#{other.person.name} at #{other.room} during
+      #{other.start_time.strftime('%H:%M')} -
+      #{other.end_time.strftime('%H:%M')}."
+    msg << link_to_other_event_schedule(other)
+    errors.add(field, msg.squish)
   end
 
   def update_legacy_db

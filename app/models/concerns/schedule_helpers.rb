@@ -55,19 +55,22 @@ module ScheduleHelpers
   # Schedule items can overlap, but not Lectures
   def errors_or_warnings(field, other)
     if self.is_a?(Schedule)
-      add_overlaps_warning(other)
+      add_overlaps_warning(other) if other.event_id == self.event_id
     else
+      field = 'time' if field.to_s.match?("_time")
       add_error(field, other)
     end
   end
 
   def times_overlap
+    Rails.logger.debug "\n\ntimes_overlap for #{self.class}...\n\n"
     self.class.where("((start_time, end_time) OVERLAPS (timestamp :start, timestamp :end))
-                      AND event_id = :this_event AND id != :myself",
+                      AND id != :myself",
                       :start => self.start_time, :end => self.end_time,
-                      :this_event => self.event_id,
                       :myself => self.id.nil? ? 0 : self.id
-    ).order(:start_time).each { |other| errors_or_warnings(:start_time, other) }
+    ).order(:start_time).each { |other|
+      Rails.logger.debug "* found: #{other.inspect}"
+      errors_or_warnings(:start_time, other) }
   end
 
   def clean_data
