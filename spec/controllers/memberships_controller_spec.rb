@@ -177,7 +177,7 @@ RSpec.describe MembershipsController, type: :controller do
 
     context 'with a valid event id' do
       before do
-        @event = create(:event,future: true)
+        @event = create(:event, future: true)
         @membership = create(:membership, event: @event, role: 'Confirmed')
       end
 

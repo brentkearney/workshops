@@ -28,7 +28,7 @@ class ApplicationController < ActionController::Base
 
   def set_event
     event_id = validate_event_id
-    @event = event_id.nil? ? nil : Event.find(event_id)
+    @event = event_id.blank? ? nil : Event.find(event_id)
     redirect_to events_future_path, error: 'Invalid event id.' if @event.nil?
   end
 
@@ -55,9 +55,9 @@ class ApplicationController < ActionController::Base
 
   def validate_event_id
     event_id = (params[:event_id] || params[:id])
-    return if event_id.nil?
-    return event_id if event_id.match?(/#{Setting.Site['code_pattern']}/)
-    event_id.match?(/\A\d+\Z/) ? event_id : nil
+    return if event_id.blank?
+    all_events = Event.pluck(:id, :code).flatten.map(&:to_s)
+    return event_id if all_events.include?(event_id)
   end
 
   def invalid_auth_token
