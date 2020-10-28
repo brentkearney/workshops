@@ -19,24 +19,51 @@
 # SOFTWARE.
 
 class ParticipantMailer < ApplicationMailer
+  def set_recipient(person)
+    recipient = '"' + person.name + '" <' + person.email + '>'
+    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
+      recipient = GetSetting.site_email('webmaster_email')
+    end
+    recipient
+  end
+
+  def set_file_attachment(membership)
+    event = membership.event
+    # PDF attachment in lib/assets/rsvp/[location]
+    pdf_path = Rails.root.join('lib', 'assets', 'rsvp', "#{event.location}")
+    file_attachment = "#{pdf_path}/#{event.event_type}.pdf"
+
+    if membership.role == 'Observer'
+      file_attachment = "#{pdf_path}/#{event.location}-Observer.pdf"
+    end
+
+    if event.name.match? "(Online)"
+      file_attachment = "#{pdf_path}/#{event.location}/not_applicable.pdf"
+    end
+
+    file_attachment
+  end
+
+  def set_template(membership)
+    template = membership.event.event_type
+
+    if membership.role == 'Observer'
+      template << "-Observer"
+    end
+
+    if membership.event.name.match? "(Online)"
+      template = "Virtual " + template
+    end
+
+    template
+  end
+
   def rsvp_confirmation(membership)
     @person = membership.person
     @event = membership.event
     @organization = GetSetting.org_name(@event.location)
-    template = @event.event_type
-
-    # PDF attachment in lib/assets/rsvp/[location]
-    pdf_path = Rails.root.join('lib', 'assets', 'rsvp', "#{@event.location}")
-    file_attachment = "#{pdf_path}/#{@event.event_type}.pdf"
-    if membership.role == 'Observer'
-      file_attachment = "#{pdf_path}/#{@event.location}-Observer.pdf"
-      template << "-Observer"
-    end
-
-    if @event.name.match?(/Online/)
-      template = "Virtual " + template
-      file_attachment = "#{pdf_path}/#{@event.location}/not_applicable.pdf"
-    end
+    template = set_template(membership)
+    file_attachment = set_file_attachment(membership)
 
     if File.exist?("#{file_attachment}") # spaces in file name
       attachments["#{@event.location}-arrival-info.pdf"] = {
@@ -47,10 +74,7 @@ class ParticipantMailer < ApplicationMailer
 
     from_email = GetSetting.email(@event.location, 'rsvp')
     subject = "[#{@event.code}] Thank you for accepting our invitation"
-    to_email = '"' + @person.name + '" <' + @person.email + '>'
-    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
-      to_email = GetSetting.site_email('webmaster_email')
-    end
+    to_email = set_recipient(@person)
 
     template_path = Rails.root.join('app', 'views', 'participant_mailer',
                       'rsvp', "#{@event.location}")
