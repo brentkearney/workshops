@@ -59,7 +59,7 @@ RSpec.describe ParticipantMailer, type: :mailer do
 
   describe '.rsvp_confirmation for online meetings' do
     before do
-      event = create(:event, name: 'Test Online Event')
+      event = create(:event, name: 'Test Online Event', online: true)
       @membership = create(:membership, event: event)
       create(:invitation, membership: @membership)
     end

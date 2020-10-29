@@ -750,7 +750,6 @@ describe 'RSVP', type: :feature do
         end
 
         it 'has a minimal personal profile form' do
-          expect(page).to have_text('Personal Information')
           expect(page).to have_field('rsvp_person_firstname')
           expect(page).to have_field('rsvp_person_lastname')
           expect(page).to have_field('rsvp_person_affiliation')

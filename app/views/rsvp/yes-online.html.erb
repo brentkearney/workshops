@@ -13,7 +13,7 @@
     </div>
     <% end %>
     <div class="card-body d-flex flex-column justify-content-center">
-      <h2 class="rsvp-section">Please share your plans, then click the green button.<br>
+      <h2 class="rsvp-section">Please update your information, then click the green button.<br>
         <small>You may return any time to update this information.</small>
       </h2>
 
@@ -24,7 +24,6 @@
 
       <%= rsvp.fields_for :person, @rsvp.person do |p| %>
       <div class="p-2">
-        <h2 class="rsvp-section midpage">Personal Information</h2>
         <p><%= @rsvp.personal_info_intro %></p>
       </div>
       <div class="p-2 personal-info">
@@ -77,7 +76,7 @@
         </div>
 
         <div class="form-group">
-          <%= p.label :url, 'Website (URL) - use "https://..."' %>
+          <%= p.label :url, 'Your Website (URL)' %>
           <%= p.url_field :url, class: "form-control", autocomplete: "url" %>
         </div>
         <div class="form-group" id="address-fields">
