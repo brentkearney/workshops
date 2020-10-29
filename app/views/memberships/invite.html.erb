@@ -30,10 +30,8 @@
             <th class="select">Select</th>
             <th>#</th>
             <th>Name</th>
-            <% if show_invited_on?(members.first) %>
+            <% if show_invited_on?(members.first.attendance) %>
               <th>Invited On</th>
-            <% else %>
-              <th></th>
             <% end %>
             <th class="d-none d-lg-table-cell rowlink-skip no-print">Reply-by</th>
             <% if policy(@event).show_email_buttons?(status) %>
