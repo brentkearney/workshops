@@ -341,6 +341,20 @@ describe 'RSVP', type: :feature do
         expect(current_path).to eq(rsvp_yes_path(@invitation.code))
       end
 
+      it 'clicking Continue goes to #yes-online, if the event is online' do
+        event = @invitation.membership.event
+        event.online = true
+        event.save
+
+        visit rsvp_otp_path(@invitation.code)
+        click_link "Yes"
+        click_button('Continue')
+
+        expect(current_path).to eq(rsvp_yes_online_path(@invitation.code))
+        event.online = false
+        event.save
+      end
+
       it 'entering a new email updates the person record' do
         person = @membership.person
         expect(person.email).not_to eq('foo@bar.com')
@@ -421,172 +435,76 @@ describe 'RSVP', type: :feature do
         expect(current_path).to eq(rsvp_yes_path(@invitation.code))
         expect(page).to have_text('E-mail updated')
       end
+
+      it 'online events redirect to yes_online_path instead' do
+        event = @invitation.membership.event
+        event.online = true
+        event.save
+
+        person = @membership.person
+        c = ConfirmEmailChange.last
+        fill_in 'email_form[replace_email_code]', with: c.replace_code
+        fill_in 'email_form[replace_with_email_code]', with: c.replace_with_code
+        click_button("Submit Verification Codes")
+
+        expect(Person.find_by_id(person.id)).to be_nil
+        updated = Membership.find(@membership.id).person
+        expect(updated).to eq(@other_person)
+        expect(updated.email).to eq('foo@bar.com')
+        expect(current_path).to eq(rsvp_yes_online_path(@invitation.code))
+        expect(page).to have_text('E-mail updated')
+      end
     end
 
     context 'After email confirmed' do
-      before do
-        reset_database
-        @rsvp = RsvpForm.new(@invitation)
-        visit rsvp_yes_path(@invitation.code)
-      end
-
-      it 'has arrival and departure date section' do
-        expect(page).to have_text(@event.dates(:long))
-        expect(page).to have_text(@rsvp.arrival_departure_intro)
-      end
-
-      it 'arrival & departure default to event start & end' do
-        expect(page).to have_select('rsvp[membership][arrival_date]',
-          selected: @event.start_date.strftime("%A, %b %-d, %Y"))
-        expect(page).to have_select('rsvp[membership][departure_date]',
-          selected: @event.end_date.strftime("%A, %b %-d, %Y"))
-      end
-
-      it 'has guests form' do
-        expect(page).to have_text(@rsvp.guests_intro)
-        expect(page).to have_css('input#rsvp_membership_has_guest')
-        expect(page).to have_css('input#rsvp_membership_guest_disclaimer')
-      end
-
-      it 'has special info/food form' do
-        expect(page).to have_text(@rsvp.special_intro)
-        expect(page).to have_css('textarea#rsvp_membership_special_info')
-      end
-
-      it 'has personal profile form' do
-        expect(page).to have_text('Personal Information')
-        expect(page).to have_field('rsvp_person_firstname')
-        expect(page).to have_field('rsvp_person_lastname')
-        expect(page).to have_field('rsvp_person_affiliation')
-        expect(page).to have_field('rsvp_person_email', disabled: true)
-        expect(page).to have_field('rsvp_membership_share_email')
-        expect(page).to have_field('rsvp_membership_share_email_hotel')
-        expect(page).to have_field('rsvp_person_url')
-        expect(page).to have_field('rsvp_person_country')
-        expect(page).to have_field('rsvp_person_biography')
-        expect(page).to have_field('rsvp_person_research_areas')
-      end
-
-      context 'user is an organizer' do
+      context 'For in-person events' do
         before do
-          @membership.role = 'Organizer'
-          @membership.save
+          reset_database
+          @rsvp = RsvpForm.new(@invitation)
           visit rsvp_yes_path(@invitation.code)
         end
 
-        after do
-          @membership.role = 'Participant'
-          @membership.save
+        it 'has arrival and departure date section' do
+          expect(page).to have_text(@event.dates(:long))
+          expect(page).to have_text(@rsvp.arrival_departure_intro)
         end
 
-        it 'has a mailing address section' do
-          expect(page).to have_field('rsvp_person_address1')
-          expect(page).to have_field('rsvp_person_address2')
-          expect(page).to have_field('rsvp_person_address3')
-          expect(page).to have_field('rsvp_person_city')
-          expect(page).to have_field('rsvp_person_region')
+        it 'arrival & departure default to event start & end' do
+          expect(page).to have_select('rsvp[membership][arrival_date]',
+            selected: @event.start_date.strftime("%A, %b %-d, %Y"))
+          expect(page).to have_select('rsvp[membership][departure_date]',
+            selected: @event.end_date.strftime("%A, %b %-d, %Y"))
+        end
+
+        it 'has guests form' do
+          expect(page).to have_text(@rsvp.guests_intro)
+          expect(page).to have_css('input#rsvp_membership_has_guest')
+          expect(page).to have_css('input#rsvp_membership_guest_disclaimer')
+        end
+
+        it 'has special info/food form' do
+          expect(page).to have_text(@rsvp.special_intro)
+          expect(page).to have_css('textarea#rsvp_membership_special_info')
+        end
+
+        it 'has personal profile form' do
+          expect(page).to have_text('Personal Information')
+          expect(page).to have_field('rsvp_person_firstname')
+          expect(page).to have_field('rsvp_person_lastname')
+          expect(page).to have_field('rsvp_person_affiliation')
+          expect(page).to have_field('rsvp_person_email', disabled: true)
+          expect(page).to have_field('rsvp_membership_share_email')
+          expect(page).to have_field('rsvp_membership_share_email_hotel')
+          expect(page).to have_field('rsvp_person_url')
           expect(page).to have_field('rsvp_person_country')
-          expect(page).to have_field('rsvp_person_postal_code')
-        end
-      end
-
-      context 'user is not an organizer' do
-        it 'has no mailing address section' do
-          expect(page).not_to have_field('rsvp_person_address1')
-          expect(page).not_to have_field('rsvp_person_address2')
-          expect(page).not_to have_field('rsvp_person_address3')
-          expect(page).not_to have_field('rsvp_person_city')
-          expect(page).not_to have_field('rsvp_person_postal_code')
+          expect(page).to have_field('rsvp_person_biography')
+          expect(page).to have_field('rsvp_person_research_areas')
         end
 
-        it 'has region and country fields' do
-          expect(page).to have_field('rsvp_person_region')
-          expect(page).to have_field('rsvp_person_country')
-        end
-      end
-
-      it 'has privacy notice' do
-        expect(page).to have_text(@rsvp.privacy_notice)
-      end
-
-      it 'has "message to the organizer" form' do
-        organizer_name = @event.organizer.name
-        expect(page).to have_text(organizer_name)
-        expect(page).to have_field("rsvp_organizer_message")
-      end
-
-      it 'has instructions for editing information' do
-        expect(page).to have_css('span#revisit-note',
-                  text: 'You can update this information')
-        expect(page).to have_link(href: invitations_new_path(@event.code))
-        expect(page).to have_link('membership profile', href: event_membership_path(@event, @membership))
-      end
-
-      it 'if participant has no account, links to register new account' do
-        expect(User.find_by_email(@membership.person.email)).to be_nil
-        expect(page).to have_link('registering an account',
-                                   href: new_user_registration_path)
-      end
-
-      it 'if participant already has an account, does not link to register' do
-        person = @membership.person
-        user = create(:user, person: person, email: person.email)
-        expect(User.find_by_email(person.email)).not_to be_nil
-
-        visit rsvp_yes_path(@invitation.code)
-
-        expect(page).not_to have_link('registering an account',
-                                       href: new_user_registration_path)
-      end
-
-      it 'persists the organizer message through form validation' do
-        fill_in 'rsvp_organizer_message', with: 'Hi Org!'
-        fill_in 'rsvp_person_firstname', with: ''
-
-        click_button 'Confirm Attendance'
-
-        expect(page.body).to have_text("firstname can't be blank")
-        expect(page).to have_css('textarea#rsvp_organizer_message',
-          text: 'Hi Org!')
-      end
-
-      it 'persists staff attributes from before RSVP' do
-        @membership.staff_notes = 'Test note'
-        @membership.room = 'Room 6'
-        @membership.stay_id = 'ABC123'
-        @membership.save
-
-        fill_in 'rsvp_organizer_message', with: 'Hi Org!'
-        click_button 'Confirm Attendance'
-
-        updated_membership = Membership.find(@membership.id)
-        expect(updated_membership.staff_notes).to eq('Test note')
-        expect(updated_membership.room).to eq('Room 6')
-        expect(updated_membership.stay_id).to eq('ABC123')
-      end
-
-      it 'skips the "message to organizer" form if the user is the organizer' do
-        @membership.role = 'Contact Organizer'
-        @membership.save
-
-        visit rsvp_otp_path(@invitation.code)
-        click_link "Yes"
-        expect(page).not_to have_field("rsvp_organizer_message")
-
-        @membership.role = 'Participant'
-        @membership.save
-      end
-
-      context 'after the "Confirm Attendance" button' do
-        context 'as an organizer' do
+        context 'user is an organizer' do
           before do
             @membership.role = 'Organizer'
             @membership.save
-            @args = { 'attendance_was' => 'Invited',
-                      'attendance' => 'Confirmed',
-                      'organizer_message' => '' }
-            allow(EmailParticipantConfirmationJob).to receive(:perform_later)
-            allow(EmailOrganizerNoticeJob).to receive(:perform_later)
             visit rsvp_yes_path(@invitation.code)
           end
 
@@ -595,114 +513,357 @@ describe 'RSVP', type: :feature do
             @membership.save
           end
 
-          it 'fails validation if address data is blank' do
-            fill_in "rsvp_person_address1", with: ''
-            fill_in "rsvp_person_address2", with: ''
-            fill_in "rsvp_person_address3", with: ''
-            fill_in "rsvp_person_city", with: ''
-            fill_in "rsvp_person_region", with: ''
-            fill_in "rsvp_person_postal_code", with: ''
-
-            click_button 'Confirm Attendance'
-
-            expect(current_path).to eq(rsvp_yes_path(@invitation.code))
-            expect(page.body).to have_text('address fields cannot be blank')
-          end
-
-          it 'passes validation if country is NOT North American and region is blank' do
-            fill_in "rsvp_person_region", with: ''
-            fill_in "rsvp_person_country", with: 'Spain'
-
-            click_button 'Confirm Attendance'
-
-            expect(Person.find(@membership.person_id).country).to eq('Spain')
-          end
-
-          it 'fails validation if country is North American and region is blank' do
-            fill_in "rsvp_person_region", with: ''
-            fill_in "rsvp_person_country", with: 'Canada'
-
-            click_button 'Confirm Attendance'
-
-            expect(current_path).to eq(rsvp_yes_path(@invitation.code))
-            failed = 'region field cannot be blank'
-            expect(page.body).to have_text(failed)
-          end
-
-          it 'saves address data' do
-            fill_in "rsvp_person_address1", with: '123 Street'
-            fill_in "rsvp_person_address2", with: 'Unit 6'
-            fill_in "rsvp_person_address3", with: 'in the alley'
-            fill_in "rsvp_person_city", with: 'Baltimore'
-            fill_in "rsvp_person_region", with: 'MD'
-
-            click_button 'Confirm Attendance'
-
-            updated = Person.find(@membership.person_id)
-            expect(updated.address1).to eq('123 Street')
-            expect(updated.address2).to eq('Unit 6')
-            expect(updated.address3).to eq('in the alley')
-            expect(updated.city).to eq('Baltimore')
-            expect(updated.region).to eq('MD')
+          it 'has a mailing address section' do
+            expect(page).to have_field('rsvp_person_address1')
+            expect(page).to have_field('rsvp_person_address2')
+            expect(page).to have_field('rsvp_person_address3')
+            expect(page).to have_field('rsvp_person_city')
+            expect(page).to have_field('rsvp_person_region')
+            expect(page).to have_field('rsvp_person_country')
+            expect(page).to have_field('rsvp_person_postal_code')
           end
         end
 
-        context 'as a participant' do
+        context 'user is not an organizer' do
+          it 'has no mailing address section' do
+            expect(page).not_to have_field('rsvp_person_address1')
+            expect(page).not_to have_field('rsvp_person_address2')
+            expect(page).not_to have_field('rsvp_person_address3')
+            expect(page).not_to have_field('rsvp_person_city')
+            expect(page).not_to have_field('rsvp_person_postal_code')
+          end
+
+          it 'has region and country fields' do
+            expect(page).to have_field('rsvp_person_region')
+            expect(page).to have_field('rsvp_person_country')
+          end
+        end
+
+        it 'has privacy notice' do
+          expect(page).to have_text(@rsvp.privacy_notice)
+        end
+
+        it 'has "message to the organizer" form' do
+          organizer_name = @event.organizer.name
+          expect(page).to have_text(organizer_name)
+          expect(page).to have_field("rsvp_organizer_message")
+        end
+
+        it 'has instructions for editing information' do
+          expect(page).to have_css('span#revisit-note',
+                    text: 'You can update this information')
+          expect(page).to have_link(href: invitations_new_path(@event.code))
+          expect(page).to have_link('membership profile', href: event_membership_path(@event, @membership))
+        end
+
+        it 'if participant has no account, links to register new account' do
+          expect(User.find_by_email(@membership.person.email)).to be_nil
+          expect(page).to have_link('registering an account',
+                                     href: new_user_registration_path)
+        end
+
+        it 'if participant already has an account, does not link to register' do
+          person = @membership.person
+          user = create(:user, person: person, email: person.email)
+          expect(User.find_by_email(person.email)).not_to be_nil
+
+          visit rsvp_yes_path(@invitation.code)
+
+          expect(page).not_to have_link('registering an account',
+                                         href: new_user_registration_path)
+        end
+
+        it 'persists the organizer message through form validation' do
+          fill_in 'rsvp_organizer_message', with: 'Hi Org!'
+          fill_in 'rsvp_person_firstname', with: ''
+
+          click_button 'Confirm Attendance'
+
+          expect(page.body).to have_text("firstname can't be blank")
+          expect(page).to have_css('textarea#rsvp_organizer_message',
+            text: 'Hi Org!')
+        end
+
+        it 'persists staff attributes from before RSVP' do
+          @membership.staff_notes = 'Test note'
+          @membership.room = 'Room 6'
+          @membership.stay_id = 'ABC123'
+          @membership.save
+
+          fill_in 'rsvp_organizer_message', with: 'Hi Org!'
+          click_button 'Confirm Attendance'
+
+          updated_membership = Membership.find(@membership.id)
+          expect(updated_membership.staff_notes).to eq('Test note')
+          expect(updated_membership.room).to eq('Room 6')
+          expect(updated_membership.stay_id).to eq('ABC123')
+        end
+
+        it 'skips the "message to organizer" form if the user is the organizer' do
+          @membership.role = 'Contact Organizer'
+          @membership.save
+
+          visit rsvp_otp_path(@invitation.code)
+          click_link "Yes"
+          expect(page).not_to have_field("rsvp_organizer_message")
+
+          @membership.role = 'Participant'
+          @membership.save
+        end
+
+
+        context 'after the "Confirm Attendance" button' do
+          context 'as an organizer' do
+            before do
+              @membership.role = 'Organizer'
+              @membership.save
+              @args = { 'attendance_was' => 'Invited',
+                        'attendance' => 'Confirmed',
+                        'organizer_message' => '' }
+              allow(EmailParticipantConfirmationJob).to receive(:perform_later)
+              allow(EmailOrganizerNoticeJob).to receive(:perform_later)
+              visit rsvp_yes_path(@invitation.code)
+            end
+
+            after do
+              @membership.role = 'Participant'
+              @membership.save
+            end
+
+            it 'fails validation if address data is blank' do
+              fill_in "rsvp_person_address1", with: ''
+              fill_in "rsvp_person_address2", with: ''
+              fill_in "rsvp_person_address3", with: ''
+              fill_in "rsvp_person_city", with: ''
+              fill_in "rsvp_person_region", with: ''
+              fill_in "rsvp_person_postal_code", with: ''
+
+              click_button 'Confirm Attendance'
+
+              expect(current_path).to eq(rsvp_yes_path(@invitation.code))
+              expect(page.body).to have_text('address fields cannot be blank')
+            end
+
+            it 'passes validation if country is NOT North American and region is blank' do
+              fill_in "rsvp_person_region", with: ''
+              fill_in "rsvp_person_country", with: 'Spain'
+
+              click_button 'Confirm Attendance'
+
+              expect(Person.find(@membership.person_id).country).to eq('Spain')
+            end
+
+            it 'fails validation if country is North American and region is blank' do
+              fill_in "rsvp_person_region", with: ''
+              fill_in "rsvp_person_country", with: 'Canada'
+
+              click_button 'Confirm Attendance'
+
+              expect(current_path).to eq(rsvp_yes_path(@invitation.code))
+              failed = 'region field cannot be blank'
+              expect(page.body).to have_text(failed)
+            end
+
+            it 'saves address data' do
+              fill_in "rsvp_person_address1", with: '123 Street'
+              fill_in "rsvp_person_address2", with: 'Unit 6'
+              fill_in "rsvp_person_address3", with: 'in the alley'
+              fill_in "rsvp_person_city", with: 'Baltimore'
+              fill_in "rsvp_person_region", with: 'MD'
+
+              click_button 'Confirm Attendance'
+
+              updated = Person.find(@membership.person_id)
+              expect(updated.address1).to eq('123 Street')
+              expect(updated.address2).to eq('Unit 6')
+              expect(updated.address3).to eq('in the alley')
+              expect(updated.city).to eq('Baltimore')
+              expect(updated.region).to eq('MD')
+            end
+          end
+
+          context 'as a participant' do
+            before do
+              @args = { 'attendance_was' => 'Invited',
+                        'attendance' => 'Confirmed',
+                        'organizer_message' => '' }
+              allow(EmailParticipantConfirmationJob).to receive(:perform_later)
+              allow(EmailOrganizerNoticeJob).to receive(:perform_later)
+              visit rsvp_yes_path(@invitation.code)
+              fill_in "rsvp_organizer_message", with: 'Excited to attend!'
+              fill_in 'rsvp_person_url', with: 'http://foo.com'
+              click_button 'Confirm Attendance'
+            end
+
+            it 'saves person data' do
+              expect(Person.find(@membership.person_id).url).to eq('http://foo.com')
+            end
+
+            it 'changes membership attendance to confirmed' do
+              expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
+            end
+
+            it 'includes message in the organizer notice' do
+              @args['organizer_message'] = 'Excited to attend!'
+              expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
+                .with(@invitation.membership.id, @args)
+            end
+
+            it 'sends confirmation email to participant via background job' do
+              expect(EmailParticipantConfirmationJob)
+                .to have_received(:perform_later).with(@membership.id)
+            end
+
+            it 'destroys invitation' do
+              expect(Invitation.where(id: @invitation.id)).to be_empty
+            end
+
+            it 'forwards to feedback form, with flash message' do
+              expect(current_path).to eq(rsvp_feedback_path(@membership.id))
+              expect(page.body).to have_css('div.alert', text:
+                'Your attendance status was successfully updated. Thanks for your
+                reply!'.squish)
+            end
+
+            it 'updates legacy database' do
+              allow(SyncMembershipJob).to receive(:perform_later)
+              reset_database
+              allow(SyncMember).to receive(:new).with(@membership, is_rsvp: true)
+
+              visit rsvp_yes_path(@invitation.code)
+              click_button 'Confirm Attendance'
+
+              expect(SyncMembershipJob).to have_received(:perform_later)
+                .with(@membership.id)
+            end
+          end
+        end # After the Confirm button
+      end # for in-person events
+
+      context 'For Online events' do
+        before do
+          event = @invitation.membership.event
+          event.online = true
+          event.save
+          @rsvp = RsvpForm.new(@invitation)
+          visit rsvp_yes_online_path(@invitation.code)
+        end
+
+        it 'has a minimal personal profile form' do
+          expect(page).to have_text('Personal Information')
+          expect(page).to have_field('rsvp_person_firstname')
+          expect(page).to have_field('rsvp_person_lastname')
+          expect(page).to have_field('rsvp_person_affiliation')
+          expect(page).to have_field('rsvp_person_email', disabled: true)
+          expect(page).to have_field('rsvp_membership_share_email')
+          expect(page).to have_field('rsvp_person_url')
+          expect(page).to have_field('rsvp_person_country')
+          expect(page).to have_field('rsvp_person_biography')
+          expect(page).to have_field('rsvp_person_research_areas')
+        end
+
+        context 'user is an organizer' do
           before do
-            @args = { 'attendance_was' => 'Invited',
-                      'attendance' => 'Confirmed',
-                      'organizer_message' => '' }
-            allow(EmailParticipantConfirmationJob).to receive(:perform_later)
-            allow(EmailOrganizerNoticeJob).to receive(:perform_later)
-            visit rsvp_yes_path(@invitation.code)
-            fill_in "rsvp_organizer_message", with: 'Excited to attend!'
-            fill_in 'rsvp_person_url', with: 'http://foo.com'
-            click_button 'Confirm Attendance'
+            @membership.role = 'Contact Organizer'
+            @membership.save
+            visit rsvp_yes_online_path(@invitation.code)
           end
 
-          it 'saves person data' do
-            expect(Person.find(@membership.person_id).url).to eq('http://foo.com')
+          after do
+            @membership.role = 'Participant'
+            @membership.save
           end
 
-          it 'changes membership attendance to confirmed' do
-            expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
+          it 'has a mailing address section' do
+            expect(page).to have_field('rsvp_person_address1')
+            expect(page).to have_field('rsvp_person_address2')
+            expect(page).to have_field('rsvp_person_address3')
+            expect(page).to have_field('rsvp_person_city')
+            expect(page).to have_field('rsvp_person_region')
+            expect(page).to have_field('rsvp_person_country')
+            expect(page).to have_field('rsvp_person_postal_code')
           end
 
-          it 'includes message in the organizer notice' do
-            @args['organizer_message'] = 'Excited to attend!'
-            expect(EmailOrganizerNoticeJob).to have_received(:perform_later)
-              .with(@invitation.membership.id, @args)
-          end
-
-          it 'sends confirmation email to participant via background job' do
-            expect(EmailParticipantConfirmationJob)
-              .to have_received(:perform_later).with(@membership.id)
-          end
-
-          it 'destroys invitation' do
-            expect(Invitation.where(id: @invitation.id)).to be_empty
-          end
-
-          it 'forwards to feedback form, with flash message' do
-            expect(current_path).to eq(rsvp_feedback_path(@membership.id))
-            expect(page.body).to have_css('div.alert', text:
-              'Your attendance status was successfully updated. Thanks for your
-              reply!'.squish)
-          end
-
-          it 'updates legacy database' do
-            allow(SyncMembershipJob).to receive(:perform_later)
-            reset_database
-            allow(SyncMember).to receive(:new).with(@membership, is_rsvp: true)
-
-            visit rsvp_yes_path(@invitation.code)
-            click_button 'Confirm Attendance'
-
-            expect(SyncMembershipJob).to have_received(:perform_later)
-              .with(@membership.id)
+          it 'skips the "message to organizer" form' do
+            expect(page).not_to have_field("rsvp_organizer_message")
           end
         end
-      end
+
+        context 'user is not an organizer' do
+          it 'has no mailing address section' do
+            expect(page).not_to have_field('rsvp_person_address1')
+            expect(page).not_to have_field('rsvp_person_address2')
+            expect(page).not_to have_field('rsvp_person_address3')
+            expect(page).not_to have_field('rsvp_person_city')
+            expect(page).not_to have_field('rsvp_person_postal_code')
+          end
+
+          it 'has region and country fields' do
+            expect(page).to have_field('rsvp_person_region')
+            expect(page).to have_field('rsvp_person_country')
+          end
+        end
+
+        it 'has privacy notice' do
+          expect(page).to have_text(@rsvp.privacy_notice)
+        end
+
+        it 'has "message to the organizer" form' do
+          organizer_name = @event.organizer.name
+          expect(page).to have_text(organizer_name)
+          expect(page).to have_field("rsvp_organizer_message")
+        end
+
+        it 'has instructions for editing information' do
+          expect(page).to have_css('span#revisit-note',
+                    text: 'You can update this information')
+          expect(page).to have_link(href: invitations_new_path(@event.code))
+          expect(page).to have_link('membership profile', href: event_membership_path(@event, @membership))
+        end
+
+        it 'if participant has no account, links to register new account' do
+          expect(User.find_by_email(@membership.person.email)).to be_nil
+          expect(page).to have_link('registering an account',
+                                     href: new_user_registration_path)
+        end
+
+        it 'if participant already has an account, does not link to register' do
+          person = @membership.person
+          user = create(:user, person: person, email: person.email)
+          expect(User.find_by_email(person.email)).not_to be_nil
+
+          visit rsvp_yes_path(@invitation.code)
+
+          expect(page).not_to have_link('registering an account',
+                                         href: new_user_registration_path)
+        end
+
+        it 'persists the organizer message through form validation' do
+          fill_in 'rsvp_organizer_message', with: 'Hi Org!'
+          fill_in 'rsvp_person_firstname', with: ''
+
+          click_button 'Confirm Attendance'
+
+          expect(page.body).to have_text("firstname can't be blank")
+          expect(page).to have_css('textarea#rsvp_organizer_message',
+            text: 'Hi Org!')
+        end
+
+        it 'persists staff attributes from before RSVP' do
+          @membership.staff_notes = 'Test note'
+          @membership.room = 'Room 6'
+          @membership.stay_id = 'ABC123'
+          @membership.save
+
+          fill_in 'rsvp_organizer_message', with: 'Hi Org!'
+          click_button 'Confirm Attendance'
+
+          updated_membership = Membership.find(@membership.id)
+          expect(updated_membership.staff_notes).to eq('Test note')
+          expect(updated_membership.room).to eq('Room 6')
+          expect(updated_membership.stay_id).to eq('ABC123')
+        end
+      end # for online events
     end
   end
 

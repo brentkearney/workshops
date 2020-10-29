@@ -22,8 +22,9 @@ class RsvpController < ApplicationController
   def email
     @person = @invitation.membership.person
     @email_form = EmailForm.new(@person)
+
     if request.post? && @email_form.validate_email(email_param)
-      redirect_to rsvp_yes_path(otp: otp_params),
+      redirect_to set_yes_path(@invitation.membership.event),
                   success: 'E-mail updated/confirmed -- thanks!' and return
     end
 
@@ -39,7 +40,7 @@ class RsvpController < ApplicationController
 
     @email_form = EmailForm.new(@person)
     if @email_form.verify_email_change(confirm_email_params)
-      redirect_to rsvp_yes_path(otp: otp_params),
+      redirect_to set_yes_path(@invitation.membership.event),
         success: 'E-mail updated! Thank you.' and return
     end
   end
@@ -68,6 +69,18 @@ class RsvpController < ApplicationController
 
     return unless request.post? && @rsvp.validate_form(yes_params)
     update_and_redirect(rsvp: :accept)
+  end
+
+  # GET /rsvp/yes-online/:otp
+  # POST /rsvp/yes-online/:otp
+  def yes_online
+    @rsvp = RsvpForm.new(@invitation.reload)
+    @years = (1930..Date.current.year).to_a.reverse
+
+    if request.post? && @rsvp.validate_form(yes_params)
+      update_and_redirect(rsvp: :accept) and return
+    end
+    render "yes-online"
   end
 
   # GET /rsvp/no/:otp
@@ -175,5 +188,10 @@ class RsvpController < ApplicationController
   def confirm_email_params
     params.require(:email_form).permit(:person_id, :replace_email_code,
                                        :replace_with_email_code)
+  end
+
+  def set_yes_path(event)
+    path_param = { otp: otp_params }
+    event.online ? rsvp_yes_online_path(path_param) : rsvp_yes_path(path_param)
   end
 end

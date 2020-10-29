@@ -18,83 +18,9 @@
       </h2>
 
       <%= form_for @rsvp, as: :rsvp,
-         url: rsvp_yes_path(@rsvp.invitation.code), method: :post,
+         url: rsvp_yes_online_path(@rsvp.invitation.code), method: :post,
         html: { role: 'form', novalidate: 'novalidate', class: 'form' } do |rsvp| %>
       <fieldset>
-
-      <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
-      <%= m.hidden_field :min_date, id: 'min_date', value: @rsvp.event.start_date %>
-      <%= m.hidden_field :max_date, id: 'max_date', value: @rsvp.event.end_date %>
-      <div class="p-2">
-        <h2 class="rsvp-section">Arrival & Departure Dates<br>
-          <small>Event dates: <%= @rsvp.event.dates(:long) %></small></h2>
-          <p><%= @rsvp.arrival_departure_intro %></p>
-      </div>
-      <div class="row justify-content-center align-items-center">
-        <div class="col-md">
-          <div class="p-2 date-titles text-left">
-            <h4>Arrival Date:</h4>
-            <%= m.select :arrival_date, @rsvp.date_list, {}, class: "form-control" %>
-          </div>
-        </div>
-        <div class="col-md">
-          <div class="p-2 date-titles text-left">
-            <h4>Departure Date:</h4>
-            <%= m.select :departure_date, @rsvp.date_list, {}, class: "form-control" %>
-          </div>
-        </div>
-      </div>
-      <p id="may-return">You can update your travel dates, later.</p>
-
-      <div class="p-2">
-        <h2 class="rsvp-section midpage">Accommodation</h2>
-        <p><%= @rsvp.accommodation_intro %></p>
-      </div>
-      <div class="form-group" id="accommodation_buttons">
-        <div class="row">
-          <label class="radio-inline">
-            <%= m.radio_button :own_accommodation, 'false', checked: 'checked' %>
-            Book a free room for me.
-          </label>
-        </div>
-        <div class="row">
-          <label class="radio-inline">
-            <%= m.radio_button :own_accommodation, 'true' %>
-            I will arrange and pay for my own accommodation.
-          </label>
-        </div>
-      </div>
-
-      <div class="p-2">
-        <h2 class="rsvp-section midpage">Guests</h2>
-        <p><%= @rsvp.guests_intro %></p>
-      </div>
-      <div id="guest-options">
-        <div class="row">
-          <div class="form-check">
-            <%= m.check_box :has_guest, { class: "form-check-input" }, true %>
-            <%= m.label :has_guest, @rsvp.has_guest, class: "form-check-label" %>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-check">
-            <%= m.check_box :guest_disclaimer, { class: "form-check-input" }, true %>
-            <%= m.label :guest_disclaimer, @rsvp.guest_disclaimer,
-                                           class: "form-check-label",
-                                              id: "guest-disclaimer-label" %>
-          </div>
-        </div>
-      </div>
-
-      <div class="p-2">
-        <h2 class="rsvp-section midpage">Special Considerations</h2>
-        <p><%= @rsvp.special_intro %></p>
-      </div>
-      <div class="p-2 form-group">
-        <%= m.text_area :special_info, size: "100x4", class: "form-control", placeholder: 'Notes to staff' %>
-      </div>
-
-      <% end # fields_for :membership %>
 
       <%= rsvp.fields_for :person, @rsvp.person do |p| %>
       <div class="p-2">
@@ -113,10 +39,6 @@
         <div class="form-group">
           <%= p.label :lastname, class: "mandatory" %>
           <%= p.text_field :lastname, class: "form-control", placeholder: 'Your family name', autocomplete: "family-name" %>
-        </div>
-        <div class="form-group">
-          <%= p.label :gender, class: "mandatory" %>
-          <%= p.select :gender, [['Male', 'M'],['Female', 'F'],['Other', 'O']], { include_blank: 'Please select' }, class: "form-control", autocomplete: "sex" %>
         </div>
         <div class="form-group">
           <%= p.label :affiliation, class: "mandatory" %>
@@ -151,22 +73,12 @@
               <%= m.label :share_email, "Allow other members of this event to see your e-mail address.", class: "form-check-label" %>
             </div>
           </div>
-          <div class="row">
-            <div class="form-check">
-              <%= m.check_box :share_email_hotel, { class: "form-check-input" }, false %>
-              <%= m.label :share_email_hotel, "Share your e-mail address with the hotel, for quality feedback and marketing.", class: "form-check-label" %>
-            </div>
-          </div>
           <% end %>
         </div>
 
         <div class="form-group">
           <%= p.label :url, 'Website (URL) - use "https://..."' %>
           <%= p.url_field :url, class: "form-control", autocomplete: "url" %>
-        </div>
-        <div class="form-group">
-          <%= p.label :phone %>
-          <%= p.telephone_field :phone, class: "form-control", autocomplete: "tel" %>
         </div>
         <div class="form-group" id="address-fields">
           <% if @rsvp.membership.role.match?(/Organizer/) %>
@@ -184,14 +96,6 @@
             </div>
           </div>
           <% end %>
-        </div>
-        <div class="form-group">
-          <%= p.label :emergency_contact, 'Emergency Contact Name' %>
-          <%= p.text_field :emergency_contact, class: "form-control" %>
-        </div>
-        <div class="form-group">
-          <%= p.label :emergency_phone, 'Emergency Contact Phone' %>
-          <%= p.text_field :emergency_phone, class: "form-control" %>
         </div>
 
         <div class="p-2">
