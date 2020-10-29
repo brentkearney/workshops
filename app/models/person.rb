@@ -7,7 +7,7 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Person < ApplicationRecord
-  attr_accessor :is_rsvp, :member_import, :is_organizer_rsvp, :region_required
+  attr_accessor :is_rsvp, :is_online_rsvp, :member_import, :is_organizer_rsvp, :region_required
 
   has_many :memberships, dependent: :destroy
   has_many :events, -> {
@@ -28,7 +28,8 @@ class Person < ApplicationRecord
                     uniqueness: true,
                     email: true
   validates :firstname, :lastname, :updated_by, presence: true
-  validates :gender, :country, presence: true, if: :is_rsvp
+  validates :country, presence: true, if: :is_rsvp
+  validates :gender, presence: true, if: :is_rsvp_but_not_online
   validates :affiliation, presence: true, unless: :member_import
   validates :gender, format:
                      { with: /\A(M|F|O)\z/, message: " must be 'M','F', or 'O'" },
@@ -46,6 +47,11 @@ class Person < ApplicationRecord
   # app/models/concerns/person_decorators.rb
   include PersonDecorators
   include SharedDecorators
+
+
+  def is_rsvp_but_not_online
+    is_rsvp && !is_online_rsvp
+  end
 
   def region_required?
     country ||= self.country

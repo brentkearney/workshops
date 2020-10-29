@@ -246,6 +246,11 @@ RSpec.describe RsvpController, type: :controller do
   end
 
   describe 'POST #yes' do
+    before do
+      @membership.attendance = 'Invited'
+      @membership.save
+    end
+
     def yes_params
       {'membership' => { arrival_date: @invitation.membership.event.start_date,
           departure_date: @invitation.membership.event.end_date,
@@ -267,6 +272,15 @@ RSpec.describe RsvpController, type: :controller do
       expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
     end
 
+    it 'does not change attendance if there are validation errors' do
+      new_params = yes_params
+      new_params['person'][:lastname] = ''
+
+      post :yes, params: { otp: @invitation.code, rsvp: new_params }
+
+      expect(Membership.find(@membership.id).attendance).not_to eq('Confirmed')
+    end
+
     it 'forwards to feedback form' do
       post :yes, params: { otp: @invitation.code, rsvp: yes_params }
 
@@ -279,6 +293,56 @@ RSpec.describe RsvpController, type: :controller do
       expect(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
 
       post :yes, params: { otp: 'foo', rsvp: yes_params }
+
+      expect(response).to redirect_to(rsvp_otp_path('foo'))
+    end
+  end
+
+  describe 'POST #yes_online' do
+    before do
+      @membership.attendance = 'Invited'
+      @membership.person.gender = nil
+      @membership.event.online = true
+      @membership.save
+    end
+
+    def online_params
+      {'membership' => { share_email: true },
+        'person' => { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
+          affiliation: 'Foo', department: '', title: '',
+          academic_status: 'Professor', phd_year: 1970, email: 'foo@bar.com',
+          url: '', country: 'Dandylion', biography: 'Yes',
+          research_areas: 'Ruby, Rails, Rspec'}
+      }
+     end
+
+    it 'changes membership attendance to Confirmed' do
+      post :yes_online, params: { otp: @invitation.code, rsvp: online_params }
+
+      expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
+    end
+
+    it 'does not change attendance if there are validation errors' do
+      new_params = online_params
+      new_params['person'][:lastname] = ''
+
+      post :yes_online, params: { otp: @invitation.code, rsvp: new_params }
+
+      expect(Membership.find(@membership.id).attendance).not_to eq('Confirmed')
+    end
+
+    it 'forwards to feedback form' do
+      post :yes_online, params: { otp: @invitation.code, rsvp: online_params }
+
+      expect(response).to redirect_to(rsvp_feedback_path(@membership.id))
+    end
+
+    it 'with an invalid OTP, it forwards to rsvp_otp' do
+      lc = FakeLegacyConnector.new
+      allow(LegacyConnector).to receive(:new).and_return(lc)
+      expect(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
+
+      post :yes_online, params: { otp: 'foo', rsvp: online_params }
 
       expect(response).to redirect_to(rsvp_otp_path('foo'))
     end

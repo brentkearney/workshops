@@ -15,10 +15,11 @@ class RsvpForm < ComplexForms
     @invitation = invitation
 
     @membership = invitation.membership
+    @event = @membership.event
     @person = @membership.person
     @person.is_rsvp = true
+    @person.is_online_rsvp = true if @event.online
     @person.is_organizer_rsvp = true if @membership.role.match?(/Organizer/)
-    @event = @membership.event
     @grant_list = RsvpForm.grant_list
     self
   end
@@ -46,8 +47,12 @@ class RsvpForm < ComplexForms
     @membership.assign_attributes(attributes['membership'])
     @person.assign_attributes(attributes['person'])
 
-    unless @membership.valid?
+    unless @membership.valid? && @person.valid?
       @membership.errors.full_messages.each do |key, value|
+        errors.add(key, value)
+      end
+
+      @person.errors.full_messages.each do |key, value|
         errors.add(key, value)
       end
     end
