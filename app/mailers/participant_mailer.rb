@@ -37,7 +37,7 @@ class ParticipantMailer < ApplicationMailer
       file_attachment = "#{pdf_path}/#{event.location}-Observer.pdf"
     end
 
-    if event.name.match? "(Online)"
+    if event.online
       file_attachment = "#{pdf_path}/#{event.location}/not_applicable.pdf"
     end
 
@@ -51,7 +51,7 @@ class ParticipantMailer < ApplicationMailer
       template << "-Observer"
     end
 
-    if membership.event.name.match? "(Online)"
+    if membership.event.online
       template = "Virtual " + template
     end
 

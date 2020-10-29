@@ -116,9 +116,9 @@ class Event < ApplicationRecord
   def update_name
     %w(Cancelled Online).each do |w|
       if self.send(w.downcase)
-        self.name << " (#{w})" unless self.name.include?("(#{w}")
+        self.name << " (#{w})" unless self.name.include?("(#{w})")
       else
-        self.name.gsub!("(#{w})", "").strip! if self.name.include?("(#{w}")
+        self.name.gsub!("(#{w})", "").strip! if self.name.include?("(#{w})")
       end
     end
   end
