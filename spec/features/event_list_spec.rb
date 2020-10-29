@@ -129,6 +129,18 @@ describe 'Event List', type: :feature do
 
       expect(page.body).to have_css("tr.cancelled", count: 1)
     end
+
+    it 'indicates whether an event is online' do
+      @current.name = 'Current event title'
+      @current.online = false
+      @current.save
+      @current.online = true
+      @current.save
+
+      visit events_path
+
+      expect(page.body).to have_text("Current event title (Online)")
+    end
   end
 
   describe 'My Events' do

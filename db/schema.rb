@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_06_000009) do
+ActiveRecord::Schema.define(version: 2020_10_29_030037) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -55,6 +55,7 @@ ActiveRecord::Schema.define(version: 2020_10_06_000009) do
     t.string "subjects"
     t.integer "max_observers", default: 0, null: false
     t.boolean "cancelled", default: false
+    t.boolean "online", default: false
     t.index ["code"], name: "index_events_on_code", unique: true
   end
 

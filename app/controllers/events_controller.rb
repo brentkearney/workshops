@@ -206,7 +206,8 @@ class EventsController < ApplicationController
                                   :end_date, :time_zone, :event_type, :location,
                                   :description, :press_release, :door_code,
                                   :max_participants, :booking_code, :subjects,
-                                  :updated_by, :max_observers, :cancelled)
+                                  :updated_by, :max_observers, :cancelled,
+                                  :online)
   end
 
   def allowed_params

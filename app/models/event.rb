@@ -15,7 +15,7 @@ class Event < ApplicationRecord
   has_many :lectures
 
   before_save :clean_data
-  before_update :update_cancelled_name
+  before_update :update_name
 
   validates :name, :start_date, :end_date, :location, :max_participants,
             :time_zone, :max_observers, presence: true
@@ -113,12 +113,13 @@ class Event < ApplicationRecord
 
   private
 
-  def update_cancelled_name
-    if cancelled && !self.name.include?('(Cancelled)')
-      self.name = self.name + " (Cancelled)"
-    end
-    if !cancelled && self.name.include?('(Cancelled)')
-      self.name.gsub!("(Cancelled)", "").strip!
+  def update_name
+    %w(Cancelled Online).each do |w|
+      if self.send(w.downcase)
+        self.name << " (#{w})" unless self.name.include?("(#{w}")
+      else
+        self.name.gsub!("(#{w})", "").strip! if self.name.include?("(#{w}")
+      end
     end
   end
 
