@@ -54,7 +54,7 @@ class RsvpForm < ComplexForms
 
       @membership.errors.full_messages.each do |key, value|
         Rails.logger.debug "\n* key: #{key}, value: #{value}\n"
-        errors.add(key, value) unless key.match? /^Person/
+        errors.add(key, value) unless key.match?(/^Person/)
       end
     end
 
