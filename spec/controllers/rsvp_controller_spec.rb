@@ -356,20 +356,24 @@ RSpec.describe RsvpController, type: :controller do
   end
 
   describe 'POST #feedback' do
-    it 'forwards to event memberships page' do
-      post :feedback, params: { membership_id: @membership.id, feedback_message: 'Hi' }
-
-      expect(response).to redirect_to(event_memberships_path(@membership.event_id))
-    end
-  end
-
-  describe 'POST #feedback in production mode' do
     before { allow(Rails.env).to receive(:production?).and_return(true) }
 
-    it 'forwards to event home page' do
+    it 'forwards to register page if user has no account' do
+      expect(User.find_by_email(@membership.person.email)).to be_nil
+
       post :feedback, params: { membership_id: @membership.id, feedback_message: 'Hi' }
 
-      expect(response).to redirect_to(@membership.event.url)
+      expect(response).to redirect_to(new_user_registration_path)
+    end
+
+    it 'forwards to login page if user has account' do
+      person = @membership.person
+      user = User.find_by_email(person.email)
+      create(:user, person: person, email: person.email) if user.nil?
+
+      post :feedback, params: { membership_id: @membership.id, feedback_message: 'Hi' }
+
+      expect(response).to redirect_to(sign_in_path)
     end
   end
 end

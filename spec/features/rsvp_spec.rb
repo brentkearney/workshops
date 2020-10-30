@@ -508,7 +508,7 @@ describe 'RSVP', type: :feature do
 
         click_button 'Confirm Attendance'
 
-        expect(page.body).to have_text("firstname can't be blank")
+        expect(page.body).to have_text("Firstname can't be blank")
         expect(page).to have_css('textarea#rsvp_organizer_message',
           text: 'Hi Org!')
       end
@@ -633,6 +633,23 @@ describe 'RSVP', type: :feature do
           .with(@membership.id)
       end
 
+      def links_to_new_account
+        expect(User.find_by_email(@membership.person.email)).to be_nil
+        expect(page).to have_link('registering an account',
+                                   href: new_user_registration_path)
+      end
+
+      def does_not_link_to_register(yes_path)
+        person = @membership.person
+        user = create(:user, person: person, email: person.email)
+        expect(User.find_by_email(person.email)).not_to be_nil
+
+        visit yes_path
+
+        expect(page).not_to have_link('registering an account',
+                                       href: new_user_registration_path)
+      end
+
       context 'For in-person events' do
         before do
           reset_database
@@ -689,6 +706,14 @@ describe 'RSVP', type: :feature do
 
         it 'fails validation if country is North American and region blank' do
           requires_region(rsvp_yes_path(@invitation.code))
+        end
+
+        it 'if participant has no account, links to register new account' do
+          links_to_new_account()
+        end
+
+        it 'if participant already has account, does not link to register' do
+          does_not_link_to_register(rsvp_yes_path(@invitation.code))
         end
 
         context 'user is an organizer' do
@@ -813,6 +838,14 @@ describe 'RSVP', type: :feature do
           requires_region(rsvp_yes_online_path(@invitation.code))
         end
 
+        it 'if participant has no account, links to register new account' do
+          links_to_new_account()
+        end
+
+        it 'if participant already has account, does not link to register' do
+          does_not_link_to_register(rsvp_yes_online_path(@invitation.code))
+        end
+
         context 'user is an organizer' do
           before do
             @membership.role = 'Contact Organizer'
@@ -914,3 +947,5 @@ describe 'RSVP', type: :feature do
     end
   end
 end
+
+

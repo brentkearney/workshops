@@ -111,8 +111,9 @@ class RsvpController < ApplicationController
   private
 
   def post_feedback_url(membership)
-    return membership.event.url if Rails.env.production?
-    event_memberships_path(membership.event_id)
+    user = User.find_by_email(membership.person.email)
+    return new_user_registration_path if user.nil?
+    sign_in_path
   end
 
   def set_organizer_message

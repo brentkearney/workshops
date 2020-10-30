@@ -48,12 +48,13 @@ class RsvpForm < ComplexForms
     @person.assign_attributes(attributes['person'])
 
     unless @membership.valid? && @person.valid?
-      @membership.errors.full_messages.each do |key, value|
+      @person.errors.full_messages.each do |key, value|
         errors.add(key, value)
       end
 
-      @person.errors.full_messages.each do |key, value|
-        errors.add(key, value)
+      @membership.errors.full_messages.each do |key, value|
+        Rails.logger.debug "\n* key: #{key}, value: #{value}\n"
+        errors.add(key, value) unless key.match? /^Person/
       end
     end
 
