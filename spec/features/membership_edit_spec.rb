@@ -195,6 +195,16 @@ describe 'Membership#edit', type: :feature do
     expect(updated.num_guests).to eq(2)
   end
 
+  def disallows_rsvp_info_editing
+    expect(page).not_to have_selector('#membership_arrival_date')
+    expect(page).not_to have_selector('#membership_departure_date')
+    expect(page).not_to have_selector('#has-guest')
+    expect(page).not_to have_selector('#membership_num_guests')
+    expect(page).not_to have_selector('#membership_guest_disclaimer')
+    expect(page).not_to have_selector('#membership_special_info')
+    # expect(page).not_to have_selector('#membership_person_attributes_emergency_contact')
+  end
+
   def allows_arrival_departure_editing(member)
     arrives = (@event.start_date + 1.day).strftime('%Y-%m-%d')
     select "#{arrives}", from: 'membership_arrival_date'
@@ -302,8 +312,17 @@ describe 'Membership#edit', type: :feature do
       allows_address_editing(@participant)
     end
 
-    it 'allows editing of RSVP fields' do
+    it 'allows editing of RSVP hotel fields' do
       allows_rsvp_info_editing(@participant)
+    end
+
+    it 'does not have RSVP hotel fields for online events' do
+      @event.online = true
+      @event.save
+
+      visit edit_event_membership_path(@event, @participant)
+
+      disallows_rsvp_info_editing()
     end
 
     it 'if user sets num_guests to nil, sets num_guests to 0' do
@@ -708,6 +727,15 @@ describe 'Membership#edit', type: :feature do
       expect(page.body).not_to have_field 'membership[departure_date]'
     end
 
+    it 'does not have RSVP hotel fields for online events' do
+      @event.online = true
+      @event.save
+
+      visit edit_event_membership_path(@event, @participant)
+
+      disallows_rsvp_info_editing()
+    end
+
     it 'allows organizer notes' do
       allows_organizer_notes(@participant)
     end
@@ -801,6 +829,15 @@ describe 'Membership#edit', type: :feature do
     it 'allows editing of travel dates' do
       expect(page.body).to have_select 'membership[arrival_date]'
       expect(page.body).to have_select 'membership[departure_date]'
+    end
+
+    it 'does not have RSVP hotel fields for online events' do
+      @event.online = true
+      @event.save
+
+      visit edit_event_membership_path(@event, @participant)
+
+      disallows_rsvp_info_editing()
     end
 
     it 'allows changing travel dates to outside of event dates' do

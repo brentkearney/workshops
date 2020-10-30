@@ -246,6 +246,11 @@ RSpec.describe RsvpController, type: :controller do
   end
 
   describe 'POST #yes' do
+    before do
+      @membership.attendance = 'Invited'
+      @membership.save
+    end
+
     def yes_params
       {'membership' => { arrival_date: @invitation.membership.event.start_date,
           departure_date: @invitation.membership.event.end_date,
@@ -267,6 +272,15 @@ RSpec.describe RsvpController, type: :controller do
       expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
     end
 
+    it 'does not change attendance if there are validation errors' do
+      new_params = yes_params
+      new_params['person'][:lastname] = ''
+
+      post :yes, params: { otp: @invitation.code, rsvp: new_params }
+
+      expect(Membership.find(@membership.id).attendance).not_to eq('Confirmed')
+    end
+
     it 'forwards to feedback form' do
       post :yes, params: { otp: @invitation.code, rsvp: yes_params }
 
@@ -284,6 +298,56 @@ RSpec.describe RsvpController, type: :controller do
     end
   end
 
+  describe 'POST #yes_online' do
+    before do
+      @membership.attendance = 'Invited'
+      @membership.person.gender = nil
+      @membership.event.online = true
+      @membership.save
+    end
+
+    def online_params
+      {'membership' => { share_email: true },
+        'person' => { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
+          affiliation: 'Foo', department: '', title: '',
+          academic_status: 'Professor', phd_year: 1970, email: 'foo@bar.com',
+          url: '', country: 'Dandylion', biography: 'Yes',
+          research_areas: 'Ruby, Rails, Rspec'}
+      }
+     end
+
+    it 'changes membership attendance to Confirmed' do
+      post :yes_online, params: { otp: @invitation.code, rsvp: online_params }
+
+      expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
+    end
+
+    it 'does not change attendance if there are validation errors' do
+      new_params = online_params
+      new_params['person'][:lastname] = ''
+
+      post :yes_online, params: { otp: @invitation.code, rsvp: new_params }
+
+      expect(Membership.find(@membership.id).attendance).not_to eq('Confirmed')
+    end
+
+    it 'forwards to feedback form' do
+      post :yes_online, params: { otp: @invitation.code, rsvp: online_params }
+
+      expect(response).to redirect_to(rsvp_feedback_path(@membership.id))
+    end
+
+    it 'with an invalid OTP, it forwards to rsvp_otp' do
+      lc = FakeLegacyConnector.new
+      allow(LegacyConnector).to receive(:new).and_return(lc)
+      expect(lc).to receive(:check_rsvp).with('foo').and_return(lc.invalid_otp)
+
+      post :yes_online, params: { otp: 'foo', rsvp: online_params }
+
+      expect(response).to redirect_to(rsvp_otp_path('foo'))
+    end
+  end
+
   describe 'GET #feedback' do
     it 'renders feedback template' do
       get :feedback, params: { membership_id: @membership.id }
@@ -292,20 +356,24 @@ RSpec.describe RsvpController, type: :controller do
   end
 
   describe 'POST #feedback' do
-    it 'forwards to event memberships page' do
-      post :feedback, params: { membership_id: @membership.id, feedback_message: 'Hi' }
-
-      expect(response).to redirect_to(event_memberships_path(@membership.event_id))
-    end
-  end
-
-  describe 'POST #feedback in production mode' do
     before { allow(Rails.env).to receive(:production?).and_return(true) }
 
-    it 'forwards to event home page' do
+    it 'forwards to register page if user has no account' do
+      expect(User.find_by_email(@membership.person.email)).to be_nil
+
       post :feedback, params: { membership_id: @membership.id, feedback_message: 'Hi' }
 
-      expect(response).to redirect_to(@membership.event.url)
+      expect(response).to redirect_to(new_user_registration_path)
+    end
+
+    it 'forwards to login page if user has account' do
+      person = @membership.person
+      user = User.find_by_email(person.email)
+      create(:user, person: person, email: person.email) if user.nil?
+
+      post :feedback, params: { membership_id: @membership.id, feedback_message: 'Hi' }
+
+      expect(response).to redirect_to(sign_in_path)
     end
   end
 end

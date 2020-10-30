@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="row">
-        <div class='col-md-12'>
+        <div class='col-md-4'>
           <div class="form-group checkbox">
             <%= f.label :cancelled %>: &nbsp;
             <label>
@@ -32,6 +32,19 @@
                 ⬅︎ Uncheck this box to unmark the event as cancelled.
               <% else %>
                 ⬅︎ Check this box to mark the event as cancelled.
+              <% end %>
+            </label>
+          </div>
+        </div>
+        <div class='col-md-4'>
+          <div class="form-group checkbox">
+            <%= f.label :online %>: &nbsp;
+            <label>
+              <%= f.check_box :online %> &nbsp;
+              <% if @event.online %>
+                ⬅︎ Uncheck this box if it is <strong>not</strong> an online event.
+              <% else %>
+                ⬅︎ Check this box if it is an online event.
               <% end %>
             </label>
           </div>

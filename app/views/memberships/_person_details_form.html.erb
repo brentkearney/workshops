@@ -124,6 +124,7 @@
     </div>
     <% end %>
 
+    <% if !@event.online || policy(@membership).show_personal_info? %>
     <div class="form-group">
       <div class="control-label">
         <%= person.label :emergency_contact, "Emergency Contact: " %>
@@ -137,6 +138,7 @@
       </div>
       <%= person.text_field :emergency_phone, class: 'form-control' %>
     </div>
+    <% end %>
     <% end %>
 
     <div class="form-group">

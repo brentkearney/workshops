@@ -96,6 +96,14 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(build(:event, event_type: 'Keg Party')).not_to be_valid
   end
 
+  it 'is not cancelled by default' do
+    expect(build(:event).cancelled).to be_falsey
+  end
+
+  it 'is not online by default' do
+    expect(build(:event).online).to be_falsey
+  end
+
   it '.dates returns formatted dates' do
     e = build(:event)
 

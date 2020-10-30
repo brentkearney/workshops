@@ -1,5 +1,6 @@
 $(document).on 'turbolinks:load', ->
   return unless $('.rsvp').length > 0
+  return if $('.feedback').length > 0
 
   region_country =(country) ->
     return (country in ['canada', 'usa', 'u.s.a.', 'us', 'u.s.', 'united states', 'united states of america']);
