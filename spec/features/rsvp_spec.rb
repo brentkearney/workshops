@@ -60,8 +60,7 @@ describe 'RSVP', type: :feature do
     end
 
     it 'expired invitations' do
-      @invitation.expires = Date.today.last_year
-      @invitation.save
+      @invitation.update_columns(expires: Date.today.last_year)
 
       visit rsvp_otp_path(@invitation.code)
 

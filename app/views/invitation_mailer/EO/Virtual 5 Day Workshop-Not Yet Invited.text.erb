@@ -1,0 +1,18 @@
+Dear <%= @person.dear_name %>,
+
+You are invited to attend the following online event:
+
+Workshop: <%= @event.name %> (<%= @event.code %>)
+On: <%= @event.dates(:long) %>
+URL: <%= @event.url %>
+Organizers: <%= @organizers %>
+
+Please follow the link below before <%= @rsvp_deadline %> to let us know whether or not you will attend.
+
+<%= @rsvp_url %>
+
+**** NOTE: DO NOT SHARE THIS LINK: It is for your personal data in our
+database. If you share it, someone can overwrite your info with theirs.****
+
+Thank you very much.
+<%= @org_name %>

@@ -39,18 +39,20 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     expect(i.expires).not_to be_nil
   end
 
-  # temporary - during pandemic we'll allow invitations during the workshop
-  # it 'derives expiry date from rsvp_expiry Setting + event.start_date' do
-  #   event = build(:event)
-  #   membership = build(:membership, event: event)
-  #   i = create(:invitation, membership: membership)
+  it 'derives expiry date from event.start_date - Setting.rsvp_expiry' do
+    event = build(:event, future: true, online: false)
+    membership = build(:membership, event: event)
+    i = create(:invitation, membership: membership)
 
-  #   duration = Invitation.duration_setting
-  #   expect(i.expires.to_date).to eq((event.start_date - duration).to_date)
-  # end
+    duration = Invitation.duration_setting
+    start_date = event.start_date.to_time
+                      .in_time_zone(event.time_zone).beginning_of_day
 
-  it 'sets expiry date to workshop end_date, end of day (pandemic)' do
-    event = build(:event)
+    expect(i.expires).to eq(start_date - duration)
+  end
+
+  it 'for online events, sets expiry date to workshop end_date, end of day' do
+    event = build(:event, online: true)
     membership = build(:membership, event: event)
     i = create(:invitation, membership: membership)
 
