@@ -22,7 +22,8 @@ class LectureRecording
 
   def stop
     return if @recording_host.nil?
-    @lecture.update_columns(is_recording: false, updated_by: @users_name)
+    @lecture.update_columns(is_recording: false, updated_by: @users_name,
+                            filename: 'pending')
     tell_recording_system("RECORD-STOP\n")
   end
 

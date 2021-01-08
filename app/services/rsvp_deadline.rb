@@ -42,7 +42,7 @@ class RsvpDeadline
     rsvp_deadline = (@sent_on + 4.weeks)
     today = DateTime.current
     if (@start_date - @sent_on).to_i < 10.days.to_i
-      rsvp_deadline = @start_date.prev_week(:tuesday)
+      rsvp_deadline = @start_date.prev_occurring(:tuesday)
       rsvp_deadline = today + 1.day if rsvp_deadline < today
     elsif (@start_date - @sent_on).to_i < 2.month.to_i
       rsvp_deadline = (@sent_on + 10.days)
