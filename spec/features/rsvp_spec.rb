@@ -459,6 +459,7 @@ describe 'RSVP', type: :feature do
       def has_person_profile_fields
         expect(page).to have_field('rsvp_person_firstname')
         expect(page).to have_field('rsvp_person_lastname')
+        expect(page).to have_field('rsvp_person_gender')
         expect(page).to have_field('rsvp_person_affiliation')
         expect(page).to have_field('rsvp_person_email', disabled: true)
         expect(page).to have_field('rsvp_membership_share_email')

@@ -28,8 +28,7 @@ class Person < ApplicationRecord
                     uniqueness: true,
                     email: true
   validates :firstname, :lastname, :updated_by, presence: true
-  validates :country, presence: true, if: :is_rsvp
-  validates :gender, presence: true, if: :is_rsvp_but_not_online
+  validates :gender, :country, presence: true, if: :is_rsvp
   validates :affiliation, presence: true, unless: :member_import
   validates :gender, format:
                      { with: /\A(M|F|O)\z/, message: " must be 'M','F', or 'O'" },
