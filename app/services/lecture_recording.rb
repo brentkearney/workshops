@@ -36,6 +36,7 @@ class LectureRecording
     @lecture.update_columns(is_recording: false, updated_by: @users_name,
                             filename: 'pending')
     tell_recording_system("RECORD-STOP\n")
+    @response_message = "Recording Stopped."
   end
 
 
