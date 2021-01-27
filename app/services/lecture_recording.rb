@@ -6,6 +6,7 @@
 
 # Sends signals to the BIRS Automated Video Recording System
 class LectureRecording
+  attr_reader :response_message
 
   def initialize(lecture, users_name)
     @lecture = lecture
@@ -16,8 +17,18 @@ class LectureRecording
 
   def start
     return if @recording_host.nil?
+
+    Rails.logger.debug "\n\nLectureRecording.start is_recording? #{@lecture.is_recording}\n\n"
+    if @lecture.is_recording
+      @response_message = "#{@lecture.person.name}: #{@lecture.title}
+        is already recording.".squish
+      return
+    end
+
     @lecture.update_columns(is_recording: true, updated_by: @users_name)
     tell_recording_system("RECORD-START\n")
+    @response_message = "Starting recording for #{@lecture.person.name}:
+                    #{@lecture.title}...".squish
   end
 
   def stop

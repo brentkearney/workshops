@@ -309,7 +309,7 @@ RSpec.describe RsvpController, type: :controller do
     def online_params
       {'membership' => { share_email: true },
         'person' => { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
-          affiliation: 'Foo', department: '', title: '',
+          affiliation: 'Foo', department: '', title: '', gender: 'O',
           academic_status: 'Professor', phd_year: 1970, email: 'foo@bar.com',
           url: '', country: 'Dandylion', biography: 'Yes',
           research_areas: 'Ruby, Rails, Rspec'}

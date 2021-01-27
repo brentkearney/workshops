@@ -114,8 +114,9 @@ class EventMaillist
     rescue
       msg = { problem: 'MaillistMailer.workshop_maillist failed.',
               recipient: recipient,
-              message: message,
-              response: resp }
+              response: resp,
+              message: message
+            }
       StaffMailer.notify_sysadmin(@event.id, msg).deliver_now
     end
   end

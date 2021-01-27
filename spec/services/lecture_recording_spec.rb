@@ -35,6 +35,33 @@ describe "LectureRecording" do
       expect(@lecture.is_recording).to be_truthy
     end
 
+    it "updates :updated_by to user's name" do
+      @lecture.updated_by = nil
+      @lecture.save
+
+      @lr.start
+
+      expect(Lecture.find(@lecture.id).updated_by).to eq('Some User')
+    end
+
+    it "updates :response_message to 'Starting recording..." do
+      @lr.start
+      expect(@lr.response_message).to include('Starting recording')
+    end
+
+    it 'does nothing if lecture.is_recording is already true' do
+      allow(ConnectToRecordingSystemJob).to receive(:perform_later)
+      @lecture.is_recording = true
+      @lecture.updated_by = 'Someone Else'
+      @lecture.save
+
+      @lr.start
+
+      expect(Lecture.find(@lecture.id).updated_by).not_to eq('Some User')
+      expect(@lr.response_message).to include('already recording')
+      expect(ConnectToRecordingSystemJob).not_to have_received(:perform_later)
+    end
+
     it 'launches ConnectToRecordingSystemJob' do
       allow(ConnectToRecordingSystemJob).to receive(:perform_later)
       @lr.start
@@ -44,7 +71,7 @@ describe "LectureRecording" do
 
   context '.stop' do
     before do
-      @lecture.is_recording = true
+      @lecture.is_recording = false
       @lecture.save
       @lr = LectureRecording.new(@lecture, 'Some User')
     end
@@ -55,7 +82,8 @@ describe "LectureRecording" do
     end
 
     it 'updates lecture.is_recording to false' do
-      expect(@lecture.is_recording).to be_truthy
+      @lecture.is_recording = true
+      @lecture.save
       @lr.stop
       expect(@lecture.is_recording).to be_falsey
     end

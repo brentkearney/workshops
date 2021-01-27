@@ -552,7 +552,9 @@ RSpec.describe ScheduleController, type: :controller do
   end
 
   describe 'POST recording' do
+    let(:response_message) { 'Starting recording for lecture...' }
     let(:lecture_recording) { instance_double(LectureRecording) }
+
     before do
       @event.schedules.destroy_all
       @event.start_date = Date.today
@@ -576,6 +578,8 @@ RSpec.describe ScheduleController, type: :controller do
 
 
       allow(LectureRecording).to receive(:new).and_return(lecture_recording)
+      allow(lecture_recording).to receive(:response_message)
+                                  .and_return(response_message)
       allow(lecture_recording).to receive(:start)
     end
 

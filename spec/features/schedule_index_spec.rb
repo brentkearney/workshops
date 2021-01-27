@@ -9,7 +9,7 @@ require 'rails_helper'
 describe 'Schedule Index', type: :feature do
   before do
     authenticate_user
-    @event = create(:event, future: true)
+    @event = create(:event, current: true)
     @template_event = build_schedule_template(@event.event_type)
   end
 
@@ -115,6 +115,79 @@ describe 'Schedule Index', type: :feature do
         item_path = "/events/#{@event.code}/schedule/#{item.id}"
         expect(page).to have_no_selector(:xpath, "//a[@href='#{item_path}'
           and @data-method='delete']")
+      end
+    end
+
+    context "Start/Stop Recording buttons" do
+      before do
+        date = Date.today
+        @event.start_date = date.beginning_of_week(:sunday)
+        @event.end_date = @event.start_date + 5.days
+        @event.save
+        @event.schedules.destroy_all
+        build_lecture_schedule(@event)
+
+        @lecture = create(:lecture, event: @event,
+                               start_time: DateTime.current + 10.minutes,
+                                 end_time: DateTime.current + 40.minutes,
+                                    title: 'The Talk',
+                                     room: 'Online')
+        @schedule_item = create(:schedule, lecture: @lecture,
+                                             event: @event,
+                                        start_time: @lecture.start_time,
+                                          end_time: @lecture.end_time,
+                                              name: @lecture.title,
+                                          location: @lecture.room)
+
+        @link = "/events/#{@event.code}/schedule/#{@schedule_item.id}/recording"
+      end
+
+      it "has Start Recording buttons for today's future lectures" do
+        visit(event_schedule_index_path(@event))
+
+        expect(page).to have_link('Start Recording', href: "#{@link}/start")
+      end
+
+      it "clicking Start Recording sets recording flag, notifies" do
+        expect(@lecture.is_recording).to be_falsey
+        visit(event_schedule_index_path(@event))
+
+        find_link('Start Recording', href: "#{@link}/start").click
+
+        expect(Lecture.find(@lecture.id).is_recording).to be_truthy
+        expect(page.body).to have_text('Starting recording for')
+      end
+
+      it "hides Start Recording buttons when a lecture is recording" do
+        @lecture.is_recording = true
+        @lecture.save
+
+        visit(event_schedule_index_path(@event))
+
+        expect(page).not_to have_link('Start Recording', href: "#{@link}/start")
+      end
+
+      it "has a Stop Recording button for the lecture that is recording" do
+        @lecture.is_recording = true
+        @lecture.save
+
+        visit(event_schedule_index_path(@event))
+
+        expect(page).to have_link('Stop Recording', href: "#{@link}/stop")
+      end
+
+      it "if recording is already started, and start is pressed again,
+            does nothing and warns" do
+        visit(event_schedule_index_path(@event))
+
+        @lecture.is_recording = true
+        @lecture.save
+        updated_at = Lecture.find(@lecture.id).updated_at
+
+        find_link('Start Recording', href: "#{@link}/start").click
+
+        expect(Lecture.find(@lecture.id).updated_at).to eq(updated_at)
+        expect(page.body).to have_text('The Talk is already recording')
       end
     end
   end

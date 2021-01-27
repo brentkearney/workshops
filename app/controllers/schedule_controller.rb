@@ -172,20 +172,24 @@ class ScheduleController < ApplicationController
 
     lecture = schedule.lecture
     start_stop = other_params[:record_action]
-    LectureRecording.new(lecture, current_user.name).send(start_stop)
+
+    lr = LectureRecording.new(lecture, current_user.name)
+    lr.send(start_stop)
 
     respond_to do |format|
       format.html do
         redirect_to event_schedule_index_path(@event),
-                    notice: "#{start_stop == "start" ? "Starting" : "Stopping"}
-                    recording for #{lecture.person.name}:
-                    #{lecture.title}...".squish
+                    notice: lr.response_message
       end
       format.json { head :no_content }
     end
   end
 
   private
+
+  def respond_to_recording(lr)
+
+  end
 
   def recording_not_allowed?(schedule)
     return false if policy(schedule).start_recording?
