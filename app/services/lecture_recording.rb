@@ -6,7 +6,7 @@
 
 # Sends signals to the BIRS Automated Video Recording System
 class LectureRecording
-  attr_reader :response_message
+  attr_reader :flash_class, :flash_message
 
   def initialize(lecture, users_name)
     @lecture = lecture
@@ -16,19 +16,36 @@ class LectureRecording
   end
 
   def start
-    return if @recording_host.nil?
-
-    Rails.logger.debug "\n\nLectureRecording.start is_recording? #{@lecture.is_recording}\n\n"
-    if @lecture.is_recording
-      @response_message = "#{@lecture.person.name}: #{@lecture.title}
-        is already recording.".squish
-      return
-    end
+    return if @recording_host.nil? || already_recording?
 
     @lecture.update_columns(is_recording: true, updated_by: @users_name)
     tell_recording_system("RECORD-START\n")
-    @response_message = "Starting recording for #{@lecture.person.name}:
-                    #{@lecture.title}...".squish
+    set_flash(msg_type: 'success', msg_kind: :start)
+  end
+
+  def already_recording?
+    recording_lecture = @lecture.event.lectures.detect(&:is_recording)
+    return false if recording_lecture.blank?
+
+    set_flash(msg_type: 'error', msg_kind: :recording,
+              recording_lecture: recording_lecture)
+    return true
+  end
+
+  def set_flash(msg_type: 'notice', msg_kind:, recording_lecture: nil)
+    @flash_class = msg_type
+
+    case msg_kind
+    when :start
+      @flash_message = %Q{Starting recording for "#{@lecture.person.name}:
+                    #{@lecture.title}"}.squish
+    when :stop
+      @flash_message = "Recording stopped."
+
+    when :recording
+      @flash_message = %Q{Already recording
+        "#{recording_lecture.person.name}: #{recording_lecture.title}".}.squish
+    end
   end
 
   def stop
@@ -36,7 +53,7 @@ class LectureRecording
     @lecture.update_columns(is_recording: false, updated_by: @users_name,
                             filename: 'pending')
     tell_recording_system("RECORD-STOP\n")
-    @response_message = "Recording Stopped."
+    set_flash(msg_kind: :stop)
   end
 
 

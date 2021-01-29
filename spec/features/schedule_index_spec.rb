@@ -148,14 +148,14 @@ describe 'Schedule Index', type: :feature do
         expect(page).to have_link('Start Recording', href: "#{@link}/start")
       end
 
-      it "clicking Start Recording sets recording flag, notifies" do
+      it "clicking Start Recording updates is_recording, notifies" do
         expect(@lecture.is_recording).to be_falsey
         visit(event_schedule_index_path(@event))
 
         find_link('Start Recording', href: "#{@link}/start").click
 
         expect(Lecture.find(@lecture.id).is_recording).to be_truthy
-        expect(page.body).to have_text('Starting recording for')
+        expect(page.find('div', class: 'alert-success', text: /Starting recording for/))
       end
 
       it "hides Start Recording buttons when a lecture is recording" do
@@ -165,6 +165,18 @@ describe 'Schedule Index', type: :feature do
         visit(event_schedule_index_path(@event))
 
         expect(page).not_to have_link('Start Recording', href: "#{@link}/start")
+      end
+
+      it "hides Start Recording buttons after Stop Recording is pressed" do
+        @lecture.is_recording = true
+        @lecture.save
+
+        visit(event_schedule_index_path(@event))
+        find_link('Stop Recording', href: "#{@link}/stop").click
+
+        expect(current_path).to eq(event_schedule_index_path(@event))
+        expect(page).not_to have_link('Start Recording', href: "#{@link}/start")
+        expect(Lecture.find(@lecture.id).filename).to eq('pending')
       end
 
       it "has a Stop Recording button for the lecture that is recording" do
@@ -187,7 +199,40 @@ describe 'Schedule Index', type: :feature do
         find_link('Start Recording', href: "#{@link}/start").click
 
         expect(Lecture.find(@lecture.id).updated_at).to eq(updated_at)
-        expect(page.body).to have_text('The Talk is already recording')
+        expect(page.find('div', class: 'alert-error',
+                                 text: /Already recording/))
+      end
+
+      it "if a different lecture is already recording, flash message says so" do
+        visit(event_schedule_index_path(@event))
+
+        other_lecture = create(:lecture, event: @event,
+                               start_time: DateTime.current + 60.minutes,
+                                 end_time: DateTime.current + 80.minutes,
+                                    title: 'Another Talk',
+                             is_recording: true,
+                                     room: 'Online')
+
+        find_link('Start Recording', href: "#{@link}/start").click
+
+        expect(Lecture.find(@lecture.id).is_recording).to be_falsey
+
+        error_message = %Q{Already recording "#{other_lecture.person.name}:
+                  #{other_lecture.title}".}.squish
+        expect(page.find('div', class: 'alert-error',
+                                 text: error_message))
+      end
+
+      it 'clicking Stop Recording updates is_recording, notifies' do
+        @lecture.is_recording = true
+        @lecture.save
+
+        visit(event_schedule_index_path(@event))
+        find_link('Stop Recording', href: "#{@link}/stop").click
+
+        expect(Lecture.find(@lecture.id).is_recording).to be_falsey
+        expect(page.find('div', class: 'alert-notice',
+                                 text: 'Recording stopped.'))
       end
     end
   end

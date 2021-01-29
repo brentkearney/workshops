@@ -44,9 +44,9 @@ describe "LectureRecording" do
       expect(Lecture.find(@lecture.id).updated_by).to eq('Some User')
     end
 
-    it "updates :response_message to 'Starting recording..." do
+    it "updates :flash_message to 'Starting recording..." do
       @lr.start
-      expect(@lr.response_message).to include('Starting recording')
+      expect(@lr.flash_message).to include('Starting recording')
     end
 
     it 'does nothing if lecture.is_recording is already true' do
@@ -58,7 +58,7 @@ describe "LectureRecording" do
       @lr.start
 
       expect(Lecture.find(@lecture.id).updated_by).not_to eq('Some User')
-      expect(@lr.response_message).to include('already recording')
+      expect(@lr.flash_message).to include('Already recording')
       expect(ConnectToRecordingSystemJob).not_to have_received(:perform_later)
     end
 

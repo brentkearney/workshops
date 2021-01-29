@@ -552,7 +552,7 @@ RSpec.describe ScheduleController, type: :controller do
   end
 
   describe 'POST recording' do
-    let(:response_message) { 'Starting recording for lecture...' }
+    let(:flash_message) { 'Starting recording for lecture...' }
     let(:lecture_recording) { instance_double(LectureRecording) }
 
     before do
@@ -578,8 +578,10 @@ RSpec.describe ScheduleController, type: :controller do
 
 
       allow(LectureRecording).to receive(:new).and_return(lecture_recording)
-      allow(lecture_recording).to receive(:response_message)
-                                  .and_return(response_message)
+      allow(lecture_recording).to receive(:flash_message)
+                                  .and_return(flash_message)
+      allow(lecture_recording).to receive(:flash_class)
+                                  .and_return(:success)
       allow(lecture_recording).to receive(:start)
     end
 
@@ -605,7 +607,7 @@ RSpec.describe ScheduleController, type: :controller do
 
         expect(lecture_recording).to have_received(:start)
         expect(response).to redirect_to(event_schedule_index_path(@event))
-        expect(flash[:notice]).to include("Starting recording")
+        expect(flash[:success]).to include("Starting recording")
       end
 
       context 'on a day other than today' do
