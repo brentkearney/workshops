@@ -120,15 +120,16 @@ describe 'Schedule Index', type: :feature do
 
     context "Start/Stop Recording buttons" do
       before do
+        # has to be today because buttons only appear today
         date = Date.today
         @event.start_date = date.beginning_of_week(:sunday)
-        @event.end_date = @event.start_date + 5.days
+        @event.end_date = @event.start_date + 2.weeks # in case today is Friday
         @event.save
         @event.schedules.destroy_all
         build_lecture_schedule(@event)
 
         @lecture = create(:lecture, event: @event,
-                               start_time: DateTime.current + 10.minutes,
+                               start_time: DateTime.current + 20.minutes,
                                  end_time: DateTime.current + 40.minutes,
                                     title: 'The Talk',
                                      room: 'Online')
@@ -207,8 +208,8 @@ describe 'Schedule Index', type: :feature do
         visit(event_schedule_index_path(@event))
 
         other_lecture = create(:lecture, event: @event,
-                               start_time: DateTime.current + 60.minutes,
-                                 end_time: DateTime.current + 80.minutes,
+                               start_time: @lecture.start_time + 60.minutes,
+                                 end_time: @lecture.end_time + 80.minutes,
                                     title: 'Another Talk',
                              is_recording: true,
                                      room: 'Online')

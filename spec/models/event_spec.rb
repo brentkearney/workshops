@@ -42,12 +42,22 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(build(:event, location: nil)).not_to be_valid
   end
 
-  it 'is invalid without max participants' do
-    expect(build(:event, max_participants: nil)).not_to be_valid
+  it 'sets max participants to default' do
+    event = build(:event, max_participants: nil)
+    event.valid?
+    expect(event.max_participants).not_to be_nil
   end
 
-  it 'is invalid without max observers' do
-    expect(build(:event, max_observers: nil)).not_to be_valid
+  it 'sets max observers to default' do
+    event = build(:event, max_observers: nil)
+    event.valid?
+    expect(event.max_observers).not_to be_nil
+  end
+
+  it 'sets max virtual to default' do
+    event = build(:event, max_virtual: nil)
+    event.valid?
+    expect(event.max_virtual).not_to be_nil
   end
 
   it 'is invalid without a time zone' do
@@ -167,6 +177,12 @@ RSpec.describe "Model validations: Event ", type: :model do
       expect(@event.name).to eq('Test Name')
       expect(@event.short_name).to eq('Test')
       expect(@event.description).to eq('A workshop with whitespace')
+    end
+
+    it 'automatically sets max_participants from location setting' do
+      event = build(:event, max_participants: nil)
+      event.save!
+      expect(Event.find(event.code).max_participants).not_to be_nil
     end
 
     context '.set_sync_time' do

@@ -16,6 +16,7 @@ class GetSetting
   end
 
   def self.location(location, setting)
+    return '' if location.blank?
     settings_hash = Setting.Locations[location]
     return '' if settings_hash[setting].blank?
     settings_hash[setting]

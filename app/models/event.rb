@@ -16,12 +16,13 @@ class Event < ApplicationRecord
 
   before_save :clean_data
   before_update :update_name
+  # before_validation :set_max, on: [:create, :update, :save]
 
-  validates :name, :start_date, :end_date, :location, :max_participants,
-            :time_zone, :max_observers, presence: true
+  validates :name, :start_date, :end_date, :location, :time_zone, presence: true
   validates :short_name, presence: true, if: :has_long_name
   validates :event_type, presence: true, if: :check_event_type
   validate :starts_before_ends
+  validate :set_max_participants
   validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.all.map(&:name)
   validates :code, uniqueness: true, format: {
     with: /#{GetSetting.code_pattern}/,
@@ -125,5 +126,16 @@ class Event < ApplicationRecord
 
   def clean_data
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }
+  end
+
+  def set_max_participants
+    %w(participants virtual observers).each do |max_type|
+      max_setting = "max_" + max_type
+      if self.send(max_setting).blank?
+        max_num = GetSetting.location(self.location, max_setting)
+        max_num = 0 if max_num.blank?
+        self.write_attribute(max_setting, max_num)
+      end
+    end
   end
 end

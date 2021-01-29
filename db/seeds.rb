@@ -30,6 +30,8 @@ def generate_events(start_year, end_year)
        press_release: Faker::ChuckNorris.fact,
        updated_by: 'seeds.rb',
        max_participants: 50,
+       max_virtual: 300,
+       max_observers: 5,
        booking_code: Faker::Alphanumeric.alphanumeric(6),
        time_zone: 'Mountain Time (US & Canada)'
       }

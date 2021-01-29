@@ -89,6 +89,7 @@ namespace :ws do
           'Address' => "123 Example Street\nExampletown, Exampleton",
           'lock_staff_schedule' => '15.days',
           'max_participants' => 42,
+          'max_virtual' => 300,
           'max_observers' => 2
         }
       }

@@ -32,6 +32,7 @@ FactoryBot.define do
     f.end_date
     f.event_type { '5 Day Workshop' }
     f.max_participants { 42 }
+    f.max_virtual { 300 }
     f.max_observers { 3 }
     f.location { 'EO' }
     f.time_zone { 'Mountain Time (US & Canada)' }
@@ -55,12 +56,14 @@ FactoryBot.define do
         date = date.next_year
         event.start_date = date.next_week(:sunday)
       elsif evaluator.current
-        weekends = %w(Friday Saturday Sunday)
-        if date.strftime("%A").match(Regexp.union(weekends))
-          event.start_date = date.beginning_of_week(:friday)
-        else
-          event.start_date = date.beginning_of_week(:sunday)
-        end
+        # Why?
+        # weekends = %w(Friday Saturday Sunday)
+        # if date.strftime("%A").match(Regexp.union(weekends))
+        #   event.start_date = date.beginning_of_week(:friday)
+        # else
+        #   event.start_date = date.beginning_of_week(:sunday)
+        # end
+        event.start_date = date.beginning_of_week(:sunday)
       end
       event.end_date = event.start_date + 5.days unless event.start_date.nil?
 
