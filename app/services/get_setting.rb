@@ -58,13 +58,21 @@ class GetSetting
   end
 
   def self.max_participants(location)
-    return 40 if no_setting("Locations['#{location}']['max_participants']")
+    return 42 if location.blank? ||
+                 no_setting("Locations['#{location}']['max_participants']")
     Setting.Locations[location]['max_participants']
   end
 
   def self.max_observers(location)
-    return 0 if no_setting("Locations['#{location}']['max_observers']")
+    return 0 if location.blank? ||
+                no_setting("Locations['#{location}']['max_observers']")
     Setting.Locations[location]['max_observers']
+  end
+
+  def self.max_virtual(location)
+    return 300 if location.blank? ||
+                  no_setting("Locations['#{location}']['max_virtual']")
+    Setting.Locations[location]['max_virtual']
   end
 
   def self.rsvp_dates_intro(location)

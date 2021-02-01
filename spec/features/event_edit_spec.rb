@@ -155,6 +155,7 @@ describe 'Event Edit Page', type: :feature do
         fill_in 'event_subjects', with: 'New Subjects'
         fill_in 'event_max_participants', with: '50'
         fill_in 'event_max_observers', with: '1'
+        fill_in 'event_max_virtual', with: '100'
         fill_in 'event_cancelled', with: '1'
         fill_in 'event_online', with: '1'
 
@@ -169,6 +170,7 @@ describe 'Event Edit Page', type: :feature do
         expect(event.subjects).to eq('New Subjects')
         expect(event.max_participants).to eq(50)
         expect(event.max_observers).to eq(1)
+        expect(event.max_virtual).to eq(100)
         expect(event.cancelled).to be_truthy
         expect(event.online).to be_truthy
       end

@@ -69,6 +69,7 @@ describe 'Schedule Index', type: :feature do
   context 'Organizers of event' do
     before do
       @user.member!
+      @event = create(:event, future: true)
       create(:membership, event: @event,
                           person: @user.person,
                           role: 'Organizer')
@@ -208,8 +209,8 @@ describe 'Schedule Index', type: :feature do
         visit(event_schedule_index_path(@event))
 
         other_lecture = create(:lecture, event: @event,
-                               start_time: @lecture.start_time + 60.minutes,
-                                 end_time: @lecture.end_time + 80.minutes,
+                               start_time: DateTime.current + 60.minutes,
+                                 end_time: DateTime.current + 80.minutes,
                                     title: 'Another Talk',
                              is_recording: true,
                                      room: 'Online')

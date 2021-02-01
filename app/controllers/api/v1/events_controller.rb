@@ -21,6 +21,7 @@ class Api::V1::EventsController < Api::V1::BaseController
       event.max_participants = GetSetting.max_participants(event.location)
     end
     event.max_observers = GetSetting.max_observers(event.location)
+    event.max_virtual = GetSetting.max_virtual(event.location)
 
     if event.time_zone.blank?
       tz = GetSetting.location(event.location, 'Timezone')

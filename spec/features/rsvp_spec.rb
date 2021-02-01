@@ -350,8 +350,18 @@ describe 'RSVP', type: :feature do
         click_button('Continue')
 
         expect(current_path).to eq(rsvp_yes_online_path(@invitation.code))
-        event.online = false
-        event.save
+      end
+
+      it "clicking Continue goes to #yes-online, if member's role is virtual" do
+        member = @invitation.membership
+        member.role = 'Virtual Participant'
+        member.save!
+
+        visit rsvp_otp_path(@invitation.code)
+        click_link "Yes"
+        click_button('Continue')
+
+        expect(current_path).to eq(rsvp_yes_online_path(@invitation.code))
       end
 
       it 'entering a new email updates the person record' do

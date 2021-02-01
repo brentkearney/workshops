@@ -16,7 +16,6 @@ class Event < ApplicationRecord
 
   before_save :clean_data
   before_update :update_name
-  # before_validation :set_max, on: [:create, :update, :save]
 
   validates :name, :start_date, :end_date, :location, :time_zone, presence: true
   validates :short_name, presence: true, if: :has_long_name

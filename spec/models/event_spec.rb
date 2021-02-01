@@ -179,12 +179,6 @@ RSpec.describe "Model validations: Event ", type: :model do
       expect(@event.description).to eq('A workshop with whitespace')
     end
 
-    it 'automatically sets max_participants from location setting' do
-      event = build(:event, max_participants: nil)
-      event.save!
-      expect(Event.find(event.code).max_participants).not_to be_nil
-    end
-
     context '.set_sync_time' do
       it 'updates the sync_time field' do
         yesterday = DateTime.yesterday
