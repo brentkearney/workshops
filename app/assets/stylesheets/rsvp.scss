@@ -52,6 +52,11 @@
 
 /* RSVP Form start */
 .rsvp {
+
+  .online-card {
+    margin-bottom: 3em;
+  }
+
   .btn {
     border: 1px solid lightgrey;
     border-right: 2px solid $grey-border;
@@ -75,7 +80,7 @@
     @extend .card-title;
 
     text-align: center;
-    border: 2px solid white;
+    border: 4px solid white;
   }
 
   h1 {
@@ -170,6 +175,15 @@
 
   #yes-form {
     .rsvp-card-title {
+      background-color: #216eb8;
+
+      h1 {
+        color: white;
+        margin: 1.5em;
+      }
+    }
+
+    .rsvp-card-subtitle {
       h1 {
         color: white;
       }

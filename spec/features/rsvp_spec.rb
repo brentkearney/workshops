@@ -667,6 +667,13 @@ describe 'RSVP', type: :feature do
           visit rsvp_yes_path(@invitation.code)
         end
 
+        it 'asks if they intend to attend virtually (for hybrid events)' do
+          expect(page.body).to have_text('If you plan to attend this event
+                                          online'.squish)
+          expect(page).to have_link('Participate Virtually',
+                             href: rsvp_yes_online_path(@invitation.code))
+        end
+
         it 'has a personal profile form' do
           has_person_profile_fields()
           expect(page).to have_field('rsvp_person_gender')
@@ -854,6 +861,18 @@ describe 'RSVP', type: :feature do
 
         it 'if participant already has account, does not link to register' do
           does_not_link_to_register(rsvp_yes_online_path(@invitation.code))
+        end
+
+        it "changes the participant's role to Virtual Participant" do
+          membership = @invitation.membership
+          membership.role = 'Participant'
+          membership.save
+
+          visit rsvp_yes_online_path(@invitation.code)
+          click_button('Confirm Attendance')
+
+          updated = Membership.find(membership.id)
+          expect(updated.role).to eq('Virtual Participant')
         end
 
         context 'user is an organizer' do

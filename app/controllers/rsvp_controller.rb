@@ -173,7 +173,7 @@ class RsvpController < ApplicationController
     params.require(:rsvp).permit(
       membership: [:arrival_date, :departure_date,
         :own_accommodation, :has_guest, :guest_disclaimer, :special_info,
-        :share_email, :share_email_hotel],
+        :share_email, :share_email_hotel, :role],
       person: [:salutation, :firstname, :lastname, :gender,
         :affiliation, :department, :title, :academic_status, :phd_year, :email,
         :url, :phone, :address1, :address2, :address3, :city, :region,
