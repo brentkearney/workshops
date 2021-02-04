@@ -114,6 +114,10 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(build(:event).online).to be_falsey
   end
 
+  it 'is hybrid by default' do
+    expect(build(:event).hybrid).to be_truthy
+  end
+
   it '.dates returns formatted dates' do
     e = build(:event)
 

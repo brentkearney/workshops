@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_29_190554) do
+ActiveRecord::Schema.define(version: 2021_02_04_212539) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 2021_01_29_190554) do
     t.boolean "cancelled", default: false
     t.boolean "online", default: false
     t.integer "max_virtual"
+    t.boolean "hybrid", default: true
     t.index ["code"], name: "index_events_on_code", unique: true
   end
 
