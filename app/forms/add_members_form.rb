@@ -18,7 +18,7 @@ class AddMembersForm < ComplexForms
     @sync_errors = ErrorReport.new(self.class, @event)
     self.added = []
     self.new_people = []
-    self.role = 'Participant'
+    self.role = @event.online ? 'Virtual Participant' : 'Participant'
   end
 
   def process(params)

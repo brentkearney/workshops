@@ -131,6 +131,45 @@ describe 'Membership#add', type: :feature do
       expect(page).to have_button('Add These Members')
     end
 
+    it 'role selection is from Membership model definition' do
+      @org_user.admin!
+      login_as @user
+
+      visit add_event_memberships_path(@event)
+
+      expect(page).to have_select('add_members_form[role]',
+                                   options: Membership::ROLES)
+    end
+
+    it 'Organizer roles disabled from selection for non-admin users' do
+      select = find(:select, 'add_members_form[role]')
+      expect(select).to have_selector(:option, 'Contact Organizer', disabled: true)
+      expect(select).to have_selector(:option, 'Organizer', disabled: true)
+    end
+
+    it '"Participant" role excluded from Online events' do
+      @org_user.admin!
+      login_as @user
+      @event.update_column(:online, true)
+
+      visit add_event_memberships_path(@event)
+      select = find(:select, 'add_members_form[role]')
+
+      expect(select).to have_selector(:option, 'Participant', disabled: true)
+    end
+
+    it '"Virtual Participant" role excluded from non-hybrid/online events' do
+      @org_user.admin!
+      login_as @user
+      @event.update_columns(online: false, hybrid: false)
+
+      visit add_event_memberships_path(@event)
+      select = find(:select, 'add_members_form[role]')
+
+      expect(select).to have_selector(:option, 'Virtual Participant',
+                                      disabled: true)
+    end
+
     it 'adds existing local records based on email match' do
       fill_in 'add_members_form[add_members]', with: @person.email
       click_button 'Add These Members'
