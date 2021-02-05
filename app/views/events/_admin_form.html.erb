@@ -111,6 +111,12 @@
           </div>
         </div>
         <div class="col-md-2 form-group">
+          <%= f.label :max_virtual %>
+          <div style="width: 6em;">
+            <%= f.number_field :max_virtual, class: 'form-control' %>
+          </div>
+        </div>
+        <div class="col-md-2 form-group">
           <%= f.label :max_observers %>
           <div style="width: 6em;">
             <%= f.number_field :max_observers, class: 'form-control' %>

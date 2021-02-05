@@ -30,6 +30,10 @@
             <td colspan="3"><%= @event.event_type %></td>
           </tr>
           <tr>
+            <td class="label">Event Format:</td>
+            <td colspan="3"><%= @event.format %></td>
+          </tr>
+          <tr>
             <td class="label">Subject Areas:</td>
             <td colspan="3"><%= @event.subjects %></td>
           </tr>
@@ -51,10 +55,11 @@
           </tr>
           <% if policy(@event).view_details? %>
           <tr>
-            <td class="label">Maximum participants:</td>
-            <td><%= @event.max_participants %></td>
-            <td class="label">Maximum observers:</td>
-            <td><%= @event.max_observers %></td>
+            <td class="label">Participation Limits:</td>
+            <td colspan="3">
+              Physical Participants: <%= @event.max_participants %> &nbsp; | &nbsp;
+              Virtual Participants: <%= @event.max_virtual %> &nbsp; | &nbsp;
+              Observers: <%= @event.max_observers %>
           </tr>
           <% end %>
          <tr>

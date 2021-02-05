@@ -202,7 +202,6 @@ describe 'Membership#edit', type: :feature do
     expect(page).not_to have_selector('#membership_num_guests')
     expect(page).not_to have_selector('#membership_guest_disclaimer')
     expect(page).not_to have_selector('#membership_special_info')
-    # expect(page).not_to have_selector('#membership_person_attributes_emergency_contact')
   end
 
   def allows_arrival_departure_editing(member)

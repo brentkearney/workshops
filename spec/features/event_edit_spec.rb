@@ -71,7 +71,7 @@ describe 'Event Edit Page', type: :feature do
       login_as user, scope: :user
       @allowed_fields = %w(short_name description press_release subjects)
       @not_allowed_fields = %w(name code door_code booking_code max_participants
-        max_observers start_date end_date)
+        max_virtual max_observers start_date end_date)
       visit edit_event_path(@event)
     end
 
@@ -114,7 +114,7 @@ describe 'Event Edit Page', type: :feature do
       @non_member_user.staff!
       login_as @non_member_user, scope: :user
       @allowed_fields = %w(short_name description press_release door_code
-        booking_code subjects max_participants max_observers)
+        booking_code subjects max_participants max_virtual max_observers)
       @not_allowed_fields = %w(name code start_date end_date time_zone
         location template)
     end

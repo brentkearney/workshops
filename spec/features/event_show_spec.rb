@@ -26,6 +26,7 @@ describe 'Event Show Page', type: :feature do
     expect(body).to have_text(@event.time_zone)
     expect(body).to have_text(@event.dates(:long))
     expect(body).to have_text(@event.event_type)
+    expect(body).to have_text(@event.format)
     expect(body).to have_link(@event.url)
   end
 
@@ -35,16 +36,18 @@ describe 'Event Show Page', type: :feature do
     expect(body).to have_text(@event.description)
     expect(body).to have_text(@event.short_name)
     expect(body).to have_text("Door Code: #{@event.door_code}")
-    expect(body).to have_text("Maximum participants: #{@event.max_participants}")
-    expect(body).to have_text("Maximum observers: #{@event.max_observers}")
+    expect(body).to have_text("Physical Participants: #{@event.max_participants}")
+    expect(body).to have_text("Virtual Participants: #{@event.max_virtual}")
+    expect(body).to have_text("Observers: #{@event.max_observers}")
   end
 
   def hides_some_details
     body = page.body.squish
     expect(body).not_to have_text("Door Code: #{@event.door_code}")
     expect(body).not_to have_text(@event.booking_code)
-    expect(body).not_to have_text("Maximum participants: #{@event.max_participants}")
-    expect(body).not_to have_text("Maximum observers: #{@event.max_observers}")
+    expect(body).not_to have_text("Physical Participants: #{@event.max_participants}")
+    expect(body).not_to have_text("Virtual Participants: #{@event.max_virtual}")
+    expect(body).not_to have_text("Observers: #{@event.max_observers}")
   end
 
   def has_no_edit_button

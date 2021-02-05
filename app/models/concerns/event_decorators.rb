@@ -170,4 +170,10 @@ module EventDecorators
   def options_list
     "#{self.date}: [#{self.code}] #{self.name}".truncate(55)
   end
+
+  def format
+    return 'Online' if self.online
+    return 'Hybrid' if self.hybrid
+    return 'Physical'
+  end
 end
