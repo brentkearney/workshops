@@ -42,10 +42,9 @@ module MembershipsHelper
     if @current_user.is_organizer?(@event) && !@current_user.is_admin?
       disabled_options = ['Contact Organizer', 'Organizer']
     end
-    disabled_options << 'Participant' if @event.online
-    unless @event.hybrid || @event.online
-      disabled_options << 'Virtual Participant'
-    end
+    disabled_options << 'Participant' if @event.online?
+    disabled_options << 'Virtual Participant' if @event.physical?
+
 
     f.select :role, Membership::ROLES,
              { selected: default, disabled: disabled_options },

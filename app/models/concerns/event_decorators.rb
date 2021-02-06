@@ -171,9 +171,31 @@ module EventDecorators
     "#{self.date}: [#{self.code}] #{self.name}".truncate(55)
   end
 
-  def format
-    return 'Online' if self.online
-    return 'Hybrid' if self.hybrid
-    return 'Physical'
+  def append_name(word)
+    self.name << " (#{word})" unless self.name.include?("(#{word})")
+  end
+
+  def truncate_name(word)
+    self.name.gsub!("(#{word})", "").strip! if self.name.include?("(#{word})")
+  end
+
+  def update_name
+    append_name('Cancelled') if self.cancelled
+    truncate_name('Cancelled') unless self.cancelled
+
+    append_name('Online') if self.format == 'Online'
+    truncate_name('Online') unless self.format == 'Online'
+  end
+
+  def online?
+    self.format == 'Online'
+  end
+
+  def hybrid?
+    self.format == 'Hybrid'
+  end
+
+  def physical?
+    self.format == 'Physical'
   end
 end

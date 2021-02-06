@@ -205,7 +205,7 @@ class EventsController < ApplicationController
     params.require(:event).permit(:code, :name, :short_name, :start_date,
                                   :end_date, :time_zone, :event_type, :location,
                                   :description, :press_release, :door_code,
-                                  :booking_code, :subjects, :cancelled, :online,
+                                  :booking_code, :subjects, :cancelled, :format,
                                   :max_participants, :max_observers,
                                   :max_virtual, :updated_by)
   end

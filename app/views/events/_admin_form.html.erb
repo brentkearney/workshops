@@ -36,19 +36,6 @@
             </label>
           </div>
         </div>
-        <div class='col-md-4'>
-          <div class="form-group checkbox">
-            <%= f.label :online %>: &nbsp;
-            <label>
-              <%= f.check_box :online %> &nbsp;
-              <% if @event.online %>
-                ⬅︎ Uncheck this box if it is <strong>not</strong> an online event.
-              <% else %>
-                ⬅︎ Check this box if it is an online event.
-              <% end %>
-            </label>
-          </div>
-        </div>
       </div>
 
       <div class="row event-dates">
@@ -86,9 +73,19 @@
         <%= f.text_field :short_name, class: 'form-control' %>
       </div>
       <div class="form-group">
-        <%= f.label :location %>
-        <div style="width: 6em;">
-          <%= f.select(:location, Setting.Locations.keys, {}, { class: 'form-control' }) %>
+        <div class="row">
+          <div class='col-md-1'>
+            <%= f.label :location %>
+            <div style="width: 6em;">
+              <%= f.select(:location, GetSetting.locations, {}, { class: 'form-control' }) %>
+            </div>
+          </div>
+          <div class='col-md-1'>
+            <%= f.label :format %>
+            <div style="width: 6em;">
+              <%= f.select(:format, GetSetting.site_setting('event_formats'), {}, { class: 'form-control' }) %>
+            </div>
+          </div>
         </div>
       </div>
       <div class="form-group">
@@ -100,7 +97,7 @@
       <div class="form-group">
         <%= f.label :event_type %>
         <div style="width: 17em;">
-          <%= f.select(:event_type, Setting.Site['event_types'], {}, { class: 'form-control' }) %>
+          <%= f.select(:event_type, GetSetting.site_setting('event_types'), {}, { class: 'form-control' }) %>
         </div>
       </div>
       <div class="row">

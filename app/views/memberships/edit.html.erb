@@ -8,7 +8,7 @@
       <%= render partial: 'person_details_form', locals: { membership: @membership, f: f } %>
     </div>
     <div class="col-lg-6" id="membership-deets-form">
-      <% if !@event.online && policy(@membership).self_edit? %>
+      <% if !@event.online? && policy(@membership).self_edit? %>
         <%= render partial: 'membership_rsvp_form', locals: { membership: @membership, f: f } %>
       <% else %>
         <%= render partial: 'membership_details_form', locals: { membership: @membership, f: f } %>

@@ -147,27 +147,43 @@ describe 'Membership#add', type: :feature do
       expect(select).to have_selector(:option, 'Organizer', disabled: true)
     end
 
-    it '"Participant" role excluded from Online events' do
+    it '"Participant" role excluded, "Virtual Participant" included,
+        for Online events'.squish do
       @org_user.admin!
       login_as @user
-      @event.update_column(:online, true)
+      @event.update_column(:format, 'Online')
 
       visit add_event_memberships_path(@event)
       select = find(:select, 'add_members_form[role]')
 
       expect(select).to have_selector(:option, 'Participant', disabled: true)
+      expect(select).to have_selector(:option, 'Virtual Participant',
+                                               disabled: false)
     end
 
-    it '"Virtual Participant" role excluded from non-hybrid/online events' do
+    it '"Virtual Participant" role excluded from Physical events' do
       @org_user.admin!
       login_as @user
-      @event.update_columns(online: false, hybrid: false)
+      @event.update_columns(format: 'Physical')
 
       visit add_event_memberships_path(@event)
       select = find(:select, 'add_members_form[role]')
 
       expect(select).to have_selector(:option, 'Virtual Participant',
                                       disabled: true)
+    end
+
+    it '"Virtual" and "Physical" Participants included for Hybrid events' do
+      @org_user.admin!
+      login_as @user
+      @event.update_column(:format, 'Hybrid')
+
+      visit add_event_memberships_path(@event)
+      select = find(:select, 'add_members_form[role]')
+
+      expect(select).to have_selector(:option, 'Participant', disabled: false)
+      expect(select).to have_selector(:option, 'Virtual Participant',
+                                               disabled: false)
     end
 
     it 'adds existing local records based on email match' do

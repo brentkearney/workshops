@@ -124,7 +124,7 @@
     </div>
     <% end %>
 
-    <% if !@event.online || policy(@membership).show_personal_info? %>
+    <% if !@event.online? || policy(@membership).show_personal_info? %>
     <div class="form-group">
       <div class="control-label">
         <%= person.label :emergency_contact, "Emergency Contact: " %>

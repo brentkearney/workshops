@@ -31,6 +31,7 @@ FactoryBot.define do
     f.start_date
     f.end_date
     f.event_type { '5 Day Workshop' }
+    f.format { 'Hybrid' }
     f.max_participants { 42 }
     f.max_virtual { 300 }
     f.max_observers { 3 }

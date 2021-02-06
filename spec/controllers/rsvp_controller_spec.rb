@@ -302,7 +302,7 @@ RSpec.describe RsvpController, type: :controller do
     before do
       @membership.attendance = 'Invited'
       @membership.person.gender = nil
-      @membership.event.online = true
+      @membership.event.format = 'Online'
       @membership.save
     end
 

@@ -162,6 +162,10 @@ class GetSetting
     Setting.Locations.first.first
   end
 
+  def self.locations
+    Setting.Locations.keys
+  end
+
   def self.new_registration_msg
     setting = Setting.Site['new_registration_msg']
     setting.blank? ? 'Site Setting "new_registration_msg" is missing.' : setting

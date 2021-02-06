@@ -170,7 +170,7 @@ class MembershipPolicy
   end
 
   def edit_dates?
-    return false if @membership.event.online
+    return false if @membership.event.online?
     staff_and_admins || @membership.person == @current_user.person
   end
 
@@ -179,7 +179,7 @@ class MembershipPolicy
   end
 
   def edit_hotel?
-    return false if @membership.event.online
+    return false if @membership.event.online?
     staff_and_admins
   end
 

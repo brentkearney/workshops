@@ -36,7 +36,7 @@ class InvitationMailer < ApplicationMailer
     pdf_template_file = "#{template_path}/#{template_name}.pdf.erb"
     pdf_template = "invitation_mailer/#{event.location}/#{template_name}.pdf.erb"
 
-    if event.online
+    if event.online?
       template_name = "Virtual " + template_name
       pdf_template_file = 'not_applicable.pdf'
     end
@@ -71,7 +71,7 @@ class InvitationMailer < ApplicationMailer
 
     Time.zone = @event.time_zone
 
-    return if !@event.online && @event.start_date.in_time_zone < Time.now
+    return if !@event.online? && @event.start_date.in_time_zone < Time.now
     @event_start = @event.start_date.in_time_zone.strftime('%A, %B %-d')
     @event_end = @event.end_date.in_time_zone.strftime('%A, %B %-d, %Y')
 

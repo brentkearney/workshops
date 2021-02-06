@@ -31,7 +31,7 @@ class RsvpDeadline
 
   def rsvp_by
     rsvp_deadline = calculate_deadline
-    if @event.online
+    if @event.online?
       rsvp_deadline = @end_date.change({hour: 23, minute: 59})
     end
 

@@ -193,7 +193,7 @@ class RsvpController < ApplicationController
 
   def set_yes_path(event)
     path_param = { otp: otp_params }
-    if event.online || @invitation.membership.role == 'Virtual Participant'
+    if event.online? || @invitation.virtual?
       return rsvp_yes_online_path(path_param)
     end
     rsvp_yes_path(path_param)

@@ -157,7 +157,7 @@ describe 'Event Edit Page', type: :feature do
         fill_in 'event_max_observers', with: '1'
         fill_in 'event_max_virtual', with: '100'
         fill_in 'event_cancelled', with: '1'
-        fill_in 'event_online', with: '1'
+        fill_in 'event_format', with: 'Online'
 
         click_button "Update Event"
 
@@ -172,7 +172,7 @@ describe 'Event Edit Page', type: :feature do
         expect(event.max_observers).to eq(1)
         expect(event.max_virtual).to eq(100)
         expect(event.cancelled).to be_truthy
-        expect(event.online).to be_truthy
+        expect(event.format).to eq('Online')
       end
 
       it 'appends "(Cancelled)" to event name when it is marked as cancelled' do
@@ -200,7 +200,7 @@ describe 'Event Edit Page', type: :feature do
 
       it 'appends "(Online)" to event name when it is marked as online' do
         expect(@event.name.include?('Online')).to be_falsey
-        fill_in 'event_online', with: '1'
+        fill_in 'event_format', with: 'Online'
 
         click_button "Update Event"
 
@@ -209,12 +209,12 @@ describe 'Event Edit Page', type: :feature do
       end
 
       it 'removes "(Online)" from event name when unmarked as online' do
-        @event.online = true
+        @event.format = 'Online'
         @event.save
         expect(@event.name.include?('Online')).to be_truthy
 
         visit edit_event_path(@event)
-        fill_in 'event_online', with: '0'
+        fill_in 'event_format', with: 'Physical'
         click_button "Update Event"
 
         event = Event.find(@event.code)

@@ -18,7 +18,7 @@ class RsvpForm < ComplexForms
     @event = @membership.event
     @person = @membership.person
     @person.is_rsvp = true
-    @person.is_online_rsvp = true if @event.online
+    @person.is_online_rsvp = true if @event.online?
     @person.is_organizer_rsvp = true if @membership.role.match?(/Organizer/)
     @grant_list = RsvpForm.grant_list
     self

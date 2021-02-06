@@ -132,9 +132,7 @@ describe 'Event List', type: :feature do
 
     it 'indicates whether an event is online' do
       @current.name = 'Current event title'
-      @current.online = false
-      @current.save
-      @current.online = true
+      @current.format = 'Online'
       @current.save
 
       visit events_path

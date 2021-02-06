@@ -23,6 +23,7 @@ if Setting.find_by(var: 'Site').blank?
     'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
     'academic_status' => ['Professor', 'Post Doctoral Fellow', 'Medical Doctor', 'Ph.D. Student', 'Masters Student', 'Undergraduate Student', 'K-12 Teacher', 'K-12 Student', 'Other'],
     'salutations' => ['Prof.', 'Dr.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'],
+    'event_formats' => ['Physical', 'Online', 'Hybrid'],
     'rsvp_expiry' => '1.month',
     'email_domain' => 'workshops.example.com',
     'maillist_domain' => 'lists.example.com',

@@ -23,6 +23,7 @@ class Event < ApplicationRecord
   validate :starts_before_ends
   validate :set_max_participants
   validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.all.map(&:name)
+  validates_inclusion_of :format, in: GetSetting.site_setting('event_formats')
   validates :code, uniqueness: true, format: {
     with: /#{GetSetting.code_pattern}/,
     message: "- invalid code format. Must match: #{GetSetting.code_pattern}"
@@ -112,16 +113,6 @@ class Event < ApplicationRecord
   end
 
   private
-
-  def update_name
-    %w(Cancelled Online).each do |w|
-      if self.send(w.downcase)
-        self.name << " (#{w})" unless self.name.include?("(#{w})")
-      else
-        self.name.gsub!("(#{w})", "").strip! if self.name.include?("(#{w})")
-      end
-    end
-  end
 
   def clean_data
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }
