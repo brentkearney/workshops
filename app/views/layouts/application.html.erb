@@ -48,7 +48,7 @@
     <% end %>
 
     <%# Main body content %>
-    <main class="app-content">
+    <main class="app-content<%= " no-sidebar" unless user_signed_in? %>">
       <% if @event && !@event.name.nil? %>
           <header>
             <h3 class="page-header"><%= link_to @event.name, @event %></h3>

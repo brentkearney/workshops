@@ -41,7 +41,6 @@ gem "administrate", ">= 0.13.0"
 gem 'popper_js', '~> 1.16.0'
 gem 'webpacker', '~> 5.1.1'
 
-
 group :development, :test do
   gem 'byebug'
   gem 'spring'
