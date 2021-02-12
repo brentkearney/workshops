@@ -77,4 +77,55 @@ RSpec.describe ParticipantMailer, type: :mailer do
       expect(@sent_message.attachments).to be_empty
     end
   end
+
+  describe '.rsvp_confirmation for hybrid meetings' do
+    before do
+      @event = create(:event, name: 'Test Hybrid Event', format: 'Hybrid')
+    end
+
+    context 'for in-person participants' do
+      before do
+        @membership = create(:membership, event: @event, role: 'Participant')
+        create(:invitation, membership: @membership)
+
+        ParticipantMailer.rsvp_confirmation(@membership).deliver_now
+        @sent_message = ActionMailer::Base.deliveries.first
+      end
+
+      it 'To: confirmed participant' do
+        expect(@sent_message.to).to include(@membership.person.email)
+      end
+
+      it 'includes PDF attachment' do
+        filename = @membership.event.location + '-arrival-info.pdf'
+        expect(@sent_message.attachments.first.filename).to eq(filename)
+      end
+
+      it 'uses default template for physical meetings' do
+        expect(@sent_message.text_part.body.to_s).to include('attend the event')
+      end
+    end
+
+    context 'for online participants' do
+      before do
+        @membership = create(:membership, event: @event, role: 'Virtual Participant')
+        create(:invitation, membership: @membership)
+
+        ParticipantMailer.rsvp_confirmation(@membership).deliver_now
+        @sent_message = ActionMailer::Base.deliveries.last
+      end
+
+      it 'To: confirmed participant' do
+        expect(@sent_message.to).to include(@membership.person.email)
+      end
+
+      it 'uses "Virtual" template for online meetings' do
+        expect(@sent_message.body.to_s).to include('attend the online event')
+      end
+
+      it 'does not include PDF attachment for online meetings' do
+        expect(@sent_message.attachments).to be_empty
+      end
+    end
+  end
 end
