@@ -267,27 +267,124 @@ describe 'Invite Members', type: :feature do
       end
     end
 
-    it 'invitation fails if max_participants is exceeded' do
-      num_participants = @event.num_invited_participants
-      @event.max_participants = num_participants
-      @event.save!
+    context 'Physical events' do
+      before do
+        @event.update_columns(format: 'Physical')
+        visit invite_event_memberships_path(@event)
+      end
 
-      participant = @event.memberships.where(role: 'Participant')
-                                      .where(attendance: 'Not Yet Invited').last
-      expect(participant).not_to be_blank
-      html_id = 'invite_members_form_' + participant.id.to_s
-      find(:css, "input##{html_id}").set(true)
+      it 'invitation fails if max_participants is exceeded' do
+        num_participants = @event.num_invited_participants
+        @event.max_participants = num_participants
+        @event.save!
 
-      click_button('not-yet-invited-submit')
+        participant = @event.memberships.where(role: 'Participant')
+                                        .where(attendance: 'Not Yet Invited').last
+        expect(participant).not_to be_blank
+        html_id = 'invite_members_form_' + participant.id.to_s
+        find(:css, "input##{html_id}").set(true)
 
-      expect(current_path).to eq(invite_event_memberships_path(@event))
-      updated_member = Membership.find(participant.id)
-      expect(updated_member.attendance).to eq('Not Yet Invited')
-      expect(page).to have_text("You may not invite more than
-        #{@event.max_participants} participants.".squish)
+        click_button('not-yet-invited-submit')
+
+        expect(current_path).to eq(invite_event_memberships_path(@event))
+        updated_member = Membership.find(participant.id)
+        expect(updated_member.attendance).to eq('Not Yet Invited')
+        expect(page).to have_text("You may not invite more than
+          #{@event.max_participants} participants.".squish)
+      end
+    end
+
+    context 'Online events' do
+      before do
+        @event.update_columns(format: 'Online')
+        @event.memberships.select {|m| m.role == 'Participant'}.each do |member|
+          member.update_columns(role: 'Virtual Participant')
+        end
+
+      end
+
+      it 'invitation fails if max_virtual is exceeded' do
+        num_participants = @event.num_invited_participants
+        @event.max_virtual = num_participants
+        @event.save!
+
+        visit invite_event_memberships_path(@event)
+
+        participant = @event.memberships.where(role: 'Virtual Participant')
+                            .where(attendance: 'Not Yet Invited').last
+        expect(participant).not_to be_blank
+        html_id = 'invite_members_form_' + participant.id.to_s
+        find(:css, "input##{html_id}").set(true)
+
+        click_button('not-yet-invited-submit')
+
+        expect(current_path).to eq(invite_event_memberships_path(@event))
+        updated_member = Membership.find(participant.id)
+        expect(updated_member.attendance).to eq('Not Yet Invited')
+        expect(page).to have_text("You may not invite more than
+          #{@event.max_virtual} participants.".squish)
+      end
+    end
+
+    context 'Hybrid events' do
+      before do
+        @event.update_columns(format: 'Hybrid')
+        @event.memberships.select {|m| m.role == 'Participant' &&
+          (m.attendance == 'Not Yet Invited' || m.attendance == 'Confirmed')}
+              .each_slice(2) do |member|
+          member[0].update_columns(role: 'Virtual Participant')
+        end
+      end
+
+      it 'invitation fails if max_participants is exceeded by in-person
+        participants'.squish do
+        num_participants = @event.num_invited_in_person
+        @event.max_participants = num_participants
+        @event.save!
+
+        visit invite_event_memberships_path(@event)
+
+        participant = @event.memberships.where(role: 'Participant')
+                            .where(attendance: 'Not Yet Invited').last
+        expect(participant).not_to be_blank
+        html_id = 'invite_members_form_' + participant.id.to_s
+        find(:css, "input##{html_id}").set(true)
+
+        click_button('not-yet-invited-submit')
+
+        expect(current_path).to eq(invite_event_memberships_path(@event))
+        updated_member = Membership.find(participant.id)
+        expect(updated_member.attendance).to eq('Not Yet Invited')
+        expect(page).to have_text("You may not invite more than
+          #{@event.max_participants} in-person participants.".squish)
+      end
+
+      it 'invitation fails if max_virtual is exceeded by virtual
+        participants'.squish do
+        num_participants = @event.num_invited_virtual
+        @event.max_virtual = num_participants
+        @event.save!
+
+        visit invite_event_memberships_path(@event)
+
+        participant = @event.memberships.where(role: 'Virtual Participant')
+                            .where(attendance: 'Not Yet Invited').last
+        expect(participant).not_to be_blank
+        html_id = 'invite_members_form_' + participant.id.to_s
+        find(:css, "input##{html_id}").set(true)
+
+        click_button('not-yet-invited-submit')
+
+        expect(current_path).to eq(invite_event_memberships_path(@event))
+        updated_member = Membership.find(participant.id)
+        expect(updated_member.attendance).to eq('Not Yet Invited')
+        expect(page).to have_text("You may not invite more than
+          #{@event.max_virtual} virtual participants.".squish)
+      end
     end
 
     it 'invitation fails if max_observers is exceeded' do
+      @event.update_columns(format: 'Physical')
       num_observers = @event.num_invited_observers
       @event.max_observers = num_observers
       @event.save!

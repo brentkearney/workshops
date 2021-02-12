@@ -41,6 +41,11 @@ class InvitationMailer < ApplicationMailer
       pdf_template_file = 'not_applicable.pdf'
     end
 
+    if event.hybrid?
+      template_name = "Hybrid " + template_name
+      pdf_template_file = 'not_applicable.pdf'
+    end
+
     text_template_file = "#{template_path}/#{template_name}.text.erb"
     text_template = "invitation_mailer/#{event.location}/#{template_name}.text.erb"
 
@@ -71,7 +76,9 @@ class InvitationMailer < ApplicationMailer
 
     Time.zone = @event.time_zone
 
-    return if !@event.online? && @event.start_date.in_time_zone < Time.now
+    # no invitations to physical events once they've started
+    return if @event.physical? && @event.start_date.in_time_zone < Time.now
+
     @event_start = @event.start_date.in_time_zone.strftime('%A, %B %-d')
     @event_end = @event.end_date.in_time_zone.strftime('%A, %B %-d, %Y')
 
