@@ -248,19 +248,57 @@ module MembershipsHelper
     column.html_safe
   end
 
-  def add_limits_message
-    invited = @event.num_invited_participants
-    spots = @event.max_participants - invited
-    isare = 'are'
-    isare = 'is' if spots == 1
-    spot_s = 'spots'
-    spot_s = 'spot' if spots == 1
-    unless_cancel = ''
-    if spots == 0
-      unless_cancel = "<br>\nUnless someone cancels, no more invitations can be sent."
+  def cancellations_msg(physical_spots, virtual_spots)
+    if physical_spots == 0
+      return "<br>\nUnless there are cancellations from in-person participants,
+        no more can be invited."
     end
-    ('<div class="no-print" id="limits-message">There ' + "#{isare} #{spots} #{spot_s} left:
-      #{invited} confirmed & invited / #{@event.max_participants} maximum. #{unless_cancel}</div>").squish.html_safe
+
+    if virtual_spots == 0
+      return "<br>\nUnless there are cancellations from virtual participants,
+        no more can be invited."
+    end
+
+    ''
+  end
+
+  def hybrid_spots_msg
+    max_physical = @event.max_participants
+    physical_spots = max_physical - @event.num_invited_in_person
+    max_virtual = @event.max_virtual
+    virtual_spots = max_virtual - @event.num_invited_virtual
+
+    msg = "There #{pluralize_no_count(physical_spots, 'is', 'are')}
+      <strong>#{physical_spots}/#{max_physical}</strong>
+      #{pluralize_no_count(physical_spots, 'in-person spot')}, and
+      <strong>#{virtual_spots}/#{max_virtual}</strong>
+      #{pluralize_no_count(virtual_spots, 'virtual spot')} left
+      (includes confirmed + invited)."
+
+    msg << cancellations_msg(physical_spots, virtual_spots)
+  end
+
+  def compose_spots_left_msg(format)
+    return hybrid_spots_msg if format == 'Hybrid'
+
+    max = format == 'Online' ? @event.max_virtual : @event.max_participants
+    invited = @event.num_invited_participants
+    spots = max - invited
+
+    msg = "There #{pluralize_no_count(spots, 'is', 'are')}
+      #{pluralize(spots, 'spot')} left: #{invited} confirmed & invited /
+      #{max} maximum."
+
+    if spots == 0
+      msg << "<br>\nUnless there are cancellations, no more can be invited."
+    end
+
+    msg
+  end
+
+  def add_limits_message
+    (%Q{<div class="no-print" id="limits-message">
+      #{compose_spots_left_msg(@event.format)}</div>}).squish.html_safe
   end
 
   def get_status_heading(status)

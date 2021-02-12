@@ -72,4 +72,8 @@ module ApplicationHelper
   def set_read_notice
     cookies[:read_notice2] = { value: true, expires: 1.month.from_now }
   end
+
+  def pluralize_no_count(count, singular, plural = nil)
+    ((count == 1 || count == '1') ? singular : (plural || singular.pluralize))
+  end
 end

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2.4.3'
+gem 'rails', '~> 5.2.4.5'
 gem 'rack', ">= 2.2.3"
 gem 'dry-configurable', '~> 0.9.0'
 gem 'pg', '1.1.3'

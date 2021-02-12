@@ -140,10 +140,49 @@ describe 'Invite Members', type: :feature do
       expect(page).to have_text(RsvpDeadline.new(@event).rsvp_by)
     end
 
-    it 'shows how many spots are left, given max participants' do
-      spots_left = @event.max_participants - @event.num_invited_participants
-      expect(page).to have_text("There are #{spots_left} spots left")
+    context 'Physical events' do
+      before do
+        @event.update_columns(format: 'Physical')
+        visit invite_event_memberships_path(@event)
+      end
+
+      it 'shows how many spots are left, given max participants' do
+        spots_left = @event.max_participants - @event.num_invited_participants
+        expect(page).to have_text("There are #{spots_left} spots left")
+      end
     end
+
+    context 'Online events' do
+      before do
+        @event.update_columns(format: 'Online')
+        visit invite_event_memberships_path(@event)
+      end
+
+      it 'shows how many spots are left, given max_virtual participants' do
+        spots_left = @event.max_virtual - @event.num_invited_participants
+        expect(page).to have_text("There are #{spots_left} spots left")
+      end
+    end
+
+    context 'Hybrid events' do
+      before do
+        @event.update_columns(format: 'Hybrid')
+        visit invite_event_memberships_path(@event)
+      end
+
+      it 'shows how many Physical and Virtual spots are left, given settings' do
+        max_physical = @event.max_participants
+        physical_spots = max_physical - @event.num_invited_participants
+        max_virtual = @event.max_virtual
+        virtual_spots = max_virtual - @event.num_invited_virtual
+
+        msg = "There are #{physical_spots}/#{max_physical} in-person spots, and
+              #{virtual_spots}/#{max_virtual} virtual spots left".squish
+
+        expect(page).to have_text(msg)
+      end
+    end
+
 
     it 'has checkboxes for each member listed' do
       ['Not Yet Invited', 'Undecided', 'Invited'].each do |status|

@@ -28,6 +28,18 @@ module EventDecorators
     memberships.size
   end
 
+  def num_invited_in_person
+    memberships.where("(attendance = 'Invited' OR attendance = 'Undecided'
+      OR attendance = 'Confirmed') AND role != 'Observer'
+      AND (role = 'Participant' OR role LIKE '%Organizer')").size
+  end
+
+  def num_invited_virtual
+    memberships.where("(attendance = 'Invited' OR attendance = 'Undecided'
+      OR attendance = 'Confirmed') AND role != 'Observer'
+      AND role LIKE 'Virtual%'").size
+  end
+
   def num_invited_participants
     memberships.where("(attendance = 'Invited' OR attendance = 'Undecided'
       OR attendance = 'Confirmed') AND role != 'Observer'").size

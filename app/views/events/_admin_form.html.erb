@@ -86,18 +86,18 @@
               <%= f.select(:format, GetSetting.site_setting('event_formats'), {}, { class: 'form-control' }) %>
             </div>
           </div>
+          <div class='col-md-3'>
+            <%= f.label :event_type %>
+            <div style="width: 17em;">
+              <%= f.select(:event_type, GetSetting.site_setting('event_types'), {}, { class: 'form-control' }) %>
+            </div>
+          </div>
         </div>
       </div>
       <div class="form-group">
         <%= f.label :time_zone, class: "control-label" %>
         <div class="controls" style="width: 375px;">
           <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: 'form-control' } %>
-        </div>
-      </div>
-      <div class="form-group">
-        <%= f.label :event_type %>
-        <div style="width: 17em;">
-          <%= f.select(:event_type, GetSetting.site_setting('event_types'), {}, { class: 'form-control' }) %>
         </div>
       </div>
       <div class="row">

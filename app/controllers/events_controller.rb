@@ -222,6 +222,7 @@ class EventsController < ApplicationController
 
   def remove_locations
     @events = @events.select {|e| e.location == @location} unless @location.blank?
+    @events = @events[0 ... 100]
   end
 
   def remove_years

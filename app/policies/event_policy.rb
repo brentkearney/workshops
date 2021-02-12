@@ -26,14 +26,14 @@ class EventPolicy
   class Scope < Struct.new(:current_user, :model)
     def resolve
       if current_user && (current_user.is_admin? || current_user.staff?)
-        return model.all.order(:start_date).limit(100) if current_user.is_admin?
+        return model.all.order(:start_date) if current_user.is_admin?
 
         location = current_user.location
         model.where
              .not('(template = ? AND location != ?)', true, location)
-             .order(:start_date).limit(100)
+             .order(:start_date)
       else
-        model.where(template: false).order(:start_date).limit(100)
+        model.where(template: false).order(:start_date)
       end
     end
   end

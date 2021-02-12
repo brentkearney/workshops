@@ -193,7 +193,7 @@ class FakeLegacyConnector
   end
 
   def get_members_with_changed_membership(m: membership, sn: staff_notes,
-    updated_at: updated_at)
+    updated_at: updated_at_arg)
     [{
       'Person' => {
         'lastname' => m.person.lastname, 'firstname' => m.person.firstname,
