@@ -26,7 +26,7 @@ describe 'Event Show Page', type: :feature do
     expect(body).to have_text(@event.time_zone)
     expect(body).to have_text(@event.dates(:long))
     expect(body).to have_text(@event.event_type)
-    expect(body).to have_text(@event.format)
+    expect(body).to have_text(@event.event_format)
     expect(body).to have_link(@event.url)
   end
 

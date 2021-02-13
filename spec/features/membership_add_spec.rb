@@ -151,7 +151,7 @@ describe 'Membership#add', type: :feature do
         for Online events'.squish do
       @org_user.admin!
       login_as @user
-      @event.update_column(:format, 'Online')
+      @event.update_column(:event_format, 'Online')
 
       visit add_event_memberships_path(@event)
       select = find(:select, 'add_members_form[role]')
@@ -164,7 +164,7 @@ describe 'Membership#add', type: :feature do
     it '"Virtual Participant" role excluded from Physical events' do
       @org_user.admin!
       login_as @user
-      @event.update_columns(format: 'Physical')
+      @event.update_columns(event_format: 'Physical')
 
       visit add_event_memberships_path(@event)
       select = find(:select, 'add_members_form[role]')
@@ -176,7 +176,7 @@ describe 'Membership#add', type: :feature do
     it '"Virtual" and "Physical" Participants included for Hybrid events' do
       @org_user.admin!
       login_as @user
-      @event.update_column(:format, 'Hybrid')
+      @event.update_column(:event_format, 'Hybrid')
 
       visit add_event_memberships_path(@event)
       select = find(:select, 'add_members_form[role]')

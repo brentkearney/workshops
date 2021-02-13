@@ -195,19 +195,19 @@ module EventDecorators
     append_name('Cancelled') if self.cancelled
     truncate_name('Cancelled') unless self.cancelled
 
-    append_name('Online') if self.format == 'Online'
-    truncate_name('Online') unless self.format == 'Online'
+    append_name('Online') if self.event_format == 'Online'
+    truncate_name('Online') unless self.event_format == 'Online'
   end
 
   def online?
-    self.format == 'Online'
+    self.event_format == 'Online'
   end
 
   def hybrid?
-    self.format == 'Hybrid'
+    self.event_format == 'Hybrid'
   end
 
   def physical?
-    self.format == 'Physical'
+    self.event_format == 'Physical'
   end
 end

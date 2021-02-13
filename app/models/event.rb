@@ -23,7 +23,7 @@ class Event < ApplicationRecord
   validate :starts_before_ends
   validate :set_max_participants
   validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.all.map(&:name)
-  validates_inclusion_of :format, in: GetSetting.site_setting('event_formats')
+  validates_inclusion_of :event_format, in: GetSetting.site_setting('event_formats')
   validates :code, uniqueness: true, format: {
     with: /#{GetSetting.code_pattern}/,
     message: "- invalid code format. Must match: #{GetSetting.code_pattern}"

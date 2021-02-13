@@ -142,7 +142,7 @@ describe 'Invite Members', type: :feature do
 
     context 'Physical events' do
       before do
-        @event.update_columns(format: 'Physical')
+        @event.update_columns(event_format: 'Physical')
         visit invite_event_memberships_path(@event)
       end
 
@@ -154,7 +154,7 @@ describe 'Invite Members', type: :feature do
 
     context 'Online events' do
       before do
-        @event.update_columns(format: 'Online')
+        @event.update_columns(event_format: 'Online')
         visit invite_event_memberships_path(@event)
       end
 
@@ -166,7 +166,7 @@ describe 'Invite Members', type: :feature do
 
     context 'Hybrid events' do
       before do
-        @event.update_columns(format: 'Hybrid')
+        @event.update_columns(event_format: 'Hybrid')
         visit invite_event_memberships_path(@event)
       end
 
@@ -269,7 +269,7 @@ describe 'Invite Members', type: :feature do
 
     context 'Physical events' do
       before do
-        @event.update_columns(format: 'Physical')
+        @event.update_columns(event_format: 'Physical')
         visit invite_event_memberships_path(@event)
       end
 
@@ -296,7 +296,7 @@ describe 'Invite Members', type: :feature do
 
     context 'Online events' do
       before do
-        @event.update_columns(format: 'Online')
+        @event.update_columns(event_format: 'Online')
         @event.memberships.select {|m| m.role == 'Participant'}.each do |member|
           member.update_columns(role: 'Virtual Participant')
         end
@@ -328,7 +328,7 @@ describe 'Invite Members', type: :feature do
 
     context 'Hybrid events' do
       before do
-        @event.update_columns(format: 'Hybrid')
+        @event.update_columns(event_format: 'Hybrid')
         @event.memberships.select {|m| m.role == 'Participant' &&
           (m.attendance == 'Not Yet Invited' || m.attendance == 'Confirmed')}
               .each_slice(2) do |member|
@@ -384,7 +384,7 @@ describe 'Invite Members', type: :feature do
     end
 
     it 'invitation fails if max_observers is exceeded' do
-      @event.update_columns(format: 'Physical')
+      @event.update_columns(event_format: 'Physical')
       num_observers = @event.num_invited_observers
       @event.max_observers = num_observers
       @event.save!

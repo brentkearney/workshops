@@ -81,9 +81,9 @@
             </div>
           </div>
           <div class='col-md-1'>
-            <%= f.label :format %>
+            <%= f.label :event_format %>
             <div style="width: 6em;">
-              <%= f.select(:format, GetSetting.site_setting('event_formats'), {}, { class: 'form-control' }) %>
+              <%= f.select(:event_format, GetSetting.site_setting('event_formats'), {}, { class: 'form-control' }) %>
             </div>
           </div>
           <div class='col-md-3'>

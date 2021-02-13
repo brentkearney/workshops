@@ -342,7 +342,7 @@ describe 'RSVP', type: :feature do
 
       it 'clicking Continue goes to #yes-online, if the event is online' do
         event = @invitation.membership.event
-        event.format = 'Online'
+        event.event_format = 'Online'
         event.save
 
         visit rsvp_otp_path(@invitation.code)
@@ -447,7 +447,7 @@ describe 'RSVP', type: :feature do
 
       it 'online events redirect to yes_online_path instead' do
         event = @invitation.membership.event
-        event.format = 'Online'
+        event.event_format = 'Online'
         event.save
 
         person = @membership.person
@@ -811,7 +811,7 @@ describe 'RSVP', type: :feature do
       context 'For Online events' do
         before do
           event = @invitation.membership.event
-          event.format = 'Online'
+          event.event_format = 'Online'
           event.save
           @rsvp = RsvpForm.new(@invitation)
           visit rsvp_yes_online_path(@invitation.code)

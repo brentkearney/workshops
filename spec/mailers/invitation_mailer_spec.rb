@@ -130,7 +130,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     end
 
     it 'sets date to the last day of the workshop, if the event is online' do
-      @event.format = 'Online'
+      @event.event_format = 'Online'
       @event.save
 
       InvitationMailer.invite(@invitation, @template).deliver_now

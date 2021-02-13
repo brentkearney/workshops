@@ -298,7 +298,7 @@ module MembershipsHelper
 
   def add_limits_message
     (%Q{<div class="no-print" id="limits-message">
-      #{compose_spots_left_msg(@event.format)}</div>}).squish.html_safe
+      #{compose_spots_left_msg(@event.event_format)}</div>}).squish.html_safe
   end
 
   def get_status_heading(status)

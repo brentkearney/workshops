@@ -59,7 +59,7 @@ RSpec.describe ParticipantMailer, type: :mailer do
 
   describe '.rsvp_confirmation for online meetings' do
     before do
-      event = create(:event, name: 'Test Online Event', format: 'Online')
+      event = create(:event, name: 'Test Online Event', event_format: 'Online')
       @membership = create(:membership, event: event)
       create(:invitation, membership: @membership)
     end
@@ -80,7 +80,7 @@ RSpec.describe ParticipantMailer, type: :mailer do
 
   describe '.rsvp_confirmation for hybrid meetings' do
     before do
-      @event = create(:event, name: 'Test Hybrid Event', format: 'Hybrid')
+      @event = create(:event, name: 'Test Hybrid Event', event_format: 'Hybrid')
     end
 
     context 'for in-person participants' do

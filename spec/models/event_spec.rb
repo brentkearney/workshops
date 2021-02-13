@@ -111,11 +111,11 @@ RSpec.describe "Model validations: Event ", type: :model do
   end
 
   it 'has a format that is part of event_format settings' do
-    expect(build(:event, format: 'Foo')).not_to be_valid
+    expect(build(:event, event_format: 'Foo')).not_to be_valid
   end
 
   it 'is hybrid format by default' do
-    expect(build(:event).format).to eq('Hybrid')
+    expect(build(:event).event_format).to eq('Hybrid')
   end
 
   it '.dates returns formatted dates' do

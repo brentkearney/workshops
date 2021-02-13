@@ -316,7 +316,7 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'does not have RSVP hotel fields for online events' do
-      @event.format = 'Online'
+      @event.event_format = 'Online'
       @event.save
 
       visit edit_event_membership_path(@event, @participant)
@@ -727,7 +727,7 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'does not have RSVP hotel fields for online events' do
-      @event.format = 'Online'
+      @event.event_format = 'Online'
       @event.save
 
       visit edit_event_membership_path(@event, @participant)
@@ -831,7 +831,7 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'does not have RSVP hotel fields for online events' do
-      @event.format = 'Online'
+      @event.event_format = 'Online'
       @event.save
 
       visit edit_event_membership_path(@event, @participant)
