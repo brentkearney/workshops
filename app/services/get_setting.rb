@@ -11,7 +11,7 @@ class GetSetting
     not_set = "#{setting_string} not set"
     return not_set if settings_hash.blank?
     return not_set unless settings_hash.key? setting_string
-    setting = Setting.Site[setting_string]
+    setting = settings_hash[setting_string]
     setting.blank? ? not_set : setting
   end
 

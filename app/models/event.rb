@@ -22,8 +22,8 @@ class Event < ApplicationRecord
   validates :event_type, presence: true, if: :check_event_type
   validate :starts_before_ends
   validate :set_max_participants
+  validate :has_format
   validates_inclusion_of :time_zone, in: ActiveSupport::TimeZone.all.map(&:name)
-  validates_inclusion_of :event_format, in: GetSetting.site_setting('event_formats')
   validates :code, uniqueness: true, format: {
     with: /#{GetSetting.code_pattern}/,
     message: "- invalid code format. Must match: #{GetSetting.code_pattern}"
@@ -112,6 +112,12 @@ class Event < ApplicationRecord
     save(touch: false)
   end
 
+  def has_format
+    return if event_formats.include?(self.event_format)
+    errors.add(:event_format,
+                "must be set to one of #{event_formats.join(', ')}")
+  end
+
   private
 
   def clean_data
@@ -127,5 +133,10 @@ class Event < ApplicationRecord
         self.write_attribute(max_setting, max_num)
       end
     end
+  end
+
+  def event_formats
+    formats = GetSetting.site_setting('event_formats')
+    formats.kind_of?(Array) ? formats : ['Physical', 'Online', 'Hybrid']
   end
 end

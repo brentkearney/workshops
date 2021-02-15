@@ -110,8 +110,19 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(build(:event).cancelled).to be_falsey
   end
 
-  it 'has a format that is part of event_format settings' do
-    expect(build(:event, event_format: 'Foo')).not_to be_valid
+  it 'must have an event_format' do
+    expect(build(:event, event_format: nil)).not_to be_valid
+  end
+
+  it 'has an event format that is part of event_format settings' do
+    event = build(:event, event_format: 'Foo')
+    expect(event).not_to be_valid
+
+    error_msg = event.errors.full_messages.first
+    expect(error_msg).to match("format must be set to one of")
+
+    event.event_format = GetSetting.site_setting('event_formats').first
+    expect(event).to be_valid
   end
 
   it 'is hybrid format by default' do
