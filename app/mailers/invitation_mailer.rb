@@ -27,6 +27,37 @@ class InvitationMailer < ApplicationMailer
     organizers.gsub!(/, $/, '')
   end
 
+  def set_format_template(membership, template_name)
+    if membership.event.online?
+      template_name = "Virtual " + template_name
+    end
+
+    if membership.event.hybrid?
+      template_name = "Hybrid " + template_name
+    end
+
+    template_name
+  end
+
+  def set_role_template(membership, template_name)
+    return template_name if membership.event.online?
+    if membership.role.match?('Virtual')
+      template_name = template_name + "-Virtual"
+    elsif membership.role == 'Observer'
+      template_name = template_name + "-Observer"
+    end
+
+    return template_name
+  end
+
+  def set_pdf_template(membership, pdf_template_file)
+    return 'not-applicable.pdf' if membership.event.online? ||
+                                   membership.event.hybrid?
+    return 'not-applicable.pdf' if membership.role.include?('Virtual') ||
+                                   membership.role.include?('Observer')
+    pdf_template_file
+  end
+
   def set_template(membership, template)
     event = membership.event
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
@@ -36,24 +67,12 @@ class InvitationMailer < ApplicationMailer
     pdf_template_file = "#{template_path}/#{template_name}.pdf.erb"
     pdf_template = "invitation_mailer/#{event.location}/#{template_name}.pdf.erb"
 
-    if event.online?
-      template_name = "Virtual " + template_name
-      pdf_template_file = 'not_applicable.pdf'
-    end
-
-    if event.hybrid?
-      template_name = "Hybrid " + template_name
-      pdf_template_file = 'not_applicable.pdf'
-    end
+    template_name = set_format_template(membership, template_name)
+    template_name = set_role_template(membership, template_name)
+    pdf_template_file = set_pdf_template(membership, pdf_template_file)
 
     text_template_file = "#{template_path}/#{template_name}.text.erb"
     text_template = "invitation_mailer/#{event.location}/#{template_name}.text.erb"
-
-    if membership.role == 'Observer'
-      text_template_file.gsub!(/\.text/, "-Observer\.text")
-      text_template.gsub!(/\.text/, "-Observer\.text")
-      pdf_template_file = 'no-file'
-    end
 
     invitation_file = "#{event.location}-invitation-#{membership.person_id}.pdf"
 
