@@ -322,6 +322,38 @@ module MembershipsHelper
     get_status_heading(status).html_safe
   end
 
+  def add_member_icons(member, line)
+    case member.role
+    when "Contact Organizer"
+      line.prepend('<i class="fa fa-star" aria-hidden="true"></i> '
+          .html_safe)
+    when /Organizer/
+      line.prepend('<i class="fa fa-star-half-o" aria-hidden="true"></i> '
+          .html_safe)
+    when /Virtual/
+      return line if member.event.event_format == 'Online'
+      line.prepend('<i class="fa fa-video-camera" aria-hidden="true"></i> '
+          .html_safe)
+    when /Backup/
+      line.prepend('<i class="fa fa-clock-o" aria-hidden="true"></i> '
+          .html_safe)
+    end
+
+    line
+  end
+
+  def show_member(member)
+    line = '<span class="' + member.role.parameterize + '">'
+    line << member_link(member)
+    line << '</span>'
+
+    unless member.person.affiliation.blank?
+      line << " (#{member.person.affiliation})"
+    end
+
+    add_member_icons(member, line).html_safe
+  end
+
   def member_link(member)
     link_to "#{member.person.lname}", event_membership_path(@event, member)
   end

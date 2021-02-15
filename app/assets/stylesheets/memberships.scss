@@ -22,6 +22,10 @@
       margin: -8px;
     }
 
+    .organizer, .contact-organizer {
+      font-weight: bold;
+    }
+
     .observer {
       a {
         color: $secondary-text-color;
@@ -92,6 +96,10 @@
           white-space: normal;
           word-wrap: normal;
           float: left;
+
+          i.fa {
+            color: $secondary-text-color;
+          }
         }
 
         .reply-by-date {

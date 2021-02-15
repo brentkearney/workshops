@@ -158,6 +158,16 @@ describe 'Event Membership Page', type: :feature do
       shows_confirmed_members
     end
 
+    it 'indicates Virtual Participants' do
+      @event.update_columns(event_format: 'Hybrid')
+      member = @event.memberships.where('role = ?', 'Participant').first
+      member.update_columns(role: 'Virtual Participant')
+
+      visit event_memberships_path(@event)
+
+      expect(page.body).to have_css('i.fa.fa-video-camera')
+    end
+
     it 'shows maillist links for confirmed members' do
       shows_confirmed_maillist_links
     end
