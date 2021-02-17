@@ -108,14 +108,16 @@ class Membership < ApplicationRecord
 
     max = event.max_participants
     invited = event.num_invited_participants
+    field_name ="attendance"
 
-    # if the role is being updated, add 1 for would-be new participant
-    if role_changed? && role == 'Participant'
-      invited += 1 unless new_record?
+    # if the role changes from Virtual to Physical, ensure within max limit
+    if role_changed?
+      field_name = "role"
+      invited += 1 if role == 'Participant'
     end
 
-    if invited >= max
-      errors.add(:attendance, "- the maximum number of invited participants
+    if invited > max
+      errors.add(:"#{field_name}", "- the maximum number of invited participants
                 (#{max}) for #{event.code} has been reached.".squish)
     end
     check_max_virtual if event.hybrid?
@@ -124,13 +126,16 @@ class Membership < ApplicationRecord
   def check_max_virtual
     max = event.max_virtual
     invited = event.num_invited_virtual
+    field_name ="attendance"
 
-    if role_changed? && role == 'Virtual Participant'
-      invited += 1 unless new_record?
+    # if the role changes to Virtual, make sure we're in max_virtual limit
+    if role_changed?
+      field_name = "role"
+      invited += 1 if role.match?('Virtual')
     end
 
-    if invited >= max
-      errors.add(:attendance, "- the maximum number of invited Virtual
+    if invited > max
+      errors.add(:"#{field_name}", "- the maximum number of invited Virtual
         Participants (#{max}) for #{event.code} has been
         reached.".squish)
     end
@@ -142,10 +147,15 @@ class Membership < ApplicationRecord
 
     max = event.max_observers
     invited = event.num_invited_observers
-    invited += 1 unless new_record?
+    field_name ="attendance"
 
-    if invited >= max
-      errors.add(:attendance, "- the maximum number of invited observers
+    if role_changed?
+      field_name = "role"
+      invited += 1
+    end
+
+    if invited > max
+      errors.add(:"#{field_name}", "- the maximum number of invited observers
               (#{max}) for #{event.code} has been reached.".squish)
     end
   end

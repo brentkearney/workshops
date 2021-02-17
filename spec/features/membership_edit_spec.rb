@@ -619,7 +619,7 @@ describe 'Membership#edit', type: :feature do
       confirmation = ConfirmEmailChange
                               .where(replace_person_id: @participant.person_id)
       expect(confirmation).to be_blank
-      expect(page.body).to have_css('div.alert-danger')
+      expect(page.body).to have_css('div.alert-error')
       expect(page.body).to have_text('Person email has already been taken')
     end
 
@@ -828,7 +828,7 @@ describe 'Membership#edit', type: :feature do
       confirmation = ConfirmEmailChange
                               .where(replace_person_id: @participant.person_id)
       expect(confirmation).to be_blank
-      expect(page.body).to have_css('div.alert-danger')
+      expect(page.body).to have_css('div.alert-error')
       expect(page.body).to have_text('Person email has already been taken')
     end
 

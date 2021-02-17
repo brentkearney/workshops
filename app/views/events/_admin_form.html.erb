@@ -3,19 +3,19 @@
 <%= form_for @event, html: { role: "form", class: "form" } do |f| %>
     <fieldset>
       <div class="row">
-        <div class='col-md-2'>
+        <div class="col">
           <div class="form-group">
             <%= f.label "Event Code" %>
             <%= f.text_field :code, class: 'form-control' %>
           </div>
         </div>
-        <div class='col-md-2'>
+        <div class="col">
           <div class="form-group">
             <%= f.label :door_code %>
             <%= f.text_field :door_code, class: 'form-control' %>
           </div>
         </div>
-        <div class='col-md-2'>
+        <div class="col">
           <div class="form-group">
             <%= f.label "Booking code" %>
             <%= f.text_field :booking_code, class: 'form-control' %>
@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="row">
-        <div class='col-md-4'>
+        <div class="col">
           <div class="form-group checkbox">
             <%= f.label :cancelled %>: &nbsp;
             <label>
@@ -39,7 +39,7 @@
       </div>
 
       <div class="row event-dates">
-        <div class='col-md-3'>
+        <div class="col">
           <div class="form-group">
             <%= f.label :start_date %>
             <div class='input-group date' id='start_date'>
@@ -50,11 +50,11 @@
             </div>
           </div>
         </div>
-        <div class='col-md-3'>
+        <div class="col">
           <div class="form-group">
             <%= f.label :end_date %>
-            <div class='input-group date' id='end_date'>
-              <input type='text' name="event[end_date]" class="form-control" value="<%= @event.end_date.strftime("%Y-%m-%d") if @event.end_date %>" />
+            <div class="input-group date" id="end_date">
+              <input type="text" name="event[end_date]" class="form-control" value="<%= @event.end_date.strftime("%Y-%m-%d") if @event.end_date %>" />
                 <span class="input-group-addon">
                     <i class="fa fa-lg fa-calendar" aria-hidden="true"></i>
                 </span>
@@ -66,7 +66,7 @@
 
       <div class="form-group">
         <%= f.label :name %>
-        <%= f.text_area :name, class: 'form-control' %>
+        <%= f.text_area :name, class: "form-control" %>
       </div>
       <div class="form-group">
         <%= f.label "Short name (less than 67 characters) for name tags" %>
@@ -74,19 +74,19 @@
       </div>
       <div class="form-group">
         <div class="row">
-          <div class='col-md-1'>
+          <div class="col-lg-2">
             <%= f.label :location %>
             <div style="width: 6em;">
               <%= f.select(:location, GetSetting.locations, {}, { class: 'form-control' }) %>
             </div>
           </div>
-          <div class='col-md-1'>
+          <div class="col-lg-2">
             <%= f.label :event_format %>
             <div style="width: 6em;">
               <%= f.select(:event_format, GetSetting.site_setting('event_formats'), {}, { class: 'form-control' }) %>
             </div>
           </div>
-          <div class='col-md-3'>
+          <div class="col-lg-2">
             <%= f.label :event_type %>
             <div style="width: 17em;">
               <%= f.select(:event_type, GetSetting.site_setting('event_types'), {}, { class: 'form-control' }) %>
@@ -100,22 +100,18 @@
           <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: 'form-control' } %>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-2 form-group">
-          <%= f.label :max_participants %>
-          <div style="width: 6em;">
+      <div class="form-group">
+        <div class="row">
+          <div class="col-lg-3">
+            <%= f.label :max_participants %>
             <%= f.number_field :max_participants, class: 'form-control' %>
           </div>
-        </div>
-        <div class="col-md-2 form-group">
-          <%= f.label :max_virtual %>
-          <div style="width: 6em;">
+          <div class="col-lg-2">
+            <%= f.label :max_virtual %>
             <%= f.number_field :max_virtual, class: 'form-control' %>
           </div>
-        </div>
-        <div class="col-md-2 form-group">
-          <%= f.label :max_observers %>
-          <div style="width: 6em;">
+          <div class="col-lg-3">
+            <%= f.label :max_observers %>
             <%= f.number_field :max_observers, class: 'form-control' %>
           </div>
         </div>
