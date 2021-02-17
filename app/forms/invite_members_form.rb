@@ -10,6 +10,8 @@
 class InviteMembersForm < ComplexForms
   attr_reader :error_msg, :success_msg
 
+  include ParticipantLimits
+
   def initialize(event, current_user)
     @event = event
     @current_user = current_user
@@ -75,58 +77,6 @@ class InviteMembersForm < ComplexForms
   def check_for_errors
     @error_msg = 'No members selected to invite.' and return if @memberships.empty?
     @error_msg = max_participants_exceeded?
-  end
-
-  def max_participants_exceeded?
-    msg = ''
-    msg = max_hybrid_msg if @event.hybrid?
-
-    msg = "You may not invite more than #{max_participants}
-      participants.".squish if !@event.hybrid? && max_participants?
-
-    msg << " You may not invite more than #{@event.max_observers}
-      observers.".squish if max_observers?
-
-    msg
-  end
-
-  def max_hybrid_msg
-    msg = ''
-    invited_physical = @memberships.count do |m|
-        m.attendance == 'Not Yet Invited' && m.role == 'Participant'
-    end
-    if @event.num_invited_in_person + invited_physical > @event.max_participants
-      msg = "You may not invite more than #{@event.max_participants}
-                    in-person participants.".squish
-    end
-
-    invited_virtual = @memberships.count do |m|
-      m.attendance == 'Not Yet Invited' && m.role == 'Virtual Participant'
-    end
-
-    if @event.num_invited_virtual + invited_virtual > @event.max_virtual
-      msg << " You may not invite more than #{@event.max_virtual} virtual
-            participants.".squish
-    end
-    msg
-  end
-
-  def max_participants
-    @event.online? ? @event.max_virtual : @event.max_participants
-  end
-
-  def max_participants?
-    invited = @memberships.count { |m| m.attendance == 'Not Yet Invited' &&
-      m.role != 'Observer' }
-
-    @event.num_invited_participants + invited > max_participants
-  end
-
-  def max_observers?
-    invited_observers = @memberships.count { |m| m.role == 'Observer' &&
-      m.attendance == 'Not Yet Invited' }
-    return false if invited_observers == 0
-    @event.num_invited_observers + invited_observers > @event.max_observers
   end
 
   private

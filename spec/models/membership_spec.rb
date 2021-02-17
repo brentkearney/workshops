@@ -201,41 +201,39 @@ RSpec.describe 'Model validations: Membership', type: :model do
 
   it 'is invalid if the number of invited + confirmed participants is greater
     than max_participants' do
+    @event = Event.find(@event.id)
+    @event.event_format = 'Physical'
     @event.max_participants = @event.num_participants + 1
     @event.save
 
-    second_membership = create(:membership, event: @event,
-                                            attendance: 'Invited')
-    expect(second_membership).to be_valid
-
-    third_membership = create(:membership, event: @event, attendance: 'Invited')
+    create(:membership, event: @event, attendance: 'Invited')
+    third_membership = build(:membership, event: @event,
+                                      attendance: 'Invited',
+                                            role: 'Participant')
     expect(third_membership).not_to be_valid
   end
 
   it 'does not count Observers as part of the confirmed number of
     participants' do
+    @event = Event.find(@event.id)
     @event.max_participants = @event.num_participants
     @event.save
 
-    observer_membership = create(:membership, event: @event,
+    observer_membership = build(:membership, event: @event,
                                   attendance: 'Invited', role: 'Observer')
     expect(observer_membership).to be_valid
   end
 
   it 'is invalid if the number of invited + confirmed observers is greater
     than max_observers' do
-    observers = @event.memberships.where(role: 'Observer')
-                                 .where.not(attendance: 'Declined')
-                                 .where.not(attendance: 'Not Yet Invited').count
-
-    @event.max_observers = observers + 1
+    @event = Event.find(@event.id)
+    @event.max_observers = @event.num_invited_observers + 1
     @event.save
 
     new_observer = create(:membership, event: @event,
                                   attendance: 'Invited', role: 'Observer')
-    expect(new_observer).to be_valid
 
-    new_observer2 = create(:membership, event: @event,
+    new_observer2 = build(:membership, event: @event,
                                    attendance: 'Invited', role: 'Observer')
     expect(new_observer2).not_to be_valid
   end
@@ -292,6 +290,7 @@ RSpec.describe 'Model validations: Membership', type: :model do
 
   it "decreases associated event's confirmed_cache when Confirmed member is
     deleted" do
+    @event = Event.find(@event.id)
     create(:membership, event: @event, role: 'Confirmed')
     counter_cache = @event.confirmed_count
 

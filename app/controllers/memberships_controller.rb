@@ -115,7 +115,12 @@ class MembershipsController < ApplicationController
                         location: event_memberships_path(@event)
         end
       else
-        format.html { render :edit }
+        format.html do
+          unless @membership.errors.blank?
+            flash[:error] = @membership.errors.full_messages.join(', ')
+          end
+          render :edit
+        end
         format.json do
           render json: @membership.errors, status: :unprocessable_entity
         end

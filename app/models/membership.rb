@@ -103,20 +103,51 @@ class Membership < ApplicationRecord
     return if sync_memberships
     return if attendance == 'Declined' || attendance == 'Not Yet Invited'
     return if event_id.nil?
+    return if role == 'Observer'
+    return check_max_virtual if event.online?
 
-    invited = event.num_invited_participants.to_i
-    return if event.max_participants.to_i - invited >= 0
-    errors.add(:attendance, "- the maximum number of invited participants for
-               #{event.code} has been reached.".squish)
+    max = event.max_participants
+    invited = event.num_invited_participants
+
+    # if the role is being updated, add 1 for would-be new participant
+    if role_changed? && role == 'Participant'
+      invited += 1 unless new_record?
+    end
+
+    if invited >= max
+      errors.add(:attendance, "- the maximum number of invited participants
+                (#{max}) for #{event.code} has been reached.".squish)
+    end
+    check_max_virtual if event.hybrid?
+  end
+
+  def check_max_virtual
+    max = event.max_virtual
+    invited = event.num_invited_virtual
+
+    if role_changed? && role == 'Virtual Participant'
+      invited += 1 unless new_record?
+    end
+
+    if invited >= max
+      errors.add(:attendance, "- the maximum number of invited Virtual
+        Participants (#{max}) for #{event.code} has been
+        reached.".squish)
+    end
   end
 
   def check_max_observers
     return if sync_memberships
     return unless role == 'Observer'
-    observers = event.num_invited_observers
-    return if observers <= event.max_observers
-    errors.add(:attendance, "- the maximum number of invited observers for
-               #{event.code} has been reached.".squish)
+
+    max = event.max_observers
+    invited = event.num_invited_observers
+    invited += 1 unless new_record?
+
+    if invited >= max
+      errors.add(:attendance, "- the maximum number of invited observers
+              (#{max}) for #{event.code} has been reached.".squish)
+    end
   end
 
   def arrival_and_departure_dates

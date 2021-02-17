@@ -608,6 +608,18 @@ RSpec.describe MembershipsController, type: :controller do
             expect(updated_member.role).to eq('Backup Participant')
           end
 
+          it 'disallows updating role if participant limits are exceeded' do
+            @event.update_columns(event_format: 'Hybrid', max_virtual: 1)
+            create(:membership, event: @event, role: 'Virtual Participant')
+            @membership.update_columns(role: 'Participant')
+
+            @params['membership']['role'] = 'Virtual Participant'
+            patch :update, params: @params
+
+            updated_member = Membership.find(@membership.id)
+            expect(updated_member.role).to eq('Participant')
+          end
+
           it 'disallows changing role to an Organizer role' do
             @membership.role = 'Participant'
             @membership.save

@@ -633,6 +633,17 @@ describe 'Membership#edit', type: :feature do
                                     text: 'Backup Participant')
     end
 
+    it 'disallows changing membership role, if max participants reached' do
+      @event.update_columns(event_format: 'Hybrid', max_virtual: 0)
+
+      select 'Virtual Participant', from: 'membership_role'
+      click_button 'Update Member'
+
+      expect(Membership.find(@participant.id).role).to eq('Participant')
+      expect(page.body).to have_css('div.alert', text:
+        'maximum number of invited Virtual Participants')
+    end
+
     it 'does not allow changing Participants to Organizer role' do
       select = find(:select, 'membership_role')
       expect(select).to have_selector(:option, 'Contact Organizer',

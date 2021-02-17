@@ -31,10 +31,12 @@ module EventDecorators
   def num_invited_in_person
     memberships.where("(attendance = 'Invited' OR attendance = 'Undecided'
       OR attendance = 'Confirmed') AND role != 'Observer'
-      AND (role = 'Participant' OR role LIKE '%Organizer')").size
+      AND (role = 'Participant' OR role LIKE '%Organizer')
+      AND role != 'Virtual%'").size
   end
 
   def num_invited_virtual
+    return num_invited_participants if self.online?
     memberships.where("(attendance = 'Invited' OR attendance = 'Undecided'
       OR attendance = 'Confirmed') AND role != 'Observer'
       AND role LIKE 'Virtual%'").size
