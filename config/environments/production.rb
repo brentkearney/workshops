@@ -91,12 +91,23 @@ Rails.application.configure do
   end
 
   ## SMTP Settings
-  config.action_mailer.delivery_method = :mailgun
+
+  # Mailgun
+  # config.action_mailer.delivery_method = :mailgun
+  # config.action_mailer.raise_delivery_errors = true
+  # config.action_mailer.mailgun_settings = {
+  #   api_key: ENV['MAILGUN_API_KEY'],
+  #   domain: ENV['MAILGUN_EMAIL_DOMAIN'],
+  # }
+
+  # Mailjet
+  config.action_mailer.delivery_method = :mailjet_api
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.mailgun_settings = {
-    api_key: ENV['MAILGUN_API_KEY'],
-    domain: ENV['MAILGUN_EMAIL_DOMAIN'],
-  }
+  # config.action_mailer.delivery_method_options = {
+  #   secret_key: ENV['MAILJET_SECRET_KEY'],
+  #   api_key: ENV['MAILJET_API_KEY']
+  # }
+
   config.action_mailer.smtp_settings = {
     address:              ENV['EMAIL_SERVER'],
     port:                 ENV['EMAIL_PORT'],

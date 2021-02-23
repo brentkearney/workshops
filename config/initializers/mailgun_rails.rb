@@ -4,7 +4,7 @@
 # Actionmailer config is in production.rb
 
 Mailgun.configure do |config|
-  config.api_key = ENV['MAILGUN_API_KEY'],
+  config.api_key = ENV['MAILGUN_API_KEY']
   config.domain = ENV['EMAIL_DOMAIN']
 end
 
