@@ -21,9 +21,8 @@ class Invitation < ApplicationRecord
   end
 
   def send_invite
-    template = membership.attendance
     update_and_save
-    EmailInvitationJob.perform_later(id, template)
+    EmailInvitationJob.perform_later(id)
   end
 
   def send_reminder

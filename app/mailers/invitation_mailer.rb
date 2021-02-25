@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-class InvitationMailer < ApplicationMailer
+class InvitationMailer < MandrillMailer::TemplateMailer
   def compose_organizers(event)
     organizers = ''
     event.organizers.each do |org|
@@ -58,7 +58,8 @@ class InvitationMailer < ApplicationMailer
     pdf_template_file
   end
 
-  def set_template(membership, template)
+  def set_template(membership)
+    template = membership.attendance
     event = membership.event
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{event.location}")
@@ -86,13 +87,12 @@ class InvitationMailer < ApplicationMailer
     }
   end
 
-  def invite(invitation, template)
-    @person = invitation.membership.person
-    @event = invitation.membership.event
+  def invite(invitation)
     @membership = invitation.membership
+    @person = @membership.person
+    @event = @membership.event
     @rsvp_url = invitation.rsvp_url
     @invitation_date = invitation.invited_on.strftime('%A, %B %-d, %Y')
-
     Time.zone = @event.time_zone
 
     # no invitations to physical events once they've started
@@ -104,23 +104,22 @@ class InvitationMailer < ApplicationMailer
     @rsvp_deadline = RsvpDeadline.new(@event).rsvp_by
     @organizers = compose_organizers(@event)
 
-    from_email = GetSetting.rsvp_email(@event.location)
+    from_email, from_name = GetSetting.rsvp_email(@event.location)
 
     location = @event.location
+    template_label = { label: location }
     subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
-
-    bcc_email = GetSetting.rsvp_email(@event.location)
-    bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email.match?(/</)
-    to_email = '"' + @person.name + '" <' + @person.email + '>'
 
     if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
       to_email = GetSetting.site_email('webmaster_email')
     end
 
     # Set email template according to location, type of event, and attendance status
-    templates = set_template(@membership, template)
+    templates = set_template(@membership)
+    template_name = templates['template_name'].downcase.parameterize
 
     # Create PDF attachment
+    attachments = []
     if File.exist?(templates[:pdf_template_file])
       @page_title = "#{location} Invitation Details"
       pdf_file = WickedPdf.new.pdf_from_string(
@@ -129,7 +128,14 @@ class InvitationMailer < ApplicationMailer
                        lowquality: false,
                         page_size: 'Letter'))
 
-      attachments[templates[:invitation_file]] = pdf_file
+      # attachments[templates[:invitation_file]] = pdf_file
+      attachments = [
+        {
+          content: pdf_file,
+          name: templates[:invitation_file],
+          type: application/pdf
+        }
+      ]
 
       ## save to a file (for testing)
       # save_path = Rails.root.join('tmp','invitation.pdf')
@@ -142,23 +148,56 @@ class InvitationMailer < ApplicationMailer
     headers['X-Priority'] = 1
     headers['X-MSMail-Priority'] = 'High'
 
-    if File.exist?(templates[:text_template_file])
-      mail(to: to_email,
-           bcc: bcc_email,
-           from: from_email,
-           subject: subject,
-           template_path: "invitation_mailer/#{@event.location}",
-           template_name: templates[:template_name]) do |format|
-        format.text { render templates[:text_template] }
-      end
-    else
-      error_msg = { problem: 'Participant (re)invitation not sent.',
-                    cause: 'Email template file missing.',
-                    template: templates[:text_template_file],
-                    person: @person,
-                    membership: @membership,
-                    invitation: invitation }
-      StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
-    end
+    mandrill_mail(
+      template: template_name,
+      from_email: from_email,
+      from_name: from_name,
+      subject: subject,
+      to: [
+        {
+          email: @person.email,
+          name: @person.name,
+          type: "to"
+        },
+        {
+          email: from_email,
+          type: "bcc"
+        },
+      ],
+      vars: {
+        dear_name: @person.dear_name,
+        event_name: @event.name,
+        event_code: @event.code,
+        event_url: @event.url,
+        event_start: @event_start,
+        event_end: @event_end,
+        rsvp_url: @rsvp_url,
+        rsvp_deadline: @rsvp_deadline
+      },
+      headers: headers,
+      merge_language: 'handlebars',
+      merge: true,
+      track_opens: false,
+      track_clicks: false,
+      attachments: attachments
+    )
+    # if File.exist?(templates[:text_template_file])
+    #   mail(to: to_email,
+    #        bcc: bcc_email,
+    #        from: from_email,
+    #        subject: subject,
+    #        template_path: "invitation_mailer/#{@event.location}",
+    #        template_name: templates[:template_name]) do |format|
+    #     format.text { render templates[:text_template] }
+    #   end
+    # else
+    #   error_msg = { problem: 'Participant (re)invitation not sent.',
+    #                 cause: 'Email template file missing.',
+    #                 template: templates[:text_template_file],
+    #                 person: @person,
+    #                 membership: @membership,
+    #                 invitation: invitation }
+    #   StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
+    # end
   end
 end

@@ -43,7 +43,8 @@ class GetSetting
 
   def self.rsvp_email(location)
     return ENV['DEVISE_EMAIL'] if no_setting("Emails['#{location}']['rsvp']")
-    Setting.Emails[location]['rsvp']
+    [Setting.Emails[location]['rsvp_from_email'],
+      Setting.Emails[location]['rsvp_from_name']]
   end
 
   def self.org_name(location)

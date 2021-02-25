@@ -40,6 +40,8 @@ gem 'bootsnap'
 gem "administrate", ">= 0.13.0"
 gem 'popper_js', '~> 1.16.0'
 gem 'webpacker', '~> 5.1.1'
+gem 'MailchimpTransactional', '~> 1.0.22'
+gem 'mandrill_mailer'
 
 group :development, :test do
   gem 'byebug'

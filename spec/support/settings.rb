@@ -47,6 +47,8 @@ if Setting.find_by(var: 'Emails').blank?
       'name_tags' => 'organization-secretary@example.com',
       'confirmation_notices' => 'organization@example.com',
       'rsvp' => 'rsvp@example.com',
+      'rsvp_from_email' => 'rsvp@example.com',
+      'rsvp_from_name' => 'Example Organization'
       'station_manager' => 'stnmgr@example.com',
       'confirmation_lead' => '1.year',
       'maillist_from' => '"Workshops Maillist" <no-reply@example.com>',
