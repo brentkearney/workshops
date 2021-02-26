@@ -58,12 +58,11 @@ class InvitationMailer < MandrillMailer::TemplateMailer
     pdf_template_file
   end
 
-  def set_template(membership)
-    template = membership.attendance
+  def set_template(membership, attendance)
     event = membership.event
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{event.location}")
-    template_name = "#{event.event_type}-#{template}"
+    template_name = "#{event.event_type}-#{attendance}"
 
     pdf_template_file = "#{template_path}/#{template_name}.pdf.erb"
     pdf_template = "invitation_mailer/#{event.location}/#{template_name}.pdf.erb"
@@ -80,6 +79,7 @@ class InvitationMailer < MandrillMailer::TemplateMailer
     {
            template_name: template_name,
            text_template: text_template,
+          template_label: event.location,
       text_template_file: text_template_file,
             pdf_template: pdf_template,
        pdf_template_file: pdf_template_file,
@@ -87,7 +87,8 @@ class InvitationMailer < MandrillMailer::TemplateMailer
     }
   end
 
-  def invite(invitation)
+  def invite(invitation, attendance)
+    # attendance is pre-updated membership.attendance
     @membership = invitation.membership
     @person = @membership.person
     @event = @membership.event
@@ -107,46 +108,54 @@ class InvitationMailer < MandrillMailer::TemplateMailer
     from_email, from_name = GetSetting.rsvp_email(@event.location)
 
     location = @event.location
-    template_label = { label: location }
     subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
 
+    to_email = @person.email
     if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
       to_email = GetSetting.site_email('webmaster_email')
     end
 
     # Set email template according to location, type of event, and attendance status
-    templates = set_template(@membership)
-    template_name = templates['template_name'].downcase.parameterize
+    templates = set_template(@membership, attendance)
+    template_name = templates[:template_name].downcase.parameterize
 
     # Create PDF attachment
+    # WickedPDF.render_to_string no longer works?
     attachments = []
-    if File.exist?(templates[:pdf_template_file])
-      @page_title = "#{location} Invitation Details"
-      pdf_file = WickedPdf.new.pdf_from_string(
-        render_to_string(template: "#{templates[:pdf_template]}",
-                         encoding: "UTF-8",
-                       lowquality: false,
-                        page_size: 'Letter'))
+    # if File.exist?(templates[:pdf_template_file])
+    #   @page_title = "#{location} Invitation Details"
+    #   pdf_file = WickedPdf.new.pdf_from_string(
+    #     render_to_string(template: "#{templates[:pdf_template]}",
+    #                      encoding: "UTF-8",
+    #                    lowquality: false,
+    #                     page_size: 'Letter'))
 
-      # attachments[templates[:invitation_file]] = pdf_file
-      attachments = [
-        {
-          content: pdf_file,
-          name: templates[:invitation_file],
-          type: application/pdf
-        }
-      ]
+    #   # attachments[templates[:invitation_file]] = pdf_file
+    #   attachments = [
+    #     {
+    #       content: pdf_file,
+    #       name: templates[:invitation_file],
+    #       type: application/pdf
+    #     }
+    #   ]
 
       ## save to a file (for testing)
       # save_path = Rails.root.join('tmp','invitation.pdf')
       # File.open(save_path, 'wb') do |file|
       #   file << pdf_file
       # end
-    end
+    # end
 
-    headers['X-BIRS-Sender'] = "#{invitation.invited_by}"
-    headers['X-Priority'] = 1
-    headers['X-MSMail-Priority'] = 'High'
+    headers = {
+          'X-BIRS-Sender': "#{invitation.invited_by}",
+             'X-Priority': 1,
+      'X-MSMail-Priority': 'High'
+    }
+
+    Rails.logger.debug "\n\n************************************************\n\n"
+    Rails.logger.debug "Sending mandrill_mail with template: #{template_name}\n"
+    Rails.logger.debug "sending to: <#{@person.name}> #{to_email}..."
+    Rails.logger.debug "\n\n************************************************\n\n"
 
     mandrill_mail(
       template: template_name,
@@ -155,7 +164,7 @@ class InvitationMailer < MandrillMailer::TemplateMailer
       subject: subject,
       to: [
         {
-          email: @person.email,
+          email: to_email,
           name: @person.name,
           type: "to"
         },
@@ -181,23 +190,5 @@ class InvitationMailer < MandrillMailer::TemplateMailer
       track_clicks: false,
       attachments: attachments
     )
-    # if File.exist?(templates[:text_template_file])
-    #   mail(to: to_email,
-    #        bcc: bcc_email,
-    #        from: from_email,
-    #        subject: subject,
-    #        template_path: "invitation_mailer/#{@event.location}",
-    #        template_name: templates[:template_name]) do |format|
-    #     format.text { render templates[:text_template] }
-    #   end
-    # else
-    #   error_msg = { problem: 'Participant (re)invitation not sent.',
-    #                 cause: 'Email template file missing.',
-    #                 template: templates[:text_template_file],
-    #                 person: @person,
-    #                 membership: @membership,
-    #                 invitation: invitation }
-    #   StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
-    # end
   end
 end

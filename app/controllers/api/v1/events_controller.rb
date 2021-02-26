@@ -28,6 +28,10 @@ class Api::V1::EventsController < Api::V1::BaseController
       event.time_zone = tz.blank? ? GetSetting.default_timezone : tz
     end
 
+    if event.event_format.blank?
+      event.event_format = GetSetting.location(event.location, 'default_format')
+    end
+
     respond_to do |format|
       if event.save
         SyncEventMembersJob.perform_later(event.id)

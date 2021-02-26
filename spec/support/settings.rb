@@ -68,7 +68,8 @@ end
       'max_participants' => 42,
       'max_virtual' => 300,
       'max_observers' => 5,
-      'billing_codes' => "{'default' => 'EO1', 'USA' => 'EO2'}"
+      'billing_codes' => "{'default' => 'EO1', 'USA' => 'EO2'}",
+      'default_format' => 'Hybrid'
     }
   }
 # end

@@ -10,8 +10,8 @@
 class EmailInvitationJob < ApplicationJob
   queue_as :urgent
 
-  def perform(invitation_id)
+  def perform(invitation_id, template)
     invitation = Invitation.find_by_id(invitation_id)
-    InvitationMailer.invite(invitation).deliver_now
+    InvitationMailer.invite(invitation, template).deliver_now
   end
 end
