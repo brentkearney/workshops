@@ -12,6 +12,9 @@ class EmailInvitationJob < ApplicationJob
 
   def perform(invitation_id, template)
     invitation = Invitation.find_by_id(invitation_id)
-    InvitationMailer.invite(invitation, template).deliver_now
+    mm = InvitationMailer.invite(invitation, template)
+    Rails.logger.debug "\n\n************************************************\n\n\n"
+    Rails.logger.debug "mandrill_mail response:\n#{mm.deliver_now}\n"
+    Rails.logger.debug "\n\n\n************************************************\n\n"
   end
 end

@@ -19,6 +19,8 @@
 # SOFTWARE.
 
 class InvitationMailer < MandrillMailer::TemplateMailer
+  default from: GetSetting.site_email('webmaster_email')
+
   def compose_organizers(event)
     organizers = ''
     event.organizers.each do |org|
@@ -89,34 +91,33 @@ class InvitationMailer < MandrillMailer::TemplateMailer
 
   def invite(invitation, attendance)
     # attendance is pre-updated membership.attendance
-    @membership = invitation.membership
-    @person = @membership.person
-    @event = @membership.event
-    @rsvp_url = invitation.rsvp_url
-    @invitation_date = invitation.invited_on.strftime('%A, %B %-d, %Y')
-    Time.zone = @event.time_zone
+    membership = invitation.membership
+    person = membership.person
+    event = membership.event
+    rsvp_url = invitation.rsvp_url
+    Time.zone = event.time_zone
 
     # no invitations to physical events once they've started
-    return if @event.physical? && @event.start_date.in_time_zone < Time.now
+    return if event.physical? && event.start_date.in_time_zone < Time.now
 
-    @event_start = @event.start_date.in_time_zone.strftime('%A, %B %-d')
-    @event_end = @event.end_date.in_time_zone.strftime('%A, %B %-d, %Y')
+    event_start = event.start_date.in_time_zone.strftime('%A, %B %-d')
+    event_end = event.end_date.in_time_zone.strftime('%A, %B %-d, %Y')
 
-    @rsvp_deadline = RsvpDeadline.new(@event).rsvp_by
-    @organizers = compose_organizers(@event)
+    rsvp_deadline = RsvpDeadline.new(event).rsvp_by
+    organizers = compose_organizers(event)
 
-    from_email, from_name = GetSetting.rsvp_email(@event.location)
+    from_email, from_name = GetSetting.rsvp_email(event.location)
 
-    location = @event.location
-    subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
+    location = event.location
+    subject = "#{location} Workshop Invitation: #{event.name} (#{event.code})"
 
-    to_email = @person.email
+    to_email = person.email
     if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
       to_email = GetSetting.site_email('webmaster_email')
     end
 
     # Set email template according to location, type of event, and attendance status
-    templates = set_template(@membership, attendance)
+    templates = set_template(membership, attendance)
     template_name = templates[:template_name].downcase.parameterize
 
     # Create PDF attachment
@@ -152,43 +153,46 @@ class InvitationMailer < MandrillMailer::TemplateMailer
       'X-MSMail-Priority': 'High'
     }
 
-    Rails.logger.debug "\n\n************************************************\n\n"
-    Rails.logger.debug "Sending mandrill_mail with template: #{template_name}\n"
-    Rails.logger.debug "sending to: <#{@person.name}> #{to_email}..."
-    Rails.logger.debug "\n\n************************************************\n\n"
-
-    mandrill_mail(
-      template: template_name,
-      from_email: from_email,
-      from_name: from_name,
-      subject: subject,
-      to: [
-        {
-          email: to_email,
-          name: @person.name,
-          type: "to"
+    mm = mandrill_mail(
+        template: template_name,
+        template_content: [
+          {
+            name: "",
+            content: "",
+          }
+        ],
+        subject: subject,
+        to: [
+              {
+                email: to_email,
+                name: person.name,
+                type: "to"
+              },
+              {
+                email: from_email,
+                type: "bcc"
+              },
+            ],
+        headers: headers,
+        attachments: attachments,
+        vars: {
+          'dear_name': person.dear_name,
+          'event_name': event.name,
+          'event_code': event.code,
+          'event_url': event.url,
+          'event_start': event_start,
+          'event_end': event_end,
+          'organizers': organizers,
+          'rsvp_url': rsvp_url,
+          'rsvp_deadline': rsvp_deadline
         },
-        {
-          email: from_email,
-          type: "bcc"
-        },
-      ],
-      vars: {
-        dear_name: @person.dear_name,
-        event_name: @event.name,
-        event_code: @event.code,
-        event_url: @event.url,
-        event_start: @event_start,
-        event_end: @event_end,
-        rsvp_url: @rsvp_url,
-        rsvp_deadline: @rsvp_deadline
-      },
-      headers: headers,
-      merge_language: 'handlebars',
-      merge: true,
-      track_opens: false,
-      track_clicks: false,
-      attachments: attachments
+        merge_language: 'handlebars',
+        merge: true,
+        track_opens: false,
+        track_clicks: false
     )
+    mm.message['from_email'] = from_email
+    mm.message['from_name'] = from_name
+    mm
   end
 end
