@@ -48,6 +48,12 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(event.max_participants).not_to be_nil
   end
 
+  it 'sets max virtual to default' do
+    event = build(:event, max_virtual: nil)
+    event.valid?
+    expect(event.max_virtual).not_to be_nil
+  end
+
   it 'sets max observers to default' do
     event = build(:event, max_observers: nil)
     event.valid?
