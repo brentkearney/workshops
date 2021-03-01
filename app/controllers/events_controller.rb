@@ -141,7 +141,7 @@ class EventsController < ApplicationController
     respond_to do |format|
       if @event.save
         format.html { redirect_to @event,
-            notice: 'Event was successfully created.' }
+            notice: "Event #{@event.code} was successfully created." }
         format.json { render :show, status: :created, location: @event }
       else
         format.html { render :new }
@@ -165,8 +165,9 @@ class EventsController < ApplicationController
     respond_to do |format|
       if @event.update(update_params)
         notify_staff(event: original_event, params: update_params)
+        flash[:notice] = @event.notice
         format.html { redirect_to @event,
-            success: 'Event was successfully updated.' }
+            success: "Event #{@event.code} was successfully updated." }
         format.json { render :show, status: :ok, location: @event }
       else
         format.html { render :edit }

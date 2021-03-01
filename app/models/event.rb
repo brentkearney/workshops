@@ -8,6 +8,7 @@
 
 class Event < ApplicationRecord
   attr_accessor :data_import
+  attr_reader :notice
 
   has_many :memberships, dependent: :destroy
   has_many :members, through: :memberships, source: :person
@@ -124,15 +125,54 @@ class Event < ApplicationRecord
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }
   end
 
-  def set_max_participants
+  def set_max_defaults
     %w(participants virtual observers).each do |max_type|
       max_setting = "max_" + max_type
       if self.send(max_setting).blank?
-        max_num = GetSetting.location(self.location, max_setting)
+        max_num = GetSetting.send(max_setting, self.location)
         max_num = 0 if max_num.blank?
         self.write_attribute(max_setting, max_num)
       end
     end
+  end
+
+  def set_max_participants
+    set_max_defaults if new_record?
+    return unless event_format_changed?
+    @notice = ''
+
+    case event_format
+    when "Physical"
+      if max_virtual >= 0
+        self.max_virtual = 0
+        @notice << "Changed Maximum Virtual Participants to 0. "
+      end
+      if max_participants == 0
+        self.max_participants = GetSetting.max_participants(self.location)
+        @notice << "Changed Maximum Participants to #{max_participants}."
+      end
+
+    when "Hybrid"
+      if max_participants == 0
+        self.max_participants = GetSetting.max_participants(self.location)
+        @notice << "Changed Maximum Participants to #{max_participants}. "
+      end
+      if max_virtual == 0
+        self.max_virtual = GetSetting.max_virtual(self.location)
+        @notice << "Changed Maximum Virtual Participants to #{max_virtual}."
+      end
+
+    when "Online"
+      if max_participants > 0
+        self.max_participants = 0
+        @notice << "Changed Maximum Participants to 0. "
+      end
+      if max_virtual == 0
+        self.max_virtual = GetSetting.max_virtual(self.location)
+        @notice << "Changed Maximum Virtual Participants to #{max_virtual}."
+      end
+    end
+    @notice = nil if @notice.empty?
   end
 
   def event_formats

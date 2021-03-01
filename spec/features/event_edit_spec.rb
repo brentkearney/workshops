@@ -153,11 +153,11 @@ describe 'Event Edit Page', type: :feature do
         fill_in 'event_door_code', with: '6666'
         fill_in 'event_booking_code', with: 'NewCode'
         fill_in 'event_subjects', with: 'New Subjects'
+        fill_in 'event_event_format', with: 'Hybrid'
         fill_in 'event_max_participants', with: '50'
         fill_in 'event_max_observers', with: '1'
         fill_in 'event_max_virtual', with: '100'
         fill_in 'event_cancelled', with: '1'
-        fill_in 'event_event_format', with: 'Online'
 
         click_button "Update Event"
 
@@ -172,7 +172,7 @@ describe 'Event Edit Page', type: :feature do
         expect(event.max_observers).to eq(1)
         expect(event.max_virtual).to eq(100)
         expect(event.cancelled).to be_truthy
-        expect(event.event_format).to eq('Online')
+        expect(event.event_format).to eq('Hybrid')
       end
 
       it 'appends "(Cancelled)" to event name when it is marked as cancelled' do
@@ -219,6 +219,220 @@ describe 'Event Edit Page', type: :feature do
 
         event = Event.find(@event.code)
         expect(event.name.include?('Online')).to be_falsey
+      end
+
+      context "Updating the event_format" do
+
+        def sets_max_virtual_to_default
+          fill_in 'event_max_virtual', with: 0
+          click_button "Update Event"
+
+          default = GetSetting.max_virtual(@event.location)
+
+          notice_text = "Changed Maximum Virtual Participants to #{default}."
+          expect(page.body).to have_css('div.alert-notice', text: notice_text)
+
+          event = Event.find(@event.code)
+          expect(event.max_virtual).to eq(default)
+        end
+
+        def sets_max_participants_to_default
+          fill_in 'event_max_participants', with: 0
+          click_button "Update Event"
+
+          default = GetSetting.max_participants(@event.location)
+
+          notice_text = "Changed Maximum Participants to #{default}."
+          expect(page.body).to have_css('div.alert-notice', text: notice_text)
+
+          event = Event.find(@event.code)
+          expect(event.max_participants).to eq(default)
+        end
+
+        def sets_max_participants_to_zero
+          click_button "Update Event"
+
+          event = Event.find(@event.code)
+          expect(event.max_participants).to eq(0)
+        end
+
+        def sets_to_user_entered(field, value)
+          fill_in "event_#{field}", with: value
+          click_button "Update Event"
+
+          event = Event.find(@event.code)
+          expect(event.send(field)).to eq(value)
+        end
+
+        context "from Physical to Hybrid" do
+          before do
+            @event.update_columns(event_format: 'Physical',
+                              max_participants: 50,
+                              max_virtual: 0)
+
+            visit edit_event_path(@event)
+            fill_in 'event_event_format', with: 'Hybrid'
+          end
+
+          it 'does not change max_participants if no change submitted' do
+            click_button "Update Event"
+            event = Event.find(@event.code)
+            expect(event.max_participants).to eq(50)
+          end
+
+          it 'sets max_virtual to what user entered' do
+            sets_to_user_entered('max_virtual', 100)
+          end
+
+          it 'sets max_virtual to default value if 0 is submitted' do
+            sets_max_virtual_to_default
+          end
+
+          it 'sets max_participants to default value if 0 submitted' do
+            sets_max_participants_to_default
+          end
+        end
+
+        context "from Physical to Online" do
+          before do
+            @event.update_columns(event_format: 'Physical',
+                              max_participants: 50,
+                              max_virtual: 0)
+
+            visit edit_event_path(@event)
+            fill_in 'event_event_format', with: 'Online'
+          end
+
+          it 'sets max_participants to 0' do
+            sets_max_participants_to_zero
+          end
+
+          it 'sets max_virtual to default value if 0 submitted' do
+            sets_max_virtual_to_default
+          end
+
+          it 'sets max_virtual non-zero value submitted' do
+            sets_to_user_entered('max_virtual', 150)
+          end
+        end
+
+        context "from Online to Physical" do
+          before do
+            @event.update_columns(event_format: 'Online',
+                              max_participants: 0,
+                              max_virtual: 100)
+
+            visit edit_event_path(@event)
+            fill_in 'event_event_format', with: 'Physical'
+          end
+
+          it "sets max_participants to default value if 0 submitted" do
+            sets_max_participants_to_default
+          end
+
+          it 'sets max_participants non-zero value submitted' do
+            sets_to_user_entered('max_participants', 55)
+          end
+
+          it 'sets max_virtual to 0' do
+            click_button "Update Event"
+            event = Event.find(@event.code)
+            expect(event.max_virtual).to eq(0)
+          end
+        end
+
+        context "from Online to Hybrid" do
+          before do
+            @event.update_columns(event_format: 'Online',
+                              max_participants: 0,
+                                   max_virtual: 100)
+
+            visit edit_event_path(@event)
+            fill_in 'event_event_format', with: 'Hybrid'
+          end
+
+          it 'does not change max_virtual if no change submitted' do
+            click_button "Update Event"
+            event = Event.find(@event.code)
+            expect(event.max_virtual).to eq(100)
+          end
+
+          it 'sets max_virtual to what user entered' do
+            sets_to_user_entered('max_virtual', 50)
+          end
+
+          it 'sets max_virtual to default value if 0 is submitted' do
+            sets_max_virtual_to_default
+          end
+
+          it 'sets max_participants to default value if 0 submitted' do
+            sets_max_participants_to_default
+          end
+
+          it 'sets max_participants to what user submits' do
+            sets_to_user_entered('max_participants', 35)
+          end
+        end
+
+        context "from Hybrid to Online" do
+          before do
+            @event.update_columns(event_format: 'Hybrid',
+                              max_participants: 40,
+                                   max_virtual: 50)
+
+            visit edit_event_path(@event)
+            fill_in 'event_event_format', with: 'Online'
+          end
+
+          it 'sets max_participants to 0' do
+            sets_max_participants_to_zero
+          end
+
+          it 'does not change max_virtual' do
+            click_button "Update Event"
+            event = Event.find(@event.code)
+            expect(event.max_virtual).to eq(50)
+          end
+
+          it 'sets max_virtual to value submitted' do
+            sets_to_user_entered('max_virtual', 100)
+          end
+
+          it 'sets max_virtual to default value if 0 submitted' do
+            sets_max_virtual_to_default
+          end
+        end
+
+        context "from Hybrid to Physical" do
+          before do
+            @event.update_columns(event_format: 'Hybrid',
+                              max_participants: 40,
+                              max_virtual: 300)
+
+            visit edit_event_path(@event)
+            fill_in 'event_event_format', with: 'Physical'
+          end
+
+          it 'does not change max_participants if no change submitted' do
+            click_button "Update Event"
+            event = Event.find(@event.code)
+            expect(event.max_participants).to eq(40)
+          end
+
+          it "sets max_participants to default value if 0 submitted" do
+            sets_max_participants_to_default
+          end
+
+          it 'sets max_participants non-zero value submitted' do
+            sets_to_user_entered('max_participants', 55)
+          end
+
+          it 'sets max_virtual to 0' do
+            click_button "Update Event"
+            event = Event.find(@event.code)
+            expect(event.max_virtual).to eq(0)
+          end
+        end
       end
     end
 
