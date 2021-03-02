@@ -555,20 +555,13 @@ describe "SyncMembers" do
 
   describe '.check_max_participants' do
     before do
-      Person.destroy_all
-    end
-
-    it 'checks whether the event has too many participants, sends report' do
       lc = FakeLegacyConnector.new
       allow(lc).to receive(:get_members).with(@event)
         .and_return(lc.exceed_max_participants(@event, 5))
       expect(LegacyConnector).to receive(:new).and_return(lc)
+    end
 
-      sync_errors = ErrorReport.new('SyncMembers', @event)
-      expect(ErrorReport).to receive(:new).and_return(sync_errors)
-
-      # from sync_members.rb:100
-      total_invited = @event.max_participants + 5
+    def over_booked_message(total_invited)
       msg = "Membership Totals:\n"
       msg += "Confirmed participants: #{total_invited}\n"
       msg += "Invited participants: 0\n"
@@ -577,7 +570,53 @@ describe "SyncMembers" do
       msg += "Declined participants: 0\n\n"
       msg += "Total invited participants: #{total_invited}\n"
       msg += "Total observers: 0\n"
-      msg += "#{@event.code} Maximum allowed: #{@event.max_participants}\n"
+      msg += "#{@event.code} Maximum physical allowed: #{@event.max_participants}\n"
+      msg += "#{@event.code} Maximum virtual allowed: #{@event.max_virtual}\n"
+    end
+
+    it 'checks whether the event has too many participants, sends report' do
+      @event.update_columns(event_format: 'Physical')
+
+      sync_errors = ErrorReport.new('SyncMembers', @event)
+      expect(ErrorReport).to receive(:new).and_return(sync_errors)
+
+      # from sync_members.rb:100
+      total_invited = @event.max_participants + 5
+      msg = over_booked_message(total_invited)
+      message = "#{@event.code} is overbooked!\n\n#{msg}"
+
+      expect(sync_errors).to receive(:add).with(@event, message)
+      expect(sync_errors).to receive(:send_report)
+      SyncMembers.new(@event)
+    end
+
+    it 'accounts for Online events' do
+      @event.update_columns(event_format: 'Online',
+                             max_virtual: 2)
+
+      sync_errors = ErrorReport.new('SyncMembers', @event)
+      expect(ErrorReport).to receive(:new).and_return(sync_errors)
+
+      # from sync_members.rb:100
+      total_invited = @event.max_participants + 5
+      msg = over_booked_message(total_invited)
+      message = "#{@event.code} is overbooked!\n\n#{msg}"
+
+      expect(sync_errors).to receive(:add).with(@event, message)
+      expect(sync_errors).to receive(:send_report)
+      SyncMembers.new(@event)
+    end
+
+    it 'accounts for Hybrid events' do
+      @event.update_columns(event_format: 'Hybrid',
+                             max_virtual: 2)
+
+      sync_errors = ErrorReport.new('SyncMembers', @event)
+      expect(ErrorReport).to receive(:new).and_return(sync_errors)
+
+      # from sync_members.rb:100
+      total_invited = @event.max_participants + 5
+      msg = over_booked_message(total_invited)
       message = "#{@event.code} is overbooked!\n\n#{msg}"
 
       expect(sync_errors).to receive(:add).with(@event, message)

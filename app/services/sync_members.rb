@@ -37,7 +37,7 @@ class SyncMembers
 
   def recently_synced?
     return false if event.nil? || event.sync_time.blank?
-    # return true if Rails.env.development?
+    return true if Rails.env.development?
     Time.now - event.sync_time < 5.minutes
   end
 
@@ -104,9 +104,16 @@ class SyncMembers
 
   def check_max_participants
     num = membership_counts()
-
     total_invited = num['Confirmed'] + num['Invited'] + num['Undecided']
-    if @event.max_participants - total_invited < 0
+    max_count = @event.max_participants
+
+    if @event.event_format == 'Online'
+      max_count = @event.max_virtual
+    elsif @event.event_format == 'Hybrid'
+      max_count += @event.max_virtual
+    end
+
+    if max_count - total_invited < 0
       msg = "Membership Totals:\n"
       msg += "Confirmed participants: #{num['Confirmed']}\n"
       msg += "Invited participants: #{num['Invited']}\n"
@@ -115,7 +122,8 @@ class SyncMembers
       msg += "Declined participants: #{num['Declined']}\n\n"
       msg += "Total invited participants: #{total_invited}\n"
       msg += "Total observers: #{num['Observers']}\n"
-      msg += "#{@event.code} Maximum allowed: #{@event.max_participants}\n"
+      msg += "#{@event.code} Maximum physical allowed: #{@event.max_participants}\n"
+      msg += "#{@event.code} Maximum virtual allowed: #{@event.max_virtual}\n"
 
       sync_errors.add(@event, "#{@event.code} is overbooked!\n\n#{msg}")
     end
