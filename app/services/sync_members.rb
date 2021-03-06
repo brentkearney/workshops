@@ -99,6 +99,10 @@ class SyncMembers
     Membership::ATTENDANCE.each do |a|
       counts[a] = current_event.num_attendance(a)
     end
+    counts['Virtual'] = current_event.memberships
+                                     .where("(attendance = 'Confirmed')
+                                      AND (role LIKE 'Virtual%'
+                                      OR role LIKE '%Organizer')").size
     count_observers(counts)
   end
 
@@ -116,6 +120,7 @@ class SyncMembers
     if max_count - total_invited < 0
       msg = "Membership Totals:\n"
       msg += "Confirmed participants: #{num['Confirmed']}\n"
+      msg += "Confirmed Virtual participants: #{num['Virtual']}\n"
       msg += "Invited participants: #{num['Invited']}\n"
       msg += "Undecided participants: #{num['Undecided']}\n"
       msg += "Not Yet Invited participants: #{num['Not Yet Invited']}\n"

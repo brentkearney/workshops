@@ -7,6 +7,8 @@ class EventDashboard < Administrate::BaseDashboard
   # Each different type represents an Administrate::Field object,
   # which determines how the attribute is displayed
   # on pages throughout the dashboard.
+
+  event_formats = GetSetting.site_setting('event_formats')
   ATTRIBUTE_TYPES = {
     #memberships: Field::HasMany,
     members: Field::HasMany.with_options(class_name: "Person"),
@@ -19,11 +21,13 @@ class EventDashboard < Administrate::BaseDashboard
     start_date: Field::DateTime.with_options(format: "%Y-%m-%d", searchable: true),
     end_date: Field::DateTime.with_options(format: "%Y-%m-%d"),
     event_type: Field::String.with_options(searchable: true),
-    event_format: Field::Select.with_options(collection: GetSetting.site_setting('event_formats')),
+    event_format: Field::Select.with_options(collection: event_formats),
     location: Field::String.with_options(searchable: true),
     description: Field::Text.with_options(searchable: true),
     press_release: Field::Text.with_options(searchable: true),
     max_participants: Field::Number,
+    max_virtual: Field::Number,
+    max_observers: Field::Number,
     door_code: Field::Number,
     booking_code: Field::String,
     updated_by: Field::String,
@@ -66,6 +70,8 @@ class EventDashboard < Administrate::BaseDashboard
     :description,
     :press_release,
     :max_participants,
+    :max_virtual,
+    :max_observers,
     :door_code,
     :booking_code,
     :updated_by,
@@ -99,6 +105,8 @@ class EventDashboard < Administrate::BaseDashboard
     :description,
     :press_release,
     :max_participants,
+    :max_virtual,
+    :max_observers,
     :door_code,
     :booking_code,
     :updated_by,
