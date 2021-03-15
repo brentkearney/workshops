@@ -564,6 +564,7 @@ describe "SyncMembers" do
     def over_booked_message(total_invited)
       msg = "Membership Totals:\n"
       msg += "Confirmed participants: #{total_invited}\n"
+      msg += "Confirmed Virtual participants: 0\n"
       msg += "Invited participants: 0\n"
       msg += "Undecided participants: 0\n"
       msg += "Not Yet Invited participants: 0\n"
