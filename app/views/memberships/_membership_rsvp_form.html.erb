@@ -79,7 +79,7 @@
       <div class="p-2">
         <h2 class="rsvp-section midpage">Special Considerations</h2>
         <p class="description">
-          <%= GetSetting.rsvp_special_intro(@event.location).html_safe %>
+          <%= rsvp_setting('rsvp_special_intro', @event.location) %>
         </p>
       </div>
       <div class="p-2 form-group">

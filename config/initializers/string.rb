@@ -8,7 +8,7 @@
 class String
   # Convert strings like "3.days" into Durations (via Integer)
   def to_duration
-    super unless self =~ /\A\d+\.\w+\z/
+    return 0.days unless self.match?(/\A\d+\.\w+\z/)
     parts = split('.')
 
     allowed = %w(minute minutes hour hours day days month months year years)
