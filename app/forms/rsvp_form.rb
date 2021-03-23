@@ -25,22 +25,7 @@ class RsvpForm < ComplexForms
   end
 
   def self.grant_list
-    [
-      ["1501 - Genes, Cells and Molecules", "NSERC:1501"],
-      ["1502 - Biological Systems and Functions", "NSERC:1502"],
-      ["1503 - Evolution and Ecology", "NSERC:1503"],
-      ["1504 - Chemistry", "NSERC:1504"],
-      ["1505 - Physics", "NSERC:1505"],
-      ["1506 - Geosciences", "NSERC:1506"],
-      ["1507 - Computer Science", "NSERC:1507"],
-      ["1508 - Mathematics and Statistics", "NSERC:1508"],
-      ["1509 - Civil, Industrial and Systems Engineering", "NSERC:1509"],
-      ["1510 - Electrical and Computer Engineering", "NSERC:1510"],
-      ["1511 - Materials and Chemical Engineering", "NSERC:1511"],
-      ["1512 - Mechanical Engineering", "NSERC:1512"],
-      ["CIHR grant", "CIHR"],
-      ["SSHRC grant", "SSHRC"]
-    ]
+    GetSetting.grant_list
   end
 
   def validate_form(attributes = {})
@@ -53,7 +38,6 @@ class RsvpForm < ComplexForms
       end
 
       @membership.errors.full_messages.each do |key, value|
-        Rails.logger.debug "\n* key: #{key}, value: #{value}\n"
         errors.add(key, value) unless key.match?(/^Person/)
       end
     end

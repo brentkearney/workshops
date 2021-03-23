@@ -1,8 +1,13 @@
 Dear <%= @resource.person.dear_name %>,
 
-Please confirm your account by following the link below:
+You recently set up an account at BIRS. Please verify that you control this
+e-mail address by following the link below:
 
 <%= confirmation_url(confirmation_token: @token) %>
+
+If you did not recently register an account at BIRS, please report this to
+webmaster@birs.ca.
+
 
 Many thanks,
 Banff International Research Station
