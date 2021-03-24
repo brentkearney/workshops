@@ -725,6 +725,17 @@ describe 'RSVP', type: :feature do
           requires_region(rsvp_yes_path(@invitation.code))
         end
 
+        it 'includes "Grants" field if country is Canada' do
+          fill_in "rsvp_person_country", with: 'Canada'
+          fill_in "rsvp_person_region", with: 'Alberta'
+
+          expect(page).to have_field('rsvp_person_grants')
+
+          GetSetting.grant_list.each do |grant|
+            expect(page).to have_text "#{grant.first}"
+          end
+        end
+
         it 'if participant has no account, links to register new account' do
           links_to_new_account()
         end

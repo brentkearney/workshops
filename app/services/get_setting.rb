@@ -181,6 +181,10 @@ class GetSetting
     Setting.Locations.first.second['Timezone']
   end
 
+  def self.grant_list
+    Setting.Site['grant_list']
+  end
+
   # Emails set in Settings.Site
   def self.site_email(email_setting)
     email = site_setting(email_setting)

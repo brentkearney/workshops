@@ -69,6 +69,14 @@ RSpec.describe 'Model validations: Person', type: :model do
     expect(Person.find(p.id).country).to eq('USA')
   end
 
+  it 'changes grants to an Array if it is a String' do
+    p = build(:person, grants: "NSERC:1234, NSF:56")
+    p.save
+    p = Person.find(p.id)
+    expect(p.grants.is_a? Array).to be_truthy
+    expect(p.grants).to eq(['NSERC:1234', 'NSF:56'])
+  end
+
   it 'does not require a gender if importing memberships' do
     p = build(:person, gender: '', member_import: true)
     expect(p.valid?).to be_truthy

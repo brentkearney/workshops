@@ -44,20 +44,23 @@ RSpec.describe "Model validations: Event ", type: :model do
 
   it 'sets max participants to default' do
     event = build(:event, max_participants: nil)
+    default_value = GetSetting.max_participants(event.location)
     event.valid?
-    expect(event.max_participants).not_to be_nil
-  end
-
-  it 'sets max observers to default' do
-    event = build(:event, max_observers: nil)
-    event.valid?
-    expect(event.max_observers).not_to be_nil
+    expect(event.max_participants).to eq(default_value)
   end
 
   it 'sets max virtual to default' do
     event = build(:event, max_virtual: nil)
+    default_value = GetSetting.max_virtual(event.location)
     event.valid?
-    expect(event.max_virtual).not_to be_nil
+    expect(event.max_virtual).to eq(default_value)
+  end
+
+  it 'sets max observers to default' do
+    event = build(:event, max_observers: nil)
+    default_value = GetSetting.max_observers(event.location)
+    event.valid?
+    expect(event.max_observers).to eq(default_value)
   end
 
   it 'is invalid without a time zone' do

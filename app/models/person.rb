@@ -20,7 +20,7 @@ class Person < ApplicationRecord
   belongs_to :replace_with, class_name: "ConfirmEmailChange", optional: true
 
   before_validation :downcase_email
-  before_save :clean_data, :set_usa
+  before_save :clean_data, :set_usa, :grants_to_array
   serialize :grants
 
   validates :email, presence: true,
@@ -71,6 +71,13 @@ class Person < ApplicationRecord
 
   def set_usa
     self.country = 'USA' if is_usa?(country)
+  end
+
+  def grants_to_array
+    return if grants.blank?
+    if grants.is_a? String
+      self.grants = grants.split(",").map(&:strip)
+    end
   end
 
   def downcase_email

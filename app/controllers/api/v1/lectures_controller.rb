@@ -29,6 +29,10 @@ class Api::V1::LecturesController < Api::V1::BaseController
       if @lecture.save
         format.json { head :created }
       else
+        Rails.logger.debug "\n\n********************************************\n\n"
+        Rails.logger.debug "Error with lecture data:
+                            #{@lecture.errors.full_messages.to_json}".squish
+        Rails.logger.debug "\n\n********************************************\n\n"
         format.json do
           render json: @lecture.errors.full_messages.to_json,
                  status: :unprocessable_entity

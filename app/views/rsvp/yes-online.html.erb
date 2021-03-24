@@ -70,7 +70,9 @@
 
         <div id="email-options">
           <%= rsvp.fields_for :membership, @rsvp.membership do |m| %>
-          <%= m.hidden_field :role, value: 'Virtual Participant' %>
+          <% unless @rsvp.membership.role.match? "Organizer" %>
+            <%= m.hidden_field :role, value: 'Virtual Participant' %>
+          <% end %>
           <div class="row">
             <div class="form-check">
               <%= m.check_box :share_email, { class: "form-check-input" }, true %>

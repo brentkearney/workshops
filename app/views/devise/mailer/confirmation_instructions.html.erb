@@ -1,8 +1,12 @@
 <p>Dear <%= @resource.person.dear_name %>,</p>
 
-<p>Please confirm your account by following the link below:</p>
+<p>You recently set up an account at BIRS. Please verify that you control this
+e-mail address by following the link below:</p>
 
 <p><%= link_to 'Confirm my account', confirmation_url(confirmation_token: @token) %></p>
+
+<p>If you did not recently register an account at BIRS, please report this to
+webmaster@birs.ca.</p>
 
 <p>Many thanks,<br />
   Banff International Research Station</p>

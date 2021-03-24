@@ -36,7 +36,6 @@ module EventDecorators
   end
 
   def num_invited_virtual
-    return num_invited_participants if self.online?
     memberships.where("(attendance = 'Invited' OR attendance = 'Undecided'
       OR attendance = 'Confirmed') AND role != 'Observer'
       AND role LIKE 'Virtual%'").size
