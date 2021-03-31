@@ -23,6 +23,7 @@
     "**/kind-of": "^6.0.3",
     "chokidar": "^3.4.0",
     "ssri": "^8.0.1",
-    "serialize-javascript": "^3.1.0"
+    "serialize-javascript": "^3.1.0",
+    "is-svg": "^4.2.2"
   }
 }

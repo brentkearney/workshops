@@ -100,7 +100,7 @@ class EventPolicy
 
   def send_invitations?
     # Temporary until email templates are ready at other locations
-    return false unless @event.location == 'BIRS'
+    return false if @event.location == 'UBCO'
     return false if current_user.nil?
     return false if Date.current > event.end_date
     organizers_and_staff

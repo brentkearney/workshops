@@ -59,6 +59,7 @@ class InvitationMailer < ApplicationMailer
   end
 
   def set_template(membership, template)
+    # template = membership.attendance
     event = membership.event
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{event.location}")

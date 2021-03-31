@@ -11,6 +11,7 @@ class EmailInvitationJob < ApplicationJob
   queue_as :urgent
 
   def perform(invitation_id, template)
+    # template = membership.attendance
     invitation = Invitation.find_by_id(invitation_id)
     InvitationMailer.invite(invitation, template).deliver_now
   end
