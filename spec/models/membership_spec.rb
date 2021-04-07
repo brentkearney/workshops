@@ -213,6 +213,22 @@ RSpec.describe 'Model validations: Membership', type: :model do
     expect(third_membership).not_to be_valid
   end
 
+  it 'is valid if the number of invited + confirmed participants is
+    greater than max_participants, but some of the participants are virtual' do
+    @event = Event.find(@event.id)
+    @event.event_format = 'Hybrid'
+    @event.max_participants = @event.num_participants + 1
+    @event.max_virtual = @event.num_invited_virtual + 1
+    @event.save
+
+    create(:membership, event: @event, attendance: 'Invited',
+        role: 'Virtual Participant')
+    third_membership = build(:membership, event: @event,
+                                      attendance: 'Invited',
+                                            role: 'Participant')
+    expect(third_membership).to be_valid
+  end
+
   it 'does not count Observers as part of the confirmed number of
     participants' do
     @event = Event.find(@event.id)

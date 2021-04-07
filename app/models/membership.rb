@@ -108,6 +108,7 @@ class Membership < ApplicationRecord
 
     max = event.max_participants
     invited = event.num_invited_participants
+    invited -= event.num_invited_virtual if event.hybrid?
     field_name ="attendance"
 
     # if the role changes from Virtual to Physical, ensure within max limit
