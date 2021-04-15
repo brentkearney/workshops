@@ -9,6 +9,7 @@
 class Invitation < ApplicationRecord
   belongs_to :membership
   attr_accessor :organizer_message
+  attr_reader :template
 
   validates :membership, :invited_by, presence: true
   validates :code, presence: true, length: { is: 50 }
@@ -21,11 +22,13 @@ class Invitation < ApplicationRecord
   end
 
   def send_invite
+    @template = membership.attendance
     update_and_save
     EmailInvitationJob.perform_later(id)
   end
 
   def send_reminder
+    @template = membership.attendance
     update_reminder
     EmailInvitationJob.perform_later(id)
   end

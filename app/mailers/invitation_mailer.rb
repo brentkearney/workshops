@@ -59,7 +59,7 @@ class InvitationMailer < ApplicationMailer
   end
 
   def set_template(membership, template)
-    # template = membership.attendance
+    # template = membership.attendance before update
     event = membership.event
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{event.location}")
@@ -91,7 +91,6 @@ class InvitationMailer < ApplicationMailer
     @person = invitation.membership.person
     @event = invitation.membership.event
     @membership = invitation.membership
-    template = @membership.attendance
     @rsvp_url = invitation.rsvp_url
     @invitation_date = invitation.invited_on.strftime('%A, %B %-d, %Y')
 
@@ -120,6 +119,7 @@ class InvitationMailer < ApplicationMailer
     end
 
     # Set email template according to location, type of event, and attendance status
+    template = invitation.template || @membership.attendance
     templates = set_template(@membership, template)
 
     # Create PDF attachment
