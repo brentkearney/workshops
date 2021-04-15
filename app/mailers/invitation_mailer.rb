@@ -87,10 +87,11 @@ class InvitationMailer < ApplicationMailer
     }
   end
 
-  def invite(invitation, template)
+  def invite(invitation)
     @person = invitation.membership.person
     @event = invitation.membership.event
     @membership = invitation.membership
+    template = @membership.attendance
     @rsvp_url = invitation.rsvp_url
     @invitation_date = invitation.invited_on.strftime('%A, %B %-d, %Y')
 

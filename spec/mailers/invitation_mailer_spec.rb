@@ -13,7 +13,6 @@ RSpec.describe InvitationMailer, type: :mailer do
   end
 
   before :each do
-    @template = 'Not Yet Invited'
     ActionMailer::Base.deliveries.clear
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
@@ -27,7 +26,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     end
 
     before :each do
-      InvitationMailer.invite(@invitation, @template).deliver_now
+      InvitationMailer.invite(@invitation).deliver_now
       @delivery = ActionMailer::Base.deliveries.first
       expect(@delivery).not_to be_nil
     end
@@ -66,7 +65,8 @@ RSpec.describe InvitationMailer, type: :mailer do
 
   describe 'RSVP deadline' do
     before do
-      @invitation = create(:invitation)
+      membership = create(:membership, attendance: 'Not Yet Invited')
+      @invitation = create(:invitation, membership: membership)
       @event = @invitation.membership.event
       @today = DateTime.current.in_time_zone(@event.time_zone)
     end
@@ -76,7 +76,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       @event.end_date = @event.start_date + 5.days
       @event.save
 
-      InvitationMailer.invite(@invitation, @template).deliver_now
+      InvitationMailer.invite(@invitation).deliver_now
       delivery = ActionMailer::Base.deliveries.first
       body = delivery.body.empty? ? delivery.text_part : delivery.body
 
@@ -89,7 +89,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       @event.end_date = @event.start_date + 5.days
       @event.save
 
-      InvitationMailer.invite(@invitation, @template).deliver_now
+      InvitationMailer.invite(@invitation).deliver_now
       delivery = ActionMailer::Base.deliveries.first
       body = delivery.body.empty? ? delivery.text_part : delivery.body
       rsvp_date = @event.start_date.prev_occurring(:tuesday)
@@ -108,7 +108,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       @event.end_date = @event.start_date + 5.days
       @event.save
 
-      InvitationMailer.invite(@invitation, @template).deliver_now
+      InvitationMailer.invite(@invitation).deliver_now
       delivery = ActionMailer::Base.deliveries.first
       body = delivery.body.empty? ? delivery.text_part : delivery.body
 
@@ -121,7 +121,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       @event.end_date = @event.start_date + 5.days
       @event.save
 
-      InvitationMailer.invite(@invitation, @template).deliver_now
+      InvitationMailer.invite(@invitation).deliver_now
       delivery = ActionMailer::Base.deliveries.first
       body = delivery.body.empty? ? delivery.text_part : delivery.body
 
@@ -133,7 +133,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       @event.event_format = 'Online'
       @event.save
 
-      InvitationMailer.invite(@invitation, @template).deliver_now
+      InvitationMailer.invite(@invitation).deliver_now
       delivery = ActionMailer::Base.deliveries.first
       body = delivery.body.empty? ? delivery.text_part : delivery.body
 
