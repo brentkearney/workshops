@@ -108,6 +108,14 @@ module EventDecorators
     end_date.strftime('%A, %B %-d, %Y')
   end
 
+  def start_date_formatted
+    start_date.in_time_zone.strftime('%A, %B %-d')
+  end
+
+  def end_date_formatted
+    end_date.in_time_zone.strftime('%A, %B %-d, %Y')
+  end
+
   def date
     start_date.strftime('%Y-%m-%d')
   end

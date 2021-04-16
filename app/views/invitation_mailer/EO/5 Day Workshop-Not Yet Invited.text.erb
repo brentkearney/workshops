@@ -2,8 +2,9 @@ Dear <%= @person.dear_name %>,
 
 You are invited to attend the following event:
 
-Workshop: <%= @event.name %> (<%= @event.code %>)
-On: <%= @event.dates(:long) %>
+<%= @event.name %> (<%= @event.code %>), <%= @event_start %> to <%= @event_end %>. The workshop will begin on Monday morning, and end on Friday mid-day.
+
+
 At: <%= @event.location %>
 URL: <%= @event.url %>
 Organizers: <%= @organizers %>

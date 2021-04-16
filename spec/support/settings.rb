@@ -66,7 +66,8 @@ if Setting.find_by(var: 'Emails').blank?
       'station_manager' => 'stnmgr@example.com',
       'confirmation_lead' => '1.year',
       'maillist_from' => '"Workshops Maillist" <no-reply@example.com>',
-      'email_domain' => 'example.com'
+      'email_domain' => 'example.com',
+      'rsvp_email' => 'coordinator@example.com'
     }
   }
 end

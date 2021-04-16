@@ -19,137 +19,39 @@
 # SOFTWARE.
 
 class InvitationMailer < ApplicationMailer
-  def compose_organizers(event)
-    organizers = ''
-    event.organizers.each do |org|
-      organizers << org.name + ' (' + org.affiliation + '), '
-    end
-    organizers.gsub!(/, $/, '')
-  end
-
-  def set_format_template(membership, template_name)
-    if membership.event.online?
-      template_name = "Virtual " + template_name
-    end
-
-    if membership.event.hybrid?
-      template_name = "Hybrid " + template_name
-    end
-
-    template_name
-  end
-
-  def set_role_template(membership, template_name)
-    return template_name if membership.event.online?
-    if membership.role.match?('Virtual')
-      template_name = template_name + "-Virtual"
-    elsif membership.role == 'Observer'
-      template_name = template_name + "-Observer"
-    end
-
-    return template_name
-  end
-
-  def set_pdf_template(membership, pdf_template_file)
-    return 'not-applicable.pdf' if membership.event.online? ||
-                                   membership.event.hybrid?
-    return 'not-applicable.pdf' if membership.role.include?('Virtual') ||
-                                   membership.role.include?('Observer')
-    pdf_template_file
-  end
-
-  def set_template(membership, template)
-    # template = membership.attendance before update
-    event = membership.event
-    template_path = Rails.root.join('app', 'views', 'invitation_mailer',
-                      "#{event.location}")
-    template_name = "#{event.event_type}-#{template}"
-
-    pdf_template_file = "#{template_path}/#{template_name}.pdf.erb"
-    pdf_template = "invitation_mailer/#{event.location}/#{template_name}.pdf.erb"
-
-    template_name = set_format_template(membership, template_name)
-    template_name = set_role_template(membership, template_name)
-    pdf_template_file = set_pdf_template(membership, pdf_template_file)
-
-    text_template_file = "#{template_path}/#{template_name}.text.erb"
-    text_template = "invitation_mailer/#{event.location}/#{template_name}.text.erb"
-
-    invitation_file = "#{event.location}-invitation-#{membership.person_id}.pdf"
-
-    {
-           template_name: template_name,
-           text_template: text_template,
-      text_template_file: text_template_file,
-            pdf_template: pdf_template,
-       pdf_template_file: pdf_template_file,
-         invitation_file: invitation_file
-    }
-  end
-
   def invite(invitation)
     @person = invitation.membership.person
     @event = invitation.membership.event
-    @membership = invitation.membership
     @rsvp_url = invitation.rsvp_url
     @invitation_date = invitation.invited_on.strftime('%A, %B %-d, %Y')
-
-    Time.zone = @event.time_zone
-
-    # no invitations to physical events once they've started
-    return if @event.physical? && @event.start_date.in_time_zone < Time.now
-
-    @event_start = @event.start_date.in_time_zone.strftime('%A, %B %-d')
-    @event_end = @event.end_date.in_time_zone.strftime('%A, %B %-d, %Y')
-
+    @event_start = @event.start_date_formatted
+    @event_end = @event.end_date_formatted
     @rsvp_deadline = RsvpDeadline.new(@event).rsvp_by
-    @organizers = compose_organizers(@event)
-
-    from_email = GetSetting.rsvp_email(@event.location)
+    @organizers = PersonWithAffilList.compose(@event.organizers)
 
     location = @event.location
     subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
 
-    bcc_email = GetSetting.rsvp_email(@event.location)
-    bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email.match?(/</)
-    to_email = '"' + @person.name + '" <' + @person.email + '>'
-
-    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
-      to_email = GetSetting.site_email('webmaster_email')
-    end
-
-    # Set email template according to location, type of event, and attendance status
-    template = invitation.template || @membership.attendance
-    templates = set_template(@membership, template)
+    recipients = EmailRecipients.new(invitation).compose
+    templates = TemplateSelector.new(invitation).set_template
 
     # Create PDF attachment
     if File.exist?(templates[:pdf_template_file])
-      @page_title = "#{location} Invitation Details"
-      pdf_file = WickedPdf.new.pdf_from_string(
-        render_to_string(template: "#{templates[:pdf_template]}",
-                         encoding: "UTF-8",
-                       lowquality: false,
-                        page_size: 'Letter'))
-
-      attachments[templates[:invitation_file]] = pdf_file
-
-      ## save to a file (for testing)
-      # save_path = Rails.root.join('tmp','invitation.pdf')
-      # File.open(save_path, 'wb') do |file|
-      #   file << pdf_file
-      # end
+      generator = PdfTemplateGenerator.new(location, templates[:pdf_template])
+      attachments[templates[:invitation_file]] = generator.pdf_file
     end
 
     headers['X-BIRS-Sender'] = "#{invitation.invited_by}"
+    headers['X-BIRS-Event'] = "#{invitation.event.code}"
     headers['X-Priority'] = 1
     headers['X-MSMail-Priority'] = 'High'
 
     if File.exist?(templates[:text_template_file])
-      mail(to: to_email,
-           bcc: bcc_email,
-           from: from_email,
+      mail(to: recipients[:to],
+           bcc: recipients[:bcc],
+           from: recipients[:from],
            subject: subject,
-           template_path: "invitation_mailer/#{@event.location}",
+           template_path: templates[:template_path],
            template_name: templates[:template_name]) do |format|
         format.text { render templates[:text_template] }
       end
@@ -157,8 +59,9 @@ class InvitationMailer < ApplicationMailer
       error_msg = { problem: 'Participant (re)invitation not sent.',
                     cause: 'Email template file missing.',
                     template: templates[:text_template_file],
-                    person: @person,
-                    membership: @membership,
+                    recipients: recipients,
+                    person: invitation.person,
+                    membership: invitation.membership,
                     invitation: invitation }
       StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
     end

@@ -60,20 +60,55 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     expect(i.expires).to eq(end_time)
   end
 
-  it 'updates membership fields when sending invites' do
-    event = build(:event)
-    membership = create(:membership, event: event, update_by_staff: true,
-                        attendance: 'Not Yet Invited',
-                        role: 'Backup Participant',
-                        arrival_date: event.start_date - 1.day,
-                        departure_date: event.end_date + 1.day)
-    create(:invitation, membership: membership, invited_by: 'Foo').send_invite
+  context '.send_invite' do
+    it 'updates membership fields' do
+      event = build(:event)
+      membership = create(:membership, event: event, update_by_staff: true,
+                          attendance: 'Not Yet Invited',
+                          role: 'Backup Participant',
+                          arrival_date: event.start_date - 1.day,
+                          departure_date: event.end_date + 1.day)
+      create(:invitation, membership: membership, invited_by: 'Foo').send_invite
 
-    expect(membership.invited_by).to eq('Foo')
-    expect(membership.invited_on).not_to be_nil
-    expect(membership.attendance).to eq('Invited')
-    expect(membership.role).to eq('Participant')
-    expect(membership.arrival_date).to be_nil
-    expect(membership.departure_date).to be_nil
+      expect(membership.invited_by).to eq('Foo')
+      expect(membership.invited_on).not_to be_nil
+      expect(membership.attendance).to eq('Invited')
+      expect(membership.role).to eq('Participant')
+      expect(membership.arrival_date).to be_nil
+      expect(membership.departure_date).to be_nil
+    end
+
+    it 'sets the mailer template' do
+      membership = create(:membership, attendance: 'Not Yet Invited')
+      invitation = create(:invitation, membership: membership)
+
+      invitation.send_invite
+      expect(invitation.template).to eq('Not Yet Invited')
+    end
+  end
+
+  context '.send_reminder' do
+    it 'updates the invite_reminders field with a datetime and name' do
+      invitation = create(:invitation)
+      invitation.send_invite
+
+      expect(invitation.membership.invite_reminders).to be_empty
+      invitation.send_reminder
+
+      reminders = invitation.membership.invite_reminders
+      expect(reminders).not_to be_empty
+      expect(reminders.values.last).to eq('FactoryBot')
+
+      reminded_on = reminders.keys.first.strftime("%Y-%m-%d %H:%M")
+      expect(reminded_on).to eq(DateTime.now.strftime("%Y-%m-%d %H:%M"))
+    end
+
+    it 'sets the mailer template' do
+      membership = create(:membership, attendance: 'Invited')
+      invitation = create(:invitation, membership: membership)
+
+      invitation.send_reminder
+      expect(invitation.template).to eq('Invited')
+    end
   end
 end

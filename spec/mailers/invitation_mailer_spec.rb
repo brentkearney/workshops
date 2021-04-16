@@ -23,6 +23,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     before do
       membership = create(:membership, attendance: 'Not Yet Invited')
       @invitation = create(:invitation, membership: membership)
+      allow(@invitation).to receive(:template).and_return(membership.attendance)
     end
 
     before :each do
@@ -57,9 +58,41 @@ RSpec.describe InvitationMailer, type: :mailer do
       expect(body).to have_text(event_name)
     end
 
+    it 'message body includes formatted dates' do
+      start_date = @invitation.membership.event.start_date_formatted
+      expect(@delivery.body).to have_text(start_date)
+
+      end_date = @invitation.membership.event.end_date_formatted
+      expect(@delivery.body).to have_text(end_date)
+    end
+
     it 'headers include the senders name and event code' do
-      expect(@delivery.header).to have_text(@invitation.membership.event.code)
-      expect(@delivery.header).to have_text(@invitation.invited_by)
+      senders_name_header = "X-BIRS-Sender: #{@invitation.invited_by}"
+      expect(@delivery.header).to have_text(senders_name_header)
+
+      event_code_header = "X-BIRS-Event: #{@invitation.membership.event.code}"
+      expect(@delivery.header).to have_text(event_code_header)
+    end
+
+    it 'includes bcc to rsvp address' do
+      rsvp_email = GetSetting.rsvp_email(@invitation.event.location)
+      expect(@delivery.bcc.first).to eq(rsvp_email)
+    end
+
+    it 'invitations to physical meetings include a PDF attachment' do
+      event = create(:event, event_format: 'Physical',
+                               event_type: '5 Day Workshop')
+      membership = create(:membership, event: event,
+                                  attendance: 'Not Yet Invited')
+      invitation = create(:invitation, membership: membership)
+      allow(invitation).to receive(:template).and_return(membership.attendance)
+
+      InvitationMailer.invite(invitation).deliver_now
+      delivery = ActionMailer::Base.deliveries.last
+
+      expect(delivery.attachments).not_to be_empty
+      template = TemplateSelector.new(invitation).set_template
+      expect(delivery.attachments[0].filename).to eq(template[:invitation_file])
     end
   end
 
@@ -67,6 +100,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     before do
       membership = create(:membership, attendance: 'Not Yet Invited')
       @invitation = create(:invitation, membership: membership)
+      allow(@invitation).to receive(:template).and_return(membership.attendance)
       @event = @invitation.membership.event
       @today = DateTime.current.in_time_zone(@event.time_zone)
     end
