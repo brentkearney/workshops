@@ -33,7 +33,7 @@ class InvitationMailer < ApplicationMailer
     subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
 
     recipients = EmailRecipients.new(invitation).compose
-    templates = TemplateSelector.new(invitation).set_template
+    templates = EmailTemplateSelector.new(invitation).set_template
 
     # Create PDF attachment
     if File.exist?(templates[:pdf_template_file])

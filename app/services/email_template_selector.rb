@@ -1,5 +1,14 @@
-class TemplateSelector
-  attr_accessor :membership, :template
+# ./app/services/email_template_selector.rb
+# Copyright (c) 2021 Banff International Research Station.
+# This file is part of Workshops. Workshops is licensed under
+# the GNU Affero General Public License as published by the
+# Free Software Foundation, version 3 of the License.
+# See the COPYRIGHT file for details and exceptions.
+
+# Returns a hash of the email templates and paths appropriate
+# for a given invitation object, for the invitation_mailer.
+class EmailTemplateSelector
+  attr_reader :membership, :template
 
   def initialize(invitation)
     @membership = invitation.membership
@@ -41,23 +50,24 @@ class TemplateSelector
     event = membership.event
     template_path = Rails.root.join('app', 'views', 'invitation_mailer',
                       "#{event.location}")
-    template_name = "#{event.event_type}-#{template}"
+    basic_template_name = "#{event.event_type}-#{@template}"
 
-    pdf_template_file = "#{template_path}/#{template_name}.pdf.erb"
-    pdf_template = "invitation_mailer/#{event.location}/#{template_name}.pdf.erb"
+    pdf_template_file = "#{template_path}/#{basic_template_name}.pdf.erb"
+    pdf_template = "invitation_mailer/#{event.location}/
+                                      #{basic_template_name}.pdf.erb".squish
 
-    template_name = set_format_template(template_name)
-    template_name = set_role_template(template_name)
+    name_with_event_format = set_format_template(basic_template_name)
+    final_template_name = set_role_template(name_with_event_format)
     pdf_template_file = set_pdf_template(pdf_template_file)
 
-    text_template_file = "#{template_path}/#{template_name}.text.erb"
+    text_template_file = "#{template_path}/#{final_template_name}.text.erb"
     relative_template_path = "invitation_mailer/#{event.location}"
-    text_template = "#{relative_template_path}/#{template_name}.text.erb"
+    text_template = "#{relative_template_path}/#{final_template_name}.text.erb"
 
     invitation_file = "#{event.location}-invitation-#{membership.person_id}.pdf"
 
     {
-           template_name: template_name,
+           template_name: final_template_name,
            text_template: text_template,
       text_template_file: text_template_file,
            template_path: relative_template_path,

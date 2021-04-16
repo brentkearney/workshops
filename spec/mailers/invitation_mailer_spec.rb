@@ -91,7 +91,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       delivery = ActionMailer::Base.deliveries.last
 
       expect(delivery.attachments).not_to be_empty
-      template = TemplateSelector.new(invitation).set_template
+      template = EmailTemplateSelector.new(invitation).set_template
       expect(delivery.attachments[0].filename).to eq(template[:invitation_file])
     end
   end
