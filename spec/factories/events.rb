@@ -57,14 +57,12 @@ FactoryBot.define do
         date = date.next_year
         event.start_date = date.next_week(:sunday)
       elsif evaluator.current
-        # Why?
-        # weekends = %w(Friday Saturday Sunday)
-        # if date.strftime("%A").match(Regexp.union(weekends))
-        #   event.start_date = date.beginning_of_week(:friday)
-        # else
-        #   event.start_date = date.beginning_of_week(:sunday)
-        # end
-        event.start_date = date.beginning_of_week(:sunday)
+        weekends = %w(Friday Saturday Sunday)
+        if date.strftime("%A").match(Regexp.union(weekends))
+          event.start_date = date.beginning_of_week(:friday)
+        else
+          event.start_date = date.beginning_of_week(:sunday)
+        end
       end
       event.end_date = event.start_date + 5.days unless event.start_date.nil?
 

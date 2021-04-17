@@ -32,12 +32,14 @@ class InvitationMailer < ApplicationMailer
     location = @event.location
     subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
 
-    recipients = EmailRecipients.new(invitation).compose
-    templates = EmailTemplateSelector.new(invitation).set_template
+    recipients = InvitationEmailRecipients.new(invitation).compose
+    templates = InvitationTemplateSelector.new(invitation.membership,
+                                               invitation.template).set_template
 
     # Create PDF attachment
     if File.exist?(templates[:pdf_template_file])
-      generator = PdfTemplateGenerator.new(location, templates[:pdf_template])
+      Rails.logger.debug "file exists: #{templates[:pdf_template_file]}"
+      generator = PdfTemplateGenerator.new(location, templates[:pdf_template_file])
       attachments[templates[:invitation_file]] = generator.pdf_file
     end
 

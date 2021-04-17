@@ -30,6 +30,7 @@ RSpec.describe InvitationMailer, type: :mailer do
       InvitationMailer.invite(@invitation).deliver_now
       @delivery = ActionMailer::Base.deliveries.first
       expect(@delivery).not_to be_nil
+      @body = @delivery.body.empty? ? @delivery.text_part : @delivery.body
     end
 
     it 'sends email' do
@@ -43,27 +44,25 @@ RSpec.describe InvitationMailer, type: :mailer do
 
     it "message body includes participant's name" do
       participant_name = @invitation.membership.person.dear_name
-      body = @delivery.body.empty? ? @delivery.text_part : @delivery.body
-      expect(body).to have_text(participant_name)
+
+      expect(@body).to have_text(participant_name)
     end
 
     it 'message body includes the invitation code' do
-      body = @delivery.body.empty? ? @delivery.text_part : @delivery.body
-      expect(body).to have_text(@invitation.code)
+      expect(@body).to have_text(@invitation.code)
     end
 
     it 'message body contains event name' do
       event_name = @invitation.membership.event.name
-      body = @delivery.body.empty? ? @delivery.text_part : @delivery.body
-      expect(body).to have_text(event_name)
+      expect(@body).to have_text(event_name)
     end
 
     it 'message body includes formatted dates' do
       start_date = @invitation.membership.event.start_date_formatted
-      expect(@delivery.body).to have_text(start_date)
+      expect(@body).to have_text(start_date)
 
       end_date = @invitation.membership.event.end_date_formatted
-      expect(@delivery.body).to have_text(end_date)
+      expect(@body).to have_text(end_date)
     end
 
     it 'headers include the senders name and event code' do
@@ -91,7 +90,8 @@ RSpec.describe InvitationMailer, type: :mailer do
       delivery = ActionMailer::Base.deliveries.last
 
       expect(delivery.attachments).not_to be_empty
-      template = EmailTemplateSelector.new(invitation).set_template
+      template = InvitationTemplateSelector.new(membership,
+                                           membership.attendance).set_template
       expect(delivery.attachments[0].filename).to eq(template[:invitation_file])
     end
   end
