@@ -29,6 +29,19 @@ describe 'InvitationTemplateSelector' do
 
                 expect(templates[:template_name]).to eq(template_name)
               end
+
+              if event_format == 'Hybrid'
+                it 'appends -Virtual for if member role includes Virtual' do
+                  membership.role = 'Virtual Particiant'
+                  template_name = "Hybrid-#{event_type}-#{attendance}-Virtual"
+
+                  templates = InvitationTemplateSelector.new(membership,
+                                attendance).set_template
+
+                  expect(templates[:template_name]).to eq(template_name)
+                end
+              end
+
             end # context ... attendance
           end # attendances.each
         end # context ... event_type

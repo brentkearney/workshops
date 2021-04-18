@@ -58,14 +58,15 @@ class InvitationMailer < ApplicationMailer
         format.text { render templates[:text_template] }
       end
     else
-      error_msg = { problem: 'Participant (re)invitation not sent.',
-                    cause: 'Email template file missing.',
+      subject = "[#{@event.code}] invitation template missing!"
+      error_msg = { problem: 'Participant invitation not sent.',
+                    cause: 'Email template missing.',
                     template: templates[:text_template_file],
                     recipients: recipients,
                     person: invitation.person,
                     membership: invitation.membership,
                     invitation: invitation }
-      StaffMailer.notify_sysadmin(@event, error_msg).deliver_now
+      StaffMailer.notify_program_coord(@event, subject, error_msg).deliver_now
     end
   end
 end

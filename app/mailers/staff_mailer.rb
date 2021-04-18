@@ -55,6 +55,12 @@ class StaffMailer < ApplicationMailer
     mail(to: to_email, subject: subject, template_name: 'notify_sysadmin')
   end
 
+  def notify_program_coord(event, subject, error)
+    to_email = GetSetting.email(event.location, 'program_coordinator')
+    @message = error.pretty_inspect
+    mail(to: to_email, subject: subject, template_name: 'notify_sysadmin')
+  end
+
   def event_update(event, args:)
     @updated_by = args[:updated_by]
     @event_name = "#{event.code}: #{event.name} (#{event.dates})"

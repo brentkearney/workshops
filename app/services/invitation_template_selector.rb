@@ -15,8 +15,13 @@ class InvitationTemplateSelector
     @template = template
   end
 
-  def virtual_event_or_observer?
-    membership.event.online? || membership.role.match?(/Virtual|Observer/)
+  def invitation_file
+    "#{membership.event.location}-invitation-#{membership.person_id}.pdf"
+  end
+
+  def normal_template
+    event = membership.event
+    event.event_format + '-' + event.event_type + '-' + template
   end
 
   def pdf_template_file
@@ -25,40 +30,43 @@ class InvitationTemplateSelector
     "#{template_path}/#{template_name}.pdf.erb"
   end
 
-  def template_path
-    Rails.root.join('app', 'views', 'invitation_mailer',
-        "#{membership.event.location}")
+  def relative_template_path
+    "invitation_mailer/#{membership.event.location}"
   end
 
   def template_name
-    event = membership.event
-    event.event_format + '-' + event.event_type + '-' + template
+    membership.role.match?('Virtual') ? virtual_template : normal_template
   end
 
-  def invitation_file
-    "#{membership.event.location}-invitation-#{membership.person_id}.pdf"
-  end
-
-  def text_template_file
-    "#{template_path}/#{template_name}.text.erb"
-  end
-
-  def relative_template_path
-    "invitation_mailer/#{membership.event.location}"
+  def template_path
+    Rails.root.join('app', 'views', 'invitation_mailer',
+        "#{membership.event.location}")
   end
 
   def text_template
     "#{relative_template_path}/#{template_name}.text.erb"
   end
 
+  def text_template_file
+    "#{template_path}/#{template_name}.text.erb"
+  end
+
+  def virtual_event_or_observer?
+    membership.event.online? || membership.role.match?(/Virtual|Observer/)
+  end
+
+  def virtual_template
+    normal_template << '-Virtual'
+  end
+
   def set_template
     {
-           template_name: template_name,
-           text_template: text_template,
+      template_name:      template_name,
+      text_template:      text_template,
       text_template_file: text_template_file,
-           template_path: relative_template_path,
-       pdf_template_file: pdf_template_file,
-         invitation_file: invitation_file
+      template_path:      relative_template_path,
+      pdf_template_file:  pdf_template_file,
+      invitation_file:    invitation_file
     }
   end
 end

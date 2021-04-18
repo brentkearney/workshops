@@ -10,7 +10,7 @@ class InvitationEmailRecipients
     @invitation = invitation
   end
 
-  def test_env?
+  def development_environment?
     Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
   end
 
@@ -19,7 +19,7 @@ class InvitationEmailRecipients
   end
 
   def to_email
-    return webmaster_email if test_env?
+    return webmaster_email if development_environment?
     '"' + @invitation.person.name + '" <' + @invitation.person.email + '>'
   end
 
