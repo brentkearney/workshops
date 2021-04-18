@@ -19,33 +19,39 @@ class InvitationTemplateSelector
     membership.event.online? || membership.role.match?(/Virtual|Observer/)
   end
 
-  def construct_pdf_template_name(template_path, template_name)
-    template_name = 'not-applicable' if virtual_event_or_observer?
+  def pdf_template_file
+    return 'not-applicable' if virtual_event_or_observer?
 
     "#{template_path}/#{template_name}.pdf.erb"
   end
 
-  def construct_template_path(location)
-    Rails.root.join('app', 'views', 'invitation_mailer', "#{location}")
+  def template_path
+    Rails.root.join('app', 'views', 'invitation_mailer',
+        "#{membership.event.location}")
   end
 
-  def construct_template_name(event)
+  def template_name
+    event = membership.event
     event.event_format + '-' + event.event_type + '-' + template
   end
 
+  def invitation_file
+    "#{membership.event.location}-invitation-#{membership.person_id}.pdf"
+  end
+
+  def text_template_file
+    "#{template_path}/#{template_name}.text.erb"
+  end
+
+  def relative_template_path
+    "invitation_mailer/#{membership.event.location}"
+  end
+
+  def text_template
+    "#{relative_template_path}/#{template_name}.text.erb"
+  end
+
   def set_template
-    event = membership.event
-    template_path = construct_template_path(event.location)
-    template_name = construct_template_name(event)
-
-    pdf_template_file = construct_pdf_template_name(template_path,
-                                                    template_name)
-    invitation_file = "#{event.location}-invitation-#{membership.person_id}.pdf"
-
-    text_template_file = "#{template_path}/#{template_name}.text.erb"
-    relative_template_path = "invitation_mailer/#{event.location}"
-    text_template = "#{relative_template_path}/#{template_name}.text.erb"
-
     {
            template_name: template_name,
            text_template: text_template,

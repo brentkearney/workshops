@@ -10,19 +10,30 @@ class InvitationEmailRecipients
     @invitation = invitation
   end
 
+  def test_env?
+    Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
+  end
+
+  def webmaster_email
+    GetSetting.site_email('webmaster_email')
+  end
+
+  def to_email
+    return webmaster_email if test_env?
+    '"' + @invitation.person.name + '" <' + @invitation.person.email + '>'
+  end
+
+  def from_email
+    GetSetting.rsvp_email(@invitation.event.location)
+  end
+
+  def bcc_email
+    email = from_email
+    email = email.match(/<(.+)>/)[1] if email.match?(/</)
+    email
+  end
+
   def compose
-    from_email = GetSetting.rsvp_email(@invitation.event.location)
-
-    person = @invitation.person
-    to_email = '"' + person.name + '" <' + person.email + '>'
-
-    bcc_email = GetSetting.rsvp_email(@invitation.event.location)
-    bcc_email = bcc_email.match(/<(.+)>/)[1] if bcc_email.match?(/</)
-
-    if Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
-      to_email = GetSetting.site_email('webmaster_email')
-    end
-
     {
       from: from_email,
       to: to_email,

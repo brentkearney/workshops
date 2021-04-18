@@ -9,7 +9,7 @@ require 'rails_helper'
 # EmailTemplateSelector should return the correct email template name
 # for each workshop type, membership attendance status, and membership role
 describe 'InvitationTemplateSelector' do
-  GetSetting.site_setting('event_formats').sample(2).each do |event_format|
+  GetSetting.site_setting('event_formats').each do |event_format|
     context "For #{event_format} events" do
       GetSetting.site_setting('event_types').sample(2).each do |event_type|
         context "Of type #{event_type}" do

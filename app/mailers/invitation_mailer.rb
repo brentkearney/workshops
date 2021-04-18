@@ -38,8 +38,8 @@ class InvitationMailer < ApplicationMailer
 
     # Create PDF attachment
     if File.exist?(templates[:pdf_template_file])
-      Rails.logger.debug "file exists: #{templates[:pdf_template_file]}"
-      generator = PdfTemplateGenerator.new(location, templates[:pdf_template_file])
+      generator = PdfTemplateGenerator.new(location,
+                                           templates[:pdf_template_file])
       attachments[templates[:invitation_file]] = generator.pdf_file
     end
 
