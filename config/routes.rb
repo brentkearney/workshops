@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   get '/welcome', to: redirect('/home')
   get '/apple-touch-icon-precomposed.png', to: redirect('/icons/apple-touch-icon-precomposed.png')
   get '/apple-touch-icon.png', to: redirect('/icons/apple-touch-icon.png')
+  get '/.well-known/assetlinks.json', to: 'errors#not_found'
 
   # Post-login home page
   get 'home' => 'home#index'
@@ -69,8 +70,10 @@ Rails.application.routes.draw do
   post 'settings/delete' => 'settings#delete'
 
   # Errors
-  match "/404", :to => "errors#not_found", via: :all
-  match "/500", :to => "errors#internal_server_error", via: :all
+  get '/not_found' => 'errors#not_found'
+  get '*unmatched_route', to: 'errors#not_found'
+  match "/404", to: "errors#not_found", via: :all
+  match "/500", to: "errors#internal_server_error", via: :all
 
   # Invitations & RSVP
   get '/invitations' => 'invitations#index'

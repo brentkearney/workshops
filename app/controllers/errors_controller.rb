@@ -1,11 +1,15 @@
 class ErrorsController < ApplicationController
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
+  rescue_from Exception, with: :exception_notification
+  rescue_from ActionController::RoutingError, with: :not_found
+
   def not_found
-    render(:status => 404)
+    render(status: :not_found)
   end
 
   def internal_server_error
     exception_notification
-    render(:status => 500)
+    render(status: :internal_server_error)
   end
 
   private
