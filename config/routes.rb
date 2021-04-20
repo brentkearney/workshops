@@ -69,12 +69,6 @@ Rails.application.routes.draw do
   resources :settings
   post 'settings/delete' => 'settings#delete'
 
-  # Errors
-  get '/not_found' => 'errors#not_found'
-  get '*unmatched_route', to: 'errors#not_found'
-  match "/404", to: "errors#not_found", via: :all
-  match "/500", to: "errors#internal_server_error", via: :all
-
   # Invitations & RSVP
   get '/invitations' => 'invitations#index'
   get '/invitations/new/(:id)' => 'invitations#new', as: :invitations_new
@@ -138,4 +132,10 @@ Rails.application.routes.draw do
   get '/lectures/today/:room' => 'lectures#today', as: :todays_lectures
   get '/lectures/current/:room' => 'lectures#current', as: :current_lecture
   get '/lectures/next/:room' => 'lectures#next', as: :next_lecture
+
+  # Errors
+  match "/404", to: "errors#not_found", via: :all
+  match "/500", to: "errors#internal_server_error", via: :all
+  get '/not_found' => 'errors#not_found'
+  get '*unmatched_route', to: 'errors#not_found'
 end

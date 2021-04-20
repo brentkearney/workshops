@@ -1,7 +1,6 @@
 class ErrorsController < ApplicationController
-  rescue_from ActiveRecord::RecordNotFound, with: :not_found
-  rescue_from Exception, with: :exception_notification
   rescue_from ActionController::RoutingError, with: :not_found
+  rescue_from Exception, with: :exception_notification
 
   def not_found
     render(status: :not_found)

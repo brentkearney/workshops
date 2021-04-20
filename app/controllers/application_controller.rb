@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   skip_before_action :verify_authenticity_token, if: :json_request?
 
   rescue_from ActionController::InvalidAuthenticityToken, with: :invalid_auth_token
-  rescue_from ActiveRecord::RecordNotFound, with: :not_found
+  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
   # Authorization module
   include Pundit
@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def not_found
+  def record_not_found
     redirect_to events_future_path, error: 'Record not found.'
   end
 
