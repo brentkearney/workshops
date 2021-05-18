@@ -229,7 +229,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.1.0)
-    mini_portile2 (2.5.0)
+    mini_portile2 (2.5.1)
     minitest (5.14.4)
     momentjs-rails (2.20.1)
       railties (>= 3.1)
@@ -243,7 +243,7 @@ GEM
     netrc (0.11.0)
     newrelic_rpm (6.15.0)
     nio4r (2.5.7)
-    nokogiri (1.11.3)
+    nokogiri (1.11.4)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
     octokit (4.20.0)
