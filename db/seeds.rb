@@ -20,8 +20,8 @@ def generate_events(start_year, end_year)
 
       event_data = {
        code: code,
-       name: Faker::Lorem.sentence(4),
-       short_name: Faker::Lorem.sentence(2),
+       name: Faker::Lorem.sentence(word_count: 4),
+       short_name: Faker::Lorem.sentence(word_count: 2),
        start_date: start_date,
        end_date: end_date,
        event_type: '5 Day Workshop',
@@ -32,7 +32,7 @@ def generate_events(start_year, end_year)
        max_participants: 50,
        max_virtual: 300,
        max_observers: 5,
-       booking_code: Faker::Alphanumeric.alphanumeric(6),
+       booking_code: Faker::Alphanumeric.alphanumeric(number: 6),
        time_zone: 'Mountain Time (US & Canada)'
       }
 

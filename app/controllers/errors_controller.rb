@@ -1,9 +1,20 @@
 class ErrorsController < ApplicationController
   rescue_from ActionController::RoutingError, with: :not_found
   rescue_from Exception, with: :exception_notification
+  rescue_from ActionView::MissingTemplate do |exception|
+    head :not_found
+  end
+  rescue_from ActionController::UnknownFormat, with: :not_found
+
+  def index; not_found; end
 
   def not_found
-    render(status: :not_found)
+    respond_to do |format|
+      format.html { render template: 'errors/not_found',
+                             layout: 'application', status: :not_found }
+      format.all { head :not_found, "content_type" => 'text/plain' }
+    end
+    true
   end
 
   def internal_server_error

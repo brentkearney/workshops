@@ -54,7 +54,7 @@ class EventPolicy
       all_fields
     when 'staff'
       all_fields - %w[code name start_date end_date location event_type
-                       time_zone template]
+                      time_zone template]
     when 'member'
       if current_user.is_organizer?(event)
         %w[short_name subjects description press_release]
@@ -99,8 +99,6 @@ class EventPolicy
   end
 
   def send_invitations?
-    # Temporary until email templates are ready at other locations
-    return false if @event.location == 'UBCO'
     return false if current_user.nil?
     return false if Date.current > event.end_date
     organizers_and_staff

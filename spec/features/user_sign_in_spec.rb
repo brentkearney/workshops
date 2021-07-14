@@ -8,7 +8,7 @@ require 'rails_helper'
 
 describe 'SignIn', type: :feature do
   before do
-    @password = Faker::Internet.password(12)
+    @password = Faker::Internet.password(min_length: 12)
     @user = create(:user, password: @password, password_confirmation: @password)
     @person = @user.person
     @membership = create(:membership, person: @person, attendance: 'Confirmed')

@@ -26,7 +26,7 @@ FactoryBot.define do
     f.country { Faker::Address.country }
     f.legacy_id
     f.biography { Faker::Lorem.paragraph }
-    f.research_areas { Faker::Lorem.words(4).join(', ') }
+    f.research_areas { Faker::Lorem.words(number: 4).join(', ') }
     f.grants { [] }
     f.updated_by { 'FactoryBot' }
   end

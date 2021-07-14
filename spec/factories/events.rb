@@ -24,8 +24,8 @@ FactoryBot.define do
 
   factory :event do |f|
     f.code
-    f.name { Faker::Lorem.sentence(4) }
-    f.short_name { Faker::Lorem.sentence(1) }
+    f.name { Faker::Lorem.sentence(word_count: 4) }
+    f.short_name { Faker::Lorem.sentence(word_count: 1) }
     f.booking_code { 'Booking' }
     f.door_code { 1234 }
     f.start_date
@@ -37,7 +37,7 @@ FactoryBot.define do
     f.max_observers { 3 }
     f.location { 'EO' }
     f.time_zone { 'Mountain Time (US & Canada)' }
-    f.description { Faker::Lorem.sentence(6) }
+    f.description { Faker::Lorem.sentence(word_count: 6) }
     f.updated_by { 'FactoryBot' }
     f.template { false }
 

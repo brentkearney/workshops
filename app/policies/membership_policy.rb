@@ -130,6 +130,10 @@ class MembershipPolicy
     organizer_and_staff
   end
 
+  def destroy?
+    delete_membership?
+  end
+
   def show_email_address?
     return false if @current_user.nil?
     (organizer_and_staff && @membership.share_email) || is_member_and_shared

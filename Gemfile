@@ -53,7 +53,9 @@ end
 group :test do
   gem 'capybara'
   gem 'selenium-webdriver'
-  gem 'faker', '~> 1.9.6'
+  gem 'faker'
+  gem 'rubocop-faker'
+  gem 'rubocop'
   gem 'database_cleaner'
   gem 'rails-controller-testing'
 end

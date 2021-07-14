@@ -11,7 +11,7 @@ describe 'Visitor Signup', type: :feature do
     @membership = create(:membership)
     @person = @membership.person
     @event = @membership.event
-    @password = Faker::Internet.password(12)
+    @password = Faker::Internet.password(min_length: 12)
 
     visit new_user_registration_path
   end

@@ -69,14 +69,14 @@ RSpec.describe "Model validations: Event ", type: :model do
 
   it 'is invalid if the name is longer than 68 characters and it has no
     short name' do
-    e = build(:event, name: Faker::Lorem.paragraph(5), short_name: nil)
+    e = build(:event, name: Faker::Lorem.paragraph(sentence_count: 5), short_name: nil)
     expect(e).not_to be_valid
     expect(e.errors).to include(:short_name)
   end
 
   it 'is invalid if the short name is also longer than 68 characters' do
-    e = build(:event, name: Faker::Lorem.paragraph(5),
-                      short_name: Faker::Lorem.paragraph(5))
+    e = build(:event, name: Faker::Lorem.paragraph(sentence_count: 5),
+                      short_name: Faker::Lorem.paragraph(sentence_count: 5))
     expect(e).not_to be_valid
     expect(e.errors).to include(:short_name)
   end

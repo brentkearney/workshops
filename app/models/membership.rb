@@ -104,7 +104,7 @@ class Membership < ApplicationRecord
     return if attendance == 'Declined' || attendance == 'Not Yet Invited'
     return if event_id.nil?
     return if role == 'Observer'
-    return check_max_virtual if event.online?
+    return check_max_virtual if event.online? || role.match?('Virtual')
 
     max = event.max_participants
     invited = event.num_invited_participants
