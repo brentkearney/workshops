@@ -2,7 +2,8 @@ class ErrorsController < ApplicationController
   rescue_from ActionController::RoutingError, with: :not_found
   rescue_from Exception, with: :exception_notification
   rescue_from ActionView::MissingTemplate do |exception|
-    head :not_found
+    exception_notification(exception)
+    not_found
   end
   rescue_from ActionController::UnknownFormat, with: :not_found
 
@@ -24,8 +25,7 @@ class ErrorsController < ApplicationController
 
   private
 
-  def exception_notification
-    exception = $!
+  def exception_notification(exception = $!)
     unless exception.nil?
       logger.debug "\n\n*************************** ErrorsController.exception_notification: ***************************\n\n"
       logger.debug "Exception object: #{exception.inspect}"
