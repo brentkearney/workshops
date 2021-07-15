@@ -22,6 +22,13 @@ class GetSetting
     settings_hash[setting]
   end
 
+  def self.rsvp(location, setting)
+    return '' if location.blank?
+    settings_hash = Setting.RSVP[location]
+    return false if settings_hash[setting].blank?
+    settings_hash[setting]
+  end
+
   def self.no_setting(setting_string)
     parts = setting_string.scan(/\w+-?\w*/) # include hyphenated words
     settings_hash = Setting.send(parts[0]) # i.e. Locations
@@ -73,51 +80,6 @@ class GetSetting
     return 300 if location.blank? ||
                   no_setting("Locations['#{location}']['max_virtual']")
     Setting.Locations[location]['max_virtual']
-  end
-
-  def self.rsvp_dates_intro(location)
-    return false if no_setting("RSVP['#{location}']['arrival_departure_intro']")
-    Setting.RSVP[location]['arrival_departure_intro']
-  end
-
-  def self.rsvp_accommodation_intro(location)
-    return false if no_setting("RSVP['#{location}']['accommodation_intro']")
-    Setting.RSVP[location]['accommodation_intro']
-  end
-
-  def self.rsvp_guests_intro(location)
-    return false if no_setting("RSVP['#{location}']['guests_intro']")
-    Setting.RSVP[location]['guests_intro']
-  end
-
-  def self.rsvp_has_guest(location)
-    return false if no_setting("RSVP['#{location}']['has_guest']")
-    Setting.RSVP[location]['has_guest']
-  end
-
-  def self.rsvp_guest_disclaimer(location)
-    return false if no_setting("RSVP['#{location}']['guest_disclaimer']")
-    Setting.RSVP[location]['guest_disclaimer']
-  end
-
-  def self.rsvp_special_intro(location)
-    return false if no_setting("RSVP['#{location}']['special_intro']")
-    Setting.RSVP[location]['special_intro']
-  end
-
-  def self.rsvp_personal_info_intro(location)
-    return false if no_setting("RSVP['#{location}']['personal_info_intro']")
-    Setting.RSVP[location]['personal_info_intro']
-  end
-
-  def self.rsvp_biography_intro(location)
-    return false if no_setting("RSVP['#{location}']['biography_intro']")
-    Setting.RSVP[location]['biography_intro']
-  end
-
-  def self.rsvp_privacy_notice(location)
-    return false if no_setting("RSVP['#{location}']['privacy_notice']")
-    Setting.RSVP[location]['privacy_notice']
   end
 
   def self.code_pattern

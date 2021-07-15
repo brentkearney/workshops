@@ -45,7 +45,6 @@ module MembershipsHelper
     disabled_options << 'Participant' if @event.online?
     disabled_options << 'Virtual Participant' if @event.physical?
 
-
     f.select :role, Membership::ROLES,
              { selected: default, disabled: disabled_options },
              class: 'form-control'
