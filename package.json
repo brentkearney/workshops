@@ -12,9 +12,9 @@
     "serialize-javascript": "^3.1.0",
     "ssri": "^8.0.1",
     "stimulus": "^1.1.1",
+    "trim-newlines": "3.0.1",
     "vali-admin": "^3.0.0",
-    "websocket-extensions": "^0.1.4",
-    "trim-newlines@^3.0.1"
+    "websocket-extensions": "^0.1.4"
   },
   "devDependencies": {
     "webpack": "^4.43.0",
