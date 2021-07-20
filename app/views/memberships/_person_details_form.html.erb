@@ -144,7 +144,7 @@
     <div class="form-group">
       <div class="control-label">
         <%= person.label :biography, "Biographical Summary: " %>
-        <p class="description"><%= GetSetting.rsvp_biography_intro(@event.location) %></p>
+        <p class="description"><%= GetSetting.rsvp(@event.location, 'biography_intro') %></p>
       </div>
       <%= person.text_area :biography, class: 'form-control' %>
     </div>

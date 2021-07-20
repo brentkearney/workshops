@@ -104,16 +104,17 @@ class Membership < ApplicationRecord
     return if attendance == 'Declined' || attendance == 'Not Yet Invited'
     return if event_id.nil?
     return if role == 'Observer'
+    return check_max_confirmed if attendance == 'Confirmed'
     return check_max_virtual if event.online? || role.match?('Virtual')
 
     max = event.max_participants
     invited = event.num_invited_participants
     invited -= event.num_invited_virtual if event.hybrid?
-    field_name ="attendance"
+    field_name = 'attendance'
 
     # if the role changes from Virtual to Physical, ensure within max limit
     if role_changed?
-      field_name = "role"
+      field_name = 'role'
       invited += 1 if role == 'Participant'
     end
 
@@ -122,6 +123,18 @@ class Membership < ApplicationRecord
                 (#{max}) for #{event.code} has been reached.".squish)
     end
     check_max_virtual if event.hybrid?
+  end
+
+  def check_max_confirmed
+    event_full = false
+    if role.include?('Virtual') || event.event_format == 'Online'
+      event_full = event.num_confirmed_virtual >= event.max_virtual
+    else
+      event_full = event.num_confirmed_in_person >= event.max_participants
+    end
+
+    errors.add(:role, "- the maximum number of confirmed #{role.pluralize} has
+               been reached.".squish) if event_full
   end
 
   def check_max_virtual

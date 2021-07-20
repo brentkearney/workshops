@@ -641,7 +641,8 @@ describe 'Membership#edit', type: :feature do
 
       expect(Membership.find(@participant.id).role).to eq('Participant')
       expect(page.body).to have_css('div.alert', text:
-        'maximum number of invited Virtual Participants')
+        'Role - the maximum number of confirmed Virtual Participants
+         has been reached.'.squish)
     end
 
     it 'does not allow changing Participants to Organizer role' do

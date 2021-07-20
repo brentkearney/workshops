@@ -15,7 +15,7 @@
         <h2 class="rsvp-section">Arrival & Departure Dates<br>
           <small>Event dates: <%= @event.dates(:long) %></small></h2>
           <p class="description">
-            <%= rsvp_setting('rsvp_dates_intro', @event.location) %>
+            <%= GetSetting.rsvp(@event.location, 'dates_intro') %>
           </p>
       </div>
       <div class="row justify-content-center align-items-center">
@@ -36,7 +36,7 @@
       <div class="p-2">
         <h2 class="rsvp-section midpage">Accommodation</h2>
         <p class="description">
-          <%= rsvp_setting('rsvp_accommodation_intro', @event.location) %>
+          <%= GetSetting.rsvp(@event.location, 'accommodation_intro') %>
         </p>
       </div>
       <div class="form-group" id="accommodation_buttons">
@@ -57,7 +57,7 @@
       <div class="p-2">
         <h2 class="rsvp-section midpage">Guests</h2>
         <p class="description">
-          <%= rsvp_setting('rsvp_guests_intro', @event.location) %>
+          <%= GetSetting.rsvp(@event.location, 'guests_intro') %>
         </p>
       </div>
       <div class="form-inline checkbox-field">
@@ -79,7 +79,7 @@
       <div class="p-2">
         <h2 class="rsvp-section midpage">Special Considerations</h2>
         <p class="description">
-          <%= rsvp_setting('rsvp_special_intro', @event.location) %>
+          <%= GetSetting.rsvp(@event.location, 'special_intro') %>
         </p>
       </div>
       <div class="p-2 form-group">

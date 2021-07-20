@@ -10,8 +10,8 @@ RSpec.describe MembershipsController, type: :controller do
 
   context 'As an unauthenticated user' do
     before do
-      @event = create(:event, future: true)
-      @membership = create(:membership, event: @event, role: 'Confirmed')
+      @event = create(:event, future: true, max_participants: 40)
+      @membership = create(:membership, event: @event, attendance: 'Confirmed')
     end
 
     describe '#index' do
@@ -178,7 +178,8 @@ RSpec.describe MembershipsController, type: :controller do
     context 'with a valid event id' do
       before do
         @event = create(:event, future: true)
-        @membership = create(:membership, event: @event, role: 'Confirmed')
+        @membership = create(:membership, event: @event,
+                             attendance: 'Confirmed')
       end
 
       describe '#index' do
@@ -613,8 +614,18 @@ RSpec.describe MembershipsController, type: :controller do
             create(:membership, event: @event, role: 'Virtual Participant')
             @membership.update_columns(role: 'Participant')
 
+            puts "\n\nmax_virtual for event: #{@event.max_virtual}"
+            puts "membership attendance status: #{@membership.attendance}"
+            puts "membership role: #{@membership.role}"
+            puts "event id: #{@event.id}"
+            puts "event format: #{@event.event_format}"
+            puts "number of virtual participants: #{@event.num_confirmed_virtual}\n\n"
+
             @params['membership']['role'] = 'Virtual Participant'
             patch :update, params: @params
+
+            puts "\n\n new number of virtual participants: #{@event.num_confirmed_virtual}\n\n"
+
 
             updated_member = Membership.find(@membership.id)
             expect(updated_member.role).to eq('Participant')

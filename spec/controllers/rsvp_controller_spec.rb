@@ -302,8 +302,12 @@ RSpec.describe RsvpController, type: :controller do
     before do
       @membership.attendance = 'Invited'
       @membership.person.gender = nil
-      @membership.event.event_format = 'Online'
       @membership.save
+
+      event = @membership.event
+      event.event_format = 'Online'
+      event.max_virtual = 1000
+      event.save
     end
 
     def online_params
@@ -311,7 +315,7 @@ RSpec.describe RsvpController, type: :controller do
         'person' => { salutation: 'Mr.', firstname: 'Bob', lastname: 'Smith',
           affiliation: 'Foo', department: '', title: '', gender: 'O',
           academic_status: 'Professor', phd_year: 1970, email: 'foo@bar.com',
-          url: '', country: 'Dandylion', biography: 'Yes',
+          url: '', country: 'Spain', biography: 'Yes',
           research_areas: 'Ruby, Rails, Rspec'}
       }
      end

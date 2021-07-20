@@ -200,7 +200,7 @@ RSpec.describe 'Model validations: Membership', type: :model do
   end
 
   it 'is invalid if the number of invited + confirmed participants is greater
-    than max_participants' do
+    than max_participants, when a new invitation is added' do
     @event = Event.find(@event.id)
     @event.event_format = 'Physical'
     @event.max_participants = @event.num_participants + 1
@@ -211,6 +211,20 @@ RSpec.describe 'Model validations: Membership', type: :model do
                                       attendance: 'Invited',
                                             role: 'Participant')
     expect(third_membership).not_to be_valid
+  end
+
+  it 'is valid if the max_particpants is equal to the number of invited
+      physical participants and one of them confirms' do
+    @event = Event.find(@event.id)
+    @event.event_format = 'Physical'
+    last_member = create(:membership, event: @event, role: 'Participant',
+                         attendance: 'Invited')
+    @event.max_participants = @event.num_invited_in_person
+    @event.save
+
+    last_member.attendance = 'Confirmed'
+    expect(last_member).to be_valid
+    expect(last_member.save).to be_truthy
   end
 
   it 'is valid if the number of invited + confirmed participants is
@@ -227,6 +241,20 @@ RSpec.describe 'Model validations: Membership', type: :model do
                                       attendance: 'Invited',
                                             role: 'Participant')
     expect(third_membership).to be_valid
+  end
+
+  it 'is valid if the max_virtual_particpants is equal to the number of invited
+      virtual participants and one of them confirms' do
+    @event = Event.find(@event.id)
+    @event.event_format = 'Hybrid'
+    last_member = create(:membership, event: @event, attendance: 'Invited',
+                         role: 'Virtual Participant')
+    @event.max_participants = @event.num_invited_virtual
+    @event.save
+
+    last_member.attendance = 'Confirmed'
+    expect(last_member).to be_valid
+    expect(last_member.save).to be_truthy
   end
 
   it 'does not count Observers as part of the confirmed number of

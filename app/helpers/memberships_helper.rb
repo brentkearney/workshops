@@ -361,10 +361,4 @@ module MembershipsHelper
     return 'No' unless member.has_guest
     member.num_guests
   end
-
-  def rsvp_setting(setting, location = @event.location)
-    intro = GetSetting.send(setting, location)
-    return '' if intro.blank?
-    intro.html_safe
-  end
 end
