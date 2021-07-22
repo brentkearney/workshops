@@ -12,9 +12,6 @@ class InvitationTemplateSelector
 
   def initialize(membership)
     @membership = membership
-    Rails.logger.debug "\n\n***********************************************\n\n"
-    Rails.logger.debug "InvitationTemplateSelector received member: #{membership.inspect}"
-    Rails.logger.debug "\n\n***********************************************\n\n"
   end
 
   def invitation_file

@@ -57,7 +57,6 @@ class EmailBounce
         }
       }
     )
-    Rails.logger.debug "\n\nParams is now: #{params.inspect}\n\n"
   end
 
   def email_from

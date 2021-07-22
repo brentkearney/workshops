@@ -36,10 +36,6 @@ class InvitationMailer < ApplicationMailer
     templates = invitation.templates
     return if templates.blank?
 
-    Rails.logger.debug "\n\n***********************************************\n\n"
-    Rails.logger.debug "InvitationMailer templates: #{templates.inspect}"
-    Rails.logger.debug "\n\n***********************************************\n\n"
-
     # Create PDF attachment
     if File.exist?(templates['pdf_template_file'])
       generator = PdfTemplateGenerator.new(location,
