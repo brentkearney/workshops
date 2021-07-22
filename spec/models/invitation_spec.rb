@@ -83,13 +83,15 @@ RSpec.describe 'Model validations: Invitation', type: :model do
       invitation = create(:invitation, membership: membership)
 
       invitation.send_invite
-      expect(invitation.template).to eq('Not Yet Invited')
+      template = invitation.templates['template_name']
+      expect(template).to eq('Hybrid-5 Day Workshop-Not Yet Invited')
     end
   end
 
   context '.send_reminder' do
     it 'updates the invite_reminders field with a datetime and name' do
-      invitation = create(:invitation)
+      membership = create(:membership, attendance: 'Not Yet Invited')
+      invitation = create(:invitation, membership: membership)
       invitation.send_invite
 
       expect(invitation.membership.invite_reminders).to be_empty
@@ -108,7 +110,8 @@ RSpec.describe 'Model validations: Invitation', type: :model do
       invitation = create(:invitation, membership: membership)
 
       invitation.send_reminder
-      expect(invitation.template).to eq('Invited')
+      template = invitation.templates['template_name']
+      expect(template).to eq('Hybrid-5 Day Workshop-Invited')
     end
   end
 end

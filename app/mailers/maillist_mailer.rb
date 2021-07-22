@@ -80,15 +80,30 @@ class MaillistMailer < ApplicationMailer
     @html_body = email_parts[:html_body]
     inline_attachments = email_parts[:inline_attachments]
 
+    unless message[:attachments].blank?
+      message[:attachments].each do |ad|
+        file = ad.original_filename
+        unless inline_attachments[file].nil?
+          attachments.inline[file] = {
+            mime_type: ad.content_type,
+            content: File.read(ad.tempfile)
+          }
+          attachments.inline[file].header['content-id'] = inline_attachments[file]
+        else
+          attachments[file] = {
+            mime_type: ad.content_type,
+            content: File.read(ad.tempfile)
+          }
+        end
+      end
+    end
+
     to = recipients[:to]
     cc = recipients[:cc]
     if to.blank?
       to = cc
       cc = ''
     end
-
-    # Use local mail server for these
-    self.delivery_method = :smtp
 
     mail(to: to, cc: cc, bcc: bcc, from: from, reply_to: reply_to,
       subject: subject) do |format|

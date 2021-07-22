@@ -9,7 +9,6 @@
 class Invitation < ApplicationRecord
   belongs_to :membership
   attr_accessor :organizer_message
-  attr_reader :template
 
   validates :membership, :invited_by, presence: true
   validates :code, presence: true, length: { is: 50 }
@@ -22,13 +21,31 @@ class Invitation < ApplicationRecord
   end
 
   def send_invite
-    @template = membership.attendance
+    return unless set_invitation_template
     update_and_save
     EmailInvitationJob.perform_later(id)
   end
 
+  def set_invitation_template
+    self.templates = InvitationTemplateSelector.new(membership).set_templates
+    return true if File.exist?(self.templates['text_template_file'])
+
+    subject = "[#{event.code}] invitation template missing!"
+    error_msg = { problem: 'Participant invitation not sent.',
+                  cause: 'Email template missing.',
+                  template: self.templates['text_template_file'],
+                  recipient: "#{person.name} <#{person.email}>",
+                  attendance: membership.attendance,
+                  person: person.inspect,
+                  membership: membership.inspect,
+                  invitation: self.inspect }
+    StaffMailer.notify_program_coord(event, subject, error_msg).deliver_now
+    self.templates = nil
+  end
+
   def send_reminder
-    @template = membership.attendance
+    return unless set_invitation_template
+    save # save new template
     update_reminder
     EmailInvitationJob.perform_later(id)
   end

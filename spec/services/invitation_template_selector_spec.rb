@@ -16,16 +16,18 @@ describe 'InvitationTemplateSelector' do
           let(:event) { build(:event, event_type:   event_type,
                                       event_format: event_format) }
 
-          Membership::ATTENDANCE.sample(2).each do |attendance|
+          attendances = Membership::ATTENDANCE.dup - ['Confirmed']
+          attendances.sample(2).each do |attendance|
             context "For membership attendance '#{attendance}'" do
-              let(:membership) { build(:membership, event: event) }
+              let(:membership) { build(:membership, event: event,
+                                               attendance: attendance) }
 
               it "template: #{event_format}-#{event_type}-#{attendance}" do
 
                 template_name = "#{event_format}-#{event_type}-#{attendance}"
 
-                templates = InvitationTemplateSelector.new(membership,
-                              attendance).set_template
+                templates = InvitationTemplateSelector.new(membership)
+                                                      .set_templates
 
                 expect(templates[:template_name]).to eq(template_name)
               end
@@ -35,8 +37,8 @@ describe 'InvitationTemplateSelector' do
                   membership.role = 'Virtual Particiant'
                   template_name = "Hybrid-#{event_type}-#{attendance}-Virtual"
 
-                  templates = InvitationTemplateSelector.new(membership,
-                                attendance).set_template
+                  templates = InvitationTemplateSelector.new(membership)
+                                                        .set_templates
 
                   expect(templates[:template_name]).to eq(template_name)
                 end

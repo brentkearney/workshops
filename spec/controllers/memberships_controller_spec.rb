@@ -614,18 +614,8 @@ RSpec.describe MembershipsController, type: :controller do
             create(:membership, event: @event, role: 'Virtual Participant')
             @membership.update_columns(role: 'Participant')
 
-            puts "\n\nmax_virtual for event: #{@event.max_virtual}"
-            puts "membership attendance status: #{@membership.attendance}"
-            puts "membership role: #{@membership.role}"
-            puts "event id: #{@event.id}"
-            puts "event format: #{@event.event_format}"
-            puts "number of virtual participants: #{@event.num_confirmed_virtual}\n\n"
-
             @params['membership']['role'] = 'Virtual Participant'
             patch :update, params: @params
-
-            puts "\n\n new number of virtual participants: #{@event.num_confirmed_virtual}\n\n"
-
 
             updated_member = Membership.find(@membership.id)
             expect(updated_member.role).to eq('Participant')

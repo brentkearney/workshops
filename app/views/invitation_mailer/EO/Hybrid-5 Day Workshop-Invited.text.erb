@@ -1,0 +1,18 @@
+Dear <%= @person.dear_name %>,
+
+On <%= @invitation_date %>, you were sent an invitation to attend the following workshop at <%= @event.location %>:
+
+<%= @event.name %> (<%= @event.code %>), <%= @event_start %> to <%= @event_end %>.
+
+Organizers: <%= @organizers %>
+Event URL: <%= @event.url %>
+
+We have not yet received a reply from you. Please follow this link to indicate your confirmation or decline of our invitation, or reply to this email, no later than <%= @rsvp_deadline %>.
+
+<%= @rsvp_url %>
+
+We hope you will attend.
+
+Best regards,
+
+Program Coordinator

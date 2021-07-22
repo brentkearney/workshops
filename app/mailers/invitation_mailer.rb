@@ -33,14 +33,18 @@ class InvitationMailer < ApplicationMailer
     subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
 
     recipients = InvitationEmailRecipients.new(invitation).compose
-    templates = InvitationTemplateSelector.new(invitation.membership,
-                                               invitation.template).set_template
+    templates = invitation.templates
+    return if templates.blank?
+
+    Rails.logger.debug "\n\n***********************************************\n\n"
+    Rails.logger.debug "InvitationMailer templates: #{templates.inspect}"
+    Rails.logger.debug "\n\n***********************************************\n\n"
 
     # Create PDF attachment
-    if File.exist?(templates[:pdf_template_file])
+    if File.exist?(templates['pdf_template_file'])
       generator = PdfTemplateGenerator.new(location,
-                                           templates[:pdf_template_file])
-      attachments[templates[:invitation_file]] = generator.pdf_file
+                                           templates['pdf_template_file'])
+      attachments[templates['invitation_file']] = generator.pdf_file
     end
 
     headers['X-BIRS-Sender'] = "#{invitation.invited_by}"
@@ -48,25 +52,17 @@ class InvitationMailer < ApplicationMailer
     headers['X-Priority'] = 1
     headers['X-MSMail-Priority'] = 'High'
 
-    if File.exist?(templates[:text_template_file])
-      mail(to: recipients[:to],
-           bcc: recipients[:bcc],
-           from: recipients[:from],
-           subject: subject,
-           template_path: templates[:template_path],
-           template_name: templates[:template_name]) do |format|
-        format.text { render templates[:text_template] }
-      end
-    else
-      subject = "[#{@event.code}] invitation template missing!"
-      error_msg = { problem: 'Participant invitation not sent.',
-                    cause: 'Email template missing.',
-                    template: templates[:text_template_file],
-                    recipients: recipients,
-                    person: invitation.person,
-                    membership: invitation.membership,
-                    invitation: invitation }
-      StaffMailer.notify_program_coord(@event, subject, error_msg).deliver_now
+    message = {
+      to: recipients[:to],
+      bcc: recipients[:bcc],
+      from: recipients[:from],
+      subject: subject,
+      template_path: templates['template_path'],
+      template_name: templates['template_name']
+    }
+
+    mail(message) do |format|
+      format.text { render templates['text_template'] }
     end
   end
 end

@@ -245,14 +245,14 @@ describe 'Invite Members', type: :feature do
       selected = []
       i = 1
       @event.memberships.where(role: 'Participant')
-                        .where(attendance: 'Invited').each do |m|
+                        .where(attendance: 'Invited').each do |member|
 
-        expect(m.invite_reminders).to be_empty
+        expect(member.invite_reminders).to be_empty
         if i.odd?
           # an Invitation must already exist for a reminder to be sent
-          Invitation.new(membership: m, invited_by: 'Rspec').send_invite
-          selected << m.id
-          html_id = 'invite_members_form_' + m.id.to_s
+          Invitation.new(membership: member, invited_by: 'Rspec').send_invite
+          selected << member.id
+          html_id = 'invite_members_form_' + member.id.to_s
           find(:css, "input##{html_id}").set(true)
         end
         i+=1

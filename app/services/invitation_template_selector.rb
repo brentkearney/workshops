@@ -6,13 +6,15 @@
 # See the COPYRIGHT file for details and exceptions.
 
 # Returns a hash of the email templates and paths appropriate
-# for a given membership and template (attendance before update).
+# for a given membership and template (attendance *before update*).
 class InvitationTemplateSelector
-  attr_reader :membership, :template
+  attr_reader :membership
 
-  def initialize(membership, template)
+  def initialize(membership)
     @membership = membership
-    @template = template
+    Rails.logger.debug "\n\n***********************************************\n\n"
+    Rails.logger.debug "InvitationTemplateSelector received member: #{membership.inspect}"
+    Rails.logger.debug "\n\n***********************************************\n\n"
   end
 
   def invitation_file
@@ -21,7 +23,7 @@ class InvitationTemplateSelector
 
   def normal_template
     event = membership.event
-    event.event_format + '-' + event.event_type + '-' + template
+    event.event_format + '-' + event.event_type + '-' + membership.attendance
   end
 
   def pdf_template_file
@@ -59,7 +61,8 @@ class InvitationTemplateSelector
     normal_template << '-Virtual'
   end
 
-  def set_template
+  def set_templates
+    return { text_template_file: 'n/a' } if membership.attendance == 'Confirmed'
     {
       template_name:      template_name,
       text_template:      text_template,

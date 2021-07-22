@@ -23,7 +23,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     before do
       membership = create(:membership, attendance: 'Not Yet Invited')
       @invitation = create(:invitation, membership: membership)
-      allow(@invitation).to receive(:template).and_return(membership.attendance)
+      @invitation.set_invitation_template
     end
 
     before :each do
@@ -84,14 +84,13 @@ RSpec.describe InvitationMailer, type: :mailer do
       membership = create(:membership, event: event,
                                   attendance: 'Not Yet Invited')
       invitation = create(:invitation, membership: membership)
-      allow(invitation).to receive(:template).and_return(membership.attendance)
+      invitation.set_invitation_template
 
       InvitationMailer.invite(invitation).deliver_now
       delivery = ActionMailer::Base.deliveries.last
 
       expect(delivery.attachments).not_to be_empty
-      template = InvitationTemplateSelector.new(membership,
-                                           membership.attendance).set_template
+      template = InvitationTemplateSelector.new(membership).set_templates
       expect(delivery.attachments[0].filename).to eq(template[:invitation_file])
     end
   end
@@ -100,7 +99,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     before do
       membership = create(:membership, attendance: 'Not Yet Invited')
       @invitation = create(:invitation, membership: membership)
-      allow(@invitation).to receive(:template).and_return(membership.attendance)
+      @invitation.set_invitation_template
       @event = @invitation.membership.event
       @today = DateTime.current.in_time_zone(@event.time_zone)
     end
