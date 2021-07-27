@@ -137,5 +137,7 @@ Rails.application.routes.draw do
   match "/404", to: "errors#not_found", via: :all
   match "/500", to: "errors#internal_server_error", via: :all
   get '/not_found' => 'errors#not_found'
+  get '/wp-login.php' => 'errors#not_found'
   get '*unmatched_route', to: 'errors#not_found'
+  match '*path' => redirect('/'), via: :get
 end

@@ -155,8 +155,6 @@ class EmailProcessor
     end
 
     person = Person.find_by_email(from_email)
-    # non_member_bounce(event, to_email) and return false if person.blank?
-
     return true if organizers_and_staff(event).include?(person)
 
     unless event.confirmed.include?(person)
