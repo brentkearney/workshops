@@ -5,7 +5,10 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RegistrationsController < Devise::RegistrationsController
-  include ActiveSupport::Rescuable
+  rescue_from ActionController::ParameterMissing do
+    redirect_to register_path, error: "Invalid form submission."
+  end
+
   layout "devise"
 
   def create
@@ -38,12 +41,15 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def not_invited_redirect
-    redirect_to register_path, error: 'We have no records of pending event invitations for you. Please contact the event organizer.'
+    redirect_to register_path, error: 'We have no records of pending event
+      invitations for you. Please contact the event organizer.'.squish
     return false
   end
 
   def no_person_redirect
-    redirect_to register_path, error: 'We have no record of that email address. Please check our correspondence with you, to see what email address is in the To: field.'
+    redirect_to register_path, error: 'We have no record of that email address.
+      Please check our correspondence with you, to see what email address is in
+      the To: field.'.squish
     return false
   end
 
@@ -53,14 +59,13 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def sign_up_params
-    params.require(:user).permit(:person_id, :email, :password, :password_confirmation)
-    rescue_from ActionController::ParameterMissing do |e|
-      redirect_to register_path, error: "There was a problem with your form submission."
-    end
+    params.require(:user).permit(:person_id, :email, :password,
+                                 :password_confirmation)
   end
 
   def account_update_params
-    params.require(:user).permit(:person_id, :password, :password_confirmation, :current_password)
+    params.require(:user).permit(:person_id, :password, :password_confirmation,
+                                 :current_password)
   end
 
   def valid_email?
