@@ -327,6 +327,10 @@ module MembershipsHelper
       line.prepend('<i class="fa fa-star" aria-hidden="true"></i> '
           .html_safe)
     when /Organizer/
+      if member.role == 'Virtual Organizer'
+        line.prepend('<i class="fa fa-video-camera" aria-hidden="true"></i> '
+            .html_safe)
+      end
       line.prepend('<i class="fa fa-star-half-o" aria-hidden="true"></i> '
           .html_safe)
     when /Virtual/

@@ -71,6 +71,7 @@ node_modules/
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+node_modules/.yarn-integrity
 bin/webpack
 bin/webpack-dev-server
 mandrill_test.rb
