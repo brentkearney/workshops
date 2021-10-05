@@ -39,6 +39,8 @@ class RsvpDeadline
   end
 
   def calculate_deadline
+    return @end_date unless @event.physical?
+
     rsvp_deadline = (@sent_on + 4.weeks)
     today = DateTime.current
     if (@start_date - @sent_on).to_i < 10.days.to_i

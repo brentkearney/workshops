@@ -286,11 +286,11 @@ describe 'Invite Members', type: :feature do
 
         click_button('not-yet-invited-submit')
 
-        expect(current_path).to eq(invite_event_memberships_path(@event))
         updated_member = Membership.find(participant.id)
         expect(updated_member.attendance).to eq('Not Yet Invited')
         expect(page).to have_text("You may not invite more than
           #{@event.max_participants} participants.".squish)
+        expect(current_path).to eq(invite_event_memberships_path(@event))
       end
     end
 
@@ -380,6 +380,28 @@ describe 'Invite Members', type: :feature do
         expect(updated_member.attendance).to eq('Not Yet Invited')
         expect(page).to have_text("You may not invite more than
           #{@event.max_virtual} virtual participants.".squish)
+      end
+
+      it 'invitation fails if max_virtual is exceeded by virtual organizers' do
+        num_participants = @event.num_invited_virtual
+        @event.max_virtual = num_participants
+        @event.save!
+
+        organizer = create(:membership, event: @event,
+                             role: 'Virtual Organizer',
+                             attendance: 'Not Yet Invited')
+
+        visit invite_event_memberships_path(@event)
+        html_id = 'invite_members_form_' + organizer.id.to_s
+        find(:css, "input##{html_id}").set(true)
+
+        click_button('not-yet-invited-submit')
+
+        updated_member = Membership.find(organizer.id)
+        expect(updated_member.attendance).to eq('Not Yet Invited')
+        expect(page).to have_text("You may not invite more than
+          #{@event.max_virtual} virtual participants.".squish)
+        expect(current_path).to eq(invite_event_memberships_path(@event))
       end
     end
 

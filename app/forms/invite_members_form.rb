@@ -30,20 +30,22 @@ class InviteMembersForm < ComplexForms
     check_for_errors
   end
 
+  def send_invite(membership)
+    Invitation.new(membership: membership,
+                   invited_by: @current_user.person.name).send_invite
+    @invited << membership.person.name
+  end
+
   def send_invitations
     pause_membership_syncing unless @memberships.empty?
     @memberships.each do |membership|
       membership.person.member_import = true # skip validations on save
       if membership.attendance == 'Not Yet Invited'
-        Invitation.new(membership: membership,
-                       invited_by: @current_user.person.name).send_invite
-        @invited << membership.person.name
+        send_invite(membership)
       else
         invite = Invitation.where(membership: membership).last
         if invite.blank?
-          Invitation.new(membership: membership,
-                         invited_by: @current_user.person.name).send_invite
-          @invited << membership.person.name
+          send_invite(membership)
         else
           invite.invited_by = @current_user.person.name
           invite.send_reminder
@@ -75,7 +77,10 @@ class InviteMembersForm < ComplexForms
   end
 
   def check_for_errors
-    @error_msg = 'No members selected to invite.' and return if @memberships.empty?
+    if @memberships.empty?
+      @error_msg = 'No members selected to invite.'
+      return
+    end
     @error_msg = max_participants_exceeded?
   end
 
