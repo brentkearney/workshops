@@ -135,13 +135,13 @@ describe 'Membership#edit', type: :feature do
   end
 
   def allows_membership_info_editing(member)
-    select 'Organizer', from: 'membership_role'
+    select 'Virtual Organizer', from: 'membership_role'
     select 'Undecided', from: 'membership_attendance'
 
     click_button 'Update Member'
 
     membership = Membership.find(member.id)
-    expect(membership.role).to eq('Organizer')
+    expect(membership.role).to eq('Virtual Organizer')
     expect(membership.attendance).to eq('Undecided')
 
     visit edit_event_membership_path(@event, member)

@@ -158,7 +158,9 @@ module EventDecorators
 
   def supporting_organizers
     organizers = []
-    memberships.where(role: 'Organizer').each do |org_member|
+    memberships.where(role: 'Organizer')
+               .or(memberships.where(role: 'Virtual Organizer'))
+               .each do |org_member|
       organizers << org_member.person
     end
     organizers
