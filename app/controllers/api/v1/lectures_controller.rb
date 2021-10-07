@@ -81,8 +81,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
   # GET /api/v1/lectures_on/:date/room.json
   def lectures_on
     lectures = GetLectures.on(@date, @room)
-    schedules = Schedule.where(lecture_id: lectures.pluck(:id))
-    data = add_schedules(lectures, schedules)
+    data = add_schedules(lectures)
 
     respond_to do |format|
       format.json do
@@ -94,8 +93,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
   # GET /api/v1/lectures_at/:date/location.json
   def lectures_at
     lectures = GetLectures.at(@date, @location)
-    schedules = Schedule.where(lecture_id: lectures.pluck(:id))
-    data = add_schedules(lectures, schedules)
+    data = add_schedules(lectures)
 
     respond_to do |format|
       format.json do
@@ -104,9 +102,10 @@ class Api::V1::LecturesController < Api::V1::BaseController
     end
   end
 
-  def add_schedules(lectures, schedules)
+  def add_schedules(lectures)
+    schedules = Schedule.where(lecture_id: lectures.pluck(:id))
+
     lectures.each_with_object([]) do |lecture, data|
-      # scheduled time may differ from (actual) lecture time
       schedule = schedules.detect {|s| s.lecture_id == lecture.id}
       start_time = schedule.nil? ? '' : schedule.start_time
       end_time = schedule.nil? ? '' : schedule.end_time
