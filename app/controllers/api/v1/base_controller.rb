@@ -33,9 +33,9 @@ class Api::V1::BaseController < ApplicationController
       @json = {}
       @json['api_key'] = request.headers.env['HTTP_API_KEY']
       @json['lecture'] = 'payload type placeholder'
-      if action_name == 'lectures_on'
-        @date = Date.parse(lectures_on_params.first)
-        @room = lectures_on_params.last
+      if action_name =~ /lectures_[on|at]/
+        @date = Date.parse(lectures_params.first)
+        @room = @location = lectures_params.last
       elsif action_name == 'lecture_data'
         @lecture_id = lecture_data_params
       else
@@ -59,8 +59,8 @@ class Api::V1::BaseController < ApplicationController
     head :service_unavailable
   end
 
-  def lectures_on_params
-    params.require([:date, :room])
+  def lectures_params
+    params.require([:date, :location])
   end
 
   def lecture_data_params
