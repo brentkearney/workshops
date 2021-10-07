@@ -199,9 +199,10 @@ describe 'Event Edit Page', type: :feature do
       end
 
       it 'appends "(Online)" to event name when it is marked as online' do
-        expect(@event.name.include?('Online')).to be_falsey
-        fill_in 'event_event_format', with: 'Online'
+        @event.update_columns(name: @event.name.tr(' (Online)', ''))
+        expect(Event.find(@event.code).name.include?('Online')).to be_falsey
 
+        fill_in 'event_event_format', with: 'Online'
         click_button "Update Event"
 
         event = Event.find(@event.code)

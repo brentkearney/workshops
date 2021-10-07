@@ -31,11 +31,12 @@ FactoryBot.define do
     f.start_date
     f.end_date
     f.event_type { '5 Day Workshop' }
-    f.event_format { 'Hybrid' }
-    f.max_participants { 42 }
-    f.max_virtual { 300 }
-    f.max_observers { 3 }
+    f.event_format { ['Physical', 'Online', 'Hybrid'].sample }
+    # f.event_format { 'Hybrid' }
     f.location { 'EO' }
+    f.max_participants { GetSetting.max_participants('EO') }
+    f.max_virtual { GetSetting.max_virtual('EO') }
+    f.max_observers { GetSetting.max_observers('EO') }
     f.time_zone { 'Mountain Time (US & Canada)' }
     f.description { Faker::Lorem.sentence(word_count: 6) }
     f.updated_by { 'FactoryBot' }

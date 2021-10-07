@@ -154,10 +154,16 @@ RSpec.describe RsvpController, type: :controller do
       end
 
       it 'changes participants email & forwards to #yes' do
+        expected_path = rsvp_yes_path(otp: @invitation.code)
+        if @invitation.membership.event.online? ||
+           @invitation.membership.role.match?('Virtual')
+          expected_path = rsvp_yes_online_path(otp: @invitation.code)
+        end
+
         post :email, params: @email_params
         person_id = @invitation.membership.person_id
         expect(Person.find(person_id).email).to eq('foo@bar.com')
-        expect(response).to redirect_to(rsvp_yes_path(otp: @invitation.code))
+        expect(response).to redirect_to(expected_path)
       end
 
       it 'renders confirm_email form if email is held by another record' do
@@ -228,7 +234,13 @@ RSpec.describe RsvpController, type: :controller do
       end
 
       it 'redirects to #yes' do
-        expect(response).to redirect_to(rsvp_yes_path(otp: @invitation.code))
+        expected_path = rsvp_yes_path(otp: @invitation.code)
+        if @invitation.membership.event.online? ||
+           @invitation.membership.role.match?('Virtual')
+          expected_path = rsvp_yes_online_path(otp: @invitation.code)
+        end
+
+        expect(response).to redirect_to(expected_path)
       end
     end
   end

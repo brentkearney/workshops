@@ -21,6 +21,15 @@ describe 'RSVP', type: :feature do
     @invitation = create(:invitation, membership: @membership)
   end
 
+  def expected_yes_path
+    if @invitation.membership.event.online? ||
+       @invitation.membership.role.match?('Virtual')
+       return rsvp_yes_online_path(@invitation.code)
+    end
+
+    rsvp_yes_path(@invitation.code)
+  end
+
   before do
     @lc = FakeLegacyConnector.new
     allow(LegacyConnector).to receive(:new).and_return(@lc)
@@ -321,6 +330,8 @@ describe 'RSVP', type: :feature do
         click_link "Yes"
       end
 
+
+
       it 'syncs membership with legacy db' do
         expect(SyncMember).to have_received(:new).with(@membership, is_rsvp: true)
       end
@@ -337,13 +348,12 @@ describe 'RSVP', type: :feature do
 
       it 'clicking Continue goes to #yes' do
         click_button('Continue')
-        expect(current_path).to eq(rsvp_yes_path(@invitation.code))
+        expect(current_path).to eq(expected_yes_path)
       end
 
       it 'clicking Continue goes to #yes-online, if the event is online' do
         event = @invitation.membership.event
-        event.event_format = 'Online'
-        event.save
+        event.update_columns(event_format: 'Online', max_virtual: 300)
 
         visit rsvp_otp_path(@invitation.code)
         click_link "Yes"
@@ -353,9 +363,9 @@ describe 'RSVP', type: :feature do
       end
 
       it "clicking Continue goes to #yes-online, if member's role is virtual" do
-        member = @invitation.membership
-        member.role = 'Virtual Participant'
-        member.save!
+        event = @invitation.membership.event
+        event.update_columns(event_format: 'Online', max_virtual: 300)
+        @invitation.membership.update_columns(role: 'Virtual Participant')
 
         visit rsvp_otp_path(@invitation.code)
         click_link "Yes"
@@ -372,7 +382,7 @@ describe 'RSVP', type: :feature do
         click_button('Continue')
 
         expect(Person.find(person.id).email).to eq('foo@bar.com')
-        expect(current_path).to eq(rsvp_yes_path(@invitation.code))
+        expect(current_path).to eq(expected_yes_path)
       end
 
       it 'entering email of another record with the same name merges records' do
@@ -391,7 +401,7 @@ describe 'RSVP', type: :feature do
 
         merged_person = person.nil? ? other_person : person
         expect(Membership.find(@membership.id).person).to eq(merged_person)
-        expect(current_path).to eq(rsvp_yes_path(@invitation.code))
+        expect(current_path).to eq(expected_yes_path)
       end
     end
 
@@ -441,7 +451,7 @@ describe 'RSVP', type: :feature do
         updated = Membership.find(@membership.id).person
         expect(updated).to eq(@other_person)
         expect(updated.email).to eq('foo@bar.com')
-        expect(current_path).to eq(rsvp_yes_path(@invitation.code))
+        expect(current_path).to eq(expected_yes_path)
         expect(page).to have_text('E-mail updated')
       end
 
