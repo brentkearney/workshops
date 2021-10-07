@@ -992,6 +992,7 @@ RSpec.describe MembershipsController, type: :controller do
 
           it 'does not invite if event is full' do
             @event.max_participants = @event.num_invited_participants
+            @event.max_virtual = @event.num_invited_virtual
             @event.save
 
             member = create(:membership, attendance: 'Not Yet Invited')
@@ -1005,6 +1006,7 @@ RSpec.describe MembershipsController, type: :controller do
 
           it 'allows invite to full event if invitee is an Obersver' do
             @event.max_participants = @event.num_invited_participants
+            @event.max_virtual = @event.num_invited_virtual
             @event.save
 
             member = create(:membership, attendance: 'Not Yet Invited',
@@ -1031,7 +1033,6 @@ RSpec.describe MembershipsController, type: :controller do
             expect(updated_member.attendance).to eq('Not Yet Invited')
           end
         end
-
       end
     end
   end

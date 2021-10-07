@@ -27,6 +27,7 @@ RSpec.describe ParticipantMailer, type: :mailer do
     before do
       @invitation = create(:invitation)
       @membership = @invitation.membership
+      @membership.event.update_columns(event_format: 'Physical')
     end
 
     before :each do
@@ -47,7 +48,7 @@ RSpec.describe ParticipantMailer, type: :mailer do
       expect(@sent_message.to).to include(@membership.person.email)
     end
 
-    it 'includes PDF attachment' do
+    it 'includes PDF attachment (for Physical events)' do
       filename = @membership.event.location + '-arrival-info.pdf'
       expect(@sent_message.attachments.first.filename).to eq(filename)
     end

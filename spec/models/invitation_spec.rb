@@ -78,13 +78,16 @@ RSpec.describe 'Model validations: Invitation', type: :model do
       expect(membership.departure_date).to be_nil
     end
 
-    it 'sets the mailer template' do
+    it 'sets the mailer template according to event format & type' do
       membership = create(:membership, attendance: 'Not Yet Invited')
       invitation = create(:invitation, membership: membership)
 
+      event_format = membership.event.event_format
+      event_type = membership.event.event_type
+
       invitation.send_invite
       template = invitation.templates['template_name']
-      expect(template).to eq('Hybrid-5 Day Workshop-Not Yet Invited')
+      expect(template).to eq("#{event_format}-#{event_type}-Not Yet Invited")
     end
   end
 
@@ -109,9 +112,12 @@ RSpec.describe 'Model validations: Invitation', type: :model do
       membership = create(:membership, attendance: 'Invited')
       invitation = create(:invitation, membership: membership)
 
+      event_format = membership.event.event_format
+      event_type = membership.event.event_type
+
       invitation.send_reminder
       template = invitation.templates['template_name']
-      expect(template).to eq('Hybrid-5 Day Workshop-Invited')
+      expect(template).to eq("#{event_format}-#{event_type}-Invited")
     end
   end
 end

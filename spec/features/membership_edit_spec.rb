@@ -135,13 +135,14 @@ describe 'Membership#edit', type: :feature do
   end
 
   def allows_membership_info_editing(member)
-    select 'Virtual Organizer', from: 'membership_role'
+    role = member.event.physical? ? 'Organizer' : 'Virtual Organizer'
+    select role, from: 'membership_role'
     select 'Undecided', from: 'membership_attendance'
 
     click_button 'Update Member'
 
     membership = Membership.find(member.id)
-    expect(membership.role).to eq('Virtual Organizer')
+    expect(membership.role).to eq(role)
     expect(membership.attendance).to eq('Undecided')
 
     visit edit_event_membership_path(@event, member)
@@ -291,6 +292,7 @@ describe 'Membership#edit', type: :feature do
   context 'As a member of the event editing their own record' do
     before do
       login_as @participant_user, scope: :user
+      @event.update_columns(event_format: 'Physical', max_participants: 42)
     end
 
     before :each do
@@ -316,8 +318,7 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'does not have RSVP hotel fields for online events' do
-      @event.event_format = 'Online'
-      @event.save
+      @event.update_columns(event_format: 'Online')
 
       visit edit_event_membership_path(@event, @participant)
 
@@ -325,6 +326,8 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'if user sets num_guests to nil, sets num_guests to 0' do
+      @participant.update_columns(num_guests: 1)
+
       visit edit_event_membership_path(@event, @participant)
       fill_in 'membership_num_guests', with: nil
       uncheck 'membership[has_guest]'
@@ -335,8 +338,8 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'if user checks has_guests, sets num_guests to 1' do
-      @participant.num_guests = 0
-      @participant.save
+      @participant.update_columns(num_guests: 0)
+
       visit edit_event_membership_path(@event, @participant)
       check 'membership[has_guest]'
       click_button 'Update Member'
@@ -346,8 +349,8 @@ describe 'Membership#edit', type: :feature do
     end
 
     it 'if user unchecks has_guests, sets num_guests to 0' do
-      @participant.num_guests = 2
-      @participant.save
+      @participant.update_columns(num_guests: 2)
+
       visit edit_event_membership_path(@event, @participant)
       uncheck 'membership[has_guest]'
       click_button 'Update Member'
@@ -636,6 +639,7 @@ describe 'Membership#edit', type: :feature do
     it 'disallows changing membership role, if max participants reached' do
       @event.update_columns(event_format: 'Hybrid', max_virtual: 0)
 
+      visit edit_event_membership_path(@event, @participant)
       select 'Virtual Participant', from: 'membership_role'
       click_button 'Update Member'
 
@@ -773,6 +777,7 @@ describe 'Membership#edit', type: :feature do
       @non_member_user.role = :staff
       @non_member_user.location = @event.location
       @non_member_user.save
+      @event.update_columns(event_format: 'Physical', max_participants: 42)
       @participant = create(:membership, event: @event, has_guest: false,
                             role:'Participant', reviewed: false)
       login_as @non_member_user, scope: :user
@@ -878,6 +883,8 @@ describe 'Membership#edit', type: :feature do
       @non_member_user.role = :admin
       @non_member_user.save
       login_as @non_member_user, scope: :user
+      @event.update_columns(event_format: 'Hybrid', max_participants: 42,
+                            max_virtual: 300)
       @participant = create(:membership, event: @event, has_guest: false,
                                          reviewed: false)
     end

@@ -215,42 +215,39 @@ RSpec.describe 'Model validations: Membership', type: :model do
 
   it 'is valid if the max_particpants is equal to the number of invited
       physical participants and one of them confirms' do
-    @event = Event.find(@event.id)
-    @event.event_format = 'Physical'
+    @event.update_columns(event_format: 'Physical',
+                          max_participants: @event.num_invited_in_person + 1)
     last_member = create(:membership, event: @event, role: 'Participant',
                          attendance: 'Invited')
-    @event.max_participants = @event.num_invited_in_person
-    @event.save
 
     last_member.attendance = 'Confirmed'
     expect(last_member).to be_valid
     expect(last_member.save).to be_truthy
+    event = Event.find(@event.id)
+    expect(event.max_participants).to eq(event.num_invited_in_person)
   end
 
   it 'is valid if the number of invited + confirmed participants is
     greater than max_participants, but some of the participants are virtual' do
-    @event = Event.find(@event.id)
-    @event.event_format = 'Hybrid'
-    @event.max_participants = @event.num_participants + 1
-    @event.max_virtual = @event.num_invited_virtual + 1
-    @event.save
+    @event.update_columns(event_format: 'Hybrid',
+                          max_participants: @event.num_participants + 1,
+                          max_virtual: @event.num_invited_virtual + 1)
 
     create(:membership, event: @event, attendance: 'Invited',
-        role: 'Virtual Participant')
+                        role: 'Virtual Participant')
+
     third_membership = build(:membership, event: @event,
-                                      attendance: 'Invited',
-                                            role: 'Participant')
+                             attendance: 'Invited', role: 'Participant')
     expect(third_membership).to be_valid
   end
 
   it 'is valid if the max_virtual_particpants is equal to the number of invited
       virtual participants and one of them confirms' do
-    @event = Event.find(@event.id)
-    @event.event_format = 'Hybrid'
+    @event.update_columns(event_format: 'Hybrid',
+                          max_virtual: @event.num_invited_virtual + 1)
+
     last_member = create(:membership, event: @event, attendance: 'Invited',
                          role: 'Virtual Participant')
-    @event.max_participants = @event.num_invited_virtual
-    @event.save
 
     last_member.attendance = 'Confirmed'
     expect(last_member).to be_valid

@@ -42,11 +42,22 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(build(:event, location: nil)).not_to be_valid
   end
 
-  it 'sets max participants to default' do
-    event = build(:event, max_participants: nil)
+  it 'sets max participants to default for non-online events' do
+    event = build(:event, max_participants: nil, event_format: 'Physical')
     default_value = GetSetting.max_participants(event.location)
     event.valid?
     expect(event.max_participants).to eq(default_value)
+
+    event = build(:event, max_participants: nil, event_format: 'Hybrid')
+    default_value = GetSetting.max_participants(event.location)
+    event.valid?
+    expect(event.max_participants).to eq(default_value)
+  end
+
+  it 'sets max participants to 0 for online events' do
+    event = build(:event, max_participants: nil, event_format: 'Online')
+    event.valid?
+    expect(event.max_participants).to eq(0)
   end
 
   it 'sets max virtual to default' do
@@ -128,8 +139,8 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(event).to be_valid
   end
 
-  it 'is hybrid format by default' do
-    expect(build(:event).event_format).to eq('Hybrid')
+  it 'has event_format one of Physical, Online, or Hybrid' do
+    expect(%w[Physical Online Hybrid]).to include(build(:event).event_format)
   end
 
   it '.dates returns formatted dates' do
@@ -192,7 +203,8 @@ RSpec.describe "Model validations: Event ", type: :model do
       @event.description = ' A workshop with whitespace  '
       @event.save
 
-      expect(@event.name).to eq('Test Name')
+      event_name = @event.online? ? 'Test Name (Online)' : 'Test Name'
+      expect(@event.name).to eq(event_name)
       expect(@event.short_name).to eq('Test')
       expect(@event.description).to eq('A workshop with whitespace')
     end

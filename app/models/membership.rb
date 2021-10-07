@@ -76,13 +76,13 @@ class Membership < ApplicationRecord
   end
 
   def set_num_guests
-    return 1 if has_guest && (num_guests.blank? || num_guests == 0)
+    return 1 if has_guest && (num_guests.blank? || num_guests.to_i == 0)
     return 0 if has_guest === false
     num_guests
   end
 
   def set_guests
-    self.warn_guest = true if has_guest === false && num_guests > 0
+    self.warn_guest = true if has_guest === false && num_guests.to_i > 0
     self.num_guests = set_num_guests
   end
 
