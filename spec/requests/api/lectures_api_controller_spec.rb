@@ -92,7 +92,7 @@ describe Api::V1::LecturesController, type: :request do
     end
   end
 
-  context '#lectures_on' do
+  context '#lectures_on/at' do
     context 'authentication with api key' do
       it 'authenticates with api key in the request header' do
         get "/api/v1/lectures_on/2019-04-10/#{ERB::Util.url_encode(@room)}.json",
@@ -126,6 +126,8 @@ describe Api::V1::LecturesController, type: :request do
           Lecture.all.each do |lecture|
             record = json.detect {|item| item['lecture']['id'].to_i == lecture.id }
             expect(record['lecture']['title']).to eq(lecture.title)
+            expect(record['lecture']['event_format']).to eq(lecture.event.event_format)
+            expect(record['lecture']['event_location']).to eq(lecture.event.location)
             expect(record['scheduled_for']['start_time']).to eq(record['lecture']['start_time'])
           end
         end
@@ -142,6 +144,34 @@ describe Api::V1::LecturesController, type: :request do
 
           expect(lecture['scheduled_for']['start_time']).to be_empty
           expect(lecture['scheduled_for']['end_time']).to be_empty
+        end
+
+        it 'includes the event_format in the lecture data' do
+          get "/api/v1/lectures_on/#{@date}/#{ERB::Util.url_encode(@room)}.json"
+          json = JSON.parse(response.body)
+          r = json.detect {|j| j['lecture']['id'].to_i == @lecture.id }
+
+          formats = ['Physical', 'Online', 'Hybrid']
+          expect(formats).to include(r['lecture']['event_format'])
+        end
+      end
+
+      context '/lectures_at/' do
+        before do
+          @event.update_columns(location: 'EO')
+        end
+
+        it 'returns the lectures at the given location on the given day' do
+          get "/api/v1/lectures_at/#{@date}/#{@event.location}.json"
+          json = JSON.parse(response.body)
+
+          Lecture.all.each do |lecture|
+            record = json.detect {|item| item['lecture']['id'].to_i == lecture.id }
+            expect(record['lecture']['title']).to eq(lecture.title)
+            expect(record['lecture']['event_format']).to eq(lecture.event.event_format)
+            expect(record['lecture']['event_location']).to eq(lecture.event.location)
+            expect(record['scheduled_for']['start_time']).to eq(record['lecture']['start_time'])
+          end
         end
       end
     end
@@ -277,6 +307,7 @@ describe Api::V1::LecturesController, type: :request do
         expect(@json['event']['code']).to eq(@lecture.event.code)
         expect(@json['event']['name']).to eq(@lecture.event.name)
         expect(@json['event']['event_type']).to eq(@lecture.event.event_type)
+        expect(@json['event']['event_format']).to eq(@lecture.event.event_format)
         expect(@json['event']['start_date']).to eq(@lecture.event.date)
         expect(@json['event']['location']).to eq(@lecture.event.location)
       end

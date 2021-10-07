@@ -12,7 +12,12 @@ class GetLectures
 
   def self.on(date, room = @room)
     Lecture.where(start_time: date.beginning_of_day..date.end_of_day)
-                         .where(room: room).order(:start_time)
+           .where(room: room).order(:start_time)
+  end
+
+  def self.at(date, location)
+    Lecture.where(start_time: date.beginning_of_day..date.end_of_day)
+           .joins(:event).where(events: { location: location })
   end
 
   def lectures_on(date, room = @room)

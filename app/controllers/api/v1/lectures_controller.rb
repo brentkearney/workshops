@@ -4,7 +4,7 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-# API for updating Lecture records
+# API for accessing Lecture records
 class Api::V1::LecturesController < Api::V1::BaseController
   before_action :authenticated?, :find_lecture
   respond_to :json
@@ -61,6 +61,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
         code: lecture.event.code,
         name: lecture.event.name,
         event_type: lecture.event.event_type,
+        event_format: lecture.event.event_format,
         start_date: lecture.event.start_date,
         end_date: lecture.event.end_date,
         location: lecture.event.location,
@@ -77,13 +78,34 @@ class Api::V1::LecturesController < Api::V1::BaseController
     end
   end
 
-  # GET /api/v1/lectures_on/room/date.json
+  # GET /api/v1/lectures_on/:date/room.json
   def lectures_on
     lectures = GetLectures.on(@date, @room)
     schedules = Schedule.where(lecture_id: lectures.pluck(:id))
+    data = add_schedules(lectures, schedules)
 
-    data = []
-    lectures.each do |lecture|
+    respond_to do |format|
+      format.json do
+        render json: data.to_json
+      end
+    end
+  end
+
+  # GET /api/v1/lectures_at/:date/location.json
+  def lectures_at
+    lectures = GetLectures.at(@date, @location)
+    schedules = Schedule.where(lecture_id: lectures.pluck(:id))
+    data = add_schedules(lectures, schedules)
+
+    respond_to do |format|
+      format.json do
+        render json: data.to_json
+      end
+    end
+  end
+
+  def add_schedules(lectures, schedules)
+    lectures.each_with_object([]) do |lecture, data|
       # scheduled time may differ from (actual) lecture time
       schedule = schedules.detect {|s| s.lecture_id == lecture.id}
       start_time = schedule.nil? ? '' : schedule.start_time
@@ -93,14 +115,7 @@ class Api::V1::LecturesController < Api::V1::BaseController
       lecture_attribs = compose_data(lecture)
       data << { lecture: lecture_attribs, scheduled_for: scheduled_for }
     end
-
-    respond_to do |format|
-      format.json do
-        render json: data.to_json
-      end
-    end
   end
-
 
   # GET /api/v1/current/room.json
   def current
@@ -152,6 +167,8 @@ class Api::V1::LecturesController < Api::V1::BaseController
     start_time = schedule.nil? ? '' : schedule.start_time
     extras = {
       event_code: lecture.event.code,
+      event_format: lecture.event.event_format,
+      event_location: lecture.event.location,
       firstname: lecture.person.firstname,
       lastname: lecture.person.lastname,
       affiliation: lecture.person.affiliation,

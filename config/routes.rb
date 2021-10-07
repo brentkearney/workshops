@@ -105,7 +105,8 @@ Rails.application.routes.draw do
       patch 'lectures' => 'lectures#update'
       put 'lectures' => 'lectures#update'
       get 'lecture_data/:id' => 'lectures#lecture_data', as: :lecture_data
-      get 'lectures_on/:date/:room' => 'lectures#lectures_on', as: :lectures_on
+      get 'lectures_on/:date/:location' => 'lectures#lectures_on', as: :lectures_on
+      get 'lectures_at/:date/:location' => 'lectures#lectures_at', as: :lectures_at
       get 'lectures_current/:room' => 'lectures#current', as: :lectures_current
       get 'lectures_next/:room' => 'lectures#next', as: :lectures_next
       get 'lectures_last/:room' => 'lectures#last', as: :lectures_last
