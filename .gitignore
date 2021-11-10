@@ -75,3 +75,10 @@ node_modules/.yarn-integrity
 bin/webpack
 bin/webpack-dev-server
 mandrill_test.rb
+
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity

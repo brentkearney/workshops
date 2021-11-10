@@ -55,7 +55,9 @@ class InvitationTemplateSelector
   end
 
   def virtual_template
-    normal_template << '-Virtual' unless membership.event.online?
+    template = normal_template
+    template << '-Virtual' unless membership.event.online?
+    template
   end
 
   def set_templates

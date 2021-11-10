@@ -22,11 +22,12 @@
 
 # Calculates RSVP deadline for invitation emails
 class RsvpDeadline
-  def initialize(event, sent_on = DateTime.current)
+  def initialize(event, sent_on = DateTime.current, membership = false)
     @event = event
     @start_date = event.start_date.to_time.in_time_zone(event.time_zone)
     @end_date = event.end_date.to_time.in_time_zone(event.time_zone)
     @sent_on = sent_on.to_time.in_time_zone(event.time_zone)
+    @membership = membership || Membership.new(role: 'Virtual Participant')
   end
 
   def rsvp_by
@@ -39,7 +40,7 @@ class RsvpDeadline
   end
 
   def calculate_deadline
-    return @end_date unless @event.physical?
+    return @end_date if @event.online? || @membership.virtual?
 
     rsvp_deadline = (@sent_on + 4.weeks)
     today = DateTime.current

@@ -42,6 +42,7 @@ namespace :ws do
         'webmaster_email' => 'webmaster@example.com',
         'sysadmin_email' => 'sysadmin@example.com',
         'event_types' => ['5 Day Workshop', '2 Day Workshop', 'Research in Teams', 'Focussed Research Group', 'Summer School', 'Public Lecture'],
+        'event_formats' => ['Online', 'Hybrid', 'Physical'],
         'code_pattern' => '\A\d{2}(w|ss|rit|frg|pl)\d{3,4}\z',
         'academic_status' => ["Professor Emeritus", "Professor", "Associate Professor", "Assistant Professor",
                               "Post Doctoral Fellow", "Medical Doctor", "Ph.D. Student", "Masters Student",

@@ -3,13 +3,14 @@
   "private": true,
   "license": "SEE LICENSE IN GNU-AGPL-3.0",
   "dependencies": {
-    "@rails/webpacker": "5.1.1",
+    "@rails/webpacker": "5.4.3",
     "ansi-regex": "^5.0.1",
     "chokidar": "^3.4.0",
     "kind-of": "^6.0.3",
     "lodash": "^4.17.19",
     "minimist": "^1.2.5",
-    "node-sass": "^4.14.1",
+    "node-gyp": "^8.4.0",
+    "node-sass": "^6.0.1",
     "nth-check": "^2.0.1",
     "serialize-javascript": "^3.1.0",
     "set-value": "^4.0.1",
@@ -18,11 +19,12 @@
     "tar": "^4.4.18",
     "trim-newlines": "3.0.1",
     "vali-admin": "^3.0.0",
+    "webpack-cli": "^3.3.12",
     "websocket-extensions": "^0.1.4"
   },
   "devDependencies": {
-    "webpack": "^4.43.0",
-    "webpack-dev-server": "^3.11.0"
+    "webpack": "^4.46.0",
+    "webpack-dev-server": "^3"
   },
   "resolutions": {
     "**/kind-of": "^6.0.3",
@@ -35,5 +37,8 @@
     "is-svg": "^4.2.2",
     "tar": "^4.4.18",
     "trim-newlines": "^3.0.1"
-  }
+  },
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/brentkearney/workshops.git"
 }

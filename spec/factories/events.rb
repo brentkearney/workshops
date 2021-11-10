@@ -32,7 +32,6 @@ FactoryBot.define do
     f.end_date
     f.event_type { '5 Day Workshop' }
     f.event_format { ['Physical', 'Online', 'Hybrid'].sample }
-    # f.event_format { 'Hybrid' }
     f.location { 'EO' }
     f.max_participants { GetSetting.max_participants('EO') }
     f.max_virtual { GetSetting.max_virtual('EO') }
@@ -74,6 +73,10 @@ FactoryBot.define do
 
     factory :event_with_roles do
       after(:create) do |event|
+        event.max_participants = GetSetting.max_participants('EO')
+        event.max_virtual = GetSetting.max_virtual('EO')
+        event.max_observers = GetSetting.max_observers('EO')
+
         Membership::ROLES.shuffle.each do |role|
           person = create(:person)
           create(:membership, role: role, person: person, event: event)

@@ -22,6 +22,7 @@ class Invitation < ApplicationRecord
 
   def send_invite
     return unless set_invitation_template
+
     update_and_save
     EmailInvitationJob.perform_later(id)
   end
@@ -41,10 +42,12 @@ class Invitation < ApplicationRecord
                   invitation: self.inspect }
     StaffMailer.notify_program_coord(event, subject, error_msg).deliver_now
     self.templates = nil
+    false
   end
 
   def send_reminder
     return unless set_invitation_template
+
     save # save new template
     update_reminder
     EmailInvitationJob.perform_later(id)
@@ -92,6 +95,7 @@ class Invitation < ApplicationRecord
 
   def self.duration_setting
     return 3.days if invalid_rsvp_setting
+
     parts = Setting.Site['rsvp_expiry'].split('.')
     parts.first.to_i.send(parts.last)
   end
@@ -101,9 +105,10 @@ class Invitation < ApplicationRecord
 
   def update_times
     self.invited_on = DateTime.current
-    if self.membership.event.online?
+    if self.membership.event.online? || self.membership.virtual?
       self.expires = event.end_date.to_time
-                             .in_time_zone(event.time_zone).end_of_day
+                          .in_time_zone(event.time_zone)
+                          .end_of_day
     else
       start_time = event.start_date.to_time
                         .in_time_zone(event.time_zone).beginning_of_day

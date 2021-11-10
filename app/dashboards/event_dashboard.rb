@@ -9,6 +9,9 @@ class EventDashboard < Administrate::BaseDashboard
   # on pages throughout the dashboard.
 
   event_formats = GetSetting.site_setting('event_formats')
+  if event_formats == 'event_formats not set'
+    event_formats = ['Physical', 'Online', 'Hybrid']
+  end
   ATTRIBUTE_TYPES = {
     #memberships: Field::HasMany,
     members: Field::HasMany.with_options(class_name: "Person"),

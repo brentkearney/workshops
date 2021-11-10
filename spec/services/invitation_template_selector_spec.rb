@@ -44,6 +44,18 @@ describe 'InvitationTemplateSelector' do
                 end
               end
 
+              if event_format == 'Online'
+                it 'does not append -Virtual for Virtual Participants of Online
+                    events'.squish do
+                  membership.role = 'Virtual Particiant'
+                  template_name = "Online-#{event_type}-#{attendance}"
+
+                  templates = InvitationTemplateSelector.new(membership)
+                                                        .set_templates
+
+                  expect(templates[:template_name]).to eq(template_name)
+                end
+              end
             end # context ... attendance
           end # attendances.each
         end # context ... event_type

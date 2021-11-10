@@ -26,7 +26,8 @@ class InvitationMailer < ApplicationMailer
     @invitation_date = invitation.invited_on.strftime('%A, %B %-d, %Y')
     @event_start = @event.start_date_formatted
     @event_end = @event.end_date_formatted
-    @rsvp_deadline = RsvpDeadline.new(@event).rsvp_by
+    @rsvp_deadline = RsvpDeadline.new(@event, DateTime.current,
+                                      invitation.membership).rsvp_by
     @organizers = PersonWithAffilList.compose(@event.organizers)
 
     location = @event.location
@@ -34,7 +35,7 @@ class InvitationMailer < ApplicationMailer
 
     recipients = InvitationEmailRecipients.new(invitation).compose
     templates = invitation.templates
-    return if templates.blank?
+    return if templates.blank? # error report sent from the Invitation model
 
     # Create PDF attachment
     if File.exist?(templates['pdf_template_file'])

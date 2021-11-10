@@ -67,6 +67,10 @@ class Membership < ApplicationRecord
     replied_at.in_time_zone(event.time_zone).strftime('%b %-d, %Y %H:%M %Z')
   end
 
+  def virtual?
+    role.match?('Virtual')
+  end
+
   private
 
   def set_billing
