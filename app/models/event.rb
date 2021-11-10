@@ -129,8 +129,7 @@ class Event < ApplicationRecord
     %w(participants virtual observers).each do |max_type|
       max_setting = "max_" + max_type
       if self.send(max_setting).blank?
-        max_num = GetSetting.send(max_setting, self.location)
-        max_num = 0 if max_num.blank?
+        max_num = GetSetting.send(max_setting, self.location) || 0
         self.write_attribute(max_setting, max_num)
       end
     end

@@ -60,6 +60,16 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     expect(i.expires).to eq(end_time)
   end
 
+  it 'for hybrid events & virtual attendees, sets expiry date to workshop
+      end_date, end of day' do
+    event = build(:event, event_format: 'Hybrid')
+    membership = build(:membership, event: event, role: 'Virtual Participant')
+    i = create(:invitation, membership: membership)
+
+    end_time = event.end_date.to_time.end_of_day.in_time_zone(event.time_zone)
+    expect(i.expires).to eq(end_time)
+  end
+
   context '.send_invite' do
     it 'updates membership fields' do
       event = build(:event)

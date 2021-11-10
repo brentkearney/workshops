@@ -188,7 +188,9 @@ RSpec.describe InvitationMailer, type: :mailer do
         @event.update_columns(event_format: 'Hybrid')
       end
 
-      it 'sets date to the last day of the workshop' do
+      it 'sets date to the last day of the workshop for virtual participants' do
+        @invitation.membership.update_columns(role: 'Virtual Participant')
+
         InvitationMailer.invite(@invitation).deliver_now
         delivery = ActionMailer::Base.deliveries.first
         body = delivery.body.empty? ? delivery.text_part : delivery.body
@@ -197,7 +199,20 @@ RSpec.describe InvitationMailer, type: :mailer do
         expect(body).to have_text("before #{rsvp_date}")
       end
 
-      it 'sets dates to the same as Physical workshops, if participant is non-Virtual'
+      it 'sets dates to the same as Physical workshops, for non-Virtual' do
+        @invitation.membership.update_columns(role: 'Participant')
+
+        @event.start_date = @today + 5.months
+        @event.end_date = @event.start_date + 5.days
+        @event.save
+
+        InvitationMailer.invite(@invitation).deliver_now
+        delivery = ActionMailer::Base.deliveries.first
+        body = delivery.body.empty? ? delivery.text_part : delivery.body
+
+        rsvp_date = (@today + 4.weeks).strftime('%B %-d, %Y')
+        expect(body).to have_text("before #{rsvp_date}")
+      end
     end
   end
 end

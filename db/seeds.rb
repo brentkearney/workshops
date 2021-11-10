@@ -186,8 +186,8 @@ end
 generate_people(10)
 
 # Generate 3 years worth of events, populated by random people
-start_year = Time.new.year - 1
-end_year = start_year
+start_year = Time.new.year # - 1
+end_year = Time.new.year + 1
 generate_events(start_year, end_year)
 
 # Create a schedule template event, and add admin user to it

@@ -557,4 +557,15 @@ RSpec.describe 'Model validations: Membership', type: :model do
     @membership.save
     expect(@membership.organizer?).to be_truthy
   end
+
+  it '.virtual? tests for virtual role' do
+    @membership.update_columns(role: 'Participant')
+    expect(Membership.find(@membership.id).virtual?).to be_falsey
+
+    @membership.update_columns(role: 'Virtual Participant')
+    expect(Membership.find(@membership.id).virtual?).to be_truthy
+
+    @membership.update_columns(role: 'Virtual Organizer')
+    expect(Membership.find(@membership.id).virtual?).to be_truthy
+  end
 end

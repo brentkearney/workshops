@@ -38,7 +38,7 @@ gem 'sdoc', group: :doc
 gem 'sucker_punch'
 gem 'turbolinks'
 gem 'uglifier'
-gem 'webpacker', '~> 5.1.1'
+gem 'webpacker', '~> 5.x'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
