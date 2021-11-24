@@ -9,7 +9,7 @@
 class ErrorReport
   attr_reader :from, :event, :errors
 
-  def initialize(errors_from, event)
+  def initialize(errors_from, event = nil)
     @from = errors_from
     @event = event
     @errors = {}
@@ -96,9 +96,9 @@ class ErrorReport
 
   def other_errors(errors)
     # Iterate over Errors hash, send report for each type of error
-    errors.each do |string, array|
+    errors&.each do |string, array|
       error_message = errors[string].shift.message
-      error_message << "\n and: #{array.inspect}"
+      error_message << "\n and: #{array.inspect}" unless array.blank?
       unless error_message.blank?
         StaffMailer.notify_sysadmin(@event, error_message).deliver_now
       end
@@ -138,9 +138,10 @@ class ErrorReport
   end
 
   Error = Struct.new(:object, :message)
+
   def errorify(the_object, error_message)
     the_object.valid? if the_object.is_a?(ActiveRecord::Base)
-    message = error_message.nil? ? the_object.errors.full_messages : error_message
-    Error.new(the_object, message) unless message.blank?
+    error_message = the_object&.errors&.full_messages if error_message.blank?
+    Error.new(the_object, error_message) unless error_message.blank?
   end
 end

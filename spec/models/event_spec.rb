@@ -60,8 +60,9 @@ RSpec.describe "Model validations: Event ", type: :model do
     expect(event.max_participants).to eq(0)
   end
 
-  it 'sets max virtual to default' do
-    event = build(:event, max_virtual: nil)
+  it 'sets max virtual to default for Hybrid or Virtual events' do
+    event_format = ['Hybrid', 'Virtual'].sample
+    event = build(:event, max_virtual: nil, event_format: event_format)
     default_value = GetSetting.max_virtual(event.location)
     event.valid?
     expect(event.max_virtual).to eq(default_value)

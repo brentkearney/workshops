@@ -215,4 +215,34 @@ describe "LegacyConnector", type: :feature do
       expect(rows.first).to eq(1)
     end
   end
+
+  context 'Failture conditions' do
+    it 'fails gracefully if no api url is set' do
+      allow(GetSetting).to receive(:site_setting).with('legacy_api').and_return nil
+
+      lc = LegacyConnector.new
+      returned_person = lc.get_person('31337')
+      expect(returned_person).to be_nil
+    end
+
+    it '#update_member fails gracefully & reports if no member id given ' do
+      allow(GetSetting).to receive(:site_email).and_return 'foo@bar.com'
+
+      lc = LegacyConnector.new
+      response = lc.update_member(membership1.id)
+      expect(response).to be_nil
+      expect(ActionMailer::Base.deliveries.first.to).to eq(['foo@bar.com'])
+    end
+
+    it '#add_lecture connection failure sends report' do
+      lc = LegacyConnector.new
+      lecture = create(:lecture)
+
+      lecture_id = lc.add_lecture(lecture)
+      expect(lecture_id).to eq(0)
+
+      to_email = GetSetting.site_email('sysadmin_email')
+      expect(ActionMailer::Base.deliveries.first.to).to include(to_email)
+    end
+  end
 end
