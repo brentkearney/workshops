@@ -219,14 +219,14 @@ class LegacyConnector
   def get_from(url, params = {})
     return if @rest_url.blank?
 
+    uri = "#{@rest_url}/#{url}"
     begin
-      uri = "#{@rest_url}/#{url}"
       return JSON.parse(RestClient.get uri) if params.blank?
 
       return JSON.parse(RestClient.get uri, params: params)
 
     rescue => error
-      send_error_report(error)
+      send_error_report(error, uri)
     end
   end
 
