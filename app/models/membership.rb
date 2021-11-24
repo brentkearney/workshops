@@ -7,7 +7,8 @@
 # See the COPYRIGHT file for details and exceptions.
 #
 class Membership < ApplicationRecord
-  attr_accessor :sync_memberships, :update_by_staff, :update_remote, :is_rsvp, :warn_guest
+  attr_accessor :sync_memberships, :update_by_staff, :update_remote, :is_rsvp,
+                :warn_guest
 
   belongs_to :event
   belongs_to :person

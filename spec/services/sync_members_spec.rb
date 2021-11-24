@@ -609,8 +609,7 @@ describe "SyncMembers" do
     end
 
     it 'accounts for Hybrid events' do
-      @event.update_columns(event_format: 'Hybrid',
-                             max_virtual: 2)
+      @event.update_columns(event_format: 'Hybrid', max_virtual: 2)
 
       sync_errors = ErrorReport.new('SyncMembers', @event)
       expect(ErrorReport).to receive(:new).and_return(sync_errors)
