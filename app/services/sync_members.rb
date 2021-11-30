@@ -26,6 +26,7 @@ class SyncMembers
   def initialize(event)
     @event = event
     return if event.nil? || recently_synced?
+
     @sync_errors = ErrorReport.new(self.class, @event)
     @remote_members = retrieve_remote_members
     @local_members = event.memberships.includes(:person)
@@ -37,7 +38,9 @@ class SyncMembers
 
   def recently_synced?
     return false if event.nil? || event.sync_time.blank?
+
     return true if Rails.env.development?
+
     Time.now - event.sync_time < 5.minutes
   end
 
@@ -47,6 +50,7 @@ class SyncMembers
 
   def sync_memberships
     return if remote_members.blank?
+
     fixed_remote_members = []
     remote_members.each do |rm|
       remote_member = fix_remote_fields(rm)
@@ -72,6 +76,7 @@ class SyncMembers
 
   def prune_members
     return if remote_members.empty?
+
     remote_ids = remote_members.map { |m| m['Person']['legacy_id'].to_i }
     remote_emails = remote_members.map { |m| m['Person']['email'] }
 

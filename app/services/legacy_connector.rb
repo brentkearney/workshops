@@ -40,17 +40,17 @@ class LegacyConnector
 
   # get data for specific events
   def get_event_data(event_id)
-    get_from("#{@rest_url}/event_data/#{event_id}")
+    get_from("event_data/#{event_id}")
   end
 
   # get event data for given year
   def get_event_data_for_year(year)
-    get_from("#{@rest_url}/event_data_for_year/#{year}")
+    get_from("#event_data_for_year/#{year}")
   end
 
   # get membership data for an event
   def get_members(event)
-    get_from("#{@rest_url}/members/#{event.code}")
+    get_from("members/#{event.code}")
   end
 
   # get a member record data
@@ -220,26 +220,23 @@ class LegacyConnector
     return if @rest_url.blank?
 
     uri = "#{@rest_url}/#{url}"
-    begin
-      return JSON.parse(RestClient.get uri) if params.blank?
+    return JSON.parse(RestClient.get uri) if params.blank?
 
-      return JSON.parse(RestClient.get uri, params: params)
+    return JSON.parse(RestClient.get uri, params: params)
 
-    rescue => error
-      send_error_report(error, uri)
-    end
+  rescue => error
+    send_error_report(error)
   end
 
   def post_to(url, params)
     return if @rest_url.blank?
 
     uri = @rest_url + '/' + url
-    begin
-      params = params.to_json
-      return RestClient.post uri, params, content_type: :json, accept: :json
 
-    rescue => error
-      send_error_report(error, uri)
-    end
+    params = params.to_json
+    return RestClient.post uri, params, content_type: :json, accept: :json
+
+  rescue => error
+    send_error_report(error)
   end
 end
