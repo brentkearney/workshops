@@ -19,6 +19,8 @@ module Syncable
   end
 
   def fix_remote_fields(h)
+    return if h.blank?
+
     h['Person'] = Person.new.attributes if h['Person'].blank?
     h['Membership'] = Membership.new.attributes if h['Membership'].blank?
 
@@ -83,6 +85,7 @@ module Syncable
 
   def boolean_fields(obj)
     return if obj.nil?
+
     fields = []
     obj.attribute_names.each do |field|
       fields << field if obj.type_for_attribute(field).type == :boolean
@@ -93,6 +96,7 @@ module Syncable
   def local_is_newer?(local, remote)
     rupdated = prepare_value('updated_at', remote['updated_at'])
     return true if rupdated.nil?
+
     local.updated_at >= rupdated
   end
 
@@ -140,6 +144,7 @@ module Syncable
   def update_record(local, remote)
     local = update_record_updateds(local)
     return update_missing_data(local, remote) if local_is_newer?(local, remote)
+
     local = dedupe(local, remote)
 
     booleans = boolean_fields(local)
@@ -168,6 +173,7 @@ module Syncable
   def resolve_duplicates(local, remote, mode)
     person = local
     return person if remote["#{mode}"].blank?
+
     other_person = Person.find_by("#{mode}": remote["#{mode}"])
     if other_person.blank?
       # no local record with remote['legacy_id'], so replace the remote
@@ -185,6 +191,7 @@ module Syncable
 
   def update_email(person, email)
     return person if person.email == email
+
     person.email = email
     update_user_account(person, person)
     person
@@ -221,7 +228,9 @@ module Syncable
   def convert_to_time(v)
     Time.zone = ActiveSupport::TimeZone.new(event.time_zone)
     return Time.at(v) if v.is_a?(Integer)
+
     return v.in_time_zone(event.time_zone) if v.is_a?(Time) || v.is_a?(DateTime)
+
     begin
       time = Time.parse(v.to_s)
     rescue ArgumentError
@@ -274,7 +283,9 @@ module Syncable
 
   def replace_remote(replace, replace_with)
     return if replace.legacy_id.blank? || replace_with.legacy_id.blank?
+
     return if replace.legacy_id.to_i == replace_with.legacy_id.to_i
+
     ReplacePersonJob.perform_later(replace.legacy_id, replace_with.legacy_id)
   end
 
@@ -329,6 +340,7 @@ module Syncable
 
   def fixtime(val)
     return DateTime.current.in_time_zone(event.time_zone) if blank_time?(val)
+
     val
   end
 
