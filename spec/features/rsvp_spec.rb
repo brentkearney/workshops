@@ -78,6 +78,21 @@ describe 'RSVP', type: :feature do
       @invitation.save
     end
 
+    it 'expired invitations for Virtual invitees' do
+      @invitation.update_columns(expires: Date.today.last_year)
+      @membership.update_columns(role: 'Virtual Organizer')
+
+      visit rsvp_otp_path(@invitation.code)
+
+      expect(current_path).to eq(rsvp_otp_path(@invitation.code))
+      expect(page).to have_link('Yes')
+      expect(page).to have_link('No')
+      expect(page).to have_link('Maybe')
+
+      @invitation.update_columns(expires: Date.today.next_year)
+      @membership.update_columns(role: 'Participant')
+    end
+
     it 'non-existent invitations' do
       response = {'denied' => 'Invalid code'}
       lc = FakeLegacyConnector.new
