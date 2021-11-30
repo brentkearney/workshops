@@ -101,7 +101,15 @@ class InvitationChecker
   end
 
   def check_invitation_expiry(invitation)
-    if invitation.expires && DateTime.now > invitation.expires
+    return if invitation.expires.nil?
+
+    # some invitations were sent before the invitee was Virtual
+    if invitation.membership.role.match?('Virtual')
+      invitation.expires = invitation.event.end_date.to_time.end_of_day
+      invitation.save
+    end
+
+    if DateTime.now > invitation.expires
       @errors.add(:Invitation, 'This invitation code is expired.')
     end
   end
