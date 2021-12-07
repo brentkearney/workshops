@@ -45,7 +45,7 @@ class LegacyConnector
 
   # get event data for given year
   def get_event_data_for_year(year)
-    get_from("#event_data_for_year/#{year}")
+    get_from("event_data_for_year/#{year}")
   end
 
   # get membership data for an event
