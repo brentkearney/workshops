@@ -84,6 +84,7 @@ class Api::V1::EventsController < Api::V1::BaseController
     end
 
     event.event_format = 'Hybrid' if event.event_format.blank?
+    event.event_type = '5 Day Workshop' if event.event_type.blank?
     event.event_type.gsub!(/^(\d)-Day/, '\1 Day')
 
     event
