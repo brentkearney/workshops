@@ -66,7 +66,7 @@ FactoryBot.define do
       end
       event.end_date = event.start_date + 5.days unless event.start_date.nil?
 
-      if event.start_date
+      if event.start_date.present? && event.code.present?
         event.code.gsub!(/^\d{2}/, event.start_date.strftime('%y'))
       end
     end

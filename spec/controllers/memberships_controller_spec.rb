@@ -1004,7 +1004,7 @@ RSpec.describe MembershipsController, type: :controller do
             expect(updated_member.attendance).to eq('Not Yet Invited')
           end
 
-          it 'allows invite to full event if invitee is an Obersver' do
+          it 'allows invite to full event if invitee is an Observer' do
             @event.max_participants = @event.num_invited_participants
             @event.max_virtual = @event.num_invited_virtual
             @event.save

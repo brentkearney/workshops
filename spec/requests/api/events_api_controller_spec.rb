@@ -17,8 +17,17 @@ describe Api::V1::EventsController do
       @event = build(:event)
       @payload = {
           api_key: @key,
-          event_id: @event.code,
-          event: @event.as_json
+          event: @event.as_json,
+          memberships: [
+            {
+              "role": "Participant",
+              "person": build(:person).as_json
+            },
+            {
+              "role": "Organizer",
+              "person": build(:person).as_json
+            }
+          ]
       }
     end
 
@@ -36,18 +45,16 @@ describe Api::V1::EventsController do
 
     it 'given appropriate keys and event data, it creates an event' do
       post "/api/v1/events.json", params: @payload.to_json
-      expect(response).to be_created
+      expect(response).to have_http_status(:created)
       expect(Event.find(@event.code)).not_to be_nil
     end
 
     it 'assigns max_observers to Settings.Location[location][max_observers]' do
       event = build(:event, max_observers: nil)
-      payload = {
-          api_key: @key,
-          event_id: event.code,
-          event: event.as_json
-      }
-      post "/api/v1/events.json", params: payload.to_json
+      @payload['event'] = event.as_json
+
+      post "/api/v1/events.json", params: @payload.to_json
+
       event = Event.find(event.code)
       max = GetSetting.max_observers(event.location)
       expect(max).not_to be_blank
@@ -56,12 +63,9 @@ describe Api::V1::EventsController do
 
     it 'assigns max_participants to Settings.Location[location][max_participants]' do
       event = build(:event, max_participants: nil)
-      payload = {
-          api_key: @key,
-          event_id: event.code,
-          event: event.as_json
-      }
-      post "/api/v1/events.json", params: payload.to_json
+      @payload['event'] = event.as_json
+
+      post "/api/v1/events.json", params: @payload.to_json
       event = Event.find(event.code)
       max = GetSetting.max_participants(event.location)
       expect(max).not_to be_blank
@@ -69,39 +73,33 @@ describe Api::V1::EventsController do
     end
 
     it 'given invalid or missing event code, it fails' do
-      @payload[:event_id] = 'X'
-      post "/api/v1/events.json", params: @payload.to_json
-      expect(response).to be_bad_request
+      event = build(:event, code: nil)
+      @payload['event'] = event.as_json
 
-      @payload.delete(:event_id)
       post "/api/v1/events.json", params: @payload.to_json
       expect(response).to be_bad_request
     end
 
     it 'given event code of existing event, it fails' do
       existing_event = create(:event)
-      new_payload = {
-        api_key: @payload[:api_key],
-        event_id: existing_event.code,
-        event: existing_event.as_json
-      }
+      @payload['event'] = existing_event.as_json
 
-      post "/api/v1/events.json", params: new_payload.to_json
-      expect(response).to be_bad_request
+      post "/api/v1/events.json", params: @payload.to_json
+      expect(response).to have_http_status(:unprocessable_entity)
     end
 
     it 'given missing, invalid or empty event, it fails' do
       @payload['event'] = {}
       post "/api/v1/events.json", params: @payload.to_json
-      expect(response).to be_bad_request
+      expect(response).to have_http_status(:bad_request)
 
       @payload['event'] = Array.new
       post "/api/v1/events.json", params: @payload.to_json
-      expect(response).to be_bad_request
+      expect(response).to have_http_status(:bad_request)
 
       @payload.delete(:event)
       post "/api/v1/events.json", params: @payload.to_json
-      expect(response).to be_bad_request
+      expect(response).to have_http_status(:bad_request)
     end
   end
 
@@ -113,18 +111,6 @@ describe Api::V1::EventsController do
           event_id: @event.code,
           event: ''
       }
-    end
-
-    it 'queues an ActiveJob job to sync events in the background' do
-      expect { post "/api/v1/events/sync.json", params: @payload.to_json }.to change(ActiveJob::Base.queue_adapter.enqueued_jobs, :size).by(1)
-    end
-
-    it 'sends given event_id to SyncEventMembersJob' do
-      allow(SyncEventMembersJob).to receive(:perform_later)
-
-      post "/api/v1/events/sync.json", params: @payload.to_json
-
-      expect(SyncEventMembersJob).to have_received(:perform_later).with(@event.id)
     end
 
     it 'given invalid event_id, it fails' do
