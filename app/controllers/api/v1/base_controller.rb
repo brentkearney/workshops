@@ -17,7 +17,13 @@ class Api::V1::BaseController < ApplicationController
     @authenticated = false
     unauthorized && return if @json['api_key'].blank?
 
-    local_key = GetSetting.site_setting('EVENTS_API_KEY')
+    local_key = 'not set'
+    if @json.keys.include?('lecture')
+      local_key = GetSetting.site_setting('LECTURES_API_KEY')
+    else
+      local_key = GetSetting.site_setting('EVENTS_API_KEY')
+    end
+
     unavailable && return if local_key.blank? || local_key.match?('not set')
 
     if Devise.secure_compare(local_key, @json['api_key'])
