@@ -17,11 +17,10 @@ class Api::V1::BaseController < ApplicationController
     @authenticated = false
     unauthorized && return if @json['api_key'].blank?
 
-    payload_type = @json.keys.last.pluralize.upcase
-    local_api_key = Setting.Site["#{payload_type}_API_KEY"]
-    unavailable && return if local_api_key.blank?
+    local_key = GetSetting.site_setting('EVENTS_API_KEY')
+    unavailable && return if local_key.blank? || local_key.match?('not set')
 
-    if Devise.secure_compare(local_api_key, @json['api_key'])
+    if Devise.secure_compare(local_key, @json['api_key'])
       @authenticated = true
     else
       unauthorized
