@@ -27,7 +27,7 @@ class Api::V1::EventsController < Api::V1::BaseController
       end
     else
       respond_to do |format|
-        format.json { head :unprocessable_entity }
+        format.json { render json: memberships.errors, status: :unprocessable_entity }
       end
     end
   end
