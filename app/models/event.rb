@@ -17,6 +17,7 @@ class Event < ApplicationRecord
 
   before_save :clean_data
   before_update :update_name
+  after_create :update_legacy_db
 
   validates :name, :start_date, :end_date, :location, :time_zone, presence: true
   validates :short_name, presence: true, if: :has_long_name
@@ -120,6 +121,12 @@ class Event < ApplicationRecord
   end
 
   private
+
+  def update_legacy_db
+    return unless Rails.env.production?
+
+    LegacyConnector.new.add_event(self)
+  end
 
   def clean_data
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }

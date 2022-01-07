@@ -56,12 +56,11 @@ class Lecture < ApplicationRecord
   end
 
   def update_legacy_db
-    if Rails.env.production?
-      lc = LegacyConnector.new
-      remote_id = lc.add_lecture(self)
-      unless remote_id.blank? || remote_id == 0 || self.legacy_id == remote_id
-        self.update_column(:legacy_id, remote_id)
-      end
+    return unless Rails.env.production?
+
+    remote_id = LegacyConnector.new.add_lecture(self)
+    unless remote_id.blank? || remote_id == 0 || self.legacy_id == remote_id
+      self.update_column(:legacy_id, remote_id)
     end
   end
 
