@@ -101,8 +101,9 @@ class StaffMailer < ApplicationMailer
   end
 
   def site_feedback(section:, membership:, message:)
-    feedback_email = GetSetting.site_email('webmaster_email')
+    feedback_email = GetSetting.site_email('rsvp_feedback') || ENV['DEVISE_EMAIL']
     return if feedback_email.blank?
+
     @membership = membership
     @message = message
     @question = 'How was your RSVP experience?'

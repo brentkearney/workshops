@@ -38,6 +38,17 @@ class LegacyConnector
     get_from("event_list", { year1: from_date, year2: to_date })
   end
 
+  # add a new event to legacy db
+  def add_event(event)
+    response = JSON.parse(post_to("event_add/#{event.code}", event))
+    if response.empty?
+      add_members(event_code: event.code, members: event.memberships,
+                  updated_by: 'Workshops')
+    else
+      send_error_report(nil, JSON.parse(response))
+    end
+  end
+
   # get data for specific events
   def get_event_data(event_id)
     get_from("event_data/#{event_id}")
@@ -97,7 +108,7 @@ class LegacyConnector
   # add new members to event
   def add_members(event_code:, members:, updated_by:)
     members.each_with_object([]) do |member, responses|
-      person = member.person.attributes.merge(updated_by: membership.updated_by)
+      person = member.person #.attributes.merge(updated_by: member.updated_by)
       responses << add_member(membership: member,
                               event_code: event_code,
                               person:  person,

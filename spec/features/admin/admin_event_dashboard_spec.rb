@@ -57,8 +57,8 @@ describe 'Events Admin Dashboard', type: :feature do
       visit 'admin/events'
     end
 
-    it "should redirect to future events path" do
-      expect(page).to have_current_path(events_future_path)
+    it "should redirect to root path" do
+      expect(page).to have_current_path(root_path)
       expect(page).to have_content("Access denied")
     end
   end
