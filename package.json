@@ -9,7 +9,7 @@
     "json-schema": "^0.4.0",
     "kind-of": "^6.0.3",
     "lodash": "^4.17.19",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "node-gyp": "^8.4.0",
     "node-sass": "^6.0.1",
     "nth-check": "^2.0.1",
